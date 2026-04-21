@@ -7,7 +7,7 @@ Este archivo documenta los fallos críticos encontrados en la gestión de sesion
 ## 📜 BITÁCORA DE ERRORES Y MIDDLEWARE (HISTORIAL)
 
 > [!IMPORTANT]
-> **REGLA DE ORO**: NUNCA CREAR COPIAS DE SEGURIDAD EN GITHUB DE FORMA AUTOMÁTICA. LAS COPIAS DE SEGURIDAD LAS ACTUALIZA ÚNICAMENTE **CRISTIAN (CEO DEL PROYECTO)**.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 ## 🛑 Fallo I: El Middleware "Bloqueante" (Marzo 2026)
 **Problema:** Al intentar usar `@supabase/ssr` con consultas directas a la base de datos dentro de `middleware.ts`, la aplicación entraba en una carga infinita o "hang". Next.js tiene límites estrictos de tiempo de ejecución en el middleware.

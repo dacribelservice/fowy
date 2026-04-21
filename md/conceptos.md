@@ -1,6 +1,6 @@
 # 💡 CONCEPTOS CLAVE: AISLAMIENTO Y ESCALABILIDAD EN FOWY
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 En este documento se explica cómo se gestiona la independencia de los negocios y la relación entre subdominios y la base de datos de Supabase.
 
@@ -42,7 +42,7 @@ Si un negocio quiere usar `pasteleria.fowy.com`, el proceso es este:
 
 ---
 
-## 4. ESTRATEGIA "CAMALEÓN": THEMING DINÁMICO (FOWY)
+## 4. ESTRATEGIA "LLAMARADA SOLAR": DISEÑO DE ALTA ENERGÍA (FOWY)
 
 Para ofrecer personalización sin sacrificar la escalabilidad, implementaremos un sistema de **Estructura Fija vs. Marca Flexible**.
 
@@ -51,10 +51,11 @@ Todos los locales comparten el mismo código (el "esqueleto"), pero la personali
 
 ### Elementos Personalizables (Tokens)
 Cada dueño de negocio puede configurar desde su dashboard:
-*   **Paleta de Colores**: Color primario, acentos y gradientes.
-*   **Branding**: Logo, Favicon y Banners de cabecera.
-*   **Tipografía**: Selección de sets de fuentes pre-aprobadas (Google Fonts optimizadas).
-*   **Modo Visual**: Opción de Light Mode, Dark Mode o Glassmorphism (Efecto cristal).
+*   **Paleta de Colores**: Base clara (Surface) con acentos en Rojo Primario (#ff0000) y Ámbar Secundario (#f5ad28).
+*   **Branding**: Logo con bordes redondeados y Banners de alta visibilidad.
+*   **Tipografía**: **Inter** para máxima legibilidad y precisión clínica.
+*   **Modo Visual**: Base fija en **Modo Claro de alta claridad** (The Solar Flare). Se eliminan los fondos oscuros para favorecer la energía cinética y la rapidez visual.
+*   **Geometría**: Regla de la **Píldora** (redondeado máximo nivel 3) en todos los botones y contenedores.
 
 ### Implementación Técnica: Variables CSS Dinámicas
 El sistema carga los valores de la base de datos y los inyecta en el estilo global del subdominio:
@@ -69,9 +70,9 @@ El sistema carga los valores de la base de datos y los inyecta en el estilo glob
 ```
 
 ### Beneficios
-1.  **Mantenimiento Centralizado**: Una corrección de un botón arregla el botón en todos los negocios.
-2.  **Identidad Propia**: El cliente siente que tiene su propia app personalizada.
-3.  **Monetización**: Se pueden ofrecer "Plantillas Premium" como un servicio adicional (Upselling).
+1.  **Consistencia Energética**: Un entorno que transmite acción y urgencia controlada.
+2.  **Identidad Proyectada**: El cliente siente que está en una herramienta de alta precisión.
+3.  **Monetización de Estilo**: Plantillas basadas en diferentes "intensidades de calor" visual.
 
 ---
 

@@ -1,6 +1,6 @@
 # 🎯 FOWY MVP: FASE 1 - MOTOR DE NEGOCIOS Y EXPLORACIÓN GLOBAL
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 > "Empieza pequeño, luce gigante."
 
@@ -64,13 +64,14 @@ Para que esto funcione, solo necesitamos estas tablas iniciales:
 
 ---
 
-## 5. DISEÑO "WOW FACTOR"
+## 5. DISEÑO "THE SOLAR FLARE" (FACTOR WOW)
 
-En el MVP, el diseño es nuestra mayor ventaja competitiva. Implementaremos:
-*   **Barra de Navegación "FOWY Connect"**: Una barra sutil y elegante en los menús que permite al usuario saber que está en un ecosistema más grande y saltar al catálogo global.
-*   **Skeleton Loaders**: Para que la app se sienta instantánea mientras cargan los datos.
-*   **Micro-interacciones**: Hover en productos y scroll suave entre categorías.
-*   **Tipografía Moderna**: Uso de fuentes premium que denoten calidad.
+En el MVP, el diseño es nuestra mayor ventaja competitiva. Implementaremos un entorno de **alta energía y máxima visibilidad**:
+*   **Geometría Fluida**: Uso obligatorio de formas de **Píldora (Redondeado nivel 3)** en todos los botones e inputs.
+*   **Barra de Navegación "FOWY Connect"**: Una barra flotante en el pie de página que utiliza el Rojo Primario (#ff0000) para destacar sobre el fondo claro.
+*   **Contraste Energético**: Base blanca impecable con acentos vibrantes en Ámbar y Verde Azulado para una lectura rápida.
+*   **Micro-interacciones Kinéticas**: Los elementos ganan saturación al interactuar, indicando movimiento y precisión.
+*   **Tipografía Clínica**: Uso exclusivo de **Inter** en pesos Bold para encabezados.
 
 ---
 
@@ -88,11 +89,11 @@ En el MVP, el diseño es nuestra mayor ventaja competitiva. Implementaremos:
 - [x] **1.1 Inicialización del Proyecto**: Configuración de Next.js, Tailwind/Vanilla CSS y estructura de carpetas modular.
 - [x] **1.2 Despliegue de DB**: Creación de tablas base (`profiles`, `cities`, `businesses`, `categories`, `menu_items`) en Supabase.
 - [x] **1.3 Blindaje RLS**: Implementación de políticas de seguridad por `negocio_id` en todas las tablas.
-- [ ] **1.4 Sistema de Auth**: Configuración de Supabase Auth y sincronización con la tabla `profiles`.
-- [ ] **1.5 Middleware de Seguridad**: Protección de rutas administrativas y validación de sesiones en el Edge.
+- [x] **1.4 Sistema de Auth**: Configuración de Supabase Auth y sincronización con la tabla `profiles`.
+- [x] **1.5 Middleware de Seguridad**: Protección de rutas administrativas y validación de sesiones en el Edge.
 
 ### 🌐 FASE 2: MOTOR DE SUBDOMINIOS Y EXPLORACIÓN
-- [ ] **2.1 Mapeo de Subdominios**: Lógica de Middleware para leer `nombre.fowy.com` y extraer datos del negocio.
+- [x] **2.1 Mapeo de Subdominios**: Lógica de Middleware para leer `nombre.fowy.com` y extraer datos del negocio.
 - [ ] **2.2 Mapa Interactivo de Cali**: Implementación del visor GeoJSON local y marcadores de negocios.
 - [ ] **2.3 Directorio Global**: Buscador de negocios por barrios de Cali y categorías (Comida, Servicios, etc.).
 

@@ -1,6 +1,6 @@
 # 💸 INGENIERÍA FINANCIERA: EL FLUJO DE DINERO EN FOWY
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 > "Transacciones claras, cuentas largas."
 

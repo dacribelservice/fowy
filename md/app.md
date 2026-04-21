@@ -1,6 +1,6 @@
 # 🚀 FOWY: EL ECOSISTEMA MODULAR (BLUEPRINT MAESTRO)
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 > **Estado**: Planificación Analítica Inicial  
 > **Versión**: 1.0.0  
@@ -55,7 +55,7 @@ root/
 
 ## 🛡️ 3. SEGURIDAD "FRÍAMENTE CALCULADA" (REGLA DE ORO)
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 La seguridad no es un añadido, es la base. Utilizaremos el modelo **Zero-Trust**.
 
@@ -84,7 +84,7 @@ Cada rol tendrá un **Centro de Mando** específico. No compartiremos componente
 
 1.  **Consolidar `base-de-datos.md`**: Definir las tablas de `profiles`, `businesses`, `orders` y sus relaciones multi-inquilino (Multitenancy).
 2.  **Definir `seguridad.md`**: Escribir las políticas RLS exactas y el flujo de los JWT Claims.
-3.  **Prototipado de UI**: Crear el sistema de diseño "Premium Ethereal" en CSS Vanilla/Tailwind.
+3.  **Prototipado de UI**: Crear el sistema de diseño "The Radiant Spectrum" (Solar Flare) en CSS Vanilla/Tailwind.
 
 ---
 **"FOWY: Construido para durar, diseñado para escalar."**

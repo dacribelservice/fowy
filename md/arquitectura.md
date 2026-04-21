@@ -1,6 +1,6 @@
 # 🏗️ INGENIERÍA DE MÓDULOS: "SISTEMA PLUG & PLAY"
 
-> **REGLA DE ORO:** Solo Cristian puede dar la orden de crear código.
+> **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 > "Modulares por diseño, unidos por el éxito."
 
@@ -15,7 +15,7 @@ En Next.js, cada carpeta de rol `(admin)`, `(vendedores)`, etc., tiene su propio
 ## 2. COMPONENTES "LOCALES" VS "CENTRO COMERCIAL"
 
 ### Atoms & UI (Shared)
-Componentes básicos como botones, inputs y tarjetas de cristal (Glassmorphism) viven en `@/components/ui`. Son compartidos para mantener la coherencia de marca (El diseño premium de FOWY).
+Componentes básicos como botones tipo "Píldora", inputs y tarjetas de alta claridad viven en `@/components/ui`. Son compartidos para mantener la coherencia de marca (The Radiant Spectrum).
 
 ### Modules (Isolated)
 Lógica compleja como un "Calculador de Comisiones" para Vendedores vive en `@/modules/vendedores`. 
