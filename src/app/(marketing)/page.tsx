@@ -73,6 +73,7 @@ export default function MobileExplorerPage() {
   const [isLocating, setIsLocating] = useState(true)
   const [hasCoverage, setHasCoverage] = useState(true)
   const [mapCenter, setMapCenter] = useState<[number, number]>([3.4516, -76.5320])
+  const [zoom, setZoom] = useState(13)
 
   const [isNotifyMode, setIsNotifyMode] = useState(false)
   const [notifySuccess, setNotifySuccess] = useState(false)
@@ -169,6 +170,7 @@ export default function MobileExplorerPage() {
             <div className="absolute inset-0 z-0">
                <MapViewer 
                   center={mapCenter} 
+                  zoom={zoom}
                   userLocation={userLocation}
                   businesses={ALL_BUSINESSES}
                />
@@ -214,6 +216,22 @@ export default function MobileExplorerPage() {
                </div>
             </header>
 
+            {/* 🔍 ZOOM CONTROLS (Desktop only) */}
+            <div className="hidden lg:flex absolute top-10 left-6 z-40 flex-col gap-2">
+               <button 
+                  onClick={() => setZoom(prev => Math.min(prev + 1, 18))}
+                  className="h-10 w-10 bg-white/90 backdrop-blur-3xl rounded-full flex items-center justify-center shadow-xl border border-white text-slate-900 font-black text-xl hover:text-red-500 transition-colors leading-none pb-1"
+               >
+                  +
+               </button>
+               <button 
+                  onClick={() => setZoom(prev => Math.max(prev - 1, 10))}
+                  className="h-10 w-10 bg-white/90 backdrop-blur-3xl rounded-full flex items-center justify-center shadow-xl border border-white text-slate-900 font-black text-xl hover:text-red-500 transition-colors leading-none pb-1"
+               >
+                  −
+               </button>
+            </div>
+
             {/* FAB Map Pin */}
             <div className="absolute right-6 bottom-[240px] z-[60]">
                <button 
@@ -234,7 +252,7 @@ export default function MobileExplorerPage() {
                {!isSheetExpanded ? (
                  <div className="flex flex-col items-center animate-fade-premium w-full overflow-hidden">
                      <span className="text-[9px] font-black uppercase text-red-500 tracking-[0.4em] italic mb-6">Explorar</span>
-                     <div className="flex overflow-x-auto no-scrollbar gap-6 w-full px-2 pb-4 snap-x snap-mandatory">
+                     <div className="flex overflow-x-auto fowy-scrollbar gap-6 w-full px-2 pb-4 snap-x snap-mandatory">
                         {CATEGORIES.map(cat => (
                            <button 
                                key={cat.id} 
