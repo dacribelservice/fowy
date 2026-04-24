@@ -1,36 +1,12 @@
 'use client'
 
-import { useEffect, useState, memo } from 'react'
+import { useEffect, useState, memo, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import Image from 'next/image'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// --- CONFIGURACIÓN DE ICONOS ---
-const solarIcon = L.divIcon({
-  className: 'custom-solar-marker',
-  html: `
-    <div class="relative flex items-center justify-center">
-      <div class="absolute w-8 h-8 bg-red-500/20 rounded-full animate-ping"></div>
-      <div class="relative w-4 h-4 bg-red-600 rounded-full border-2 border-white shadow-lg shadow-red-500/50"></div>
-    </div>
-  `,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-})
-
-const userIcon = L.divIcon({
-  className: 'custom-user-marker',
-  html: `
-    <div class="relative flex items-center justify-center">
-      <div class="absolute w-8 h-8 bg-blue-500/20 rounded-full animate-pulse"></div>
-      <div class="relative w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
-    </div>
-  `,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-})
-
+// --- COMPONENTE DE CONTROL DE VISTA ---
 function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
   const map = useMap()
   useEffect(() => {
@@ -78,6 +54,37 @@ const MapViewer = memo(function MapViewer({
 }: MapViewerProps) {
   const [isMounted, setIsMounted] = useState(false)
 
+  // --- ICONOS SEGUROS PARA SSR ---
+  // Los creamos dentro del componente para evitar errores de construcción en Vercel
+  const icons = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    
+    return {
+      solar: L.divIcon({
+        className: 'custom-solar-marker',
+        html: `
+          <div class="relative flex items-center justify-center">
+            <div class="absolute w-8 h-8 bg-red-500/20 rounded-full animate-ping"></div>
+            <div class="relative w-4 h-4 bg-red-600 rounded-full border-2 border-white shadow-lg"></div>
+          </div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      }),
+      user: L.divIcon({
+        className: 'custom-user-marker',
+        html: `
+          <div class="relative flex items-center justify-center">
+            <div class="absolute w-8 h-8 bg-blue-500/20 rounded-full animate-pulse"></div>
+            <div class="relative w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
+          </div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      })
+    }
+  }, [])
+
   useEffect(() => {
     setIsMounted(true)
     if (typeof window !== 'undefined') {
@@ -90,7 +97,7 @@ const MapViewer = memo(function MapViewer({
     }
   }, [])
 
-  if (!isMounted) return <div className="w-full h-full bg-slate-50 animate-pulse" />;
+  if (!isMounted || !icons) return <div className="w-full h-full bg-slate-50 animate-pulse" />;
 
   return (
     <div className="w-full h-full relative overflow-hidden">
@@ -110,7 +117,7 @@ const MapViewer = memo(function MapViewer({
         />
         
         {userLocation && (
-          <Marker position={userLocation} icon={userIcon}>
+          <Marker position={userLocation} icon={icons.user}>
             <Popup className="custom-popup-user">
                <span className="font-black uppercase text-[9px] text-blue-600 tracking-widest px-2">Tú</span>
             </Popup>
@@ -118,11 +125,11 @@ const MapViewer = memo(function MapViewer({
         )}
 
         {businesses.map((biz) => (
-          <Marker key={`marker-${biz.id}`} position={[biz.lat, biz.lng]} icon={solarIcon}>
+          <Marker key={`marker-${biz.id}`} position={[biz.lat, biz.lng]} icon={icons.solar}>
             <Popup className="custom-biz-popup" maxWidth={300} minWidth={300}>
-              <div className="relative w-[280px] p-3.5 bg-slate-100/95 backdrop-blur-md rounded-[2rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] border border-white/50 flex items-center gap-4 animate-zoom-premium overflow-hidden">
+              <div className="relative w-[280px] p-3.5 bg-slate-100/95 backdrop-blur-md rounded-[2.2rem] shadow-xl border border-white/50 flex items-center gap-4 animate-zoom-premium overflow-hidden">
                 
-                {/* 1. Imagen Cuadrada Redondeada */}
+                {/* 1. Imagen Business */}
                 <div className="relative h-20 w-20 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-white/20">
                    {biz.logo && (
                       <Image 
@@ -135,7 +142,7 @@ const MapViewer = memo(function MapViewer({
                    )}
                 </div>
 
-                {/* 2. Content Area */}
+                {/* 2. Info Content Area */}
                 <div className="flex-1 min-w-0 pr-1">
                    <div className="flex items-center gap-2 mb-0.5">
                       <div className="flex items-center gap-1.5">
@@ -151,18 +158,17 @@ const MapViewer = memo(function MapViewer({
                       </div>
                    </div>
 
-                   {/* Nombre: Largo Fijo y Truncado */}
                    <h3 className="font-medium text-lg text-slate-800 tracking-tighter leading-tight mb-0.5 truncate block">
                       {biz.name}
                    </h3>
                    <p className="text-[9px] font-normal text-slate-400 italic mb-3 truncate block">{biz.zone}</p>
 
-                   {/* 3. Botones Premium "Metalizados" */}
+                   {/* 3. Botones Premium (Simplificados para Vercel) */}
                    <div className="flex items-center gap-2">
-                      <button className="flex-1 py-1.5 bg-gradient-to-b from-blue-500 to-blue-700 text-white text-[10px] font-black tracking-widest rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_10px_rgba(37,99,235,0.3)] border border-blue-800 active:translate-y-[1px] active:shadow-none transition-all uppercase">
+                      <button className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-blue-800 transition-all uppercase">
                          Llegar
                       </button>
-                      <button className="flex-1 py-1.5 bg-gradient-to-b from-orange-400 to-red-600 text-white text-[10px] font-black tracking-widest rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_10px_rgba(220,38,38,0.3)] border border-red-700 active:translate-y-[1px] active:shadow-none transition-all uppercase">
+                      <button className="flex-1 py-2 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-red-800 transition-all uppercase">
                          Menú
                       </button>
                    </div>
@@ -179,7 +185,7 @@ const MapViewer = memo(function MapViewer({
           padding: 0 !important;
           background: transparent !important;
           box-shadow: none !important;
-          border-radius: 2rem !important;
+          border-radius: 2.2rem !important;
         }
         .leaflet-popup-content {
           margin: 0 !important;
