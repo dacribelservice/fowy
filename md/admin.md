@@ -51,18 +51,18 @@ Este documento define la estructura y objetivos del panel maestro para el dueño
 - [x] **1.3 Tokens de Diseño:** Aplicar la paleta de colores (Rojo Primario, Ámbar) y la regla de la Píldora (redondeado nivel 3).
 
 ### 📊 FASE 2: DASHBOARD DE CONTROL MAESTRO (KPIs)
-- [ ] **2.1 Implementación de KPIs Globales:** Visualización de Negocios Totales, Estado de Red y Volumen de Pedidos.
-- [ ] **2.2 Monitor de Tráfico en Tiempo Real:** Gráfica de usuarios activos explorando el mapa.
-- [ ] **2.3 Insights de Categorías:** Identificación visual de la "Categoría Reina".
+- [x] **2.1 Implementación de KPIs Globales:** Visualización de Negocios Totales, Estado de Red y Volumen de Pedidos.
+- [x] **2.2 Monitor de Tráfico en Tiempo Real:** Gráfica de usuarios activos explorando el mapa.
+- [x] **2.3 Insights de Categorías:** Identificación visual de la "Categoría Reina".
 
 ### 🗄️ FASE 3: GESTIÓN ESTRATÉGICA (BUNKER CONTROL)
-- [ ] **3.1 Directorio Maestro de Negocios:** Tabla interactiva con filtros por ciudad, plan y estado.
-- [ ] **3.2 Switch de Activación:** Control maestro para habilitar/deshabilitar locales en el mapa instantáneamente.
-- [ ] **3.3 Editor de Categorías Globales:** Gestión centralizada de las categorías que aparecen en toda la plataforma.
+- [x] **3.1 Directorio Maestro de Negocios:** Tabla interactiva con filtros por ciudad, plan y estado.
+- [x] **3.2 Switch de Activación:** Control maestro para habilitar/deshabilitar locales en el mapa instantáneamente.
+- [x] **3.3 Editor de Categorías Globales:** Gestión centralizada de las categorías que aparecen en toda la plataforma.
 
 ### 🛡️ FASE 4: SEGURIDAD Y AUDITORÍA
 - [ ] **4.1 Middleware de Acceso Maestro:** Restringir `/fowy-admin` solo a correos autorizados (Lista Blanca).
-- [ ] **4.2 Visor de Logs de Seguridad:** Registro de operaciones críticas realizadas por el Admin.
+- [x] **4.2 Visor de Logs de Seguridad:** Registro de operaciones críticas realizadas por el Admin.
 
 ---
 **"FOWY Admin: El poder total sobre el ecosistema."**

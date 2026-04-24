@@ -16,6 +16,10 @@ La interfaz prioriza la **claridad visual y la rapidez**, utilizando espaciados 
 - **Principal:** Rojo Vibrante (Foco en acción).
 - **Secundario:** Naranja Enérgico (Momentos de transición).
 - **Terciario:** Gris Tecnológico (Estructura y neutralidad).
+- **Acento:** Verdes y Amarillos Pasteles (Para fondos y áreas de datos).
+
+> [!IMPORTANT]
+> **PROHIBICIÓN ESTRICTA:** Queda totalmente prohibido el uso de fondos oscuros o negros en la interfaz. Toda la aplicación debe mantener una estética clara, luminosa y "Ethereal".
 
 ### Degradados Dinámicos (Gradients)
 Utilizaremos gradientes llamativos para gráficos, tarjetas destacadas e indicadores de progreso:
