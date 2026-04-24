@@ -179,28 +179,6 @@ const MapViewer = memo(function MapViewer({
         ))}
       </MapContainer>
 
-      {/* Global Popup Styling for Leaflet */}
-      <style jsx global>{`
-        .leaflet-popup-content-wrapper {
-          padding: 0 !important;
-          background: transparent !important;
-          box-shadow: none !important;
-          border-radius: 2.2rem !important;
-        }
-        .leaflet-popup-content {
-          margin: 0 !important;
-          width: auto !important;
-        }
-        .leaflet-popup-tip-container {
-          display: none !important;
-        }
-        .leaflet-popup-close-button {
-          display: none !important;
-        }
-        .custom-biz-popup {
-          margin-bottom: 60px;
-        }
-      `}</style>
     </div>
   )
 })
