@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function FowyAdminDashboard() {
+// --- COMPONENTE INTERNO QUE USA SEARCH PARAMS ---
+function AdminContent() {
   const searchParams = useSearchParams()
   const activeTab = searchParams.get('view') || 'dashboard'
   
   const [activeUsers, setActiveUsers] = useState(18245)
   const [trafficData, setTrafficData] = useState([40, 70, 50, 90, 60, 100, 80, 75, 85, 95, 70, 60])
   
-  // Categoras Globales
+  // Categorías Globales
   const [categories] = useState([
     { id: '1', name: 'Hamburguesas', icon: '🍔', color: 'bg-emerald-50', count: 45 },
     { id: '2', name: 'Pizza', icon: '🍕', color: 'bg-amber-50', count: 32 },
@@ -42,7 +43,7 @@ export default function FowyAdminDashboard() {
     ))
   }
 
-  // Simulacin de trfico
+  // Simulación de tráfico
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveUsers(prev => prev + Math.floor(Math.random() * 10) - 4)
@@ -212,5 +213,14 @@ export default function FowyAdminDashboard() {
          )}
       </div>
     </div>
+  )
+}
+
+// --- COMPONENTE PRINCIPAL CON SUSPENSE ---
+export default function FowyAdminDashboard() {
+  return (
+    <Suspense fallback={<div className="p-20 text-center animate-pulse font-black text-slate-300 uppercase tracking-widest text-[10px]">Cargando Panel de Control...</div>}>
+      <AdminContent />
+    </Suspense>
   )
 }
