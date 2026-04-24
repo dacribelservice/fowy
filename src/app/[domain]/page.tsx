@@ -247,7 +247,7 @@ export default function BusinessPage() {
           <span className="text-2xl">🛍️</span>
           {cartCount === 0 && <span className="text-[7px] font-black uppercase tracking-tighter mt-1">Bolsa</span>}
         </button>
-        <Link href="/admin" className="h-16 w-16 rounded-full flex flex-col items-center justify-center text-slate-400 hover:text-red-600 transition-colors group">
+        <Link href="/negocio" className="h-16 w-16 rounded-full flex flex-col items-center justify-center text-slate-400 hover:text-red-600 transition-colors group">
            <span className="text-2xl group-hover:scale-125 transition-transform">⚙️</span>
            <span className="text-[7px] font-black uppercase tracking-tighter mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Admin</span>
         </Link>
