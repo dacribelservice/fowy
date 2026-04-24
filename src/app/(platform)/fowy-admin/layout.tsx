@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
@@ -26,11 +26,7 @@ const Icons = {
   )
 }
 
-export default function FowyAdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -57,7 +53,7 @@ export default function FowyAdminLayout({
   return (
     <div className="flex min-h-screen bg-slate-50 font-poppins text-slate-900 overflow-x-hidden relative">
       
-      {/* ⬅️ SIDEBAR (Desktop: Fixed, Mobile: Drawer) */}
+      {/* ⬅️ SIDEBAR */}
       <aside className={`
         fixed lg:sticky top-0 left-0 z-[100] h-screen lg:h-[calc(100vh-3rem)] 
         transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1)
@@ -72,7 +68,6 @@ export default function FowyAdminLayout({
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400 p-2 hover:text-slate-900">&times;</button>
         </div>
 
-        {/* 🧭 NAVIGATION MENU (Moved to Sidebar) */}
         <nav className="flex-1 px-6 space-y-3 overflow-y-auto pt-4">
           <p className="px-6 text-[8px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4">Master Control</p>
           {adminViews.map((item) => {
@@ -105,9 +100,8 @@ export default function FowyAdminLayout({
         </div>
       </aside>
 
-      {/* 🔘 FLOATING ACTION BUTTON (Mobile Only) */}
+      {/* 🔘 FLOATING ACTION BUTTON */}
       <div className="lg:hidden fixed bottom-8 right-8 z-[110]">
-         {/* Options (Expanding upward) */}
          <div className={`flex flex-col gap-4 mb-4 transition-all duration-500 ease-out ${
             isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
          }`}>
@@ -125,7 +119,6 @@ export default function FowyAdminLayout({
             ))}
          </div>
 
-         {/* The Main + Button */}
          <button 
             onClick={() => setIsFabOpen(!isFabOpen)}
             className={`w-16 h-16 rounded-full bg-gradient-to-tr from-red-600 to-orange-500 text-white flex items-center justify-center shadow-[0_15px_40px_-10px_rgba(239,68,68,0.5)] transition-all duration-500 hover:scale-110 active:scale-95 ${
@@ -138,8 +131,6 @@ export default function FowyAdminLayout({
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* Header */}
         <header className="h-20 bg-white/70 backdrop-blur-2xl border border-white rounded-none lg:rounded-[2rem] sticky top-0 lg:top-6 z-40 px-4 lg:px-8 flex items-center justify-between shadow-sm lg:mx-6 lg:mb-6 transition-all">
           <div className="flex items-center gap-4">
             <button 
@@ -153,7 +144,6 @@ export default function FowyAdminLayout({
               <h2 className="text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.2em] lg:tracking-[0.4em] text-slate-400">Core Network Live</h2>
             </div>
           </div>
-
           <div className="flex items-center gap-4">
             <button className="text-slate-900 px-6 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-900/10 hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap">
               Log Out
@@ -161,11 +151,24 @@ export default function FowyAdminLayout({
           </div>
         </header>
 
-        {/* Content Area */}
         <main className="p-4 lg:p-6 lg:pr-10 animate-in fade-in duration-700 w-full overflow-x-hidden">
           {children}
         </main>
       </div>
     </div>
+  )
+}
+
+export default function FowyAdminLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center font-black text-slate-300 uppercase tracking-widest text-[10px]">Cargando Sistema...</div>}>
+      <AdminLayoutContent>
+        {children}
+      </AdminLayoutContent>
+    </Suspense>
   )
 }
