@@ -80,6 +80,19 @@ Cada rol tendrá un **Centro de Mando** específico. No compartiremos componente
 
 ---
 
+## 🌍 4.5 ESTRATEGIA DE GEOLOCALIZACIÓN Y COBERTURA
+
+Para garantizar una expansión global fluida, implementaremos una lógica de **Detección Activa de Ciudad**:
+
+1.  **Auto-Detección**: Al cargar la aplicación (Explorador), se solicita permiso de ubicación vía navegador (Geolocation API).
+2.  **Validación de Rango (Buffer)**: El sistema calcula si la ubicación del usuario se encuentra dentro de un radio de **X km** (configurable, sugerido 4km) de algún negocio activo.
+3.  **Lógica de Fallback (Cobertura Cero)**:
+    *   Si no hay negocios en el rango, la app bloquea la vista de mapa local y muestra el **Estado de Expansión**.
+    *   Se invita al usuario a explorar zonas con cobertura (Cali como HUB inicial) o a registrar su zona para futura apertura.
+4.  **Tracking de Demanda**: Cada intento de acceso desde una zona sin cobertura se registra (de forma anónima) para que el Admin Maestro identifique "Zonas Calientes" de demanda insatisfecha.
+
+---
+
 ## 🚀 5. PLAN DE EJECUCIÓN (PRÓXIMOS PASOS)
 
 1.  **Consolidar `base-de-datos.md`**: Definir las tablas de `profiles`, `businesses`, `orders` y sus relaciones multi-inquilino (Multitenancy).

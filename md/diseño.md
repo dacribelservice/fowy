@@ -1,86 +1,86 @@
-# 🎨 DOCUMENTO DEL SISTEMA DE DISEÑO: EL ESPECTRO RADIANTE (THE RADIANT SPECTRUM)
+# 🎨 SISTEMA DE DISEÑO: NEXT-GEN SAAS (FOWY PREMIUM)
 
 > **REGLA DE ORO:** Solo Cristian, el CEO de Fowy, va a poder dar la orden para hacer copias de seguridad en GitHub y dar la orden para ejecutar líneas de código.
 
 ## 1. Visión General y Norte Creativo
-**Norte Creativo: "La Llamarada Solar" (The Solar Flare)**
-Este sistema de diseño está construido para evocar la sensación de entornos de datos de alta energía y alta visibilidad. Nos alejamos de los "vacíos" atmosféricos para entrar en un mundo de claridad vibrante, calidez y energía cinética. El objetivo es hacer que un directorio de negocios global se sienta como un mapa vivo y palpitante de actividad, pasando de la "observación" a la "acción".
+**Norte Creativo: "Ethereal High-Tech"**
+Inspirado en los dashboards más modernos del mercado (Stripe, Linear, Notion), este sistema busca una estética **premium, minimalista y tecnológica**. Nos alejamos de lo genérico para ofrecer una interfaz que se sienta como un producto de software de vanguardia: limpia, fluida y altamente intuitiva.
 
-La interfaz utiliza **Energía de Alto Contraste**. Al movernos hacia una base de modo claro con acentos audaces y cálidos, creamos una sensación de urgencia y precisión. Los elementos se definen por sus firmas de color vibrantes y geometrías suaves en forma de píldora, lo que hace que la interfaz se sienta amigable pero increíblemente poderosa.
+La interfaz prioriza la **claridad visual y la rapidez**, utilizando espaciados amplios y una jerarquía tipográfica impecable para evitar la saturación.
 
 ---
 
-## 2. Colores y Energía de Superficie
-Nuestra paleta está arraigada en un lienzo limpio y brillante, puntuado por pulsos intensos de color tipo mapa de calor.
+## 2. Paleta de Colores y Energía Visual
 
-### Roles de Color
-- **Primario (`#ff0000`):** "La Llamarada" (The Flare). Se utiliza para CTAs críticos, alertas activas y momentos principales de la marca.
-- **Secundario (`#f5ad28`):** "El Ámbar". Se utiliza para advertencias, interacciones secundarias y resaltados cálidos.
-- **Terciario (`#35a3b0`):** "El Refrigerante". Un verde azulado oceánico utilizado para equilibrar el calor de la paleta primaria, ideal para visualización de datos e insignias.
-- **Superficie:** Un lienzo nítido y claro diseñado para la máxima legibilidad y energía.
+### Colores Base
+- **Principal:** Rojo Vibrante (Foco en acción).
+- **Secundario:** Naranja Enérgico (Momentos de transición).
+- **Terciario:** Gris Tecnológico (Estructura y neutralidad).
 
-### La Regla de la "Píldora"
-En este sistema, los bordes afilados se descartan en favor de la **Fluidez Máxima**. Todos los elementos interactivos y contenedores deben utilizar un nivel de `redondeado` de 3 (forma de píldora). Esto suaviza el impacto de alto contraste de la paleta roja y naranja, haciendo que los colores de alta energía se sientan accesibles.
+### Degradados Dinámicos (Gradients)
+Utilizaremos gradientes llamativos para gráficos, tarjetas destacadas e indicadores de progreso:
+- **Core Gradient:** Rojo → Naranja (Para inyectar vida y energía a los datos).
+- **Surface Gradient:** Fondos con degradados suaves para generar profundidad sin ruido.
 
-### Jerarquía de Superficies y Espaciado
-Utilizamos **Densidad Equilibrada** (Espaciado: 2). Los diseños deben sentirse organizados y eficientes, ni apretados ni excesivamente dispersos.
-- **Nivel Base:** `superficie` (Claro/Blanco).
-- **Nivel de Contenedor:** Superficies sutilmente sombreadas que proporcionan contraste para los elementos interactivos audaces en rojo y naranja.
-- **Elevación:** Uso de sombras suaves y sutiles en lugar de desenfoques atmosféricos para mantener la claridad "Solar".
+### Interacciones y Estados (Hover & Active)
+- **Hover (Navegación y Tarjetas):** Fondo naranja pastel (`orange-50/50`), texto naranja vibrante (`orange-600`) y efecto de brillo (glow).
+- **Seleccionado / Activo:** Fondo degradado Rojo → Naranja con sombra intensa a juego.
+- **Micro-interacción:** Desplazamiento suave (translate) y escalado ligero (scale-102).
+
+### Estados de Ubicación y Cobertura
+- **Estado: Buscando Ubicación:** Overlay con efecto Glassmorphism + Progress Ring en gradiente rojo-naranja. Mensaje: *"Sintonizando tu ubicación..."*
+- **Estado: Cobertura Activa:** Transición suave (fade-in) hacia el mapa local con zoom fluido.
+- **Estado: Sin Cobertura (Modo Expansión):** Pantalla limpia con ilustración minimalista (SVG). Título: *"Fuera de Órbita"*. Subtítulo: *"Aún no aterrizamos en [Ciudad], pero estamos en camino"*. Acción: Botón para *"Ver zonas activas"* o *"Notificarme"*.
+
+### Efectos de Superficie
+- **Glassmorphism:** Uso intensivo de efectos translúcidos (Blur + Transparencia) para capas superiores y modales.
+- **Elevación:** Sombras suaves, elegantes y difusas que dan una sensación de flotabilidad y realismo táctil.
 
 ---
 
 ## 3. Tipografía
-Utilizamos **Inter** por su precisión clínica, actuando como una fuerza de conexión contra la vibrante paleta de colores.
-
-- **Display (grande/mediano/pequeño):** Titulares de alto impacto. Se prefieren pesos en negrita (Bold) para destacar frente al Rojo Primario.
-- **Encabezados (Headline):** Configurados en `sobre-superficie` (on-surface) para una legibilidad máxima.
-- **Cuerpo (Body):** Estandarizado para un escaneo de alta velocidad.
-- **Etiquetas (Label):** A menudo emparejadas con el Verde Azulado Terciario o el Naranja Secundario para categorizar información sin abrumar a la Llamarada Primaria.
+Buscamos una fuente moderna, redondeada y amigable que facilite la lectura prolongada.
+- **Fuentes Primarias:** `Poppins`, `Arial Rounded`, `Nunito`.
+- **Jerarquía:** Diferenciación clara entre Títulos (pesos bold/black), Subtítulos (medium/semi-bold) y Datos (regular con tracking ajustado).
 
 ---
 
-## 4. Elevación e Interacción
-
-### El Principio Kinético
-El movimiento y la profundidad se logran a través de la **Saturación del Color**.
-1. **Fondo:** Neutro limpio y claro.
-2. **Estados Interactivos:** Los elementos transicionan del Naranja Secundario al Rojo Primario para indicar una mayor importancia o compromiso.
-3. **Contenedores en forma de Píldora:** Uso de radios grandes para crear un "burbuja" de enfoque para el contenido crítico.
-
-### Sombras Táctiles
-- **Color de Sombra:** Neutro/Gris con baja opacidad.
-- **Sensación:** Nítida y definida, enfatizando la naturaleza de "superficie" del modo claro.
+## 4. Layout y Estructura
+Diseño enfocado en una "App Moderna", evitando estructuras corporativas rígidas.
+- **Secciones Clave:** Dashboard, Profile, Business, Ratios, Config.
+- **Área Principal:** Organizada mediante tarjetas (cards) independientes que "flotan" sobre el fondo suave.
+- **Espaciado:** Amplio y generoso para que cada elemento "respire".
 
 ---
 
-## 5. Componentes
+## 5. Componentes y Assets
 
-### Píldoras de Acción (El Componente Insignia)
-- **Radio:** `3` (Píldora completa).
-- **Fondo:** Rojo Primario o Naranja Secundario.
-- **Texto:** Alto contraste `sobre-primario` (blanco/claro) para máxima accesibilidad.
+### Iconografía
+- **REGLA ESTRICTA:** Cero (0) iconos en 3D o emojis de sistema. Son considerados obsoletos para esta estética.
+- **Estilo:** Solo iconos minimalistas, futuristas y de trazo fino (vectoriales).
+- **Consistencia:** Todos los iconos deben pertenecer a la misma familia visual.
 
-### Tarjetas de Datos (Data Cards)
-- **Radio:** Redondeado máximo (Nivel 3).
-- **Borde:** Contornos neutros sutiles o sombras suaves para definir límites sobre el fondo claro.
-- **Acentos:** Uso del Verde Azulado Terciario para acentos decorativos o estados de éxito para dar un descanso visual de los colores primarios cálidos.
-
-### Campos de Entrada (Input Fields)
-- **Base:** Fondo claro con un borde neutro claro.
-- **Enfoque (Focus):** El borde transiciona a Rojo Primario con un trazo de 2px, asegurando que el enfoque del usuario se capture instantáneamente.
+### UI Elements
+- **Tarjetas (Cards):** Bordes con un **border-radius alto** (estilo muy redondeado).
+- **Indicadores:** Uso de **Progress Rings** (indicadores circulares) para métricas de éxito.
+- **Gráficos:** Visualizaciones simples de barras y pie charts con la paleta de degradados dinámicos.
+- **Botones:** Estilo moderno, totalmente redondeados (rounded-full) con gradientes y micro-interacciones de escala.
 
 ---
 
-## 6. Qué hacer y qué no hacer (Do’s and Don’ts)
+## 6. Efectos y Movimiento (UX Kinética)
 
-### Qué hacer:
-- **Sí** usar formas de píldora completa para todos los botones y etiquetas.
-- **Sí** aprovechar el Verde Azulado Terciario para proporcionar un equilibrio "fresco" a un diseño muy "cálido".
-- **Sí** mantener el espaciado "Normal" (Nivel 2) para que la densidad de información sea profesional y eficiente.
+### Micro-interacciones
+- **Hover effects:** Elevación sutil (shadow-grow) y aumento de saturación.
+- **Transiciones:** Movimientos fluidos, no bruscos, para cambios de estado o navegación entre secciones.
+- **Feedback visual:** Cada clic o interacción debe tener una respuesta visual suave y elegante.
 
-### Qué no hacer:
-- **No** usar esquinas afiladas; rompe la estética de "Energía Fluida".
-- **No** usar texto de bajo contraste sobre fondos Rojos Primarios; asegurar el cumplimiento de accesibilidad WCAG.
-- **No** usar espaciado excesivo (Nivel 3); el objetivo es un entorno ajustado, energético y productivo.
-- **No** usar glassmorphism de modo oscuro; este es un sistema de alta claridad y modo claro.
+---
+
+## 7. Experiencia y Adaptabilidad
+- **Responsive Design:** Interfaz optimizada al 100% para móvil y escritorio.
+- **Foco:** Rapidez de carga y escaneo visual inmediato.
+- **Sensación:** Un producto tecnológico real, robusto pero estéticamente ligero.
+
+---
+**"FOWY Design: Donde la tecnología se encuentra con la elegancia."**

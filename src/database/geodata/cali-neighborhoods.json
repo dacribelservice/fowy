@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "San Antonio", "category": "Turístico" },
+      "geometry": { "type": "Point", "coordinates": [-76.5413, 3.4475] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Granada", "category": "Gastronómico" },
+      "geometry": { "type": "Point", "coordinates": [-76.5328, 3.4591] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "El Peñón", "category": "Gastronómico" },
+      "geometry": { "type": "Point", "coordinates": [-76.5401, 3.4512] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Ciudad Jardín", "category": "Residencial/Comercial" },
+      "geometry": { "type": "Point", "coordinates": [-76.5365, 3.3664] }
+    }
+  ]
+}
