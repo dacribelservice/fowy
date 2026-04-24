@@ -15,6 +15,13 @@ const extraStyles = `
   .animate-cart-expand {
     animation: cart-expand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
+  @keyframes modal-pop {
+    0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  }
+  .animate-modal-pop {
+    animation: modal-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `
@@ -74,6 +81,7 @@ export default function BusinessPage() {
   const [showCartSheet, setShowCartSheet] = useState(false)
   const [currentBanner, setCurrentBanner] = useState(0)
   const [favorites, setFavorites] = useState<number[]>([1]) // El primer item como favorito por defecto
+  const [selectedProduct, setSelectedProduct] = useState<any>(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -168,7 +176,7 @@ export default function BusinessPage() {
           <div className="w-8 h-1 bg-zinc-800 rounded-full" />
         </div>
 
-        <main className="relative w-full h-full bg-[#fafafa] overflow-hidden flex flex-col">
+        <main className="relative w-full h-full bg-[#fafafa] overflow-hidden flex flex-col min-h-0">
 
           {currentView === 'MENU' ? (
             <>
@@ -182,6 +190,15 @@ export default function BusinessPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Botón de Volver Premium */}
+                <Link 
+                  href="/"
+                  className="absolute top-6 left-6 z-50 h-10 w-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 shadow-lg active:scale-90 transition-all"
+                >
+                  <Icons.ArrowLeft />
+                </Link>
+
                 <div className="absolute bottom-6 left-0 w-full flex justify-center gap-2">
                   {BANNERS.map((_, i) => (
                     <div key={i} className={`h-2 w-2 rounded-full transition-all duration-500 ${currentBanner === i ? 'bg-white w-4 animate-water-drop' : 'bg-white/30'}`} />
@@ -214,7 +231,8 @@ export default function BusinessPage() {
                   {products.map((p, idx) => (
                     <div
                       key={p.id}
-                      className="bg-white rounded-[1.5rem] shadow-[0_10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden h-[228px] animate-in fade-in slide-in-from-bottom duration-500"
+                      onClick={() => setSelectedProduct(p)}
+                      className="bg-white rounded-[1.5rem] shadow-[0_10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden h-[228px] animate-in fade-in slide-in-from-bottom duration-500 cursor-zoom-in active:scale-95 transition-all"
                       style={{ animationDelay: `${idx * 0.05}s` }}
                     >
                       {/* Image Section */}
@@ -274,11 +292,11 @@ export default function BusinessPage() {
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] flex justify-center w-full px-4">
                   <button 
                     onClick={() => setShowCartSheet(true)}
-                    className="h-16 bg-white/70 backdrop-blur-2xl rounded-full flex items-center px-2 gap-4 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] border border-white/60 active:scale-95 transition-all overflow-hidden animate-cart-expand"
+                    className="h-16 bg-white/30 backdrop-blur-xl rounded-full flex items-center px-2 gap-4 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border border-white/40 active:scale-95 transition-all overflow-hidden animate-cart-expand"
                     style={{ width: 'auto', minWidth: '64px' }}
                   >
                     <div className="flex-1 pl-4 flex flex-col items-start animate-in fade-in slide-in-from-left duration-700 delay-300">
-                      <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em] leading-none mb-1">Total</p>
+                      <p className="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em] leading-none mb-1">Total</p>
                       <p className="text-base font-black text-slate-900 tracking-tighter leading-none">$ {cartTotal.toLocaleString()}</p>
                     </div>
 
@@ -291,16 +309,48 @@ export default function BusinessPage() {
                   </button>
                 </div>
               )}
+
+              {/* --- MODAL DE IMAGEN AMPLIADA (PREMIUM) --- */}
+              {selectedProduct && (
+                <div 
+                  className="absolute inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 animate-in fade-in duration-500"
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  <button className="absolute top-10 right-10 text-white/40 hover:text-white transition-all scale-110 active:scale-90">✕</button>
+                  
+                  <div className="relative w-full aspect-square rounded-[2.5rem] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.5)] border border-white/10 animate-modal-pop">
+                    <Image src={selectedProduct.image} alt={selectedProduct.name} fill className="object-cover" />
+                  </div>
+
+                  <div className="mt-10 text-center space-y-3 animate-in slide-in-from-bottom duration-700 delay-100">
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black uppercase text-emerald-400 tracking-[0.4em]">Detalle del producto</p>
+                      <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-tight">{selectedProduct.name}</h2>
+                    </div>
+                    <p className="text-slate-400 text-xs max-w-[260px] mx-auto leading-relaxed font-medium">{selectedProduct.description}</p>
+                    <div className="pt-6">
+                      <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 px-8 py-3 rounded-2xl shadow-xl">
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Precio</span>
+                        <span className="text-xl font-black text-white">
+                          $ {selectedProduct.finalPrice?.toLocaleString() || selectedProduct.price.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="absolute bottom-12 text-white/20 text-[8px] font-black uppercase tracking-[0.4em] animate-pulse">Toca para regresar</p>
+                </div>
+              )}
             </>
           ) : (
             /* --- PANTALLA CHECKOUT --- */
-            <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right duration-500">
+            <div className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-right duration-500">
               <div className="p-6 bg-white border-b border-slate-100 flex items-center gap-4">
                 <button onClick={() => setCurrentView('MENU')} className="text-slate-900"><Icons.ArrowLeft /></button>
                 <h2 className="text-xl font-black uppercase italic tracking-tighter">Finalizar Pedido</h2>
               </div>
 
-              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8">
+              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8 min-h-0">
                 <div className="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Tu Resumen</p>
                   <div className="space-y-2">
@@ -324,7 +374,7 @@ export default function BusinessPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold focus:border-red-600 outline-none transition-all"
+                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold text-slate-900 focus:border-[#25D366] outline-none transition-all placeholder:text-slate-300"
                       placeholder="Ej. Juan Perez"
                     />
                   </div>
@@ -334,7 +384,7 @@ export default function BusinessPage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold focus:border-red-600 outline-none transition-all"
+                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold text-slate-900 focus:border-[#25D366] outline-none transition-all placeholder:text-slate-300"
                       placeholder="300 000 0000"
                     />
                   </div>
@@ -344,7 +394,7 @@ export default function BusinessPage() {
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold focus:border-red-600 outline-none transition-all"
+                      className="w-full h-14 bg-white border border-slate-100 rounded-2xl px-5 text-sm font-bold text-slate-900 focus:border-[#25D366] outline-none transition-all placeholder:text-slate-300"
                       placeholder="Calle 00 # 00 - 00"
                     />
                   </div>
@@ -353,7 +403,7 @@ export default function BusinessPage() {
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      className="w-full h-28 bg-white border border-slate-100 rounded-2xl p-5 text-sm font-bold focus:border-red-600 outline-none transition-all resize-none"
+                      className="w-full h-28 bg-white border border-slate-100 rounded-2xl p-5 text-sm font-bold text-slate-900 focus:border-[#25D366] outline-none transition-all resize-none placeholder:text-slate-300"
                       placeholder="Instrucciones especiales..."
                     />
                   </div>
@@ -370,10 +420,10 @@ export default function BusinessPage() {
                 <button
                   onClick={handleSendOrder}
                   disabled={!formData.name || !formData.phone || !formData.address}
-                  className="w-full h-16 bg-[#25D366] text-white rounded-full font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-xl shadow-emerald-100 active:scale-95 disabled:opacity-30 transition-all"
+                  className="w-full h-16 bg-[#25D366] text-white rounded-2xl font-black uppercase tracking-[0.1em] text-[11px] flex items-center justify-center gap-3 shadow-2xl shadow-emerald-100 active:scale-95 disabled:opacity-30 transition-all"
                 >
                   <Icons.WhatsApp />
-                  Enviar Pedido por WhatsApp
+                  Hacer pedido por WhatsApp
                 </button>
               </div>
             </div>
