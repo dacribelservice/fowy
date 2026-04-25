@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 // --- COMPONENTE INTERNO QUE USA SEARCH PARAMS ---
 function AdminContent() {
@@ -85,77 +86,114 @@ function AdminContent() {
             </section>
          )}
 
-         {/* 2. DIRECTORIO MAESTRO */}
-         {(activeTab === 'dashboard' || activeTab === 'negocios') && (
-            <section className="bg-white p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[4rem] border border-white shadow-sm relative overflow-hidden">
-               <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
-                  <h2 className="text-2xl lg:text-4xl font-black italic uppercase tracking-tighter text-slate-900">Directorio <span className="text-emerald-500">Maestro</span></h2>
-                  <input 
-                     type="text" placeholder="Filtrar negocios..."
-                     className="w-full sm:w-64 bg-slate-50 border border-slate-100 px-6 py-3.5 rounded-full text-[9px] font-black uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                  />
+          {/* 2. DIRECTORIO MAESTRO (Compact & Premium) */}
+          {(activeTab === 'dashboard' || activeTab === 'negocios') && (
+            <section className="bg-white p-6 lg:p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+               <header className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
+                    <h2 className="text-xl font-bold tracking-tight text-slate-800 uppercase italic">Directorio <span className="text-emerald-500/80 font-medium">Maestro</span></h2>
+                  </div>
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <button 
+                      onClick={() => {
+                        const params = new URLSearchParams(window.location.search)
+                        params.set('view', 'categorias')
+                        window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`)
+                        window.dispatchEvent(new Event('popstate'))
+                      }}
+                      className="text-[9px] font-black uppercase tracking-widest text-slate-300 hover:text-slate-900 transition-all mr-4 border-b border-transparent hover:border-slate-900 pb-0.5"
+                    >
+                      Categorías
+                    </button>
+                    <input 
+                       type="text" placeholder="Buscar..."
+                       className="flex-1 sm:w-48 bg-slate-50/80 border border-slate-100 px-5 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all"
+                    />
+                    <button className="bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all">
+                      + Nuevo
+                    </button>
+                  </div>
                </header>
 
-               {/* Desktop Table View */}
-               <div className="hidden lg:block overflow-x-auto">
-                  <table className="w-full text-left border-separate border-spacing-y-4">
+               {/* Table Container */}
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
                      <thead>
-                        <tr className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-8">
-                           <th className="pb-4 pl-10">Negocio</th>
-                           <th className="pb-4">Ciudad</th>
-                           <th className="pb-4 text-center">Switch</th>
-                           <th className="pb-4 text-right pr-10">Acción</th>
+                        <tr className="text-[8px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-50">
+                           <th className="pb-4 px-4 font-black">Negocio</th>
+                           <th className="pb-4 px-4">Ciudad</th>
+                           <th className="pb-4 px-4 text-center">Activo</th>
+                           <th className="pb-4 px-4 text-right">Acciones</th>
                         </tr>
                      </thead>
-                     <tbody>
+                     <tbody className="divide-y divide-slate-50">
                         {businesses.map((biz) => (
-                           <tr key={biz.id} className={`group/row transition-all duration-300 ${!biz.isLive ? 'opacity-50 grayscale' : ''}`}>
-                              <td className="bg-slate-50/50 py-6 pl-10 rounded-l-[2rem] border-y border-l border-slate-100">
-                                 <span className="text-sm font-black text-slate-900 italic uppercase">{biz.name}</span>
-                              </td>
-                              <td className="bg-slate-50/50 py-6 border-y border-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest">{biz.city}</td>
-                              <td className="bg-slate-50/50 py-6 border-y border-slate-100 text-center">
-                                 <div onClick={() => toggleBusinessStatus(biz.id)} className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${biz.isLive ? 'bg-emerald-500 shadow-md' : 'bg-slate-200'}`}>
-                                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${biz.isLive ? 'right-1' : 'left-1'}`} />
+                           <tr key={biz.id} className="group transition-colors hover:bg-slate-50/50">
+                              <td className="py-4 px-4">
+                                 <div className="flex flex-col">
+                                   <span className="text-[11px] font-bold text-slate-900 uppercase italic tracking-tight">{biz.name}</span>
+                                   <span className="text-[7px] text-slate-400 font-black uppercase tracking-widest">{biz.plan} Plan</span>
                                  </div>
                               </td>
-                              <td className="bg-slate-50/50 py-6 pr-10 rounded-r-[2rem] border-y border-r border-slate-100 text-right">
-                                 <button className="text-[8px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900">Editar</button>
+                              <td className="py-4 px-4">
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{biz.city}</span>
+                              </td>
+                              <td className="py-4 px-4">
+                                 <div className="flex justify-center">
+                                   <button 
+                                      onClick={() => toggleBusinessStatus(biz.id)} 
+                                      className={`w-8 h-4 rounded-full relative transition-all duration-500 ${biz.isLive ? 'bg-emerald-500 shadow-sm shadow-emerald-500/20' : 'bg-slate-200'}`}
+                                   >
+                                      <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all duration-500 ${biz.isLive ? 'right-0.5' : 'left-0.5'}`} />
+                                   </button>
+                                 </div>
+                              </td>
+                              <td className="py-4 px-4">
+                                 <div className="flex items-center justify-end gap-4">
+                                   <Link 
+                                      href={`/fowy-admin/negocios/${biz.id}`}
+                                      className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                                   >
+                                      Editar
+                                   </Link>
+                                   <button 
+                                      className="text-[9px] font-black uppercase tracking-widest text-slate-300 hover:text-red-500 transition-colors"
+                                   >
+                                      Eliminar
+                                   </button>
+                                 </div>
                               </td>
                            </tr>
                         ))}
                      </tbody>
                   </table>
                </div>
-
-               {/* Mobile Card View */}
-               <div className="lg:hidden space-y-4">
-                  {businesses.map((biz) => (
-                     <div key={biz.id} className={`p-6 rounded-[2rem] border transition-all ${biz.isLive ? 'bg-slate-50/50 border-slate-100' : 'bg-slate-100/50 border-slate-200 opacity-60'}`}>
-                        <div className="flex justify-between items-start">
-                           <div>
-                              <h4 className="text-sm font-black text-slate-900 uppercase italic leading-none">{biz.name}</h4>
-                              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">{biz.city} &bull; {biz.plan}</p>
-                           </div>
-                           <div onClick={() => toggleBusinessStatus(biz.id)} className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${biz.isLive ? 'bg-emerald-500' : 'bg-slate-300'}`}>
-                              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${biz.isLive ? 'right-1' : 'left-1'}`} />
-                           </div>
-                        </div>
-                     </div>
-                  ))}
-               </div>
             </section>
-         )}
+          )}
 
          {/* 3. CATEGORÍAS GLOBALES */}
          {(activeTab === 'dashboard' || activeTab === 'categorias') && (
             <section className="bg-white p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[4rem] border border-white shadow-sm">
-               <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
-                  <h2 className="text-2xl lg:text-4xl font-black italic uppercase tracking-tighter text-slate-900">Categorías <span className="text-orange-500">Globales</span></h2>
-                  <button className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl">
-                     + Crear Nueva
-                  </button>
-               </header>
+                <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
+                   <div className="flex items-center gap-4">
+                     <button 
+                       onClick={() => {
+                        const params = new URLSearchParams(window.location.search)
+                        params.set('view', 'negocios')
+                        window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`)
+                        window.dispatchEvent(new Event('popstate'))
+                       }}
+                       className="w-10 h-10 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center hover:bg-slate-100 transition-all"
+                     >
+                       ←
+                     </button>
+                     <h2 className="text-2xl lg:text-4xl font-black italic uppercase tracking-tighter text-slate-900">Categorías <span className="text-orange-500">Globales</span></h2>
+                   </div>
+                   <button className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl">
+                      + Crear Nueva
+                   </button>
+                </header>
                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
                   {categories.map((cat) => (
                      <div key={cat.id} className={`${cat.color} p-6 lg:p-8 rounded-[2rem] lg:rounded-[3rem] border border-white flex flex-col items-center justify-center gap-4 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm`}>
@@ -210,6 +248,23 @@ function AdminContent() {
                   </div>
                </section>
             </div>
+         )}
+
+         {/* 5. VISTAS EN DESARROLLO */}
+         {(['vendedores', 'profesionales', 'finanzas', 'auditoria'].includes(activeTab)) && (
+            <section className="bg-white p-12 lg:p-24 rounded-[2.5rem] lg:rounded-[4rem] border border-white shadow-sm flex flex-col items-center justify-center text-center space-y-6">
+               <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-3xl animate-bounce">🚧</div>
+               <div className="space-y-2">
+                  <h2 className="text-2xl lg:text-4xl font-black italic uppercase tracking-tighter text-slate-900">Módulo en <span className="text-orange-500">Desarrollo</span></h2>
+                  <p className="text-[10px] lg:text-[12px] text-slate-400 font-bold uppercase tracking-[0.2em]">Estamos construyendo la próxima gran funcionalidad del ecosistema Fowy.</p>
+               </div>
+               <Link 
+                  href="/fowy-admin?view=negocios"
+                  className="bg-slate-900 text-white px-10 py-4 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95"
+               >
+                  Volver a Negocios
+               </Link>
+            </section>
          )}
       </div>
     </div>

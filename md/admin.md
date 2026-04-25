@@ -1,12 +1,35 @@
 # Fowy Admin (Dueño de Fowy) - Especificaciones
 
 > **Referencia Local:** [admin.md](file:///c:/Users/cange/Documents/fowy/md/admin.md)  
-> **Estructura de URLs (Puerto 3007):**
-> - **Usuarios Regulares:** [http://localhost:3007/](http://localhost:3007/)
-> - **Panel de Negocios:** [http://localhost:3007/negocio](http://localhost:3007/negocio)
-> - **Fowy Master Admin:** [http://localhost:3007/fowy-admin](http://localhost:3007/fowy-admin)
+> **Estructura de URLs (Puerto 3000):**
+> - **Usuarios Regulares:** [http://localhost:3000/](http://localhost:3000/)
+> - **Panel de Negocios:** [http://localhost:3000/negocio](http://localhost:3000/negocio)
+> - **Fowy Master Admin:** [http://localhost:3000/fowy-admin](http://localhost:3000/fowy-admin)
 
 Este documento define la estructura y objetivos del panel maestro para el dueño de la plataforma Fowy.
+
+## 🗺️ Visualización de la Estructura (Master Admin)
+
+```mermaid
+graph TD
+    A[Master Admin Dashboard] --> B[Directorio Maestro]
+    A --> C[Gestión de Vendedores]
+    A --> D[Gestión de Profesionales]
+    A --> E[Categorías Globales]
+    A --> F[Finanzas Globales]
+    A --> G[Bóveda de Seguridad]
+
+    B -- "Seleccionar Negocio" --> H[EL BÚNKER (Master Business Editor)]
+    
+    subgraph "Niveles del Búnker (Configuración Profunda)"
+    H --> H1[Identidad: Marca/Colores]
+    H --> H2[Cartera: Pagos/Recibos]
+    H --> H3[Operación: GPS/Radio]
+    H --> H4[Módulos: Plug & Play]
+    H --> H5[Puente: WhatsApp/Pedidos]
+    H --> H6[Soporte: Impersonate/KPIs]
+    end
+```
 
 ## 📈 KPIs Clave (Dashboard Principal)
 
@@ -60,9 +83,23 @@ Este documento define la estructura y objetivos del panel maestro para el dueño
 - [x] **3.2 Switch de Activación:** Control maestro para habilitar/deshabilitar locales en el mapa instantáneamente.
 - [x] **3.3 Editor de Categorías Globales:** Gestión centralizada de las categorías que aparecen en toda la plataforma.
 
-### 🛡️ FASE 4: SEGURIDAD Y AUDITORÍA
-- [ ] **4.1 Middleware de Acceso Maestro:** Restringir `/fowy-admin` solo a correos autorizados (Lista Blanca).
-- [x] **4.2 Visor de Logs de Seguridad:** Registro de operaciones críticas realizadas por el Admin.
+### 🏰 FASE 5: EL BÚNKER (SISTEMA DE PESTAÑAS MAESTRO)
+*Diseño Minimalista, Colores Pastel y Botones Estilizados.*
+
+- [x] **5.1 Arquitectura de Navegación:** Implementar el menú de pestañas internas del Búnker.
+- [x] **5.2 Pestaña Identidad (Marca):** 
+    - [x] Gestión de Slugs, Color HEX y Branding Visual.
+- [ ] **5.3 Pestaña Cartera (Blindaje Financiero):** 
+    - [ ] Fecha de corte dinámica y repositorio de recibos.
+    - [ ] Sistema de alertas (Amarillo/Rojo/Bunker Lock).
+- [ ] **5.4 Pestaña Operación (Geocerca):** 
+    - [ ] Selector GPS en mapa y radio de visibilidad.
+- [ ] **5.5 Pestaña Módulos (Plug & Play):** 
+    - [ ] Switch para Inventario, Estadísticas y Gestión de Pedidos.
+- [ ] **5.6 Pestaña Pedidos (Bridge):** 
+    - [ ] Número de WhatsApp Maestro y Template de mensajes.
+- [ ] **5.7 Pestaña Soporte (Master Access):** 
+    - [ ] Botón de "Impersonate" y monitoreo de KPIs individuales.
 
 ---
 **"FOWY Admin: El poder total sobre el ecosistema."**

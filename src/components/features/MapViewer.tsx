@@ -3,6 +3,7 @@
 import { useEffect, useState, memo, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import Image from 'next/image'
+import Link from 'next/link'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -36,6 +37,7 @@ interface Business {
   logo?: string;
   rate?: string;
   status?: string;
+  slug: string;
   category?: string;
 }
 
@@ -164,14 +166,20 @@ const MapViewer = memo(function MapViewer({
                    <p className="text-[9px] font-normal text-slate-400 italic mb-3 truncate block">{biz.zone}</p>
 
                    {/* 3. Botones Premium (Simplificados para Vercel) */}
-                   <div className="flex items-center gap-2">
-                      <button className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-blue-800 transition-all uppercase">
-                         Llegar
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${biz.lat},${biz.lng}`, '_blank')}
+                        className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-blue-800 transition-all uppercase text-center"
+                      >
+                        Llegar
                       </button>
-                      <button className="flex-1 py-2 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-red-800 transition-all uppercase">
-                         Menú
-                      </button>
-                   </div>
+                      <Link 
+                        href={`/${biz.slug}`}
+                        className="flex-1 py-2 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 !text-white text-[10px] font-black tracking-widest rounded-xl shadow-md border-b-2 border-red-800 transition-all uppercase text-center no-underline flex items-center justify-center"
+                      >
+                        Menú
+                      </Link>
+                    </div>
                 </div>
               </div>
             </Popup>

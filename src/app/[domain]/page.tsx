@@ -66,6 +66,9 @@ const Icons = {
   ),
   Plus: () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+  ),
+  Fire: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-red-600"><path d="M12 18c-2.76 0-5-2.24-5-5 0-1.5.67-2.84 1.73-3.73C9.35 8.71 10 7.42 10 6c0-1.66-1.34-3-3-3s-3 1.34-3 3c0 1.5.67 2.84 1.73 3.73C4.35 10.71 4 12.42 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8c0-1.58-.35-3.29-1.73-4.27C19.33 8.84 20 7.5 20 6c0-1.66-1.34-3-3-3s-3 1.34-3 3c0 1.42.65 2.71 1.27 3.27C16.33 10.16 17 11.5 17 13c0 2.76-2.24 5-5 5z"/></svg>
   )
 }
 
@@ -211,15 +214,18 @@ export default function BusinessPage() {
 
               {/* 2. CATEGORÍAS */}
               <div className="bg-white border-b border-slate-100 flex-shrink-0">
-                <div className="flex gap-6 overflow-x-auto px-6 py-4 no-scrollbar">
+                <div className="flex gap-2 overflow-x-auto px-4 py-3 no-scrollbar flex-nowrap">
                   {Object.keys(MENU_DATA).map(cat => (
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative py-2 ${activeCategory === cat ? 'text-red-600' : 'text-slate-300'}`}
+                      className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex-shrink-0 whitespace-nowrap ${
+                        activeCategory === cat 
+                          ? 'bg-red-400 text-white shadow-md shadow-red-100' 
+                          : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
+                      }`}
                     >
                       {cat}
-                      {activeCategory === cat && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600 rounded-full animate-in fade-in" />}
                     </button>
                   ))}
                 </div>
@@ -231,12 +237,14 @@ export default function BusinessPage() {
                   {products.map((p, idx) => (
                     <div
                       key={p.id}
-                      onClick={() => setSelectedProduct(p)}
-                      className="bg-white rounded-[1.5rem] shadow-[0_10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden h-[228px] animate-in fade-in slide-in-from-bottom duration-500 cursor-zoom-in active:scale-95 transition-all"
+                      className="bg-white rounded-[1.5rem] shadow-[0_10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden h-[228px] animate-in fade-in slide-in-from-bottom duration-500"
                       style={{ animationDelay: `${idx * 0.05}s` }}
                     >
                       {/* Image Section */}
-                      <div className="relative h-[100px] w-full flex-shrink-0">
+                      <div 
+                        onClick={() => setSelectedProduct(p)}
+                        className="relative h-[100px] w-full flex-shrink-0 cursor-zoom-in active:scale-105 transition-transform"
+                      >
                         <Image src={p.image} alt={p.name} fill className="object-cover" />
 
                         {/* Heart Icon */}
@@ -247,10 +255,10 @@ export default function BusinessPage() {
                           <Icons.Heart filled={favorites.includes(p.id)} />
                         </button>
 
-                        {/* Promo Badge */}
+                        {/* Icono de Promo (Llama Blanca en Círculo Rojo) */}
                         {p.isPromo && (
-                          <div className="absolute top-2 left-2 bg-[#f4b62d] px-2 py-0.5 rounded-md shadow-sm">
-                            <span className="text-[7px] font-black text-slate-900 uppercase">PROMO</span>
+                          <div className="absolute top-2 left-2 bg-red-600 w-7 h-7 rounded-full shadow-[0_4px_12px_rgba(220,38,38,0.4)] flex items-center justify-center border border-white/30 transition-all active:scale-110">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 23c-4.41 0-8-3.59-8-8 0-3.35 2.06-6.22 5-7.41V10c0 .55.45 1 1 1s1-.45 1-1V2.1c0-.68.75-1.12 1.34-.78C16.89 3.93 20 8.59 20 14c0 4.97-4.03 9-9 9h1z"/></svg>
                           </div>
                         )}
                       </div>
@@ -469,7 +477,7 @@ export default function BusinessPage() {
                               <p className="text-[10px] font-bold text-slate-900 leading-tight line-clamp-1">{item.name}</p>
                               <p className="text-[10px] font-black text-slate-900">$ {item.finalPrice.toLocaleString()}</p>
                             </div>
-                            <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-600 transition-colors p-1">
+                            <button onClick={() => removeItem(item.id)} className="text-pink-400 hover:text-rose-600 transition-colors p-1">
                                <Icons.Trash />
                             </button>
                           </div>

@@ -18,6 +18,15 @@ const Icons = {
   Audit: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   ),
+  Sellers: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
+  Pros: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+  ),
+  Finance: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="1" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  ),
   Menu: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
   ),
@@ -30,7 +39,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const currentView = searchParams.get('view') || 'dashboard'
+  const rawView = searchParams.get('view') || 'dashboard'
+  const currentView = (rawView === 'categorias' || pathname.includes('/negocios/')) ? 'negocios' : rawView
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isFabOpen, setIsFabOpen] = useState(false)
@@ -38,14 +48,17 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const adminViews = [
     { id: 'dashboard', label: 'Dashboard', icon: Icons.Dashboard },
     { id: 'negocios', label: 'Negocios', icon: Icons.Business },
-    { id: 'categorias', label: 'Categorías', icon: Icons.Categories },
-    { id: 'auditoria', label: 'Auditoría', icon: Icons.Audit },
+    { id: 'vendedores', label: 'Vendedores', icon: Icons.Sellers },
+    { id: 'profesionales', label: 'Profesionales', icon: Icons.Pros },
+    { id: 'finanzas', label: 'Finanzas', icon: Icons.Finance },
+    { id: 'auditoria', label: 'Seguridad', icon: Icons.Audit },
   ]
 
   const setView = (viewId: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('view', viewId)
-    router.push(`${pathname}?${params.toString()}`)
+    // Always redirect to the base admin page when switching global views
+    router.push(`/fowy-admin?${params.toString()}`)
     setIsSidebarOpen(false)
     setIsFabOpen(false)
   }
@@ -60,7 +73,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         ${isSidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full lg:translate-x-0 w-72'}
         m-0 lg:m-6 bg-white/90 lg:bg-white/40 backdrop-blur-3xl border-r lg:border border-white flex flex-col rounded-none lg:rounded-[2.5rem] shadow-2xl lg:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.05)]
       `}>
-        <div className="p-10 flex justify-between items-center">
+        <div className="p-8 pb-4 flex justify-between items-center">
           <Link href="/fowy-admin" className="flex items-center gap-3 group">
             <div className="w-9 h-9 bg-gradient-to-tr from-red-600 to-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-lg shadow-red-500/20">F</div>
             <span className="text-xl font-bold tracking-tighter uppercase italic">FOWY <span className="text-red-600 font-medium">PRO</span></span>
@@ -68,15 +81,15 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400 p-2 hover:text-slate-900">&times;</button>
         </div>
 
-        <nav className="flex-1 px-6 space-y-3 overflow-y-auto pt-4">
-          <p className="px-6 text-[8px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4">Master Control</p>
+        <nav className="flex-1 px-6 space-y-1 overflow-y-auto pt-2">
+          <p className="px-6 text-[7px] font-black text-slate-400 uppercase tracking-[0.4em] mb-2">Master Control</p>
           {adminViews.map((item) => {
             const isActive = currentView === item.id
             return (
               <button
                 key={item.id}
                 onClick={() => setView(item.id)}
-                className={`w-full flex items-center gap-4 px-6 py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-500 ${
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-500 ${
                   isActive
                     ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-xl shadow-red-500/20 scale-[1.02]'
                     : 'text-slate-400 hover:bg-orange-50/50 hover:text-orange-600 hover:translate-x-1'
@@ -131,25 +144,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-20 bg-white/70 backdrop-blur-2xl border border-white rounded-none lg:rounded-[2rem] sticky top-0 lg:top-6 z-40 px-4 lg:px-8 flex items-center justify-between shadow-sm lg:mx-6 lg:mb-6 transition-all">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 text-slate-400 hover:text-slate-900 transition-colors"
-            >
-              <Icons.Menu />
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <h2 className="text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.2em] lg:tracking-[0.4em] text-slate-400">Core Network Live</h2>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="text-slate-900 px-6 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-900/10 hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap">
-              Log Out
-            </button>
-          </div>
-        </header>
+        {/* Header removido por petición del usuario */}
 
         <main className="p-4 lg:p-6 lg:pr-10 animate-in fade-in duration-700 w-full overflow-x-hidden">
           {children}

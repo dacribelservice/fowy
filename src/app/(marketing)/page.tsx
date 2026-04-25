@@ -180,7 +180,7 @@ export default function MobileExplorerPage() {
             <div className="absolute inset-0 z-[1] bg-gradient-to-b from-white/30 via-transparent to-white/10 pointer-events-none" />
 
             {/* 🔍 HEADER (Right-aligned Search) */}
-            <header className="absolute top-10 left-0 w-full px-6 z-40 flex items-center justify-end gap-3">
+            <header className="absolute top-10 left-0 w-full px-6 z-[150] flex items-center justify-end gap-3">
                
                {/* Search Button / Bar Wrapper (Moves and expands to the left) */}
                <div className={`flex items-center bg-white/90 backdrop-blur-3xl rounded-full shadow-xl border border-white transition-all duration-700 ease-[cubic-bezier(0.23, 1, 0.32, 1)] overflow-hidden ${
@@ -217,7 +217,7 @@ export default function MobileExplorerPage() {
             </header>
 
             {/* 🔍 ZOOM CONTROLS (Desktop only) */}
-            <div className="hidden lg:flex absolute top-10 left-6 z-40 flex-col gap-2">
+            <div className="hidden lg:flex absolute top-28 left-6 z-[150] flex-col gap-2">
                <button 
                   onClick={() => setZoom(prev => Math.min(prev + 1, 18))}
                   className="h-10 w-10 bg-white/90 backdrop-blur-3xl rounded-full flex items-center justify-center shadow-xl border border-white text-slate-900 font-black text-xl hover:text-red-500 transition-colors leading-none pb-1"
@@ -232,21 +232,19 @@ export default function MobileExplorerPage() {
                </button>
             </div>
 
-            {/* FAB Map Pin */}
-            <div className="absolute right-6 bottom-[240px] z-[60]">
-               <button 
-                  onClick={detectLocation}
-                  className="h-12 w-12 bg-gradient-to-tr from-red-600 to-orange-500 rounded-full flex items-center justify-center shadow-2xl text-white border-2 border-white"
-               >
-                  <Icons.MapPin />
-               </button>
-            </div>
 
             {/* Dynamic Bottom Sheet */}
             <div 
                className={`absolute bottom-0 left-0 w-full bg-white rounded-t-[2.5rem] px-6 transition-all duration-1000 ease-[cubic-bezier(0.16, 1, 0.3, 1)] z-50 flex flex-col shadow-2xl border-t border-slate-50
                   ${isSheetExpanded ? 'h-[75%]' : 'h-[220px]'}`}
             >
+               {/* ➕ BOTÓN FLOTANTE DINÁMICO (Sincronizado con el sheet) */}
+               <div className="absolute -top-7 right-8 z-[100]">
+                  <button className="h-14 w-14 bg-gradient-to-tr from-red-600 to-orange-500 rounded-full flex items-center justify-center shadow-[0_15px_35px_-5px_rgba(239,68,68,0.4)] text-white border-4 border-white transition-all active:scale-90 hover:rotate-90 hover:scale-105">
+                     <span className="text-3xl font-light leading-none mb-1">+</span>
+                  </button>
+               </div>
+
                <div className="w-10 h-1.5 bg-slate-100 rounded-full mx-auto mt-4 mb-6" />
 
                {!isSheetExpanded ? (
