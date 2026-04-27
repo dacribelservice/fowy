@@ -22,16 +22,6 @@ Este es el plan de ejecución paso a paso para los cimientos de la aplicación.
 
 ---
 
-## 🚪 FASE 3: EL PORTERO (Authentication & Routing)
-- [ ] **3.1 Auth Pages**: Crear `/login` y `/register` con validación de formularios (Zod).
-- [ ] **3.2 Auth Provider**: Crear un Context Provider para manejar el estado de la sesión globalmente.
-- [ ] **3.3 Middleware Shield**: Implementar `middleware.ts` para gestionar redirecciones por rol:
-    - `/admin/*` -> Solo super_admin/professional.
-    - `/partners/*` -> Solo seller/business_owner.
-    - `/core/*` -> Todos los autenticados.
-
----
-
 ## 🎨 FASE 4: EL CASCARÓN (Base UI & Layout)
 - [x] **4.1 Theme Tokens**: Configurar `tailwind.config.ts` con los degradados (Rojo-Naranja / Morado-Azul) y radios de 20px.
 - [x] **4.2 Master Shell**: Crear el Layout principal con el Sidebar Glassmorphism y el fondo degradado suave.
