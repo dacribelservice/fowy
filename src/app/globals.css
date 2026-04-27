@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
+@theme {
+  /* Colores Fowy */
+  --color-fowy-red: #FF5A5F;
+  --color-fowy-orange: #FF9A3D;
+  --color-fowy-purple: #7B61FF;
+  --color-fowy-blue: #4D8BFF;
+  
+  /* Radios Premium */
+  --radius-fowy: 20px;
+  --radius-fowy-lg: 30px;
+
+  /* Sombras y Profundidad */
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFF;
+  --foreground: #2D3748;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--glass-border);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, #F8FAFF 0%, #EEF3FF 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Clases de utilidad personalizadas para degradados */
+@utility bg-fowy-primary {
+  background: linear-gradient(135deg, #FF5A5F 0%, #FF9A3D 100%);
+}
+
+@utility bg-fowy-secondary {
+  background: linear-gradient(135deg, #7B61FF 0%, #4D8BFF 100%);
+}
+
+@utility glass-morphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
 }

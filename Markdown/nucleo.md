@@ -15,10 +15,10 @@ Este es el plan de ejecución paso a paso para los cimientos de la aplicación.
 ---
 
 ## 🧠 FASE 2: EL CEREBRO (Database & Security)
-- [ ] **2.1 Role Types**: Definir el Enum `user_role` en Supabase (super_admin, professional, seller, business_owner, explorer).
-- [ ] **2.2 Profiles Table**: Crear tabla `profiles` (id, email, full_name, role, avatar_url).
-- [ ] **2.3 Auto-Profile Trigger**: Crear función PL/pgSQL para insertar en `profiles` tras cada nuevo registro en `auth.users`.
-- [ ] **2.4 RLS Mastery**: Configurar políticas para que los usuarios solo editen su propio perfil.
+- [x] **2.1 Role Types**: Definir el Enum `user_role` en Supabase (super_admin, professional, seller, business_owner, explorer).
+- [x] **2.2 Profiles Table**: Crear tabla `profiles` (id, email, full_name, role, avatar_url).
+- [x] **2.3 Auto-Profile Trigger**: Crear función PL/pgSQL para insertar en `profiles` tras cada nuevo registro en `auth.users`.
+- [x] **2.4 RLS Mastery**: Configurar políticas para que los usuarios solo editen su propio perfil.
 
 ---
 
@@ -33,10 +33,10 @@ Este es el plan de ejecución paso a paso para los cimientos de la aplicación.
 ---
 
 ## 🎨 FASE 4: EL CASCARÓN (Base UI & Layout)
-- [ ] **4.1 Theme Tokens**: Configurar `tailwind.config.ts` con los degradados (Rojo-Naranja / Morado-Azul) y radios de 20px.
-- [ ] **4.2 Master Shell**: Crear el Layout principal con el Sidebar Glassmorphism y el fondo degradado suave.
-- [ ] **4.3 Motion Presets**: Configurar los componentes base de `framer-motion` para entradas (Fade-in + Slide-up).
-- [ ] **4.4 Error Boundary**: Implementar el componente de error global con estética premium.
+- [x] **4.1 Theme Tokens**: Configurar `tailwind.config.ts` con los degradados (Rojo-Naranja / Morado-Azul) y radios de 20px.
+- [x] **4.2 Master Shell**: Crear el Layout principal con el Sidebar Glassmorphism y el fondo degradado suave.
+- [x] **4.3 Motion Presets**: Configurar los componentes base de `framer-motion` para entradas (Fade-in + Slide-up).
+- [x] **4.4 Error Boundary**: Implementar el componente de error global con estética premium.
 
 ---
 *Si esta lista llega al 100%, el sistema es indestructible y listo para recibir módulos.*
