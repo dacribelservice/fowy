@@ -50,17 +50,26 @@ Se ha implementado el "Cerebro" del sistema:
 ---
 
 ## ✅ PROGRESO ACTUAL
-- **Fase 1 (Infraestructura)**: COMPLETADA. Proyecto inicializado y conectado a Supabase.
-- **Fase 2 (Cerebro)**: COMPLETADA. Esquema de perfiles y roles funcionando en la DB.
-- **Fase 3 (Autenticación)**: POSPUESTA. El usuario decidió saltarla por ahora.
-- **Fase 4 (Cascarón UI)**: COMPLETADA. Dashboard Admin funcional con Sidebar Glassmorphism y pantallas "Coming Soon" para todos los módulos.
+- **Fase 1 (Infraestructura)**: COMPLETADA.
+- **Fase 2 (Cerebro)**: COMPLETADA.
+- **Fase 3 (Autenticación)**: POSPUESTA.
+- **Fase 4 (Cascarón UI)**: COMPLETADA.
+- **Fase 5 (Módulo Negocios)**: EN PROCESO (Planificación técnica).
+
+---
+
+## 📂 ORGANIZACIÓN DE DOCUMENTACIÓN
+Se ha creado la carpeta `Markdown/menu admin/` para organizar los archivos operativos:
+- `app.md`: Arquitectura global.
+- `negocios.md`: Especificaciones del módulo de gestión de negocios.
 
 ---
 
 ## 📌 DECISIONES CRÍTICAS
-1.  **Ocultar Dev Indicators**: Se deshabilitó el botón "N" de Next.js en `next.config.ts` para mantener la limpieza visual.
-2.  **Cero Datos Genéricos**: El usuario solicitó que el Dashboard tenga KPIs y métricas (estructura visual) pero sin datos de ejemplo inventados; él mismo irá poblando la base de datos.
-3.  **Personalización Dinámica**: Todos los negocios tendrán la misma estructura de menú, pero cambiarán sus colores y logos dinámicamente según su registro en la base de datos.
+1.  **Ocultar Dev Indicators**: Deshabilitado el botón "N" de Next.js.
+2.  **Cero Datos Genéricos**: Estructuras visuales listas para datos reales.
+3.  **Personalización Dinámica**: Identidad visual variable sobre menú único.
+4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos (inventario, ventas, etc.) individualmente por cada negocio.
 
 ---
 *Ultima actualización: 27 de Abril de 2026*
