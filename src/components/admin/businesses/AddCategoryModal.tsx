@@ -9,9 +9,10 @@ interface AddCategoryModalProps {
   onClose: () => void;
   onSuccess: () => void;
   supabase: any;
+  setToast: (config: { show: boolean, message: string }) => void;
 }
 
-export default function AddCategoryModal({ isOpen, onClose, onSuccess, supabase }: AddCategoryModalProps) {
+export default function AddCategoryModal({ isOpen, onClose, onSuccess, supabase, setToast }: AddCategoryModalProps) {
   const [name, setName] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess, supabase 
     try {
       // 1. Upload image to Supabase Storage
       const fileExt = image.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `categories/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -58,11 +59,12 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess, supabase 
       setName("");
       setImage(null);
       setPreview(null);
+      setToast({ show: true, message: "✅ Categoría creada con éxito" });
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding category:", error);
-      alert("Error al crear la categoría");
+      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
     } finally {
       setUploading(false);
     }

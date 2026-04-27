@@ -28,7 +28,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, #F8FAFF 0%, #EEF3FF 100%);
+  background: #F8FAFF;
   color: var(--foreground);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

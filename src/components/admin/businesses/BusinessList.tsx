@@ -29,9 +29,10 @@ export interface Business {
 
 interface BusinessListProps {
   businesses: Business[];
+  onDelete?: (id: string, name: string) => void;
 }
 
-export default function BusinessList({ businesses }: BusinessListProps) {
+export default function BusinessList({ businesses, onDelete }: BusinessListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -166,7 +167,10 @@ export default function BusinessList({ businesses }: BusinessListProps) {
                       >
                         <Edit2 size={18} />
                       </Link>
-                      <button className="p-3 rounded-2xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                      <button 
+                        onClick={() => onDelete?.(b.id, b.name)}
+                        className="p-3 rounded-2xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -232,7 +236,10 @@ export default function BusinessList({ businesses }: BusinessListProps) {
                 <Link href={`/admin/negocios/${b.id}`} className="p-4 rounded-[20px] bg-white border border-white/50 text-fowy-blue shadow-sm active:scale-95 transition-all">
                   <Edit2 size={20} />
                 </Link>
-                <button className="p-4 rounded-[20px] bg-white border border-white/50 text-red-400 shadow-sm active:scale-95 transition-all">
+                <button 
+                  onClick={() => onDelete?.(b.id, b.name)}
+                  className="p-4 rounded-[20px] bg-white border border-white/50 text-red-400 shadow-sm active:scale-95 transition-all"
+                >
                   <Trash2 size={20} />
                 </button>
               </div>

@@ -10,8 +10,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Store, CheckCircle2, TrendingUp, 
   TrendingDown, Calendar, ArrowUpRight, ArrowDownRight,
-  Tag, Briefcase
+  Tag, Briefcase, Trash2
 } from "lucide-react";
+import DeleteConfirmModal from "@/components/admin/shared/DeleteConfirmModal";
+import SuccessToast from "@/components/admin/shared/SuccessToast";
 
 export default function NegociosPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -19,6 +21,9 @@ export default function NegociosPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfig, setDeleteConfig] = useState<{ id: string, name: string, type: 'category' | 'business' } | null>(null);
+  const [toast, setToast] = useState({ show: false, message: "" });
   const supabase = createClient();
 
   const fetchData = useCallback(async () => {
@@ -74,6 +79,46 @@ export default function NegociosPage() {
     return { total, activos, vencimientos, diff: Math.round(diff) };
   }, [businesses]);
 
+  const handleDeleteCategory = (id: string) => {
+    const cat = categories.find(c => c.id === id);
+    setDeleteConfig({ id, name: cat?.name || 'esta categoría', type: 'category' });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteBusiness = (id: string, name: string) => {
+    setDeleteConfig({ id, name, type: 'business' });
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfig) return;
+    
+    try {
+      const table = deleteConfig.type === 'category' ? 'categories' : 'businesses';
+      const { error, count } = await supabase
+        .from(table)
+        .delete({ count: 'exact' })
+        .eq('id', deleteConfig.id);
+      
+      if (error) throw error;
+      
+      // Si no hubo error pero tampoco se borró nada (count 0), suele ser por RLS
+      if (count === 0) {
+        setToast({ show: true, message: "⚠️ No se pudo eliminar: Permisos insuficientes." });
+        return;
+      }
+
+      setToast({ show: true, message: "✅ Eliminado correctamente" });
+      fetchData();
+    } catch (error: any) {
+      console.error(`Error deleting ${deleteConfig.type}:`, error);
+      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDeleteConfig(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
@@ -110,7 +155,11 @@ export default function NegociosPage() {
       {/* Categorías (Scroll Horizontal en Móvil) */}
       <section className="mb-12">
         <h3 className="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Categorías de Comida</h3>
-        <CategoryStrip categories={categories} onAddClick={() => setIsModalOpen(true)} />
+        <CategoryStrip 
+          categories={categories} 
+          onAddClick={() => setIsModalOpen(true)} 
+          onDeleteCategory={handleDeleteCategory}
+        />
       </section>
 
       {/* Listado con Botón de Escritorio */}
@@ -130,11 +179,24 @@ export default function NegociosPage() {
           </button>
         </div>
         
-        <BusinessList businesses={businesses} />
+        <BusinessList businesses={businesses} onDelete={handleDeleteBusiness} />
       </section>
 
-      <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} supabase={supabase} />
-      <AddBusinessModal isOpen={isBusinessModalOpen} onClose={() => setIsBusinessModalOpen(false)} onSuccess={fetchData} supabase={supabase} />
+      <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} supabase={supabase} setToast={setToast} />
+      <AddBusinessModal isOpen={isBusinessModalOpen} onClose={() => setIsBusinessModalOpen(false)} onSuccess={fetchData} supabase={supabase} setToast={setToast} />
+      <DeleteConfirmModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+        onConfirm={confirmDelete}
+        title={`¿Eliminar ${deleteConfig?.type === 'category' ? 'Categoría' : 'Negocio'}?`}
+        message={`¿Estás seguro de que deseas eliminar "${deleteConfig?.name}"? Esta acción no se puede deshacer.`}
+      />
+
+      <SuccessToast 
+        show={toast.show} 
+        message={toast.message} 
+        onClose={() => setToast({ ...toast, show: false })} 
+      />
     </div>
   );
 }

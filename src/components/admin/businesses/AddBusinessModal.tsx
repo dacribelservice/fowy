@@ -9,9 +9,10 @@ interface AddBusinessModalProps {
   onClose: () => void;
   onSuccess: () => void;
   supabase: any;
+  setToast: (config: { show: boolean, message: string }) => void;
 }
 
-export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase }: AddBusinessModalProps) {
+export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase, setToast }: AddBusinessModalProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [city, setCity] = useState("");
@@ -84,6 +85,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase 
 
       if (dbError) throw dbError;
 
+      setToast({ show: true, message: "✅ Negocio creado correctamente" });
       onSuccess();
       onClose();
       // Reset
@@ -93,9 +95,9 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase 
       setWhatsapp("");
       setLogo(null);
       setPreview(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating business:", error);
-      alert("Error al crear el negocio");
+      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
     } finally {
       setLoading(false);
     }
