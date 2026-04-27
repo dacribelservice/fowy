@@ -84,7 +84,9 @@ root/
 
 ---
 
-## 🧩 GUÍA PARA REPLICAR EN PROYECTO DE COMIDAS (EJEMPLO)
+## 🧩 GUÍA PARA REPLICAR
+
+> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
 
 Si quieres crear la App de Comidas usando esta base:
 1.  **Core**: La tienda vende platos en lugar de códigos digitales.

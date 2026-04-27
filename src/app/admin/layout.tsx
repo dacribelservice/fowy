@@ -1,5 +1,6 @@
 import React from "react";
 import Sidebar from "@/components/admin/Sidebar";
+import FloatingActionMenu from "@/components/admin/FloatingActionMenu";
 
 export default function AdminLayout({
   children,
@@ -12,10 +13,13 @@ export default function AdminLayout({
       <Sidebar />
 
       {/* Contenido Principal con Scroll */}
-      <main className="flex-1 ml-[320px] p-10 pt-14 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 ml-0 xl:ml-[320px] p-4 sm:p-8 pt-14 overflow-y-auto relative">
+        <div className="max-w-full lg:max-w-7xl mx-auto">
           {children}
         </div>
+        
+        {/* Menú Flotante Global para Móvil */}
+        <FloatingActionMenu />
       </main>
     </div>
   );

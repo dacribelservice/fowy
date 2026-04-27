@@ -1,4 +1,6 @@
-# 🎨 ESPECIFICACIONES DE DISEÑO PREMIUM (FOWY)
+# 🎨 LENGUAJE VISUAL: ETHEREAL HIGH-TECH (LIGHT MODE)
+
+> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
 
 Basado en el concepto visual "SaaS High-Tech" con enfoque en Glassmorfismo y degradados vibrantes.
 

@@ -1,5 +1,7 @@
 # 🏗️ ESQUEMA DE APLICACIÓN: ARQUITECTURA "CENTRO COMERCIAL" (FOWY)
 
+> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+
 > **Estado**: Planificación / Fase 1
 > **Tecnología**: Next.js 14+ (App Router), Supabase, Vercel.
 

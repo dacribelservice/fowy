@@ -1,48 +1,76 @@
 # 🏪 MÓDULO: GESTIÓN DE NEGOCIOS (ADMIN)
 
+> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+
 Este módulo es el corazón de la administración de FOWY. Permite el control total sobre los establecimientos afiliados, su categorización y las funcionalidades (módulos) que tienen contratados.
 
 ---
 
-## 📊 1. DASHBOARD DE NEGOCIOS (LISTADO)
-Una tabla maestra con los siguientes **KPIs y métricas sugeridas**:
+## 🚀 1. FLUJO DE CREACIÓN Y ALMACENAMIENTO
+- **Manual**: El negocio se crea directamente desde el panel de administración por el Super Admin.
+- **URL (Slug)**: Se genera **automáticamente** al escribir el nombre (ej: "Pizza Real" -> "pizza-real").
+- **Imágenes**: Se guardan en **Supabase Storage** (Categorías y Logos de negocios).
 
-- **Estado de Salud**: (Activo / Pendiente de Pago / Suspendido).
-- **Rendimiento de Ventas**: Volumen total transaccionado por el negocio en el último mes.
-- **Tasa de Adopción**: Número de módulos activos vs. módulos disponibles.
-- **Fidelidad**: Tiempo transcurrido desde la afiliación.
-- **Actividad**: Fecha y hora de la última operación registrada.
+## 🏷️ 2. GESTIÓN DE CATEGORÍAS (COMIDA)
+El Super Admin crea las categorías manualmente para que los negocios puedan elegirlas.
+- **Visualización**: Fila superior de **círculos pequeños**.
+- **Acción**: Al final de la fila habrá un círculo con el signo **(+)**.
+- **Creación**: 
+  - **PC**: Abre una ventana emergente (Modal).
+  - **Móvil**: Abre un panel desde abajo (Bottom Sheet).
+  - Permite subir `Nombre` e `Imagen`.
 
----
-
-## 🏷️ 2. GESTIÓN DE CATEGORÍAS
-Panel para que el Super Admin defina el ecosistema. Ejemplos de categorías:
-- **Gastronomía**: Restaurantes, Cafés, Bares.
-- **Servicios**: Barberías, Consultorios, Spas.
-- **Retail**: Tiendas de ropa, Minimarkets.
-- **Entretenimiento**: Cines, Parques, Centros de eventos.
-
----
-
-## 🧩 3. PANEL DE MÓDULOS (Marketplace Interno)
-Selector de funciones que el Admin puede activar/desactivar por cada negocio de forma individual:
-
-- **Dashboard de Ventas**: Visualización de métricas propias para el dueño del local.
-- **Menú Digital / Catálogo**: Gestión de productos y precios.
-- **Gestión de Inventario**: Control de stock en tiempo real.
-- **Sistema de Pedidos / Delivery**: Recepción y despacho de órdenes.
-- **Programa de Lealtad**: Gestión de puntos y clientes frecuentes.
+## 🧩 3. PLANES Y MÓDULOS (Switches)
+Trato individual mediante **Switches**, organizados en 3 niveles:
+- **Standard**: Básico.
+- **Pro**: Intermedio.
+- **Premium**: Avanzado.
 
 ---
 
-## 🛠️ ESTRUCTURA TÉCNICA SUGERIDA
-- **Tabla DB**: `businesses` (id, owner_id, name, category_id, status, settings_json).
-- **Tabla DB**: `business_modules` (business_id, module_key, is_enabled).
-- **Tabla DB**: `categories` (id, name, icon, slug).
+## 🖥️ DISEÑO DE LA PANTALLA (INTERFAZ PREMIUM)
+
+### Buscador y Filtros Inteligentes
+- **Buscador**: Capacidad de buscar por **Nombre** e **ID**.
+- **Filtros Multi-Nivel**: Filtros combinables por **Estatus (Activo/Inactivo)**, **País**, **Ciudad** y **Plan**.
+
+### Vista de Tabla (Desktop)
+Diseño de "Glassmorphism" con las siguientes columnas:
+1. **ID**: Identificador único.
+2. **Logo**: Imagen circular del negocio.
+3. **Nombre**: Nombre comercial.
+4. **Ubicación**: Ciudad - País.
+5. **Plan**: Badge con el nivel (Standard/Pro/Premium).
+6. **Estatus**: Indicador visual de Activo/Inactivo.
+7. **Fecha de Pago**: Fecha de vencimiento/cobro.
+8. **WhatsApp**: Icono de enlace directo al chat.
+9. **Acciones**: Iconos para Editar (**Nueva pantalla de detalles**) y Borrar.
+
+### Vista Responsiva (Mobile)
+- La tabla se transforma en **Tarjetas (Cards)** optimizadas para celular.
 
 ---
 
-## ❓ PREGUNTAS PARA PULIR EL MÓDULO
-1. **¿Flujo de Activación?**: ¿Cuando un negocio se crea, debe ser aprobado por ti (Super Admin) antes de aparecer en la app, o se crea como "Activo" por defecto?
-2. **¿Planos de Precios?**: ¿El panel de módulos estará ligado a planes (Ej: Plan Básico tiene 3 módulos, Plan Pro tiene todos)? ¿O activas módulos uno por uno según acuerdes con el cliente?
-3. **¿Datos de Contacto?**: Además de los KPIs, ¿quieres que la tabla de negocios muestre de entrada el contacto del dueño o prefieres eso en una vista de detalle (al hacer clic)?
+## ✅ CHECKLIST DE IMPLEMENTACIÓN (Paso a Paso)
+
+### Fase 1: Infraestructura y Datos
+- [x] **1.1** Crear tabla `categories` en Supabase (id, name, image_url).
+- [x] **1.2** Crear tabla `businesses` en Supabase con todas las columnas.
+- [x] **1.3** Configurar **Supabase Storage** (Buckets para `logos` y `categories`).
+- [x] **1.4** Crear un negocio de prueba para validar visualización.
+
+### Fase 2: Interfaz del Listado (Admin)
+- [x] **2.1** Crear estructura de la página en `src/app/admin/negocios/page.tsx`.
+- [x] **2.2** Diseñar la **Fila de Categorías** (Círculos pequeños) en la parte superior.
+- [x] **2.3** Implementar botón **(+)** con lógica dual: **Bottom Sheet (Móvil)** / **Modal (PC)**.
+- [x] **2.4** Implementar el **Buscador Inteligente** y el **Sistema de Filtros**.
+- [x] **2.5** Diseñar la **Tabla Master** (PC) y la **Versión de Tarjetas** (Móvil).
+
+### Fase 3: Acciones y Navegación
+- [x] **3.1** Configurar el botón de **WhatsApp** dinámico.
+- [x] **3.2** Crear la ruta de edición `src/app/admin/negocios/[id]/page.tsx`.
+- [x] **3.3** Implementar el modal de **Creación de Negocio** con Slug automático.
+
+### Fase 4: Lógica de Negocio (Módulos)
+- [x] **4.1** Implementar el panel de **Switches** en la pantalla de edición.
+- [x] **4.2** Vincular los cambios con la base de datos (JSONB).

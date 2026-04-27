@@ -1,5 +1,7 @@
 # 🏗️ CHECKLIST: CONSTRUCCIÓN DEL NÚCLEO (CORE)
 
+> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+
 Este es el plan de ejecución paso a paso para los cimientos de la aplicación. 
 **Regla:** Solo marcar como completado [x] cuando la tarea esté probada y sin errores.
 
