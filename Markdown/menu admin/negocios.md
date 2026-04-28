@@ -74,3 +74,11 @@ Diseño de "Glassmorphism" con las siguientes columnas:
 ### Fase 4: Lógica de Negocio (Módulos)
 - [x] **4.1** Implementar el panel de **Switches** en la pantalla de edición.
 - [x] **4.2** Vincular los cambios con la base de datos (JSONB).
+
+### Fase 5: Geolocalización y Mapa Interactivo (En Progreso)
+- [ ] **5.1** Base de Datos: Añadir columnas `latitude` y `longitude` a la tabla `businesses` en Supabase.
+- [ ] **5.2** Dependencias: Instalar o verificar `leaflet`, `react-leaflet` y tipos correspondientes.
+- [ ] **5.3** UI/UX: Integrar el mapa interactivo (Componente `LocationPicker`) en la pantalla de edición (`[id]/page.tsx`).
+- [ ] **5.4** Reverse Geocoding: Conectar una API (ej. Nominatim) para auto-completar "Ciudad" y "País" al mover el pin.
+- [ ] **5.5** Persistencia: Guardar correctamente las coordenadas junto a los demás datos del negocio.
+- [ ] **5.6** Despliegue: Asegurar que la importación de Leaflet sea dinámica (`ssr: false`) para no romper el build de Next.js.

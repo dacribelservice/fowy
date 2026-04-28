@@ -18,7 +18,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [plan, setPlan] = useState("Standard");
+  const [plan, setPlan] = useState("standard");
   const [logo, setLogo] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,13 +73,13 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
           city,
           country,
           plan,
-          whatsapp,
-          active: true,
+          phone: whatsapp,
+          status: true,
           payment_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0], // Next month default
           modules: {
             standard: true,
-            pro: plan === "Pro" || plan === "Premium",
-            premium: plan === "Premium"
+            pro: plan === "pro" || plan === "premium",
+            premium: plan === "premium"
           }
         }]);
 
@@ -234,9 +234,9 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
                     value={plan}
                     onChange={(e) => setPlan(e.target.value)}
                   >
-                    <option value="Standard">Standard</option>
-                    <option value="Pro">Pro</option>
-                    <option value="Premium">Premium</option>
+                    <option value="standard">Standard</option>
+                    <option value="pro">Pro</option>
+                    <option value="premium">Premium</option>
                   </select>
                 </div>
               </div>

@@ -56,14 +56,24 @@ Se ha implementado el "Cerebro" del sistema:
 - **Fase 2 (Cerebro)**: COMPLETADA.
 - **Fase 3 (Autenticación)**: POSPUESTA.
 - **Fase 4 (Cascarón UI)**: COMPLETADA.
-- **Fase 5 (Módulo Negocios)**: EN PROCESO (Planificación técnica).
+- **Fase 5 (Módulo Negocios)**: COMPLETADA.
+- **Fase 6 (Notificaciones y Feedback)**: COMPLETADA (Sistema de Toasts Premium).
 
 ---
 
-## 📂 ORGANIZACIÓN DE DOCUMENTACIÓN
-Se ha creado la carpeta `Markdown/menu admin/` para organizar los archivos operativos:
-- `app.md`: Arquitectura global.
-- `negocios.md`: Especificaciones del módulo de gestión de negocios.
+## 🚀 HITOS RECIENTES (27 de Abril de 2026)
+1.  **Dashboard de Negocios**: Implementación de interfaz modular con KPIs dinámicos (Total, Activos, Conversión, Vencimientos).
+2.  **Modales Premium**: 
+    - `AddCategoryModal`: Creación de categorías con carga de imágenes.
+    - `AddBusinessModal`: Registro de nuevos establecimientos con generación de slug automática.
+    - `DeleteConfirmModal`: Interfaz de confirmación de borrado con estética cohesiva.
+3.  **Sistema de Feedback "FOWY Toast"**: Reemplazo de los `alert` nativos por notificaciones flotantes elegantes y automáticas.
+4.  **Seguridad y Almacenamiento**: Configuración de políticas RLS en Supabase Storage para los buckets `categories` y `logos`, permitiendo la carga pública de recursos.
+5.  **GitHub Backup**: Sincronización total del estado estable del proyecto en el repositorio oficial.
+
+6. **Estabilización de Integración con Supabase**: Se corrigió el mapeo de columnas (reemplazando `active` por `status` y `whatsapp` por `phone`) en los componentes de administración para alinear el frontend con el esquema real.
+7. **Resolución de Constraints**: Se arregló un error de restricción en la tabla `businesses` asegurando que los valores del plan siempre se envíen en minúsculas (`standard`, `pro`, `premium`).
+8. **Refinamiento UI/UX**: Se sustituyeron los mensajes `alert()` nativos en la edición de negocios por el componente `SuccessToast`, logrando una experiencia fluida y coherente con el sistema Ethereal.
 
 ---
 
@@ -72,6 +82,7 @@ Se ha creado la carpeta `Markdown/menu admin/` para organizar los archivos opera
 2.  **Cero Datos Genéricos**: Estructuras visuales listas para datos reales.
 3.  **Personalización Dinámica**: Identidad visual variable sobre menú único.
 4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos (inventario, ventas, etc.) individualmente por cada negocio.
+5.  **Feedback No Intrusivo**: Se prioriza el uso de Toasts sobre diálogos bloqueantes para una experiencia de usuario fluida.
 
 ---
-*Ultima actualización: 27 de Abril de 2026*
+*Ultima actualización: 27 de Abril de 2026 - 10:45 AM*

@@ -9,6 +9,7 @@ import {
   CreditCard, ShieldCheck, Zap, Star,
   CheckCircle2, AlertCircle
 } from "lucide-react";
+import SuccessToast from "@/components/admin/shared/SuccessToast";
 
 interface BusinessData {
   id: string;
@@ -18,8 +19,8 @@ interface BusinessData {
   city: string;
   country: string;
   plan: string;
-  active: boolean;
-  whatsapp: string;
+  status: boolean;
+  phone: string;
   payment_date: string;
   modules: {
     standard: boolean;
@@ -40,6 +41,7 @@ export default function BusinessDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("modules");
+  const [toast, setToast] = useState({ show: false, message: "" });
 
   const fetchBusiness = useCallback(async () => {
     try {
@@ -80,17 +82,17 @@ export default function BusinessDetailsPage() {
       const { error } = await supabase
         .from('businesses')
         .update({
-          active: business.active,
+          status: business.status,
           plan: business.plan,
           modules: business.modules,
           city: business.city,
           country: business.country,
-          whatsapp: business.whatsapp
+          phone: business.phone
         })
         .eq('id', id);
 
       if (error) throw error;
-      alert("Configuración actualizada con éxito");
+      setToast({ show: true, message: "Configuración actualizada con éxito" });
     } catch (error) {
       console.error("Error updating business:", error);
       alert("Error al actualizar");
@@ -154,9 +156,9 @@ export default function BusinessDetailsPage() {
               <p className="text-[10px] font-mono text-slate-400 font-bold uppercase mb-6 tracking-tighter opacity-60">ID: {business.id.slice(0,8)}</p>
               
               <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8 border ${
-                business.active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'
+                business.status ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'
               }`}>
-                {business.active ? "● Negocio Activo" : "○ Inactivo"}
+                {business.status ? "● Negocio Activo" : "○ Inactivo"}
               </div>
 
               <div className="w-full space-y-4 text-left border-t border-slate-50 pt-8">
@@ -166,7 +168,7 @@ export default function BusinessDetailsPage() {
                 </div>
                 <div className="flex items-center gap-3 text-slate-500">
                   <div className="p-2 bg-slate-50 rounded-lg"><Phone size={14} /></div>
-                  <span className="text-xs font-bold">+{business.whatsapp}</span>
+                  <span className="text-xs font-bold">+{business.phone}</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-500">
                   <div className="p-2 bg-slate-50 rounded-lg"><Globe size={14} /></div>
@@ -276,8 +278,8 @@ export default function BusinessDetailsPage() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Estatus del Negocio</label>
                         <select 
-                          value={business.active ? "true" : "false"}
-                          onChange={(e) => setBusiness({...business, active: e.target.value === "true"})}
+                          value={business.status ? "true" : "false"}
+                          onChange={(e) => setBusiness({...business, status: e.target.value === "true"})}
                           className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
                         >
                           <option value="true">Activo / Operativo</option>
@@ -292,9 +294,9 @@ export default function BusinessDetailsPage() {
                           onChange={(e) => setBusiness({...business, plan: e.target.value})}
                           className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
                         >
-                          <option value="Standard">Standard</option>
-                          <option value="Pro">Pro</option>
-                          <option value="Premium">Premium</option>
+                          <option value="standard">Standard</option>
+                          <option value="pro">Pro</option>
+                          <option value="premium">Premium</option>
                         </select>
                       </div>
 
@@ -324,6 +326,12 @@ export default function BusinessDetailsPage() {
           </div>
         </div>
       </div>
+      
+      <SuccessToast 
+        show={toast.show} 
+        message={toast.message} 
+        onClose={() => setToast({ ...toast, show: false })} 
+      />
     </div>
   );
 }
