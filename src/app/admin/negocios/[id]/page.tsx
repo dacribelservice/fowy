@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Save, Globe, Phone, MapPin, 
   CreditCard, ShieldCheck, Zap, Star,
-  CheckCircle2, AlertCircle
+  CheckCircle2, AlertCircle, Upload, ImageIcon
 } from "lucide-react";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
 import dynamic from "next/dynamic";
@@ -30,6 +30,7 @@ interface BusinessData {
   status: boolean;
   phone: string;
   payment_date: string;
+  payment_proof_url?: string | null;
   modules: {
     standard: boolean;
     pro: boolean;
@@ -50,6 +51,7 @@ export default function BusinessDetailsPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("modules");
   const [toast, setToast] = useState({ show: false, message: "" });
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const fetchBusiness = useCallback(async () => {
     try {
@@ -72,16 +74,18 @@ export default function BusinessDetailsPage() {
     fetchBusiness();
   }, [fetchBusiness]);
 
-  const handleToggleModule = (moduleKey: string) => {
+  const handleToggleModule = (moduleKey: keyof BusinessData["modules"]) => {
     if (!business) return;
+    const currentModules = business.modules || { standard: false, pro: false, premium: false };
     setBusiness({
       ...business,
       modules: {
-        ...business.modules,
-        [moduleKey]: !((business.modules as any)[moduleKey])
-      }
+        ...currentModules,
+        [moduleKey]: !currentModules[moduleKey]
+      } as BusinessData["modules"]
     });
   };
+
 
   const handleUpdate = async () => {
     if (!business) return;
@@ -97,7 +101,9 @@ export default function BusinessDetailsPage() {
           country: business.country,
           latitude: business.latitude,
           longitude: business.longitude,
-          phone: business.phone
+          phone: business.phone,
+          payment_date: business.payment_date,
+          payment_proof_url: business.payment_proof_url
         })
         .eq('id', id);
 
@@ -108,6 +114,20 @@ export default function BusinessDetailsPage() {
       alert("Error al actualizar");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const formatPaymentDate = (date: string | Date | null | undefined) => {
+    if (!date) return "No definido";
+    try {
+      const dateString = typeof date === 'string' ? date : date.toISOString();
+      const [year, month, day] = dateString.split('T')[0].split('-');
+      const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      const monthName = months[parseInt(month, 10) - 1];
+      if (!day || !monthName || !year) return dateString.split('T')[0];
+      return `${day}/${monthName}/${year}`;
+    } catch (e) {
+      return String(date);
     }
   };
 
@@ -158,6 +178,7 @@ export default function BusinessDetailsPage() {
             <div className="relative flex flex-col items-center text-center">
               <div className="w-32 h-32 rounded-[40px] p-1 bg-gradient-to-tr from-fowy-red to-fowy-orange mb-6 shadow-2xl">
                 <div className="w-full h-full rounded-[38px] overflow-hidden border-4 border-white bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={business.logo_url} className="w-full h-full object-cover" alt={business.name} />
                 </div>
               </div>
@@ -200,7 +221,7 @@ export default function BusinessDetailsPage() {
             </div>
             <div className="mt-6 flex justify-between items-center">
               <p className="text-[10px] text-slate-400 font-bold uppercase">Próximo Pago</p>
-              <span className="text-xs font-black">{business.payment_date}</span>
+              <span className="text-xs font-black">{formatPaymentDate(business.payment_date)}</span>
             </div>
           </div>
         </div>
@@ -243,7 +264,7 @@ export default function BusinessDetailsPage() {
                       title="Paquete Standard"
                       description="Menú digital, QR dinámico y perfil básico."
                       icon={<Zap size={20} />}
-                      active={business.modules.standard}
+                      active={business.modules?.standard || false}
                       onToggle={() => handleToggleModule('standard')}
                     />
 
@@ -252,7 +273,7 @@ export default function BusinessDetailsPage() {
                       title="Funciones Pro"
                       description="Gestión de pedidos en tiempo real y estadísticas."
                       icon={<Star size={20} />}
-                      active={business.modules.pro}
+                      active={business.modules?.pro || false}
                       onToggle={() => handleToggleModule('pro')}
                     />
 
@@ -261,7 +282,7 @@ export default function BusinessDetailsPage() {
                       title="Fowy Premium"
                       description="Personalización avanzada y multi-sucursal."
                       icon={<Zap size={20} className="text-yellow-500" />}
-                      active={business.modules.premium}
+                      active={business.modules?.premium || false}
                       onToggle={() => handleToggleModule('premium')}
                     />
 
@@ -270,7 +291,7 @@ export default function BusinessDetailsPage() {
                       title="Módulo Inventario"
                       description="Control de stock y alertas automáticas."
                       icon={<Zap size={20} />}
-                      active={business.modules.inventory || false}
+                      active={business.modules?.inventory || false}
                       onToggle={() => handleToggleModule('inventory')}
                     />
                   </div>
@@ -310,6 +331,55 @@ export default function BusinessDetailsPage() {
                         </select>
                       </div>
 
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Próximo Pago (Fecha)</label>
+                        <input 
+                          type="date"
+                          value={typeof business.payment_date === 'string' ? business.payment_date.split('T')[0] : ''}
+                          onChange={(e) => setBusiness({...business, payment_date: e.target.value})}
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Comprobante de Pago</label>
+                        <div className="mt-2 flex items-center gap-6 p-4 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50">
+                          {business.payment_proof_url ? (
+                            <>
+                              <div 
+                                onClick={() => setIsImageModalOpen(true)}
+                                className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-white shadow-lg shrink-0 group cursor-pointer"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={business.payment_proof_url} alt="Comprobante" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold px-3 py-1 bg-white/20 rounded-full backdrop-blur-md">Ampliar</span>
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <h5 className="text-sm font-bold text-slate-800 mb-1">Comprobante Recibido</h5>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                  El dueño del negocio ha enviado este comprobante. Haz clic en la imagen para verla en tamaño completo.
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl border-2 border-slate-200 flex flex-col gap-2 items-center justify-center bg-white text-slate-400 shrink-0 shadow-sm">
+                                <ImageIcon size={32} className="opacity-50" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Sin Comprobante</span>
+                              </div>
+                              <div className="flex-1 space-y-3">
+                                <h5 className="text-sm font-bold text-slate-800 mb-1">Esperando Comprobante</h5>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                  El dueño del negocio aún no ha enviado el comprobante de pago para este periodo.
+                                </p>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
                       <div className="md:col-span-2">
                         <DynamicLocationPicker
                           initialCity={business.city}
@@ -335,6 +405,56 @@ export default function BusinessDetailsPage() {
         </div>
       </div>
       
+      {/* Image Modal Popup */}
+      {isImageModalOpen && business?.payment_proof_url && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 sm:p-10"
+          onClick={() => setIsImageModalOpen(false)}
+        >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative max-w-4xl max-h-full w-full bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 bg-white flex justify-between items-center border-b border-slate-100">
+              <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs">Comprobante de Pago</h3>
+              <button 
+                onClick={() => setIsImageModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-auto p-4 bg-slate-100 flex items-center justify-center min-h-[300px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={business.payment_proof_url} 
+                alt="Comprobante ampliado" 
+                className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-md border border-slate-200 bg-white"
+              />
+            </div>
+            <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
+              <a 
+                href={business.payment_proof_url}
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-3 bg-fowy-primary/10 text-fowy-primary font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-fowy-primary/20 transition-colors"
+              >
+                Abrir Original
+              </a>
+              <button 
+                onClick={() => setIsImageModalOpen(false)}
+                className="px-6 py-3 bg-slate-900 text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors shadow-lg"
+              >
+                Cerrar
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       <SuccessToast 
         show={toast.show} 
         message={toast.message} 
@@ -344,7 +464,15 @@ export default function BusinessDetailsPage() {
   );
 }
 
-function ModuleSwitch({ title, description, icon, active, onToggle }: any) {
+interface ModuleSwitchProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  active: boolean;
+  onToggle: () => void;
+}
+
+function ModuleSwitch({ title, description, icon, active, onToggle }: ModuleSwitchProps) {
   return (
     <div 
       onClick={onToggle}

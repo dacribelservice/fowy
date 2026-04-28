@@ -30,7 +30,9 @@ export default function DashboardPage() {
     standardPercentage: 0,
     growthData: [0,0,0,0,0,0,0],
     growthPercentages: [0,0,0,0,0,0,0],
-    growthNames: [[],[],[],[],[],[],[]] as string[][]
+    growthNames: [[],[],[],[],[],[],[]] as string[][],
+    conversionRate: 0,
+    upcomingExpirations: 0
   });
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -317,7 +319,7 @@ export default function DashboardPage() {
                    fill="none"
                    stroke="currentColor"
                    strokeWidth="20"
-                   className="text-slate-100"
+                   className="text-emerald-400"
                  />
                  {/* Pro Circle */}
                  <circle
@@ -369,7 +371,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-slate-300" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
                   <span className="text-sm font-bold text-slate-600">Standard</span>
                 </div>
                 <span className="text-sm font-black text-slate-800">{stats.standardPercentage}%</span>

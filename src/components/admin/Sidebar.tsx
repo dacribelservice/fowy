@@ -49,7 +49,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 space-y-2">
         {menuItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname.startsWith(item.href);
           const Icon = item.icon;
 
           return (

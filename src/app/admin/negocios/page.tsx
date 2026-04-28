@@ -53,12 +53,12 @@ export default function NegociosPage() {
 
   const stats = useMemo(() => {
     const total = businesses.length;
-    const activos = businesses.filter(b => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
+    const activos = businesses.filter((b: any) => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
     const hoy = new Date();
     const en7Dias = new Date();
     en7Dias.setDate(hoy.getDate() + 7);
     
-    const vencimientos = businesses.filter(b => {
+    const vencimientos = businesses.filter((b: any) => {
       if (!b.payment_date) return false;
       const fechaPago = new Date(b.payment_date);
       return fechaPago >= hoy && fechaPago <= en7Dias;
@@ -66,8 +66,8 @@ export default function NegociosPage() {
 
     const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-    const nuevosEsteMes = businesses.filter(b => new Date(b.created_at) >= inicioMesActual).length;
-    const nuevosMesPasado = businesses.filter(b => {
+    const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
+    const nuevosMesPasado = businesses.filter((b: any) => {
       const d = new Date(b.created_at);
       return d >= inicioMesPasado && d < inicioMesActual;
     }).length;

@@ -74,6 +74,13 @@ Se ha implementado el "Cerebro" del sistema:
 6. **Estabilización de Integración con Supabase**: Se corrigió el mapeo de columnas (reemplazando `active` por `status` y `whatsapp` por `phone`) en los componentes de administración para alinear el frontend con el esquema real.
 7. **Resolución de Constraints**: Se arregló un error de restricción en la tabla `businesses` asegurando que los valores del plan siempre se envíen en minúsculas (`standard`, `pro`, `premium`).
 8. **Refinamiento UI/UX**: Se sustituyeron los mensajes `alert()` nativos en la edición de negocios por el componente `SuccessToast`, logrando una experiencia fluida y coherente con el sistema Ethereal.
+9. **Estabilización de Gráficas y TypeScript**: Se corrigieron problemas visuales en los gráficos (viewBox del donut, altura de barras) en el Dashboard Admin y se aplicó un tipado estricto eliminando errores de TypeScript.
+
+---
+
+## 🗺️ MAPA E INTERACCIÓN GEOGRÁFICA (En Desarrollo)
+- **Lo que se preparó (Administración)**: Se está estructurando la lógica de ubicación para que los dueños/administradores puedan asignar coordenadas, ciudad y país exactos a cada negocio.
+- **Lo que se quiere lograr (Vista de Usuario/Explorador)**: El objetivo principal para el usuario final es ofrecer una experiencia de descubrimiento espacial. Los usuarios ("exploradores") accederán a un mapa interactivo general donde verán todos los negocios representados como puntos geolocalizados. Podrán navegar por el mapa, descubrir comercios cercanos y hacer clic en los marcadores para ver la información de cada local (estilo "Centro Comercial Virtual").
 
 ---
 
@@ -85,4 +92,4 @@ Se ha implementado el "Cerebro" del sistema:
 5.  **Feedback No Intrusivo**: Se prioriza el uso de Toasts sobre diálogos bloqueantes para una experiencia de usuario fluida.
 
 ---
-*Ultima actualización: 27 de Abril de 2026 - 10:45 AM*
+*Ultima actualización: 27 de Abril de 2026 - 08:25 PM*
