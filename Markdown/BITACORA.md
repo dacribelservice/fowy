@@ -3,6 +3,7 @@
 > ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
 
 Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier sesión futura (o cualquier desarrollador/IA) comprenda exactamente el estado, la arquitectura y las decisiones tomadas.
+- **Guía de Arquitectura**: [conceptos.md](file:///c:/Users/cange/Documents/fowy/Markdown/conceptos.md)
 
 ---
 
@@ -57,24 +58,26 @@ Se ha implementado el "Cerebro" del sistema:
 - **Fase 3 (Autenticación)**: POSPUESTA.
 - **Fase 4 (Cascarón UI)**: COMPLETADA.
 - **Fase 5 (Módulo Negocios)**: COMPLETADA.
-- **Fase 6 (Notificaciones y Feedback)**: COMPLETADA (Sistema de Toasts Premium).
+- **Fase 6 (Notificaciones y Feedback)**: COMPLETADA.
+- **Fase 7 (Refactorización de Dashboard)**: COMPLETADA (Desacoplamiento total de componentes).
+- **Fase 8 (Optimización y Escalabilidad)**: COMPLETADA (Paginación, Imágenes y Blindaje).
 
 ---
 
-## 🚀 HITOS RECIENTES (27 de Abril de 2026)
-1.  **Dashboard de Negocios**: Implementación de interfaz modular con KPIs dinámicos (Total, Activos, Conversión, Vencimientos).
-2.  **Modales Premium**: 
-    - `AddCategoryModal`: Creación de categorías con carga de imágenes.
-    - `AddBusinessModal`: Registro de nuevos establecimientos con generación de slug automática.
-    - `DeleteConfirmModal`: Interfaz de confirmación de borrado con estética cohesiva.
-3.  **Sistema de Feedback "FOWY Toast"**: Reemplazo de los `alert` nativos por notificaciones flotantes elegantes y automáticas.
-4.  **Seguridad y Almacenamiento**: Configuración de políticas RLS en Supabase Storage para los buckets `categories` y `logos`, permitiendo la carga pública de recursos.
-5.  **GitHub Backup**: Sincronización total del estado estable del proyecto en el repositorio oficial.
-
-6. **Estabilización de Integración con Supabase**: Se corrigió el mapeo de columnas (reemplazando `active` por `status` y `whatsapp` por `phone`) en los componentes de administración para alinear el frontend con el esquema real.
-7. **Resolución de Constraints**: Se arregló un error de restricción en la tabla `businesses` asegurando que los valores del plan siempre se envíen en minúsculas (`standard`, `pro`, `premium`).
-8. **Refinamiento UI/UX**: Se sustituyeron los mensajes `alert()` nativos en la edición de negocios por el componente `SuccessToast`, logrando una experiencia fluida y coherente con el sistema Ethereal.
-9. **Estabilización de Gráficas y TypeScript**: Se corrigieron problemas visuales en los gráficos (viewBox del donut, altura de barras) en el Dashboard Admin y se aplicó un tipado estricto eliminando errores de TypeScript.
+## 🚀 HITOS RECIENTES (27 de Abril de 2026 - Sesión Nocturna)
+1.  **Refactorización Arquitectónica (Componentización)**: 
+    - Desacoplamiento total de la página de edición de negocios (`[id]/page.tsx`) en componentes especializados: `BusinessProfileHeader`, `BusinessLocationManager`, `BusinessModuleManager` y `BusinessPaymentViewer`.
+    - Refactorización del Dashboard Admin en piezas modales reutilizables (`StatsGrid`, `GrowthChart`, `DistributionChart`).
+2.  **Paginación y Búsqueda Server-side**: 
+    - Implementación de carga por bloques (offset/limit) en la tabla de negocios para manejar miles de registros.
+    - Migración de toda la lógica de filtrado (Plan, Estatus, Buscador) al servidor, reduciendo el consumo de memoria en el cliente.
+3.  **Gestión Maestra de Imágenes**: 
+    - **Compresión en Cliente**: Integración de API Canvas para comprimir logos y categorías antes de la subida, ahorrando hasta un 80% de espacio en Storage.
+    - **PremiumImage**: Creación de un componente inteligente para gestionar estados de carga, esqueletos (skeletons) y fallbacks visuales.
+    - **Storage Cleanup**: Lógica automatizada que elimina archivos huérfanos del Storage al borrar un negocio o categoría.
+4.  **Blindaje y Rendimiento de Supabase**: 
+    - **Índices Trigram**: Activación de `pg_trgm` para búsquedas textuales instantáneas.
+    - **Seguridad RLS Auditada**: Eliminación de políticas de desarrollo abiertas; ahora solo el `super_admin` tiene permisos de escritura (CRUD) en tablas críticas y buckets de storage.
 
 ---
 
@@ -88,8 +91,8 @@ Se ha implementado el "Cerebro" del sistema:
 1.  **Ocultar Dev Indicators**: Deshabilitado el botón "N" de Next.js.
 2.  **Cero Datos Genéricos**: Estructuras visuales listas para datos reales.
 3.  **Personalización Dinámica**: Identidad visual variable sobre menú único.
-4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos (inventario, ventas, etc.) individualmente por cada negocio.
-5.  **Feedback No Intrusivo**: Se prioriza el uso de Toasts sobre diálogos bloqueantes para una experiencia de usuario fluida.
+4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos individualmente.
+5.  **Compresión Forzada**: Toda imagen subida al sistema debe pasar por el proceso de optimización en el cliente para garantizar escalabilidad.
 
 ---
-*Ultima actualización: 27 de Abril de 2026 - 08:25 PM*
+*Ultima actualización: 27 de Abril de 2026 - 10:10 PM*

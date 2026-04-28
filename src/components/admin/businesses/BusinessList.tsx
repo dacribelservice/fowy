@@ -12,6 +12,7 @@ import {
   MoreVertical
 } from "lucide-react";
 import Link from "next/link";
+import PremiumImage from "@/components/admin/shared/PremiumImage";
 
 export interface Business {
   id: string;
@@ -29,20 +30,27 @@ export interface Business {
 
 interface BusinessListProps {
   businesses: Business[];
-  onDelete?: (id: string, name: string) => void;
+  onDelete?: (business: Business) => void;
+  searchTerm: string;
+  onSearchChange: (val: string) => void;
+  filterPlan: string;
+  onPlanChange: (val: string) => void;
+  filterStatus: string;
+  onStatusChange: (val: string) => void;
 }
 
-export default function BusinessList({ businesses, onDelete }: BusinessListProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterPlan, setFilterPlan] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
-
-  const filtered = businesses.filter(b => {
-    const matchesSearch = b.name.toLowerCase().includes(searchTerm.toLowerCase()) || b.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPlan = filterPlan === "all" || b.plan === filterPlan;
-    const matchesStatus = filterStatus === "all" || (filterStatus === "active" ? b.status : !b.status);
-    return matchesSearch && matchesPlan && matchesStatus;
-  });
+export default function BusinessList({ 
+  businesses, 
+  onDelete,
+  searchTerm,
+  onSearchChange,
+  filterPlan,
+  onPlanChange,
+  filterStatus,
+  onStatusChange
+}: BusinessListProps) {
+  // El filtrado ahora ocurre en el servidor (Supabase)
+  const filtered = businesses;
 
   return (
     <div className="space-y-8">
@@ -59,7 +67,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
             placeholder="Buscar negocio por nombre o ID..."
             className="w-full pl-12 pr-4 py-4 rounded-[20px] glass-morphism border-white/50 focus:ring-2 focus:ring-fowy-orange/30 outline-none transition-all shadow-sm placeholder:text-slate-400 text-slate-700"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         
@@ -67,7 +75,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
           <select 
             className="flex-1 xl:w-44 px-4 py-4 rounded-[20px] glass-morphism border-white/50 outline-none focus:ring-2 focus:ring-fowy-orange/30 text-slate-600 font-medium appearance-none cursor-pointer"
             value={filterPlan}
-            onChange={(e) => setFilterPlan(e.target.value)}
+            onChange={(e) => onPlanChange(e.target.value)}
           >
             <option value="all">Todos los Planes</option>
             <option value="standard">Standard</option>
@@ -78,7 +86,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
           <select 
             className="flex-1 lg:w-44 px-4 py-4 rounded-[20px] glass-morphism border-white/50 outline-none focus:ring-2 focus:ring-fowy-orange/30 text-slate-600 font-medium appearance-none cursor-pointer"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => onStatusChange(e.target.value)}
           >
             <option value="all">Estatus: Todos</option>
             <option value="active">Activos</option>
@@ -115,7 +123,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-sm bg-slate-50 group-hover:scale-110 transition-transform">
-                        <img src={b.logo_url} alt={b.name} className="w-full h-full object-cover" />
+                        <PremiumImage src={b.logo_url} alt={b.name} className="w-full h-full" fallbackType="logo" />
                       </div>
                       <div>
                         <div className="font-bold text-slate-700 text-base">{b.name}</div>
@@ -168,7 +176,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
                         <Edit2 size={18} />
                       </Link>
                       <button 
-                        onClick={() => onDelete?.(b.id, b.name)}
+                        onClick={() => onDelete?.(b)}
                         className="p-3 rounded-2xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm"
                       >
                         <Trash2 size={18} />
@@ -196,7 +204,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
               <div className="flex justify-between items-start mb-5">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full border-2 border-white overflow-hidden shadow-md bg-white">
-                    <img src={b.logo_url} alt={b.name} className="w-full h-full object-cover" />
+                    <PremiumImage src={b.logo_url} alt={b.name} className="w-full h-full" fallbackType="logo" />
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-700 text-lg">{b.name}</h3>
@@ -237,7 +245,7 @@ export default function BusinessList({ businesses, onDelete }: BusinessListProps
                   <Edit2 size={20} />
                 </Link>
                 <button 
-                  onClick={() => onDelete?.(b.id, b.name)}
+                  onClick={() => onDelete?.(b)}
                   className="p-4 rounded-[20px] bg-white border border-white/50 text-red-400 shadow-sm active:scale-95 transition-all"
                 >
                   <Trash2 size={20} />

@@ -13,80 +13,141 @@ import {
   Tag, Briefcase, Trash2
 } from "lucide-react";
 import DeleteConfirmModal from "@/components/admin/shared/DeleteConfirmModal";
-import SuccessToast from "@/components/admin/shared/SuccessToast";
+import Pagination from "@/components/admin/shared/Pagination";
 
 export default function NegociosPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Fase 8.1 y 8.2: Paginación y Búsqueda Server-side
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(8); 
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterPlan, setFilterPlan] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  const [globalStats, setGlobalStats] = useState({
+    total: 0,
+    activos: 0,
+    vencimientos: 0,
+    diff: 0
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteConfig, setDeleteConfig] = useState<{ id: string, name: string, type: 'category' | 'business' } | null>(null);
+  const [deleteConfig, setDeleteConfig] = useState<{ id: string, name: string, type: 'category' | 'business', imageUrl?: string } | null>(null);
   const [toast, setToast] = useState({ show: false, message: "" });
   const supabase = createClient();
 
+  // 1. Obtener Stats Globales (independiente de filtros)
+  const fetchGlobalStats = useCallback(async () => {
+    try {
+      const { data: businesses } = await supabase
+        .from('businesses')
+        .select('created_at, status, payment_date');
+
+      if (businesses) {
+        const total = businesses.length;
+        const activos = businesses.filter((b: any) => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
+        const hoy = new Date();
+        const en7Dias = new Date();
+        en7Dias.setDate(hoy.getDate() + 7);
+        
+        const vencimientos = businesses.filter((b: any) => {
+          if (!b.payment_date) return false;
+          const fechaPago = new Date(b.payment_date);
+          return fechaPago >= hoy && fechaPago <= en7Dias;
+        }).length;
+
+        const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+        const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
+        const nuevosMesPasado = businesses.filter((b: any) => {
+          const d = new Date(b.created_at);
+          return d >= inicioMesPasado && d < inicioMesActual;
+        }).length;
+
+        let diff = 0;
+        if (nuevosMesPasado > 0) diff = ((nuevosEsteMes - nuevosMesPasado) / nuevosMesPasado) * 100;
+        else if (nuevosEsteMes > 0) diff = 100;
+
+        setGlobalStats({ total, activos, vencimientos, diff: Math.round(diff) });
+      }
+    } catch (e) {
+      console.error("Error stats:", e);
+    }
+  }, [supabase]);
+
+  // 2. Obtener Datos Paginados y Filtrados
   const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
+      
       const { data: catData } = await supabase
         .from('categories')
         .select('*')
         .order('created_at', { ascending: true });
-      
-      const { data: busData } = await supabase
-        .from('businesses')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
       setCategories(catData || []);
+
+      let query = supabase
+        .from('businesses')
+        .select('*', { count: 'exact' });
+
+      // Filtro de búsqueda (Nombre o ID)
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,id.ilike.%${searchTerm}%`);
+      }
+
+      // Filtro de Plan
+      if (filterPlan !== "all") {
+        query = query.eq('plan', filterPlan);
+      }
+
+      // Filtro de Estatus
+      if (filterStatus !== "all") {
+        query = query.eq('status', filterStatus === "active");
+      }
+
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      const { data: busData, count, error } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
       setBusinesses((busData as any) || []);
+      setTotalCount(count || 0);
+
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabase, currentPage, pageSize, searchTerm, filterPlan, filterStatus]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    fetchGlobalStats();
+  }, [fetchData, fetchGlobalStats]);
 
-  const stats = useMemo(() => {
-    const total = businesses.length;
-    const activos = businesses.filter((b: any) => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
-    const hoy = new Date();
-    const en7Dias = new Date();
-    en7Dias.setDate(hoy.getDate() + 7);
-    
-    const vencimientos = businesses.filter((b: any) => {
-      if (!b.payment_date) return false;
-      const fechaPago = new Date(b.payment_date);
-      return fechaPago >= hoy && fechaPago <= en7Dias;
-    }).length;
-
-    const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-    const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
-    const nuevosMesPasado = businesses.filter((b: any) => {
-      const d = new Date(b.created_at);
-      return d >= inicioMesPasado && d < inicioMesActual;
-    }).length;
-
-    let diff = 0;
-    if (nuevosMesPasado > 0) diff = ((nuevosEsteMes - nuevosMesPasado) / nuevosMesPasado) * 100;
-    else if (nuevosEsteMes > 0) diff = 100;
-
-    return { total, activos, vencimientos, diff: Math.round(diff) };
-  }, [businesses]);
+  // Reset a página 1 al filtrar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterPlan, filterStatus]);
 
   const handleDeleteCategory = (id: string) => {
     const cat = categories.find(c => c.id === id);
-    setDeleteConfig({ id, name: cat?.name || 'esta categoría', type: 'category' });
+    setDeleteConfig({ id, name: cat?.name || 'esta categoría', type: 'category', imageUrl: cat?.image_url });
     setIsDeleteModalOpen(true);
   };
 
-  const handleDeleteBusiness = (id: string, name: string) => {
-    setDeleteConfig({ id, name, type: 'business' });
+  const handleDeleteBusiness = (business: Business) => {
+    setDeleteConfig({ id: business.id, name: business.name, type: 'business', imageUrl: business.logo_url });
     setIsDeleteModalOpen(true);
   };
 
@@ -94,6 +155,23 @@ export default function NegociosPage() {
     if (!deleteConfig) return;
     
     try {
+      // 1. Storage Cleanup (Fase 8.3)
+      if (deleteConfig.imageUrl) {
+        try {
+          const bucket = deleteConfig.type === 'category' ? 'categories' : 'logos';
+          // Extraer el nombre del archivo de la URL pública
+          const fileName = deleteConfig.imageUrl.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from(bucket).remove([fileName]);
+            console.log(`Storage: ${fileName} eliminado de ${bucket}`);
+          }
+        } catch (storageErr) {
+          console.error("Error cleaning up storage:", storageErr);
+          // Continuamos con la eliminación de DB incluso si falla el storage
+        }
+      }
+
+      // 2. Database Deletion
       const table = deleteConfig.type === 'category' ? 'categories' : 'businesses';
       const { error, count } = await supabase
         .from(table)
@@ -146,10 +224,10 @@ export default function NegociosPage() {
 
       {/* Grid de KPIs Adaptativo */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-12">
-        <StatCard title="Total Negocios" value={stats.total.toString()} icon={<Store className="text-fowy-orange" />} bgColor="bg-fowy-orange/10" />
-        <StatCard title="Activos hoy" value={stats.activos.toString()} icon={<CheckCircle2 className="text-green-500" />} bgColor="bg-green-50" percentage="+2.5%" />
-        <StatCard title="Conversión" value={`${stats.diff}%`} icon={stats.diff >= 0 ? <TrendingUp className="text-blue-500" /> : <TrendingDown className="text-red-500" />} bgColor={stats.diff >= 0 ? "bg-blue-50" : "bg-red-50"} trend={stats.diff >= 0 ? "up" : "down"} percentage={`${Math.abs(stats.diff)}%`} />
-        <StatCard title="Vencimientos" value={stats.vencimientos.toString()} icon={<Calendar className="text-amber-500" />} bgColor="bg-amber-50" alert={stats.vencimientos > 0} />
+        <StatCard title="Total Negocios" value={globalStats.total.toString()} icon={<Store className="text-fowy-orange" />} bgColor="bg-fowy-orange/10" />
+        <StatCard title="Activos hoy" value={globalStats.activos.toString()} icon={<CheckCircle2 className="text-green-500" />} bgColor="bg-green-50" percentage="+2.5%" />
+        <StatCard title="Conversión" value={`${globalStats.diff}%`} icon={globalStats.diff >= 0 ? <TrendingUp className="text-blue-500" /> : <TrendingDown className="text-red-500" />} bgColor={globalStats.diff >= 0 ? "bg-blue-50" : "bg-red-50"} trend={globalStats.diff >= 0 ? "up" : "down"} percentage={`${Math.abs(globalStats.diff)}%`} />
+        <StatCard title="Vencimientos" value={globalStats.vencimientos.toString()} icon={<Calendar className="text-amber-500" />} bgColor="bg-amber-50" alert={globalStats.vencimientos > 0} />
       </div>
 
       {/* Categorías (Scroll Horizontal en Móvil) */}
@@ -167,7 +245,7 @@ export default function NegociosPage() {
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <h3 className="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Establecimientos Afiliados</h3>
-            <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold">{businesses.length} Total</span>
+            <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold">{totalCount} Total</span>
           </div>
           
           <button 
@@ -179,7 +257,24 @@ export default function NegociosPage() {
           </button>
         </div>
         
-        <BusinessList businesses={businesses} onDelete={handleDeleteBusiness} />
+        <BusinessList 
+          businesses={businesses} 
+          onDelete={handleDeleteBusiness}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filterPlan={filterPlan}
+          onPlanChange={setFilterPlan}
+          filterStatus={filterStatus}
+          onStatusChange={setFilterStatus}
+        />
+
+        {/* Paginación */}
+        <Pagination 
+          currentPage={currentPage}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </section>
 
       <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} supabase={supabase} setToast={setToast} />
@@ -198,6 +293,33 @@ export default function NegociosPage() {
         onClose={() => setToast({ ...toast, show: false })} 
       />
     </div>
+  );
+}
+
+function SuccessToast({ show, message, onClose }: { show: boolean, message: string, onClose: () => void }) {
+  useEffect(() => {
+    if (show) {
+      const timer = setTimeout(onClose, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [show, onClose]);
+
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 bg-slate-900 text-white rounded-3xl shadow-2xl flex items-center gap-3 min-w-[300px]"
+        >
+          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            <CheckCircle2 size={16} className="text-white" />
+          </div>
+          <p className="text-sm font-bold">{message}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

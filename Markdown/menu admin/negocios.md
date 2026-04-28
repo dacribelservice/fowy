@@ -131,3 +131,9 @@ Diseño de "Glassmorphism" con las siguientes columnas:
 - [x] **7.4** Crear componente `<DashboardDistributionChart />`: Separar el gráfico circular (SVG) y la leyenda de distribución por planes.
 - [x] **7.5** Orquestación Final: Limpiar `src/app/admin/dashboard/page.tsx`, delegando la UI a los nuevos componentes y manteniendo solo la lógica de fetching y estado global.
 
+### Fase 8: Optimización Avanzada y Escalabilidad
+- [x] **8.1** **Paginación en Tiempo Real**: Implementar carga por bloques (offset/limit) en la tabla de negocios para manejar miles de registros sin degradar el rendimiento.
+- [x] **8.2** **Búsqueda Server-side**: Migrar los filtros y el buscador de la UI a consultas directas en Supabase para reducir el uso de memoria en el cliente.
+- [x] **8.3** **Gestión Maestra de Imágenes**: Implementar compresión antes de la subida, placeholders premium para errores de carga y limpieza automática de Storage al eliminar negocios.
+- [x] **8.4** **Blindaje de Supabase**: Configurar índices de rendimiento en la base de datos y auditar las políticas RLS para garantizar seguridad máxima en el centro de mando.
+

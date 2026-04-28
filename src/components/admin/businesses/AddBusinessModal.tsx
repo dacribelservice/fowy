@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, Store, Link as LinkIcon, MapPin, Phone, CreditCard } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { compressImage } from "@/utils/imageCompression";
 
 interface AddBusinessModalProps {
   isOpen: boolean;
@@ -48,14 +49,17 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
     setLoading(true);
 
     try {
-      // 1. Upload Logo
-      const fileExt = logo.name.split('.').pop();
+      // 1. Compress and Upload Logo
+      const compressedBlob = await compressImage(logo, 800, 0.7);
+      const fileExt = logo.name.split('.').pop() || 'jpg';
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `logos/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('logos')
-        .upload(filePath, logo);
+        .upload(filePath, compressedBlob, {
+          contentType: `image/${fileExt === 'png' ? 'png' : 'jpeg'}`
+        });
 
       if (uploadError) throw uploadError;
 

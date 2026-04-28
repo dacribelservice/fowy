@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, Check, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
+import { compressImage } from "@/utils/imageCompression";
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -32,23 +33,27 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess, supabase,
     setUploading(true);
 
     try {
-      // 1. Upload image to Supabase Storage
-      const fileExt = image.name.split('.').pop();
+      // 1. Compress Image (Fase 8.3)
+      const compressedBlob = await compressImage(image, 400, 0.7); // Categorías son más pequeñas (400px)
+      const compressedFile = new File([compressedBlob], image.name, { type: 'image/jpeg' });
+
+      // 2. Upload image to Supabase Storage
+      const fileExt = 'jpg';
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `categories/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('categories')
-        .upload(filePath, image);
+        .upload(filePath, compressedFile);
 
       if (uploadError) throw uploadError;
 
-      // 2. Get Public URL
+      // 3. Get Public URL
       const { data: { publicUrl } } = supabase.storage
         .from('categories')
         .getPublicUrl(filePath);
 
-      // 3. Insert into DB
+      // 4. Insert into DB
       const { error: dbError } = await supabase
         .from('categories')
         .insert([{ name, image_url: publicUrl }]);

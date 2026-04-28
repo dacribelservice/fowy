@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Plus, X } from "lucide-react";
+import PremiumImage from "@/components/admin/shared/PremiumImage";
 
 interface Category {
   id: string;
@@ -48,10 +49,11 @@ export default function CategoryStrip({ categories, onAddClick, onDeleteCategory
           </button>
 
           <div className="w-16 h-16 rounded-full p-[2px] bg-white shadow-sm border border-slate-100 group-hover:border-fowy-orange transition-all overflow-hidden relative">
-            <img
-              src={cat.image_url || "/placeholder-category.png"}
+            <PremiumImage
+              src={cat.image_url}
               alt={cat.name}
-              className="w-full h-full object-cover rounded-full"
+              className="w-full h-full rounded-full"
+              fallbackType="category"
             />
           </div>
           <span className="text-[10px] font-bold text-slate-500 group-hover:text-fowy-orange transition-colors uppercase tracking-widest text-center max-w-[80px] truncate">
