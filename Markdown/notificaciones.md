@@ -89,14 +89,14 @@ Esta lista debe seguirse en orden secuencial para garantizar la integridad del s
 
 ### 🎨 Fase 4: UI/UX Premium (Fowy Design System)
 - [x] **4.1 Notification Bell**: Crear el componente de campana con badge animado y efecto Glassmorphism.
-- [ ] **4.2 Dropdown Panel**: Diseñar el panel de notificaciones recientes con scroll y blur.
-- [ ] **4.3 Sonner Integration**: Estilizar los Toasts emergentes para que coincidan con la estética FOWY.
-- [ ] **4.4 History Page**: Crear la vista completa de historial con paginación y filtros.
+- [x] **4.2 Dropdown Panel**: Diseñar el panel de notificaciones recientes con scroll y blur.
+- [x] **4.3 Sonner Integration**: Estilizar los Toasts emergentes para que coincidan con la estética FOWY.
+- [x] **4.4 History Page**: Crear la vista completa de historial con paginación y filtros.
 
 ### 🧪 Fase 5: Integración y Testing Final
-- [ ] **5.1 End-to-End Test**: Probar el flujo completo desde la creación de un pedido hasta la alerta sonora y visual.
-- [ ] **5.2 Push Validation**: Confirmar la recepción de notificaciones Push en dispositivos móviles.
-- [ ] **5.3 Performance Check**: Optimizar la carga de assets y la memoria del Service Worker.
+- [x] **5.1 End-to-End Test**: Probar el flujo completo desde la creación de un pedido hasta la alerta sonora y visual.
+- [x] **5.2 Push Validation**: Confirmar la recepción de notificaciones Push en dispositivos móviles.
+- [x] **5.3 Performance Check**: Optimizar la carga de assets y la memoria del Service Worker.
 
 ---
 *Diseño de Sistema v5 (Checklist Enumerada) - Abril 2026*

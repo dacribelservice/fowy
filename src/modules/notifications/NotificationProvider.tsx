@@ -14,6 +14,8 @@ interface NotificationContextType {
   unreadCount: number;
   permissionStatus: NotificationPermission;
   playNotificationSound: (type?: 'order' | 'alert') => void;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -133,19 +135,51 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log('Foreground message received:', payload);
+      // You could also trigger a manual toast here if you want to override the default behavior
     });
 
     return () => unsubscribe();
   }, []);
 
+  const markAsRead = async (id: string) => {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id);
+
+    if (!error) {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const markAllAsRead = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false);
+
+    if (!error) {
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    }
+  };
+
   return (
+
     <NotificationContext.Provider value={{ 
       token, 
       requestPermission, 
       notifications, 
       unreadCount, 
       permissionStatus,
-      playNotificationSound 
+      playNotificationSound,
+      markAsRead,
+      markAllAsRead
     }}>
       <PermissionPrompt />
       {children}

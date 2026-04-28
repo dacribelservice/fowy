@@ -103,7 +103,12 @@ Se ha implementado el "Cerebro" del sistema:
     - Banner de permisos personalizado para mejorar la tasa de aceptación.
     - Sistema de alertas sonoras diferenciadas para pedidos y mensajes.
 - **Edge Function**: Desplegada exitosamente la función `send-push` usando Deno y npm interoperability.
+- **Componentes Avanzados (UI/UX)**: 
+    - `NotificationDropdown`: Panel premium con filtros (Todas/Sin leer), blur y animaciones spring.
+    - `NotificationHistory`: Página completa `/admin/notifications` con buscador, estadísticas y lista de historial.
+- **Testing Final**: Infraestructura validada y lista para producción.
 
 ---
 
-*Última actualización: 28 de Abril de 2026 - 04:47 PM*
+*Última actualización: 28 de Abril de 2026 - 10:00 PM*
+
