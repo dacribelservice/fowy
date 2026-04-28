@@ -125,9 +125,9 @@ Diseño de "Glassmorphism" con las siguientes columnas:
 - La Fase 6 se da por concluida con éxito.
 
 ### Fase 7: Refactorización del Dashboard (Centro de Mando)
-- [ ] **7.1** Crear componente `<DashboardHeader />`: Extraer el saludo de bienvenida, buscador y botones de acción (campana/ajustes).
-- [ ] **7.2** Crear componente `<DashboardStatsGrid />`: Aislar la cuadrícula de KPIs (Total negocios, activos, tasa de conversión y vencimientos).
-- [ ] **7.3** Crear componente `<DashboardGrowthChart />`: Extraer la sección de "Crecimiento de la Red" con su lógica de barras dinámicas y tooltips.
-- [ ] **7.4** Crear componente `<DashboardDistributionChart />`: Separar el gráfico circular (SVG) y la leyenda de distribución por planes.
-- [ ] **7.5** Orquestación Final: Limpiar `src/app/admin/dashboard/page.tsx`, delegando la UI a los nuevos componentes y manteniendo solo la lógica de fetching y estado global.
+- [x] **7.1** Crear componente `<DashboardHeader />`: Extraer el saludo de bienvenida, buscador y botones de acción (campana/ajustes).
+- [x] **7.2** Crear componente `<DashboardStatsGrid />`: Aislar la cuadrícula de KPIs (Total negocios, activos, tasa de conversión y vencimientos).
+- [x] **7.3** Crear componente `<DashboardGrowthChart />`: Extraer la sección de "Crecimiento de la Red" con su lógica de barras dinámicas y tooltips.
+- [x] **7.4** Crear componente `<DashboardDistributionChart />`: Separar el gráfico circular (SVG) y la leyenda de distribución por planes.
+- [x] **7.5** Orquestación Final: Limpiar `src/app/admin/dashboard/page.tsx`, delegando la UI a los nuevos componentes y manteniendo solo la lógica de fetching y estado global.
 
