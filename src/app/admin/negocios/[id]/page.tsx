@@ -10,6 +10,12 @@ import {
   CheckCircle2, AlertCircle
 } from "lucide-react";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
+import dynamic from "next/dynamic";
+
+const DynamicLocationPicker = dynamic(
+  () => import("@/components/admin/shared/LocationPicker"),
+  { ssr: false, loading: () => <div className="h-[300px] w-full rounded-[24px] bg-slate-50 animate-pulse flex items-center justify-center text-slate-400 font-bold text-xs uppercase tracking-widest border-2 border-slate-100">Cargando Mapa...</div> }
+);
 
 interface BusinessData {
   id: string;
@@ -18,6 +24,8 @@ interface BusinessData {
   logo_url: string;
   city: string;
   country: string;
+  latitude: number | null;
+  longitude: number | null;
   plan: string;
   status: boolean;
   phone: string;
@@ -87,6 +95,8 @@ export default function BusinessDetailsPage() {
           modules: business.modules,
           city: business.city,
           country: business.country,
+          latitude: business.latitude,
+          longitude: business.longitude,
           phone: business.phone
         })
         .eq('id', id);
@@ -300,23 +310,21 @@ export default function BusinessDetailsPage() {
                         </select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ciudad</label>
-                        <input 
-                          type="text"
-                          value={business.city}
-                          onChange={(e) => setBusiness({...business, city: e.target.value})}
-                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">País</label>
-                        <input 
-                          type="text"
-                          value={business.country}
-                          onChange={(e) => setBusiness({...business, country: e.target.value})}
-                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
+                      <div className="md:col-span-2">
+                        <DynamicLocationPicker
+                          initialCity={business.city}
+                          initialCountry={business.country}
+                          initialLat={business.latitude || undefined}
+                          initialLng={business.longitude || undefined}
+                          onLocationChange={(data) => {
+                            setBusiness({
+                              ...business,
+                              city: data.city,
+                              country: data.country,
+                              latitude: data.lat,
+                              longitude: data.lng
+                            });
+                          }}
                         />
                       </div>
                    </div>

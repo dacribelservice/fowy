@@ -53,7 +53,7 @@ export default function NegociosPage() {
 
   const stats = useMemo(() => {
     const total = businesses.length;
-    const activos = businesses.filter(b => b.status).length;
+    const activos = businesses.filter(b => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
     const hoy = new Date();
     const en7Dias = new Date();
     en7Dias.setDate(hoy.getDate() + 7);

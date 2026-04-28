@@ -23,10 +23,14 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({
     totalBusinesses: 0,
     activeBusinesses: 0,
-    conversionRate: 0,
-    upcomingExpirations: 0,
     totalSales: "$0.00",
-    totalOrders: 0
+    totalOrders: 0,
+    premiumPercentage: 0,
+    proPercentage: 0,
+    standardPercentage: 0,
+    growthData: [0,0,0,0,0,0,0],
+    growthPercentages: [0,0,0,0,0,0,0],
+    growthNames: [[],[],[],[],[],[],[]] as string[][]
   });
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -40,7 +44,7 @@ export default function DashboardPage() {
 
       if (businesses) {
         const total = businesses.length;
-        const activos = businesses.filter(b => b.status).length;
+        const activos = businesses.filter(b => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
         
         // Expirations (Next 7 days)
         const hoy = new Date();
@@ -65,12 +69,58 @@ export default function DashboardPage() {
         if (nuevosMesPasado > 0) diff = ((nuevosEsteMes - nuevosMesPasado) / nuevosMesPasado) * 100;
         else if (nuevosEsteMes > 0) diff = 100;
 
+        // Distribucion
+        const premiumCount = businesses.filter(b => (b.plan || '').toLowerCase().trim() === 'premium').length;
+        const proCount = businesses.filter(b => (b.plan || '').toLowerCase().trim() === 'pro').length;
+        const standardCount = total - premiumCount - proCount;
+
+        const premiumPercentage = total > 0 ? Math.round((premiumCount / total) * 100) : 0;
+        const proPercentage = total > 0 ? Math.round((proCount / total) * 100) : 0;
+        const standardPercentage = total > 0 ? Math.round((standardCount / total) * 100) : 0;
+
+        // Crecimiento últimos 7 días
+        const last7Days = Array.from({length: 7}).map((_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - i));
+          d.setHours(0,0,0,0);
+          return d;
+        });
+
+        const growthData = last7Days.map(day => {
+          const nextDay = new Date(day);
+          nextDay.setDate(nextDay.getDate() + 1);
+          return businesses.filter(b => {
+            if (!b.created_at) return false;
+            const bDate = new Date(b.created_at);
+            return bDate >= day && bDate < nextDay;
+          }).length;
+        });
+
+        const maxGrowth = Math.max(...growthData, 1);
+        const growthPercentages = growthData.map(count => Math.round((count / maxGrowth) * 100));
+
+        const growthNames = last7Days.map(day => {
+          const nextDay = new Date(day);
+          nextDay.setDate(nextDay.getDate() + 1);
+          return businesses.filter(b => {
+            if (!b.created_at) return false;
+            const bDate = new Date(b.created_at);
+            return bDate >= day && bDate < nextDay;
+          }).map(b => b.name);
+        });
+
         setStats(prev => ({
           ...prev,
           totalBusinesses: total,
           activeBusinesses: activos,
           upcomingExpirations: vencimientos,
-          conversionRate: Math.round(diff)
+          conversionRate: Math.round(diff),
+          premiumPercentage,
+          proPercentage,
+          standardPercentage,
+          growthData,
+          growthPercentages,
+          growthNames
         }));
       }
     } catch (error) {
@@ -93,7 +143,15 @@ export default function DashboardPage() {
     );
   }
 
-  const kpis = [
+  const kpis: Array<{
+    name: string;
+    value: string;
+    icon: any;
+    color: string;
+    detail: string;
+    trend?: "up" | "down";
+    alert?: boolean;
+  }> = [
     { 
       name: "Total Negocios", 
       value: stats.totalBusinesses.toString(), 
@@ -213,17 +271,23 @@ export default function DashboardPage() {
             </select>
           </div>
           <div className="flex-1 flex items-end justify-between gap-3 sm:gap-6 px-2">
-             {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
+             {stats.growthPercentages.map((h, i) => (
                <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                 <div className="relative w-full h-full flex items-end justify-center">
+                 <div className="relative w-full h-48 sm:h-64 flex items-end justify-center">
                     <motion.div 
                       initial={{ height: 0 }}
-                      animate={{ height: `${h}%` }}
+                      animate={{ height: `${Math.max(h, 2)}%` }}
                       transition={{ delay: 0.5 + (i * 0.1), duration: 0.8 }}
-                      className="w-full max-w-[40px] bg-gradient-to-t from-fowy-primary to-fowy-red rounded-2xl opacity-80 group-hover:opacity-100 transition-opacity shadow-lg shadow-fowy-red/10"
+                      className="w-full max-w-[40px] bg-gradient-to-t from-fowy-primary to-fowy-red rounded-xl opacity-80 group-hover:opacity-100 transition-opacity shadow-lg shadow-fowy-red/20"
                     />
-                    <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow-xl">
-                      {h}
+                    <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[10px] font-bold px-3 py-2 rounded-xl shadow-xl z-20 flex flex-col items-center min-w-max pointer-events-none">
+                      <span className="text-fowy-orange">{stats.growthData[i]} {stats.growthData[i] === 1 ? 'negocio' : 'negocios'}</span>
+                      {stats.growthNames && stats.growthNames[i] && stats.growthNames[i].slice(0, 3).map((name, idx) => (
+                         <span key={idx} className="text-slate-300 font-medium text-[9px] mt-0.5">{name}</span>
+                      ))}
+                      {stats.growthNames && stats.growthNames[i] && stats.growthNames[i].length > 3 && (
+                        <span className="text-slate-400 font-medium text-[9px] mt-0.5">+{stats.growthNames[i].length - 3} más</span>
+                      )}
                     </div>
                  </div>
                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">D{i+1}</span>
@@ -243,41 +307,72 @@ export default function DashboardPage() {
           <p className="text-slate-400 text-sm mb-8">Por tipo de suscripción</p>
           
           <div className="flex-1 flex flex-col items-center justify-center gap-8">
-            <div className="w-56 h-56 rounded-full border-[20px] border-slate-50 relative flex items-center justify-center shadow-inner">
-               <svg className="absolute inset-0 w-full h-full -rotate-90">
+            <div className="w-56 h-56 relative flex items-center justify-center">
+               <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 200 200">
+                 {/* Base Circle (Standard) */}
                  <circle
-                   cx="50%"
-                   cy="50%"
-                   r="90"
+                   cx="100"
+                   cy="100"
+                   r="80"
                    fill="none"
                    stroke="currentColor"
                    strokeWidth="20"
-                   strokeDasharray="565"
-                   strokeDashoffset="400"
-                   className="text-fowy-primary"
+                   className="text-slate-100"
+                 />
+                 {/* Pro Circle */}
+                 <circle
+                   cx="100"
+                   cy="100"
+                   r="80"
+                   fill="none"
+                   stroke="currentColor"
+                   strokeWidth="20"
+                   strokeDasharray="502.65"
+                   strokeDashoffset={502.65 - (502.65 * (stats.proPercentage + stats.premiumPercentage)) / 100}
+                   className="text-blue-500 transition-all duration-1000 ease-out"
+                   strokeLinecap="round"
+                 />
+                 {/* Premium Circle */}
+                 <circle
+                   cx="100"
+                   cy="100"
+                   r="80"
+                   fill="none"
+                   stroke="currentColor"
+                   strokeWidth="20"
+                   strokeDasharray="502.65"
+                   strokeDashoffset={502.65 - (502.65 * stats.premiumPercentage) / 100}
+                   className="text-fowy-primary transition-all duration-1000 ease-out"
                    strokeLinecap="round"
                  />
                </svg>
-               <div className="text-center z-10">
-                 <p className="text-4xl font-black text-slate-800">28%</p>
-                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Premium</p>
+               <div className="text-center z-10 bg-white w-32 h-32 rounded-full flex flex-col items-center justify-center shadow-sm border border-slate-50">
+                 <p className="text-4xl font-black text-slate-800 leading-none">{stats.totalBusinesses}</p>
+                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Total</p>
                </div>
             </div>
             
             <div className="w-full space-y-4">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-fowy-primary shadow-sm shadow-fowy-primary/40" />
+                  <div className="w-3 h-3 rounded-full bg-fowy-primary shadow-sm" />
                   <span className="text-sm font-bold text-slate-600">Premium</span>
                 </div>
-                <span className="text-sm font-black text-slate-800">28%</span>
+                <span className="text-sm font-black text-slate-800">{stats.premiumPercentage}%</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" />
+                  <span className="text-sm font-bold text-slate-600">Pro</span>
+                </div>
+                <span className="text-sm font-black text-slate-800">{stats.proPercentage}%</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-slate-300" />
-                  <span className="text-sm font-bold text-slate-600">Básico</span>
+                  <span className="text-sm font-bold text-slate-600">Standard</span>
                 </div>
-                <span className="text-sm font-black text-slate-800">72%</span>
+                <span className="text-sm font-black text-slate-800">{stats.standardPercentage}%</span>
               </div>
             </div>
           </div>
