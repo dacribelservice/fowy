@@ -82,3 +82,10 @@ Diseño de "Glassmorphism" con las siguientes columnas:
 - [x] **5.4** Reverse Geocoding: Conectar una API (ej. Nominatim) para auto-completar "Ciudad" y "País" al mover el pin.
 - [x] **5.5** Persistencia: Guardar correctamente las coordenadas junto a los demás datos del negocio.
 - [x] **5.6** Despliegue: Asegurar que la importación de Leaflet sea dinámica (`ssr: false`) para no romper el build de Next.js.
+
+### Fase 6: Refactorización y Escalabilidad (Desacoplamiento de `[id]/page.tsx`)
+- [ ] **6.1** Crear componente `<BusinessProfileHeader />`: Extraer toda la sección de información básica (nombre, logo, etiquetas, inputs principales y botones de guardado).
+- [ ] **6.2** Crear componente `<BusinessLocationManager />`: Aislar la sección del mapa (LocationPicker) y el manejo de los estados de latitud, longitud, ciudad y país.
+- [ ] **6.3** Crear componente `<BusinessModuleManager />`: Extraer la cuadrícula de Switches (Standard, Pro, Premium) y la función `handleToggleModule`.
+- [ ] **6.4** Crear componente `<BusinessPaymentViewer />`: Separar la tarjeta de estado de pago, el enlace de cobro por WhatsApp y el visor de comprobantes.
+- [ ] **6.5** Integración en el Orquestador: Limpiar `src/app/admin/negocios/[id]/page.tsx`, importando y conectando los nuevos sub-componentes, centralizando solo el estado maestro (`businessData`) y las llamadas a Supabase.

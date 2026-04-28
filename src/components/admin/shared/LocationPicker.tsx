@@ -55,6 +55,9 @@ function LocationMarker({ position, setPosition, onLocationChange, isLocating }:
   );
 }
 
+// Trick to force a completely new map instance on Next.js Fast Refresh
+const HOT_RELOAD_KEY = Math.random().toString(36).substring(7);
+
 export default function LocationPicker({
   initialCity,
   initialCountry,
@@ -80,7 +83,7 @@ export default function LocationPicker({
       </div>
       
       <div className="h-[300px] w-full rounded-[24px] overflow-hidden border-2 border-slate-100 shadow-inner relative z-0">
-        <MapContainer center={center} zoom={position ? 15 : 6} scrollWheelZoom={true} className="h-full w-full">
+        <MapContainer key={HOT_RELOAD_KEY} center={center} zoom={position ? 15 : 6} scrollWheelZoom={true} className="h-full w-full">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
