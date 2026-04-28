@@ -84,8 +84,50 @@ Diseño de "Glassmorphism" con las siguientes columnas:
 - [x] **5.6** Despliegue: Asegurar que la importación de Leaflet sea dinámica (`ssr: false`) para no romper el build de Next.js.
 
 ### Fase 6: Refactorización y Escalabilidad (Desacoplamiento de `[id]/page.tsx`)
-- [ ] **6.1** Crear componente `<BusinessProfileHeader />`: Extraer toda la sección de información básica (nombre, logo, etiquetas, inputs principales y botones de guardado).
-- [ ] **6.2** Crear componente `<BusinessLocationManager />`: Aislar la sección del mapa (LocationPicker) y el manejo de los estados de latitud, longitud, ciudad y país.
-- [ ] **6.3** Crear componente `<BusinessModuleManager />`: Extraer la cuadrícula de Switches (Standard, Pro, Premium) y la función `handleToggleModule`.
-- [ ] **6.4** Crear componente `<BusinessPaymentViewer />`: Separar la tarjeta de estado de pago, el enlace de cobro por WhatsApp y el visor de comprobantes.
-- [ ] **6.5** Integración en el Orquestador: Limpiar `src/app/admin/negocios/[id]/page.tsx`, importando y conectando los nuevos sub-componentes, centralizando solo el estado maestro (`businessData`) y las llamadas a Supabase.
+- [x] **6.1** Crear componente `<BusinessProfileHeader />`: Extraer toda la sección de información básica (nombre, logo, etiquetas, inputs principales y botones de guardado).
+- [x] **6.2** Crear componente `<BusinessLocationManager />`: Aislar la sección del mapa (LocationPicker) y el manejo de los estados de latitud, longitud, ciudad y país.
+- [x] **6.3** Crear componente `<BusinessModuleManager />`: Extraer la cuadrícula de Switches (Standard, Pro, Premium) y la función `handleToggleModule`.
+- [x] **6.4** Crear componente `<BusinessPaymentViewer />`: Separar la tarjeta de estado de pago, el enlace de cobro por WhatsApp y el visor de comprobantes.
+- [x] **6.5** Integración en el Orquestador: Limpiar `src/app/admin/negocios/[id]/page.tsx`, importando y conectando los nuevos sub-componentes, centralizando solo el estado maestro (`businessData`) y las llamadas a Supabase.
+
+### 📝 Bitácora de Refactorización (Fase 6)
+
+**Paso 6.1 Completado:**
+- Se creó el archivo `src/components/admin/businesses/BusinessProfileHeader.tsx`.
+- Se extrajeron y exportaron tres componentes principales:
+  - `<BusinessTopBar />`: Contiene el botón de volver y "Guardar Cambios".
+  - `<BusinessProfileCard />`: Contiene la tarjeta principal izquierda (logo, ID, Estatus y "Plan Contratado").
+  - `<BusinessBasicSettings />`: Contiene el formulario de configuración básica (Estatus, Plan, Próximo Pago).
+- Se importaron estos componentes en `src/app/admin/negocios/[id]/page.tsx`, reduciendo drásticamente las líneas de código del archivo principal.
+
+**Paso 6.2 Completado:**
+- Se creó `<BusinessLocationManager />` en `src/components/admin/businesses/`.
+- Se movió la importación dinámica (`next/dynamic`) de `LocationPicker` hacia este nuevo componente.
+- Se reemplazó el bloque del mapa en `page.tsx`, pasando la función de actualización de coordenadas, ciudad y país mediante un callback unificado.
+
+**Paso 6.3 Completado:**
+- Se creó el archivo `src/components/admin/businesses/BusinessModuleManager.tsx`.
+- Se extrajeron la cuadrícula de los módulos y el componente interno `<ModuleSwitch />` de `page.tsx` hacia este nuevo archivo.
+- Se centralizó la función `handleToggleModule` dentro de `<BusinessModuleManager />`, llamando al `onChange` que actualiza el estado `businessData.modules` en el orquestador principal.
+- Se redujeron más líneas de código en el archivo `page.tsx`.
+
+**Paso 6.4 Completado:**
+- Se creó el archivo `src/components/admin/businesses/BusinessPaymentViewer.tsx`.
+- Se encapsuló toda la lógica del comprobante de pago, incluyendo el estado del modal de imagen (`isImageModalOpen`) y el renderizado del modal mismo.
+- Se simplificó el orquestador eliminando estados locales que solo pertenecían a la visualización del pago.
+- Se mantuvo la funcionalidad de "Ampliar" y visualización de placeholder cuando no hay comprobante.
+
+**Paso 6.5 Completado (Final de Fase 6):**
+- Se realizó una limpieza profunda de `src/app/admin/negocios/[id]/page.tsx`.
+- Se eliminaron todos los imports de iconos no utilizados y componentes internos.
+- El archivo orquestador ahora tiene menos de 200 líneas (reducción del ~50%), actuando puramente como controlador de datos y manejador de la base de datos.
+- Se verificó que la comunicación entre sub-componentes y el estado maestro mediante callbacks (`onChange`) funciona correctamente.
+- La Fase 6 se da por concluida con éxito.
+
+### Fase 7: Refactorización del Dashboard (Centro de Mando)
+- [ ] **7.1** Crear componente `<DashboardHeader />`: Extraer el saludo de bienvenida, buscador y botones de acción (campana/ajustes).
+- [ ] **7.2** Crear componente `<DashboardStatsGrid />`: Aislar la cuadrícula de KPIs (Total negocios, activos, tasa de conversión y vencimientos).
+- [ ] **7.3** Crear componente `<DashboardGrowthChart />`: Extraer la sección de "Crecimiento de la Red" con su lógica de barras dinámicas y tooltips.
+- [ ] **7.4** Crear componente `<DashboardDistributionChart />`: Separar el gráfico circular (SVG) y la leyenda de distribución por planes.
+- [ ] **7.5** Orquestación Final: Limpiar `src/app/admin/dashboard/page.tsx`, delegando la UI a los nuevos componentes y manteniendo solo la lógica de fetching y estado global.
+
