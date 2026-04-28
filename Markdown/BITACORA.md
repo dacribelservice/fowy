@@ -94,5 +94,16 @@ Se ha implementado el "Cerebro" del sistema:
 4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos individualmente.
 5.  **Compresión Forzada**: Toda imagen subida al sistema debe pasar por el proceso de optimización en el cliente para garantizar escalabilidad.
 
+## 🔔 MÓDULO DE NOTIFICACIONES (28-Abr-2026)
+- **Infraestructura**: Integración de Firebase Cloud Messaging (FCM) con Supabase Edge Functions.
+- **Seguridad**: Los secretos de Firebase Admin se gestionan en Supabase Vault (`FIREBASE_SERVICE_ACCOUNT`).
+- **Push & Realtime**: Sistema híbrido que combina Supabase Realtime (para UI activa) y FCM (para notificaciones en segundo plano).
+- **UX Premium**: 
+    - Campana de notificaciones con Glassmorphism y animaciones Framer Motion.
+    - Banner de permisos personalizado para mejorar la tasa de aceptación.
+    - Sistema de alertas sonoras diferenciadas para pedidos y mensajes.
+- **Edge Function**: Desplegada exitosamente la función `send-push` usando Deno y npm interoperability.
+
 ---
-*Ultima actualización: 27 de Abril de 2026 - 10:10 PM*
+
+*Última actualización: 28 de Abril de 2026 - 04:47 PM*
