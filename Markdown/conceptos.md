@@ -1,5 +1,8 @@
 # 🧠 CONCEPTOS Y REGLAS DE ARQUITECTURA (FOWY)
 
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
+
+
 Este documento define las reglas de oro para mantener el código limpio, escalable y modular. Es de **obligado cumplimiento** para cualquier sesión de desarrollo.
 
 ---

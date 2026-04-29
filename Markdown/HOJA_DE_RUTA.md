@@ -1,5 +1,8 @@
 # 🗺️ HOJA DE RUTA MAESTRA: PROYECTO FOWY (CONSOLIDADA)
 
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
+
+
 Este es el registro único de verdad. Combina todos los checklists de `nucleo.md`, `notificaciones.md`, `negocios.md` y `rol-negocio.md`.
 
 ---

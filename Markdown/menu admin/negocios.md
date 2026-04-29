@@ -1,6 +1,6 @@
 # 🏪 MÓDULO: GESTIÓN DE NEGOCIOS (ADMIN)
 
-> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
 Este módulo es el corazón de la administración de FOWY. Permite el control total sobre los establecimientos afiliados, su categorización y las funcionalidades (módulos) que tienen contratados.
 

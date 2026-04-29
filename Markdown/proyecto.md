@@ -1,7 +1,6 @@
 # 🏗️ BLUEPRINT MAESTRO: ARQUITECTURA "BÚNKER MODULAR" (DACRIBEL ENGINE)
 
-> [!IMPORTANT]
-> **REGLA DE ORO PROYECTO**: ESTE ARCHIVO ES EL PLANO MAESTRO PARA REPLICAR LA ARQUITECTURA EN NUEVOS PROYECTOS. NUNCA COMENZAR UNA APP SIN QUE LA IA LEA Y ENTIENDA CADA FASE DE ESTE DOCUMENTO.
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
 Este documento destila la ingeniería de Dacribel para ser usada como semilla en nuevas aplicaciones (Ej: App de Comidas). Se basa en tres pilares: **Aislamiento Total**, **Seguridad Industrial** y **Escalabilidad Modular**.
 
@@ -86,7 +85,7 @@ root/
 
 ## 🧩 GUÍA PARA REPLICAR
 
-> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
 Si quieres crear la App de Comidas usando esta base:
 1.  **Core**: La tienda vende platos en lugar de códigos digitales.

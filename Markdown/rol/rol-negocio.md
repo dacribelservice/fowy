@@ -1,6 +1,6 @@
 # 🎭 ROL: DUEÑO DE NEGOCIO (BUSINESS OWNER)
 
-> ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
 Este rol representa al cliente B2B de FOWY. Su interfaz es un centro operativo premium, enfocado en la gestión en tiempo real y la personalización de su identidad visual.
 

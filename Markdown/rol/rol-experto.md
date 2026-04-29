@@ -1,5 +1,8 @@
 # 🛡️ MÓDULO: ROL EXPERTO (Marketplace)
 
+> ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
+
+
 Este módulo gestiona la conexión entre los dueños de negocios y profesionales verificados (Vetted Experts). Su objetivo principal es ofrecer servicios especializados (Marketing, Fotografía, Ads) con un sistema de pago seguro en custodia (Escrow).
 
 ## 🚀 Funcionalidades Clave
