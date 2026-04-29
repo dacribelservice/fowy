@@ -87,7 +87,7 @@ Esta lista sigue los principios de **modularidad** y **limpieza** de `conceptos.
 - [x] **5.2 Compact Frame**: Reducción de dimensiones del `MobileFrame` a `340x720` para ajuste óptimo en escritorio.
 - [x] **5.3 Grey Map Aesthetic**: Aplicación de filtro grayscale y contraste al mapa para look premium.
 - [x] **5.4 Global Navigation Sync**: Sincronización del perfil y búsqueda expansible entre Layout y Páginas.
-- [x] **5.5 Category Bar Polish**: Eliminado botón "Inicio", implementado indicador de scroll interactivo, funcional con el cursor (drag-to-scroll) y con calibración de precisión final para eliminar espacios vacíos.
+- [x] **5.5 Category Bar Polish**: Refinamiento estético total: integrado control de flechas clásicas (Arrow Icons), indicador naranja con ancho dinámico proporcional y ajuste de precisión en el scroll para visualización perfecta de la última categoría.
 - [x] **5.6 Contrast UI Cards**: Actualización de tarjetas laterales a gris claro sólido para máxima legibilidad.
 
 ---

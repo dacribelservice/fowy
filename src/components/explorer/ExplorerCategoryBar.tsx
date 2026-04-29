@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface Category {
   id: string;
@@ -26,19 +27,25 @@ export default function ExplorerCategoryBar({
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
+  const [indicatorWidth, setIndicatorWidth] = useState(30);
+
   const handleScroll = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       const maxScroll = scrollWidth - clientWidth;
       
-      // Si no hay scroll posible (todas caben), progress es 0
       if (maxScroll <= 0) {
         setScrollProgress(0);
+        setIndicatorWidth(100);
         return;
       }
 
       const progress = (scrollLeft / maxScroll) * 100;
       setScrollProgress(progress);
+
+      // Calculate thumb width based on visible ratio (min 20%, max 80%)
+      const width = Math.min(Math.max((clientWidth / scrollWidth) * 100, 20), 80);
+      setIndicatorWidth(width);
     }
   };
 
@@ -78,6 +85,13 @@ export default function ExplorerCategoryBar({
       };
     }
   }, [categories]);
+
+  const scrollByAmount = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const amount = direction === 'left' ? -150 : 150;
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   // Decidir si mostrar la barra (solo si hay contenido scrolleable)
   const showScrollbar = scrollRef.current ? scrollRef.current.scrollWidth > scrollRef.current.clientWidth : false;
@@ -128,32 +142,50 @@ export default function ExplorerCategoryBar({
         })}
       </div>
 
-      {/* Custom Scroll Indicator (Interactivo y Funcional) */}
+      {/* Custom Scroll Indicator con Flechas Clásicas */}
       <AnimatePresence>
         {showScrollbar && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="flex justify-center mt-4"
+            className="flex items-center justify-center mt-2 px-6"
           >
-            <div 
-              className="w-32 h-[4px] bg-slate-100 rounded-full relative cursor-pointer overflow-hidden group"
-              onClick={(e) => {
-                if (scrollRef.current) {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const clickPos = (e.clientX - rect.left) / rect.width;
-                  const scrollTarget = (scrollRef.current.scrollWidth - scrollRef.current.clientWidth) * clickPos;
-                  scrollRef.current.scrollTo({ left: scrollTarget, behavior: 'smooth' });
-                }
-              }}
-            >
-              <motion.div 
-                className="absolute inset-y-0 left-0 bg-fowy-orange rounded-full"
-                style={{ width: "35%" }}
-                animate={{ x: `${(scrollProgress * (100 - 35)) / 100}%` }}
-                transition={{ type: "spring", damping: 25, stiffness: 150, mass: 0.5 }}
-              />
+            <div className="flex items-center bg-white/80 backdrop-blur-sm border border-orange-100 rounded-full h-10 px-3 shadow-lg shadow-orange-500/5">
+              <button 
+                onClick={() => scrollByAmount('left')}
+                className="p-1.5 text-fowy-orange hover:bg-orange-50 rounded-full transition-colors active:scale-90"
+                title="Scroll Izquierda"
+              >
+                <ArrowLeft size={18} strokeWidth={2.5} />
+              </button>
+
+              <div 
+                className="w-32 h-[6px] bg-slate-100 mx-3 rounded-full relative cursor-pointer overflow-hidden border border-slate-50"
+                onClick={(e) => {
+                  if (scrollRef.current) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const clickPos = (e.clientX - rect.left) / rect.width;
+                    const scrollTarget = (scrollRef.current.scrollWidth - scrollRef.current.clientWidth) * clickPos;
+                    scrollRef.current.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+                  }
+                }}
+              >
+                <motion.div 
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-fowy-orange to-orange-400 rounded-full shadow-[0_0_8px_rgba(255,92,0,0.3)]"
+                  style={{ width: `${indicatorWidth}%` }}
+                  animate={{ x: `${(scrollProgress * (100 - indicatorWidth)) / 100}%` }}
+                  transition={{ type: "spring", damping: 30, stiffness: 200, mass: 0.5 }}
+                />
+              </div>
+
+              <button 
+                onClick={() => scrollByAmount('right')}
+                className="p-1.5 text-fowy-orange hover:bg-orange-50 rounded-full transition-colors active:scale-90"
+                title="Scroll Derecha"
+              >
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </button>
             </div>
           </motion.div>
         )}
