@@ -1,6 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
-import admin from "npm:firebase-admin@11.11.1";
+import { serve } from "http/server.ts";
+import { createClient } from "supabase";
+import admin from "firebase-admin";
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,7 +57,8 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });

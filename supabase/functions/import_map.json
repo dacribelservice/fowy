@@ -1,8 +1,4 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "lib": ["deno.window", "deno.ns"]
-  },
   "imports": {
     "std/": "https://deno.land/std@0.168.0/",
     "http/": "https://deno.land/std@0.168.0/http/",
@@ -10,4 +6,3 @@
     "firebase-admin": "npm:firebase-admin@11.11.1"
   }
 }
-
