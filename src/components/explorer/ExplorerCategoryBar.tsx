@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Category {
   id: string;
@@ -22,28 +22,76 @@ export default function ExplorerCategoryBar({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
   const handleScroll = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      const progress = (scrollLeft / (scrollWidth - clientWidth)) * 100;
-      setScrollProgress(isNaN(progress) ? 0 : progress);
+      const maxScroll = scrollWidth - clientWidth;
+      
+      // Si no hay scroll posible (todas caben), progress es 0
+      if (maxScroll <= 0) {
+        setScrollProgress(0);
+        return;
+      }
+
+      const progress = (scrollLeft / maxScroll) * 100;
+      setScrollProgress(progress);
     }
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const onMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; 
+    scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
   useEffect(() => {
     const el = scrollRef.current;
     if (el) {
       el.addEventListener("scroll", handleScroll);
-      return () => el.removeEventListener("scroll", handleScroll);
+      // Ejecutar una vez al inicio para verificar si hay scroll inicial
+      handleScroll();
+      
+      // Observar cambios en el tamaño (por si se cargan más categorías)
+      const resizeObserver = new ResizeObserver(() => handleScroll());
+      resizeObserver.observe(el);
+      
+      return () => {
+        el.removeEventListener("scroll", handleScroll);
+        resizeObserver.disconnect();
+      };
     }
-  }, []);
+  }, [categories]);
+
+  // Decidir si mostrar la barra (solo si hay contenido scrolleable)
+  const showScrollbar = scrollRef.current ? scrollRef.current.scrollWidth > scrollRef.current.clientWidth : false;
 
   return (
     <div className="relative pt-6 pb-4">
       {/* Scrollable Container */}
       <div 
         ref={scrollRef}
-        className="flex items-center gap-4 overflow-x-auto px-4 no-scrollbar scroll-smooth"
+        onMouseDown={onMouseDown}
+        onMouseLeave={onMouseUp}
+        onMouseUp={onMouseUp}
+        onMouseMove={onMouseMove}
+        className="flex items-center gap-4 overflow-x-auto px-6 no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing select-none"
       >
         {categories.map((cat, index) => {
           const isSelected = selectedCategoryId === cat.id;
@@ -81,26 +129,35 @@ export default function ExplorerCategoryBar({
       </div>
 
       {/* Custom Scroll Indicator (Interactivo y Funcional) */}
-      <div className="flex justify-center mt-4">
-        <div 
-          className="w-32 h-[4px] bg-slate-100 rounded-full relative cursor-pointer overflow-hidden group"
-          onClick={(e) => {
-            if (scrollRef.current) {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const clickPos = (e.clientX - rect.left) / rect.width;
-              const scrollTarget = (scrollRef.current.scrollWidth - scrollRef.current.clientWidth) * clickPos;
-              scrollRef.current.scrollTo({ left: scrollTarget, behavior: 'smooth' });
-            }
-          }}
-        >
+      <AnimatePresence>
+        {showScrollbar && (
           <motion.div 
-            className="absolute inset-y-0 left-0 bg-fowy-orange rounded-full"
-            style={{ width: "35%" }}
-            animate={{ x: `${(scrollProgress * (100 - 35)) / 100}%` }}
-            transition={{ type: "spring", damping: 25, stiffness: 150, mass: 0.5 }}
-          />
-        </div>
-      </div>
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="flex justify-center mt-4"
+          >
+            <div 
+              className="w-32 h-[4px] bg-slate-100 rounded-full relative cursor-pointer overflow-hidden group"
+              onClick={(e) => {
+                if (scrollRef.current) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const clickPos = (e.clientX - rect.left) / rect.width;
+                  const scrollTarget = (scrollRef.current.scrollWidth - scrollRef.current.clientWidth) * clickPos;
+                  scrollRef.current.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+                }
+              }}
+            >
+              <motion.div 
+                className="absolute inset-y-0 left-0 bg-fowy-orange rounded-full"
+                style={{ width: "35%" }}
+                animate={{ x: `${(scrollProgress * (100 - 35)) / 100}%` }}
+                transition={{ type: "spring", damping: 25, stiffness: 150, mass: 0.5 }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
