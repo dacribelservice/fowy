@@ -7,6 +7,13 @@
 
 ---
 
+## 🔗 ENLACES DE DESARROLLO (Localhost)
+- **Link del Admin**: http://localhost:3000/admin/dashboard
+- **Link del Negocio**: http://localhost:3000/business/orders
+- **Link del Usuario**: http://localhost:3000/explorar
+
+---
+
 ## 🏛️ EL NÚCLEO (The Mall)
 El núcleo es el sistema operativo de la app. Gestiona usuarios, seguridad y navegación global. Si un módulo falla, el núcleo lo aísla.
 
