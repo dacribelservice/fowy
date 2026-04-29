@@ -117,7 +117,7 @@ export default function ExplorerCategoryBar({
               transition={{ delay: index * 0.05 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onSelectCategory(cat.id)}
-              className={`flex-shrink-0 flex flex-col items-center gap-2 group transition-all ${
+              className={`flex-shrink-0 flex flex-col items-center gap-2 group transition-all cursor-pointer ${
                 isSelected ? "opacity-100" : "opacity-60 hover:opacity-100"
               }`}
             >
@@ -161,7 +161,7 @@ export default function ExplorerCategoryBar({
               </button>
 
               <div 
-                className="w-32 h-[6px] bg-slate-100 mx-3 rounded-full relative cursor-pointer overflow-hidden border border-slate-50"
+                className="w-32 h-[8px] bg-slate-100 mx-3 rounded-full relative cursor-pointer overflow-hidden border border-slate-50"
                 onClick={(e) => {
                   if (scrollRef.current) {
                     const rect = e.currentTarget.getBoundingClientRect();

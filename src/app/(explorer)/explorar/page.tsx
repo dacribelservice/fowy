@@ -138,7 +138,7 @@ export default function ExplorarPage() {
       {/* Categories Layer (Floating Bottom) */}
       <div className="absolute bottom-4 left-0 right-0 z-20">
         <div className="max-w-[400px] mx-auto px-4">
-          <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[30px] shadow-2xl overflow-hidden">
+          <div className="bg-zinc-100/95 backdrop-blur-xl border border-white/40 rounded-[30px] shadow-2xl overflow-hidden">
             <ExplorerCategoryBar 
               categories={categories} 
               selectedCategoryId={selectedCategoryId}
@@ -247,7 +247,7 @@ export default function ExplorarPage() {
                             key={biz.id} 
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSelectBusiness(biz)}
-                            className="bg-white rounded-[20px] p-3 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                            className="bg-zinc-100/50 rounded-[20px] p-3 border border-white/40 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                           >
                             <div className="w-full aspect-square rounded-2xl bg-slate-50 overflow-hidden mb-3 relative">
                               <img src={biz.logo_url || "/placeholder-business.png"} alt={biz.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" />

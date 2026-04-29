@@ -36,8 +36,8 @@ Para mantener la esencia de "App Móvil" incluso en navegadores de escritorio, e
 ### 1. 📍 Home: Descubrimiento Inteligente (Map-Centric)
 *   **Mapa Maestro**: Fondo completo del frame. Estética **Grayscale/Dark Grey** premium.
 *   **Header Minimalista (Sin Títulos)**:
-    *   **Perfil**: Botón circular a la izquierda (acceso a configuración/pedidos).
-    *   **Buscador Expansible**: Círculo con lupa al lado del perfil. Al activarse, se expande horizontalmente ocupando el ancho necesario.
+    *   **Perfil**: Botón circular a la derecha (acceso a configuración/pedidos).
+    *   **Buscador Expansible**: Círculo con lupa a la izquierda del perfil (ambos en el lado derecho superior). Al activarse, se expande horizontalmente ocupando el ancho necesario.
 *   **Bottom Navigation (Categorías)**: Las categorías actúan como el menú principal en la parte inferior.
 *   **Interacción**: Al hacer clic en una categoría, se despliega un **Bottom Sheet** (cristal) con la lista de negocios correspondientes.
 *   **Sin Barra Inferior**: Se elimina la barra de navegación tradicional para maximizar el área visual del mapa.
@@ -88,7 +88,8 @@ Esta lista sigue los principios de **modularidad** y **limpieza** de `conceptos.
 - [x] **5.3 Grey Map Aesthetic**: Aplicación de filtro grayscale y contraste al mapa para look premium.
 - [x] **5.4 Global Navigation Sync**: Sincronización del perfil y búsqueda expansible entre Layout y Páginas.
 - [x] **5.5 Category Bar Polish**: Refinamiento estético total: integrado control de flechas clásicas (Arrow Icons), indicador naranja con ancho dinámico proporcional y ajuste de precisión en el scroll para visualización perfecta de la última categoría.
-- [x] **5.6 Contrast UI Cards**: Actualización de tarjetas laterales a gris claro sólido para máxima legibilidad.
+- [x] **5.6 Contrast UI Cards**: Actualización de contenedores y tarjetas a Gris Claro (Zinc-100) para máxima legibilidad y estética premium.
+- [x] **5.7 Header Alignment**: Reubicación de controles de navegación al lado derecho superior para ergonomía mobile-first.
 
 ---
 ## 🛡️ SEGURIDAD Y RENDIMIENTO (Reglas Conceptos.md)

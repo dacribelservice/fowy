@@ -17,7 +17,7 @@ export default function ExplorerLayout({
     <MobileFrame>
       <div className="flex flex-col h-full bg-transparent relative overflow-hidden">
         {/* Minimalist Floating Header */}
-        <nav className="absolute top-6 left-6 right-6 z-50 flex items-center gap-3 pointer-events-none">
+        <nav className="absolute top-6 left-6 right-6 z-50 flex items-center justify-end gap-3 pointer-events-none">
           {/* Profile Circle */}
           <motion.button 
             whileTap={{ scale: 0.9 }}
