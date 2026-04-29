@@ -2,69 +2,59 @@
 
 > ⚠️ **REGLA DE ORO**: Solo Cristian (CEO de FOWY) tiene autoridad para ordenar copias de seguridad (Backups) en GitHub.
 
-Este rol representa al cliente B2B de FOWY. Su interfaz debe ser simplificada, enfocada en la operación diaria y la personalización de su "local" digital.
+Este rol representa al cliente B2B de FOWY. Su interfaz es un centro operativo premium, enfocado en la gestión en tiempo real y la personalización de su identidad visual.
 
 ---
 
-## 🏛️ ESTRUCTURA DEL DASHBOARD DE NEGOCIO (Items solicitados)
+## 🏛️ ESTRUCTURA DEL PANEL DEL NEGOCIO (Módulos)
 
-### 1. 📊 Dashboard (KPIs Generales)
-*   **Visitas al Menú**: Cuántas personas han escaneado el QR o entrado al link hoy/semana/mes.
+### 1. 📊 Dashboard (Inteligencia)
+*   **Visitas al Menú**: Métrica de tráfico real (cuántas personas entraron a ver el menú).
 *   **Pedidos Recibidos**: Contador de órdenes activas y completadas.
 *   **Ticket Promedio**: Valor medio de consumo por cliente.
-*   **Estado de Membresía**: Indicador visual (Semaforización) del tiempo restante de su plan.
+*   **Estado de Membresía**: Semaforización del tiempo restante de su plan.
 
 ### 2. 📦 Pedidos (Gestión en Tiempo Real)
-*   **Tablero de Control**: Lista de órdenes que entran al sistema al hacer clic en "Pedir por WhatsApp".
-*   **Estados del Pedido**:
-    *   🟡 **Pendiente**: Pedido recién realizado (esperando atención).
-    *   🔴 **Cancelado**: Pedidos que no se concretaron (genera métrica de pérdida).
-    *   🟢 **Realizado/Venta**: Pedido entregado y cobrado (alimenta las ventas totales).
-*   **Métricas Operativas**:
-    *   **Horas Pico**: Identificación de los momentos del día con más flujo.
-    *   **Eficiencia**: Tiempo promedio en que el dueño marca un pedido como realizado.
+*   **Tablero de Control**: Las órdenes entran al sistema en el instante en que el cliente hace clic en "Pedir por WhatsApp" desde el Checkout.
+*   **Notificación Sonora**: Sonido de **`cash-register.mp3`** cada vez que entra un nuevo pedido.
+*   **Estados**: 🟡 Pendiente, 🔴 Cancelado, 🟢 Realizado (Venta).
+*   **Métricas Operativas**: Horas pico y eficiencia de despacho.
 
-### 🍔 3. Menú (Gestión de Productos)
-*   **Categorías**: Crear, editar y organizar secciones (ej: Pizzas, Hamburguesas, Bebidas).
+### 🍔 3. Menú Digital (Gestión de Productos)
+*   **Categorías**: Creación y organización de secciones.
 *   **Editor de Productos**:
-    *   **Multimedia**: Subida de imágenes con compresión automática (80% ahorro de espacio).
-    *   **Info Básica**: Nombre, descripción detallada y precio.
-    *   **Promociones**: Posibilidad de marcar productos con precio de oferta o tags de "Nuevo", "Recomendado".
-    *   **Stock**: Switch de "Disponible/Agotado" para ocultar productos al instante.
+    *   **Multimedia**: Subida con compresión automática (80% ahorro).
+    *   **Promociones**: Tags de "Nuevo", "Oferta", "Recomendado".
+    *   **Stock**: Switch de "Disponible/Agotado" con efecto inmediato en el menú.
+*   **Disponibilidad**: Si se definen **Horarios**, el botón de pedido desaparece automáticamente fuera de hora y muestra un mensaje de "Fuera de Servicio".
 
-### 4. 📈 Finanzas (Ventas e Inteligencia)
-*   **Ventas Totales**: Gráfico de ingresos basado únicamente en pedidos con estado **Realizado**.
-*   **Análisis de Productos**: Cuál es el ítem más vendido y cuál el más ignorado.
-*   **Reportes de Conversión**: Cuántos clics en WhatsApp se convierten realmente en ventas finalizadas.
+### 4. 📈 Finanzas (Ventas y Conversión)
+*   **Ingresos**: Gráfico basado solo en pedidos con estado **Realizado**.
+*   **Embudo**: Reporte de cuántas visitas al menú se convirtieron en clics de WhatsApp.
 
-### 5. 💳 Pagos (Membresía FOWY)
-*   **Instrucciones de Pago**: Datos de la cuenta para transferencias.
-*   **Carga de Comprobante**: Sección para subir captura/foto del pago (Webhook o alerta para el Admin).
-*   **Estatus del Pago**: Espera de aprobación / Aprobado / Rechazado.
+### 5. 💳 Mi Plan (Membresía FOWY)
+*   **Pagos**: Instrucciones de transferencia y sección para **Carga de Comprobante**.
+*   **Estatus**: Seguimiento de validación por parte del Admin de Fowy.
 
-### 6. ⚙️ Configuración (Branding & Módulos)
-*   **Branding**: Carga de logo circular y selección de color de identidad del menú.
-*   **WhatsApp**: Configuración del número de destino de los pedidos.
-*   **Módulos FOWY**: Activar/Desactivar herramientas adicionales (ej: Delivery, Reservas, Encuestas).
-*   **Horarios**: Definición de horas de atención para el menú digital.
+### 6. 🎨 Perfil & Branding
+*   **Logo**: Carga de imagen circular premium.
+*   **Identidad Visual**: Selección de color de marca mediante **Color Picker** (Personalización total).
+*   **WhatsApp**: Configuración del número destino para los pedidos.
+*   **Módulos Activos**: Vista de los módulos contratados (Delivery, Reservas, etc.). *Nota: Solo el Admin de Fowy puede activar/desactivar estos módulos.*
 
 ---
 
 ## 🧩 PLAN DE IMPLEMENTACIÓN TÉCNICA
 
-1.  **Rutas**: Crear grupo `(partners)/business` con layouts protegidos.
+1.  **Rutas**: Grupo `(partners)/business` con layouts de cristal y protección de sesión.
 2.  **Base de Datos**: 
-    *   Tabla `products`: Vinculada a `business_id`.
-    *   Tabla `orders`: Para registrar las transacciones y generar los KPIs.
-    *   Tabla `membership_payments`: Para el flujo de captura de pantalla y validación.
-3.  **UI Reutilizable**: Adaptar los componentes `PremiumImage`, `StatsGrid` y `Pagination` para el contexto del negocio.
+    *   Tabla `analytics_visits`: Para el KPI de visitas al menú.
+    *   Tabla `orders`: Registro instantáneo al disparar el evento de WhatsApp.
+    *   Tabla `membership_payments`: Gestión de comprobantes.
+3.  **Sonidos**:
+    *   Negocio: `cash-register.mp3`.
+    *   Usuario (Explorer): `alert.mp3`.
 
 ---
+*Blueprint de Rol v6 - Actualizado Abril 2026*
 
-## 🤔 PREGUNTAS PARA REFINAR EL ROL
-*   ¿Los pedidos llegarán por WhatsApp únicamente o quieres una sección de "Pedidos Activos" con sonido en este dashboard?
-*   ¿El color del menú debe ser libre (Color Picker) o basado en 5-10 temas premium diseñados por FOWY?
-*   ¿El dueño del negocio podrá tener varios usuarios (empleados) o solo una cuenta maestra?
-
----
-*Documento de arquitectura - FOWY 2026*
