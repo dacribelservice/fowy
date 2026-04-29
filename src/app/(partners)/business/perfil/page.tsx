@@ -39,29 +39,43 @@ export default function BusinessProfilePage() {
   const supabase = createClient();
 
   const fetchBusinessData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    // Fetch Business
-    const { data: bizData } = await supabase
-      .from('businesses')
-      .select('*')
-      .eq('owner_id', user.id)
-      .single();
-
-    if (bizData) {
-      setBusiness(bizData);
-      
-      // Fetch Payment Proofs
-      const { data: proofData } = await supabase
-        .from('payment_proofs')
+      // Fetch Business
+      const { data: bizData, error: bizError } = await supabase
+        .from('businesses')
         .select('*')
-        .eq('business_id', bizData.id)
-        .order('created_at', { ascending: false });
-      
-      if (proofData) setProofs(proofData);
+        .eq('owner_id', user.id)
+        .single();
+
+      if (bizError && bizError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error("Error fetching business:", bizError);
+        toast.error("Error al obtener los datos del negocio");
+      }
+
+      if (bizData) {
+        setBusiness(bizData);
+        
+        // Fetch Payment Proofs
+        const { data: proofData } = await supabase
+          .from('payment_proofs')
+          .select('*')
+          .eq('business_id', bizData.id)
+          .order('created_at', { ascending: false });
+        
+        if (proofData) setProofs(proofData);
+      }
+    } catch (error) {
+      console.error("Critical error in fetchBusinessData:", error);
+      toast.error("Error al cargar los datos del perfil");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -140,8 +154,22 @@ export default function BusinessProfilePage() {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-      <Loader2 size={40} className="text-fowy-secondary animate-spin" />
-      <p className="text-slate-500 font-bold animate-pulse">Cargando configuración...</p>
+      <Loader2 size={40} className="text-slate-900 animate-spin" />
+      <p className="text-slate-500 font-bold">Cargando configuración...</p>
+    </div>
+  );
+
+  if (!business && activeTab === 'branding') return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center">
+      <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+        <AlertCircle size={40} />
+      </div>
+      <div>
+        <h3 className="text-2xl font-black text-slate-800">No se encontró el negocio</h3>
+        <p className="text-slate-500 mt-2 max-w-md">
+          Parece que no tienes un negocio vinculado a tu cuenta. Contacta con el administrador para activarlo.
+        </p>
+      </div>
     </div>
   );
 
@@ -151,7 +179,7 @@ export default function BusinessProfilePage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-4xl font-black text-slate-800 tracking-tight">
-            Configuración del Socio ⚙️
+            Configuración del Socio
           </h2>
           <p className="text-slate-500 mt-2 text-lg">
             Gestiona tu marca, pagos y herramientas en un solo lugar.
@@ -162,7 +190,7 @@ export default function BusinessProfilePage() {
           <button 
             onClick={handleSave}
             disabled={saving}
-            className="px-10 py-4 bg-fowy-secondary text-white rounded-2xl font-black shadow-premium hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
+            className="px-10 py-4 bg-fowy-energy text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 shadow-lg shadow-fowy-red/20"
           >
             {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
             Guardar Cambios
@@ -171,33 +199,33 @@ export default function BusinessProfilePage() {
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex p-2 bg-slate-100 rounded-[2rem] w-full md:w-fit gap-2">
+      <div className="flex p-2 bg-white/50 backdrop-blur-md rounded-[2rem] border border-white/50 w-full md:w-fit gap-2">
         <button 
           onClick={() => setActiveTab('branding')}
           className={`flex-1 md:flex-none px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'branding' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            activeTab === 'branding' ? 'bg-white text-slate-900 border border-slate-200' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
           <Palette size={20} />
-          🎨 Perfil & Branding
+          Perfil & Branding
         </button>
         <button 
           onClick={() => setActiveTab('plan')}
           className={`flex-1 md:flex-none px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'plan' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            activeTab === 'plan' ? 'bg-white text-slate-900 border border-slate-200' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
           <CreditCard size={20} />
-          💳 Mi Plan (Pagos)
+          Mi Plan (Pagos)
         </button>
         <button 
           onClick={() => setActiveTab('modules')}
           className={`flex-1 md:flex-none px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'modules' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            activeTab === 'modules' ? 'bg-white text-slate-900 border border-slate-200' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
           <Puzzle size={20} />
-          🧩 Mis Módulos
+          Mis Módulos
         </button>
       </div>
 
@@ -214,9 +242,9 @@ export default function BusinessProfilePage() {
             >
               {/* Basic Info */}
               <div className="lg:col-span-2 space-y-8">
-                <div className="glass-morphism p-10 rounded-[2.5rem] shadow-glass space-y-8">
+                <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 space-y-8">
                   <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-                    <Store size={24} className="text-fowy-secondary" />
+                    <Store size={24} className="text-slate-900" />
                     Información de Identidad
                   </h3>
                   
@@ -253,8 +281,8 @@ export default function BusinessProfilePage() {
                         <button
                           key={color}
                           onClick={() => setBusiness({...business, color_identity: color})}
-                          className={`w-14 h-14 rounded-2xl border-4 transition-all shadow-sm ${
-                            business?.color_identity === color ? 'border-white ring-4 ring-fowy-secondary/20 scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'
+                          className={`w-14 h-14 rounded-2xl border-4 transition-all ${
+                            business?.color_identity === color ? 'border-white ring-4 ring-fowy-secondary/20 scale-110' : 'border-transparent opacity-60 hover:opacity-100'
                           }`}
                           style={{ backgroundColor: color }}
                         />
@@ -274,14 +302,14 @@ export default function BusinessProfilePage() {
                 </div>
 
                 {/* Schedules */}
-                <div className="glass-morphism p-10 rounded-[2.5rem] shadow-glass">
+                <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100">
                   <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                    <Clock size={24} className="text-fowy-secondary" />
+                    <Clock size={24} className="text-slate-900" />
                     Horarios de Atención
                   </h3>
                   <div className="grid gap-3">
                     {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((dia) => (
-                      <div key={dia} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:shadow-sm transition-all group">
+                      <div key={dia} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all group">
                         <span className="text-sm font-black text-slate-700 w-24 group-hover:text-fowy-secondary transition-colors">{dia}</span>
                         <div className="flex items-center gap-4">
                           <input 
@@ -330,9 +358,9 @@ export default function BusinessProfilePage() {
 
               {/* Sidebar branding */}
               <div className="space-y-8">
-                <div className="glass-morphism p-10 rounded-[2.5rem] shadow-glass flex flex-col items-center text-center">
+                <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center">
                   <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 w-full text-left">Logo de Marca</p>
-                  <div className="w-48 h-48 rounded-[3rem] bg-slate-50 flex items-center justify-center relative group overflow-hidden mb-8 shadow-inner border-4 border-white ring-1 ring-slate-100">
+                  <div className="w-48 h-48 rounded-[3rem] bg-slate-50 flex items-center justify-center relative group overflow-hidden mb-8 border-4 border-white ring-1 ring-slate-100">
                     {business?.logo_url ? (
                       <img src={business.logo_url} alt="Logo" className="w-full h-full object-cover" />
                     ) : (
@@ -341,21 +369,21 @@ export default function BusinessProfilePage() {
                         <span className="text-[10px] font-black uppercase tracking-widest">Subir Imagen</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                       <Upload size={40} className="text-white" />
                     </div>
                   </div>
-                  <button className="px-8 py-3 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl text-xs font-black hover:border-fowy-secondary hover:text-fowy-secondary transition-all shadow-sm">
+                  <button className="px-8 py-3 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl text-xs font-black hover:border-fowy-secondary hover:text-fowy-secondary transition-all">
                     Cambiar Logotipo
                   </button>
                 </div>
 
-                <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-fowy-blue to-fowy-blue/80 text-white shadow-xl relative overflow-hidden group">
-                  <div className="absolute -top-10 -right-10 p-10 opacity-20 group-hover:rotate-12 transition-transform duration-700">
+                <div className="p-8 rounded-[2.5rem] bg-fowy-flow text-white relative overflow-hidden group shadow-lg shadow-fowy-purple/20">
+                  <div className="absolute -top-10 -right-10 p-10 opacity-10 group-hover:rotate-12 transition-transform duration-700">
                     <Zap size={140} />
                   </div>
-                  <h4 className="text-lg font-black mb-2 relative z-10">Potencia tu Branding</h4>
-                  <p className="text-xs text-blue-50 font-medium leading-relaxed relative z-10 opacity-90">
+                  <h4 className="text-lg font-black mb-2 relative z-10 text-white">Potencia tu Branding</h4>
+                  <p className="text-xs text-slate-300 font-medium leading-relaxed relative z-10 opacity-90">
                     Un logo claro y un color consistente aumentan la retención de clientes en un 45%. ¡Mantén tu imagen profesional!
                   </p>
                 </div>
@@ -372,13 +400,13 @@ export default function BusinessProfilePage() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-10"
             >
               <div className="lg:col-span-1 space-y-6">
-                <div className="glass-morphism p-10 rounded-[3rem] shadow-glass border-t-[12px] border-t-fowy-secondary flex flex-col relative overflow-hidden">
+                <div className="bg-white p-10 rounded-[3rem] border border-slate-100 border-t-[12px] border-t-fowy-purple flex flex-col relative overflow-hidden shadow-sm">
                   <div className="absolute top-0 right-0 p-8 opacity-5">
                     <CreditCard size={120} />
                   </div>
                   
                   <div className="flex items-center gap-4 mb-10 relative z-10">
-                    <div className="w-14 h-14 bg-fowy-secondary/10 text-fowy-secondary rounded-2xl flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 bg-slate-100 text-slate-900 rounded-2xl flex items-center justify-center">
                       <Zap size={32} />
                     </div>
                     <div>
@@ -390,7 +418,7 @@ export default function BusinessProfilePage() {
                   <div className="space-y-6 mb-10 relative z-10">
                     <div className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
                       <span className="text-sm font-bold text-slate-500">Estado</span>
-                      <span className="px-4 py-1 bg-green-500 text-white text-[10px] font-black uppercase rounded-full shadow-lg shadow-green-500/20">Activo</span>
+                      <span className="px-4 py-1 bg-green-500 text-white text-[10px] font-black uppercase rounded-full">Activo</span>
                     </div>
                     <div className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
                       <span className="text-sm font-bold text-slate-500">Precio</span>
@@ -412,7 +440,7 @@ export default function BusinessProfilePage() {
                   <button 
                     onClick={() => document.getElementById('proof-upload-profile')?.click()}
                     disabled={uploading}
-                    className="w-full py-5 bg-fowy-secondary text-white rounded-[2rem] font-black shadow-premium hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 relative z-10 disabled:opacity-50"
+                    className="w-full py-5 bg-fowy-energy text-white rounded-[2rem] font-black hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 relative z-10 disabled:opacity-50 shadow-lg shadow-fowy-red/20"
                   >
                     {uploading ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
                     Subir Comprobante
@@ -428,9 +456,9 @@ export default function BusinessProfilePage() {
               </div>
 
               <div className="lg:col-span-2">
-                <div className="glass-morphism p-10 rounded-[3rem] shadow-glass">
+                <div className="bg-white p-10 rounded-[3rem] border border-slate-100">
                   <h3 className="text-xl font-black text-slate-800 mb-10 flex items-center gap-3">
-                    <Clock size={24} className="text-fowy-secondary" />
+                    <Clock size={24} className="text-slate-900" />
                     Historial de Pagos & Facturas
                   </h3>
 
@@ -442,9 +470,9 @@ export default function BusinessProfilePage() {
                       </div>
                     ) : (
                       proofs.map((proof) => (
-                        <div key={proof.id} className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-white rounded-[2rem] border border-slate-100 hover:shadow-premium hover:-translate-y-1 transition-all">
+                        <div key={proof.id} className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-slate-300 transition-all">
                           <div className="flex items-center gap-5 mb-4 md:mb-0">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
                               proof.status === 'approved' ? 'bg-green-50 text-green-500' :
                               proof.status === 'pending' ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
                             }`}>
@@ -475,7 +503,7 @@ export default function BusinessProfilePage() {
                               href={proof.proof_url} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="p-4 bg-slate-100 text-slate-400 rounded-2xl hover:bg-fowy-secondary hover:text-white transition-all shadow-sm"
+                              className="p-4 bg-slate-100 text-slate-400 rounded-2xl hover:bg-fowy-secondary hover:text-white transition-all"
                             >
                               <FileText size={20} />
                             </a>
@@ -503,13 +531,13 @@ export default function BusinessProfilePage() {
                   return (
                     <div 
                       key={mod.id} 
-                      className={`glass-morphism p-10 rounded-[3rem] shadow-glass border-b-8 transition-all flex flex-col ${
-                        mod.active ? 'border-b-fowy-secondary' : 'border-b-slate-100 opacity-70 grayscale-[0.5]'
+                      className={`bg-white p-10 rounded-[3rem] border border-slate-100 border-b-8 transition-all flex flex-col ${
+                        mod.active ? 'border-b-fowy-purple shadow-sm' : 'border-b-slate-200 opacity-70 grayscale-[0.5]'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-8">
-                        <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-lg ${
-                          mod.active ? 'bg-fowy-secondary text-white' : 'bg-slate-100 text-slate-400'
+                        <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center ${
+                          mod.active ? 'bg-fowy-flow text-white' : 'bg-slate-100 text-slate-400'
                         }`}>
                           <Icon size={32} />
                         </div>
@@ -532,7 +560,7 @@ export default function BusinessProfilePage() {
                       <button 
                         disabled
                         className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
-                          mod.active ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-300'
+                          mod.active ? 'bg-fowy-energy text-white shadow-md shadow-fowy-red/10' : 'bg-slate-50 text-slate-300'
                         }`}
                       >
                         {mod.active ? "Módulo en Uso" : "Solicitar Activación"}
@@ -542,7 +570,7 @@ export default function BusinessProfilePage() {
                 })}
               </div>
 
-              <div className="p-10 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white relative overflow-hidden shadow-2xl">
+              <div className="p-10 rounded-[3rem] bg-fowy-flow text-white relative overflow-hidden shadow-lg shadow-fowy-purple/20">
                 <div className="absolute top-0 right-0 p-10 opacity-10">
                   <Layers size={180} />
                 </div>
@@ -552,7 +580,7 @@ export default function BusinessProfilePage() {
                     FOWY escala con tu negocio. Si necesitas integración con POS externo, 
                     módulos de inventario avanzado o inteligencia de datos, nuestro equipo lo habilita por ti.
                   </p>
-                  <button className="px-10 py-4 bg-fowy-secondary text-white rounded-2xl font-black shadow-lg hover:scale-105 transition-all flex items-center gap-3">
+                  <button className="px-10 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-100 transition-all flex items-center gap-3">
                     <MessageCircle size={24} />
                     Hablar con un Especialista
                   </button>

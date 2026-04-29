@@ -115,17 +115,6 @@ export default function ExpertPanelPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      {/* Welcome Header */}
-      <div className="relative overflow-hidden p-8 rounded-[2rem] bg-slate-900 text-white">
-        <div className="relative z-10">
-          <h2 className="text-3xl font-black mb-2">Panel de Experto</h2>
-          <p className="text-slate-400">Gestiona tus entregas y haz seguimiento de tus pagos en custodia.</p>
-        </div>
-        <div className="absolute top-0 right-0 p-8 opacity-10">
-          <Briefcase size={120} />
-        </div>
-      </div>
-
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-morphism p-6 rounded-[2rem] border border-white/40">

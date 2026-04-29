@@ -1,40 +1,49 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colores Fowy */
+  /* Colores Fowy - Ethereal High-Tech */
   --color-fowy-red: #FF5A5F;
   --color-fowy-orange: #FF9A3D;
   --color-fowy-purple: #7B61FF;
   --color-fowy-blue: #4D8BFF;
+  --color-fowy-bg-start: #FBFAFF;
+  --color-fowy-bg-end: #EEF5FF;
   
   /* Radios Premium */
   --radius-fowy: 20px;
-  --radius-fowy-lg: 30px;
+  --radius-fowy-lg: 24px;
 
-  /* Sombras y Profundidad */
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  /* Sombras Sutiles */
+  --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 :root {
-  --background: #F8FAFF;
-  --foreground: #2D3748;
+  --background: #FBFAFF;
+  --foreground: #1E293B;
   --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 * {
-  border-color: var(--glass-border);
+  border-color: #F1F5F9;
 }
 
 body {
-  background: #F8FAFF;
+  background: linear-gradient(135deg, var(--color-fowy-bg-start) 0%, var(--color-fowy-bg-end) 100%);
   color: var(--foreground);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Clases de utilidad personalizadas para degradados */
+/* Utilidades High-Tech */
+@utility bg-fowy-energy {
+  background: linear-gradient(135deg, #FF5A5F 0%, #FF9A3D 100%);
+}
+
+@utility bg-fowy-flow {
+  background: linear-gradient(135deg, #7B61FF 0%, #4D8BFF 100%);
+}
+
 @utility bg-fowy-primary {
   background: linear-gradient(135deg, #FF5A5F 0%, #FF9A3D 100%);
 }
@@ -44,8 +53,7 @@ body {
 }
 
 @utility glass-morphism {
-  background: var(--glass-bg);
+  background-color: var(--glass-bg);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
 }

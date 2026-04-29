@@ -75,16 +75,6 @@ export default function BusinessDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
-          ¡Hola de nuevo! 👋
-        </h2>
-        <p className="text-slate-500 mt-2">
-          Aquí tienes un resumen del rendimiento de tu negocio hoy.
-        </p>
-      </div>
-
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (

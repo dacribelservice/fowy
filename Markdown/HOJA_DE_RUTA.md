@@ -124,4 +124,19 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] 10.4.3 Auditoría de seguridad y protección de fondos en custodia por FOWY.
 
 ---
+
+## 🔔 FASE 11: FLUJOS DE NOTIFICACIÓN DE NEGOCIO (Próximamente)
+*Garantizar que el socio y el experto estén siempre informados en tiempo real.*
+
+- [x] **11.1 Alertas de Pedidos en Vivo**:
+    - [x] 11.1.1 Configurar trigger en tabla `orders` para disparar `send-push` al Business Owner.
+    - [x] 11.1.2 Integrar sonido de caja registradora (`cash-register.mp3`) en el Dashboard del socio al recibir pedido.
+- [x] **11.2 Notificaciones de Expertos (B2B)**:
+    - [x] 11.2.1 Notificar al Negocio cuando un Experto: Acepta el trabajo, Sube una entrega o Cambia el estatus del proyecto.
+    - [x] 11.2.2 Notificar al Experto cuando: El Negocio libera fondos (Escrow) o Se solicita una revisión.
+- [x] **11.3 UI de Notificaciones Contextuales**:
+    - [x] 11.3.1 Añadir indicador de alertas visuales directamente en el "Perfil de Negocio" y "Panel de Experto" (PartnerTopBar).
+    - [x] 11.3.2 Implementar avisos visuales para acciones críticas (ej. "Membresía por Vencer").
+
+---
 *Documento consolidado - FOWY 2026*

@@ -44,16 +44,16 @@ export default function ExpertosPage() {
       <HeaderSection />
 
       {/* View Switcher */}
-      <div className="flex p-1 bg-slate-100 rounded-3xl w-fit">
+      <div className="flex p-1 bg-white/50 backdrop-blur-sm rounded-3xl w-fit border border-slate-200/50">
         <button 
           onClick={() => setView('marketplace')}
-          className={`px-8 py-3 rounded-2xl text-sm font-bold transition-all ${view === 'marketplace' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'marketplace' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
         >
           Marketplace
         </button>
         <button 
           onClick={() => setView('orders')}
-          className={`px-8 py-3 rounded-2xl text-sm font-bold transition-all ${view === 'orders' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'orders' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
         >
           Mis Contrataciones
         </button>
@@ -116,25 +116,26 @@ export default function ExpertosPage() {
 
 function HeaderSection() {
   return (
-    <div className="relative overflow-hidden p-8 rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-2xl">
-      <div className="absolute top-0 right-0 p-8 opacity-10">
-        <Sparkles size={120} />
+    <div className="relative overflow-hidden p-10 rounded-[2.5rem] bg-fowy-flow text-white shadow-xl shadow-fowy-blue/20">
+      <div className="absolute top-0 right-0 p-8 opacity-20 rotate-12">
+        <Sparkles size={160} />
       </div>
       <div className="relative z-10 max-w-2xl">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-3 text-fowy-secondary font-bold text-sm uppercase tracking-widest mb-4"
+          className="flex items-center gap-3 text-white/90 font-black text-xs uppercase tracking-[0.2em] mb-6"
         >
-          <Zap size={16} fill="currentColor" />
-          FOWY Expert Marketplace
+          <div className="w-8 h-px bg-white/50" />
+          Marketplace de Expertos
         </motion.div>
-        <h2 className="text-4xl font-bold tracking-tight mb-4">
-          Impulsa tu negocio con <span className="text-fowy-secondary">Expertos Vetted</span>
+        <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight">
+          Impulsa tu negocio con <br />
+          <span className="text-white/80">Talento Certificado</span>
         </h2>
-        <p className="text-slate-300 text-lg leading-relaxed">
-          Hemos seleccionado a los mejores profesionales para ayudarte a crecer. 
-          Contrata con la tranquilidad de que <strong>FOWY protege tu dinero</strong> hasta que el trabajo esté terminado.
+        <p className="text-white/90 text-xl leading-relaxed font-medium">
+          Seleccionamos a los mejores profesionales para ayudarte a crecer. 
+          Contrata con la tranquilidad de que <strong className="text-white">FOWY protege tu dinero</strong> hasta que el trabajo sea entregado.
         </p>
       </div>
     </div>
@@ -143,25 +144,20 @@ function HeaderSection() {
 
 function TrustBanner() {
   return (
-    <div className="p-10 rounded-[3rem] bg-gradient-to-r from-fowy-blue/5 to-transparent border border-fowy-blue/10 flex flex-col lg:flex-row items-center gap-10">
-      <div className="w-20 h-20 rounded-[2rem] bg-fowy-blue flex items-center justify-center text-white shrink-0 shadow-premium rotate-3">
+    <div className="p-10 rounded-[3rem] bg-white/60 backdrop-blur-xl border border-white shadow-sm flex flex-col lg:flex-row items-center gap-10">
+      <div className="w-20 h-20 rounded-[2rem] bg-fowy-flow flex items-center justify-center text-white shrink-0 shadow-lg shadow-fowy-blue/30 rotate-3">
         <ShieldCheck size={40} />
       </div>
       <div className="flex-1 text-center lg:text-left">
-        <h4 className="text-2xl font-black text-slate-800 mb-2">Tu inversión está protegida por FOWY 🛡️</h4>
-        <p className="text-slate-500 text-lg leading-relaxed max-w-3xl">
+        <h4 className="text-2xl font-black text-slate-700 mb-2">Tu inversión está protegida por FOWY 🛡️</h4>
+        <p className="text-slate-400 text-lg leading-relaxed max-w-3xl">
           FOWY retiene los fondos en custodia y solo libera el pago al profesional cuando tú marcas el proyecto como completado. 
           Sin riesgos, con soporte técnico incluido.
         </p>
       </div>
       <div className="shrink-0 flex items-center gap-10">
         <div className="text-center">
-          <p className="text-4xl font-black text-slate-800">20%</p>
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Comisión FOWY</p>
-        </div>
-        <div className="h-16 w-px bg-slate-200 hidden lg:block" />
-        <div className="text-center">
-          <p className="text-4xl font-black text-slate-800">100%</p>
+          <p className="text-4xl font-black text-slate-700">100%</p>
           <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Garantía</p>
         </div>
       </div>

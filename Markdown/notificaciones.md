@@ -98,7 +98,12 @@ Esta lista debe seguirse en orden secuencial para garantizar la integridad del s
 - [x] **5.2 Push Validation**: Confirmar la recepción de notificaciones Push en dispositivos móviles.
 - [x] **5.3 Performance Check**: Optimizar la carga de assets y la memoria del Service Worker.
 
+### 🚀 Fase 6: Flujos de Negocio & Expertos (Próximamente)
+- [x] **6.1 Alertas de Pedidos**: Integrar sonido `cash-register.mp3` y push al detectar nuevos registros en la tabla `orders`.
+- [x] **6.2 Hitos de Expertos**: Notificar cambios de estatus en `service_orders` (Aceptación, Entrega, Liberación de pago).
+- [x] **6.3 Dashboard Integration**: Mostrar indicadores de alerta en el perfil del socio para eventos no leídos.
+
 ---
-*Diseño de Sistema v5 (Checklist Enumerada) - Abril 2026*
+*Diseño de Sistema v6 (Checklist Actualizada) - Abril 2026*
 
 

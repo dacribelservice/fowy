@@ -1,5 +1,7 @@
 import React from "react";
 import PartnerSidebar from "@/components/partners/PartnerSidebar";
+import PartnerTopBar from "@/components/partners/PartnerTopBar";
+import BusinessNotificationListener from "@/components/partners/BusinessNotificationListener";
 
 export default function BusinessLayout({
   children,
@@ -8,12 +10,16 @@ export default function BusinessLayout({
 }) {
   return (
     <div className="flex min-h-screen bg-[#FBFAFF]">
+      {/* Escucha global de notificaciones sonoras */}
+      <BusinessNotificationListener />
+
       {/* Sidebar for Desktop */}
       <PartnerSidebar />
 
       {/* Main Content */}
       <main className="flex-1 xl:ml-80 p-6 xl:p-10">
         <div className="max-w-7xl mx-auto">
+          <PartnerTopBar />
           {children}
         </div>
       </main>
