@@ -50,7 +50,7 @@ export default function MenuManagementPage() {
       .eq('id', id);
 
     if (!error) {
-      setProducts(prev => prev.map(p => p.id === id ? { ...p, in_stock: !currentStock } : o));
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, in_stock: !currentStock } : p));
     }
   };
 
