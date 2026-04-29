@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '../NotificationProvider';
 import { NotificationItem } from './NotificationItem';
-import { CheckAll, Bell, Filter, Settings, Trash2 } from 'lucide-react';
+import { Bell, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface NotificationDropdownProps {

@@ -15,50 +15,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Custom Icon for Businesses
-const createBusinessIcon = (color: string) => {
-  return new L.DivIcon({
-    className: 'custom-div-icon',
-    html: `
-      <div style="
-        background-color: ${color};
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        border: 2px solid white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        margin-left: -18px;
-        margin-top: -18px;
-      ">
-        <div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        </div>
-      </div>
-    `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-  });
-};
-
-interface Business {
-  id: string;
-  name: string;
-  slug: string;
-  latitude: number;
-  longitude: number;
-  logo_url: string | null;
-  color_identity: string | null;
-  category_name?: string;
-}
-
-interface ExplorerMapProps {
-  businesses: Business[];
-  center?: [number, number];
-}
-
 function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
   const map = useMap();
   useEffect(() => {
@@ -67,28 +23,70 @@ function ChangeView({ center, zoom }: { center: [number, number], zoom: number }
   return null;
 }
 
-export default function ExplorerMap({ businesses, center }: ExplorerMapProps) {
+interface ExplorerMapProps {
+  businesses: any[];
+  center?: [number, number];
+  onSelectBusiness?: (biz: any) => void;
+}
+
+export default function ExplorerMap({ businesses, center, onSelectBusiness }: ExplorerMapProps) {
   const defaultCenter: [number, number] = [4.5709, -74.2973]; // Colombia
   const mapCenter = center || (businesses.length > 0 ? [businesses[0].latitude, businesses[0].longitude] : defaultCenter);
 
   return (
-    <div className="h-full w-full relative z-0">
+    <div className="h-full w-full relative z-0 grayscale-[0.8] contrast-[1.2]">
       <MapContainer 
         center={mapCenter as [number, number]} 
-        zoom={businesses.length > 0 ? 13 : 6} 
+        zoom={center ? 17 : (businesses.length > 0 ? 16 : 14)} 
         scrollWheelZoom={true} 
         className="h-full w-full"
+        zoomControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
+
+        {/* User Location Marker (Blue Dot) */}
+        {center && (
+          <Marker 
+            position={center} 
+            icon={L.divIcon({
+              className: 'user-location-marker',
+              html: `
+                <div class="relative flex items-center justify-center">
+                  <div class="absolute w-8 h-8 bg-blue-500/20 rounded-full animate-ping"></div>
+                  <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>
+                </div>
+              `,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+            })}
+          />
+        )}
         
         {businesses.map((biz) => (
           <Marker 
             key={biz.id} 
             position={[biz.latitude, biz.longitude]} 
-            icon={createBusinessIcon(biz.color_identity || "#FF5A5F")}
+            eventHandlers={{
+              click: () => onSelectBusiness?.(biz)
+            }}
+            icon={L.divIcon({
+              className: 'custom-business-marker',
+              html: `
+                <div class="flex items-center gap-2 group">
+                  <div style="background-color: ${biz.color_identity || '#FF5A5F'}" class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white transition-transform group-hover:scale-110">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  </div>
+                  <span style="color: ${biz.color_identity || '#FF5A5F'}" class="text-[11px] font-black whitespace-nowrap bg-white/40 backdrop-blur-[2px] px-2 py-0.5 rounded-full">
+                    ${biz.name}
+                  </span>
+                </div>
+              `,
+              iconSize: [120, 40],
+              iconAnchor: [16, 16],
+            })}
           >
             <Popup className="premium-popup">
               <div className="w-64 p-2">
@@ -98,7 +96,7 @@ export default function ExplorerMap({ businesses, center }: ExplorerMapProps) {
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{biz.category_name}</span>
+                      <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{biz.categories?.name}</span>
                       <div className="flex items-center gap-0.5">
                         <Star size={8} className="fill-amber-400 text-amber-400" />
                         <span className="text-[8px] font-black">4.9</span>
@@ -120,25 +118,8 @@ export default function ExplorerMap({ businesses, center }: ExplorerMapProps) {
           </Marker>
         ))}
 
-        <ChangeView center={mapCenter as [number, number]} zoom={businesses.length > 0 ? 13 : 6} />
+        <ChangeView center={mapCenter as [number, number]} zoom={center ? 17 : (businesses.length > 0 ? 16 : 14)} />
       </MapContainer>
-
-      {/* Floating Action Buttons */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 z-[1000]">
-        <button 
-          onClick={() => {
-            if ("geolocation" in navigator) {
-              navigator.geolocation.getCurrentPosition((pos) => {
-                // This would need a way to pass back to parent or use map instance
-              });
-            }
-          }}
-          className="px-6 py-3 bg-white text-slate-900 rounded-full border border-slate-200 font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-slate-50 transition-all active:scale-95"
-        >
-          <Navigation size={16} className="text-slate-900" />
-          Mi Ubicación
-        </button>
-      </div>
     </div>
   );
 }

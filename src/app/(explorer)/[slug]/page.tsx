@@ -1,54 +1,46 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  MapPin, 
-  Phone, 
-  Info, 
-  ShoppingBag, 
   ChevronLeft, 
-  Search,
-  Star,
-  Clock,
+  Star, 
+  Info, 
+  MapPin, 
+  Search, 
+  ShoppingBag, 
+  X, 
+  Minus, 
   Plus,
-  Minus,
-  X
+  ChevronRight
 } from "lucide-react";
 import Link from "next/link";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  in_stock: boolean;
-  category_name: string;
-}
-
-interface Business {
-  id: string;
-  name: string;
-  logo_url: string;
-  color_identity: string;
-  city: string;
-  phone: string;
-}
+import { useCart } from "@/hooks/useCart";
+import ProductGrid from "@/components/explorer/ProductGrid";
+import CartSheet from "@/components/explorer/CartSheet";
 
 export default function BusinessMenuPage() {
   const { slug } = useParams();
-  const [business, setBusiness] = useState<Business | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [business, setBusiness] = useState<any | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
   const supabase = createClient();
   const router = useRouter();
+
+  // Initialize Cart Hook
+  const { 
+    businessItems, 
+    businessTotal, 
+    businessCount, 
+    addToCart, 
+    removeFromCart,
+    updateQuantity
+  } = useCart(business?.id);
 
   const fetchData = useCallback(async () => {
     try {
@@ -88,60 +80,75 @@ export default function BusinessMenuPage() {
     fetchData();
   }, [fetchData]);
 
-  const addToCart = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
-      if (existing) {
-        return prev.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.product.id === productId);
-      if (existing && existing.quantity > 1) {
-        return prev.map(item => 
-          item.product.id === productId 
-            ? { ...item, quantity: item.quantity - 1 } 
-            : item
-        );
-      }
-      return prev.filter(item => item.product.id !== productId);
-    });
-  };
-
-  const cartTotal = useMemo(() => {
-    return cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-  }, [cart]);
-
   const filteredProducts = useMemo(() => {
+    if (!searchTerm) return products;
     return products.filter(p => 
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      p.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [products, searchTerm]);
 
-  const groupedProducts = useMemo(() => {
-    const groups: { [key: string]: Product[] } = {};
-    filteredProducts.forEach(p => {
-      const cat = p.category_name || "Otros";
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(p);
+  // Analytics: Record Visit
+  const recordVisit = useCallback(async (businessId: string) => {
+    try {
+      await supabase.from('analytics_visits').insert({
+        business_id: businessId,
+        path: window.location.pathname,
+        user_agent: navigator.userAgent,
+        referrer: document.referrer || "direct"
+      });
+    } catch (e) {
+      console.error("Error recording visit:", e);
+    }
+  }, [supabase]);
+
+  // Analytics: Record Order
+  const handleCheckoutTracking = async (formData: any) => {
+    if (!business) return;
+    
+    try {
+      await supabase.from('orders').insert({
+        business_id: business.id,
+        customer_name: formData.name,
+        customer_phone: formData.phone,
+        items: businessItems,
+        total_amount: businessTotal,
+        status: 'pending'
+      });
+    } catch (e) {
+      console.error("Error recording order:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (business?.id) {
+      recordVisit(business.id);
+    }
+  }, [business?.id, recordVisit]);
+
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url,
+      business_id: business.id,
+      business_name: business.name
     });
-    return groups;
-  }, [filteredProducts]);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin" />
-        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Preparando la mesa...</p>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-slate-100 rounded-full" />
+          <div className="w-16 h-16 border-4 border-t-slate-900 rounded-full animate-spin absolute top-0" />
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Preparando la mesa</p>
+          <p className="text-[8px] font-bold text-slate-300 mt-1 uppercase">Dacribel Engine v1.3</p>
+        </div>
       </div>
     );
   }
@@ -161,23 +168,29 @@ export default function BusinessMenuPage() {
   const accentColor = business.color_identity || "#FF5A5F";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFF] pb-32">
-      {/* Header Overlay */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-          <button onClick={() => router.back()} className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 hover:bg-slate-50">
+    <div className="min-h-screen bg-[#FBFAFF] pb-40">
+      {/* Header Sticky */}
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/40 shadow-sm">
+        <div className="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+          <button 
+            onClick={() => router.back()} 
+            className="w-12 h-12 rounded-[18px] bg-white border border-slate-100 flex items-center justify-center text-slate-800 shadow-sm active:scale-90 transition-all"
+          >
             <ChevronLeft size={24} />
           </button>
           
-          <div className="flex-1 flex flex-col items-center px-4 overflow-hidden">
-             <h1 className="text-sm font-black text-slate-800 truncate w-full text-center">{business.name}</h1>
-             <div className="flex items-center gap-1">
-               <Star size={10} className="fill-amber-400 text-amber-400" />
-               <span className="text-[10px] font-bold text-slate-500">4.9 (120+ reseñas)</span>
+          <div className="flex-1 flex flex-col items-center overflow-hidden">
+             <h1 className="text-sm font-black text-slate-800 truncate w-full text-center tracking-tight">{business.name}</h1>
+             <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg">
+                 <Star size={10} className="fill-amber-400 text-amber-400" />
+                 <span className="text-[10px] font-black text-amber-600">4.9</span>
+               </div>
+               <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">120+ reseñas</span>
              </div>
           </div>
 
-          <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 hover:bg-slate-50">
+          <button className="w-12 h-12 rounded-[18px] bg-white border border-slate-100 flex items-center justify-center text-slate-800 shadow-sm active:scale-90 transition-all">
             <Info size={20} />
           </button>
         </div>
@@ -185,196 +198,116 @@ export default function BusinessMenuPage() {
 
       <div className="max-w-3xl mx-auto">
         {/* Business Hero */}
-        <div className="bg-white p-6 md:rounded-b-[40px] shadow-sm mb-6">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-24 h-24 rounded-[32px] overflow-hidden border-4 border-slate-50 shadow-xl">
+        <div className="relative px-4 pt-10 pb-10">
+          {/* Decorative background */}
+          <div className="absolute inset-0 top-0 h-40 bg-gradient-to-b from-slate-50 to-transparent z-0" />
+          
+          <div className="relative z-10 flex flex-col items-center">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-32 h-32 rounded-[45px] overflow-hidden border-8 border-white shadow-2xl shadow-slate-900/10 mb-6 bg-white"
+            >
               <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
-            </div>
+            </motion.div>
+            
             <div className="text-center">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{business.name}</h2>
-              <div className="flex items-center justify-center gap-4 mt-2">
-                <div className="flex items-center gap-1 text-slate-400 text-xs font-bold">
-                  <MapPin size={14} />
+              <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-3">{business.name}</h2>
+              <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                  <MapPin size={14} className="text-slate-300" />
                   {business.city}
                 </div>
-                <div className="w-1 h-1 bg-slate-200 rounded-full" />
-                <div className="flex items-center gap-1 text-green-500 text-xs font-black uppercase">
-                  <Clock size={14} />
-                  Abierto
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                <div className="text-green-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                  Abierto ahora
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Search in Menu */}
-          <div className="relative mt-8">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
-              <Search size={20} />
+        {/* Search Bar - Premium */}
+        <div className="px-6 mb-12">
+          <div className="relative group">
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-slate-900 transition-colors">
+              <Search size={22} />
             </div>
             <input 
               type="text" 
-              placeholder="Busca en el menú..." 
-              className="w-full pl-12 pr-4 py-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none focus:border-slate-300 transition-all font-bold text-slate-700 placeholder:text-slate-300"
+              placeholder="¿Qué se te antoja hoy?" 
+              className="w-full pl-16 pr-6 py-5 bg-white rounded-[30px] border border-slate-100 shadow-sm outline-none focus:ring-4 focus:ring-slate-900/5 transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Menu Sections */}
-        <div className="px-4 space-y-10 pb-20">
-          {Object.entries(groupedProducts).map(([category, items]) => (
-            <div key={category} className="space-y-4">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">
-                {category}
-              </h3>
-              <div className="grid gap-4">
-                {items.map((product) => (
-                  <motion.div 
-                    key={product.id}
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex gap-4 hover:shadow-md transition-all"
-                  >
-                    <div className="flex-1">
-                      <h4 className="font-black text-slate-800 mb-1">{product.name}</h4>
-                      <p className="text-xs text-slate-400 font-medium line-clamp-2 mb-3 leading-relaxed">
-                        {product.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-black text-slate-900">${product.price}</span>
-                        
-                        {!product.in_stock ? (
-                          <span className="text-[10px] font-black uppercase text-red-400 bg-red-50 px-3 py-1 rounded-full">Agotado</span>
-                        ) : (
-                          <button 
-                            onClick={() => addToCart(product)}
-                            className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 active:scale-90 transition-all"
-                          >
-                            <Plus size={20} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    {product.image_url && (
-                      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0">
-                        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
+        {/* Product Grid Components */}
+        <div className="px-6">
+          {products.length > 0 ? (
+            <ProductGrid 
+              products={filteredProducts} 
+              cart={businessItems} 
+              onAdd={handleAddToCart} 
+              onRemove={removeFromCart} 
+            />
+          ) : (
+            <div className="py-20 text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+                <ShoppingBag size={32} />
               </div>
+              <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No hay productos disponibles</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
-      {/* Floating Cart Button */}
+      {/* Premium Floating Cart Button */}
       <AnimatePresence>
-        {cart.length > 0 && (
+        {businessCount > 0 && (
           <motion.div 
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-24 md:bottom-8 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-lg z-[100]"
+            className="fixed bottom-10 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[400px] z-[100]"
           >
             <button 
               onClick={() => setIsCartOpen(true)}
-              style={{ backgroundColor: accentColor }}
-              className="w-full p-4 rounded-[28px] text-white flex items-center justify-between shadow-2xl shadow-slate-900/20 active:scale-95 transition-all"
+              style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)` }}
+              className="w-full p-2 pl-6 rounded-[35px] text-white flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.2)] active:scale-95 transition-all group overflow-hidden relative"
             >
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center font-black text-xs">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+              {/* Shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              
+              <div className="flex items-center gap-4">
+                <div className="bg-white text-slate-900 w-10 h-10 rounded-[18px] flex items-center justify-center font-black text-sm shadow-xl">
+                  {businessCount}
                 </div>
-                <span className="font-black uppercase tracking-widest text-xs">Ver Carrito</span>
+                <span className="font-black uppercase tracking-[0.2em] text-[10px]">Ver mi orden</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-black text-lg">${cartTotal}</span>
-                <ShoppingBag size={20} />
+              
+              <div className="flex items-center gap-4 bg-black/10 px-6 py-4 rounded-[30px] backdrop-blur-md">
+                <span className="font-black text-lg tracking-tighter">${businessTotal.toLocaleString()}</span>
+                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Cart Modal / Sheet */}
-      <AnimatePresence>
-        {isCartOpen && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsCartOpen(false)}
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200]"
-            />
-            <motion.div 
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[201] max-h-[90vh] flex flex-col"
-            >
-              <div className="p-8 pb-4 flex items-center justify-between border-b border-slate-50">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">Tu Pedido</h3>
-                <button onClick={() => setIsCartOpen(false)} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                {cart.map((item) => (
-                  <div key={item.product.id} className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0">
-                      <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-slate-800">{item.product.name}</h4>
-                      <p className="text-xs font-black text-slate-400">${item.product.price}</p>
-                    </div>
-                    <div className="flex items-center gap-3 bg-slate-50 p-1 rounded-full">
-                      <button 
-                        onClick={() => removeFromCart(item.product.id)}
-                        className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-slate-400 hover:text-fowy-orange transition-colors"
-                      >
-                        <Minus size={14} />
-                      </button>
-                      <span className="w-4 text-center font-black text-sm">{item.quantity}</span>
-                      <button 
-                        onClick={() => addToCart(item.product)}
-                        className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-slate-400 hover:text-fowy-orange transition-colors"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-8 bg-slate-50/50 space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm font-medium text-slate-500">
-                    <span>Subtotal</span>
-                    <span>${cartTotal}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-lg font-black text-slate-900">
-                    <span>Total</span>
-                    <span>${cartTotal}</span>
-                  </div>
-                </div>
-
-                <button 
-                  style={{ backgroundColor: accentColor }}
-                  className="w-full py-5 rounded-3xl text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-slate-900/10 flex items-center justify-center gap-3 active:scale-95 transition-all"
-                >
-                  <ShoppingBag size={18} />
-                  Confirmar Pedido
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Cart Sheet Component */}
+      <CartSheet 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={businessItems}
+        total={businessTotal}
+        businessName={business.name}
+        businessPhone={business.phone || ""}
+        onUpdateQuantity={updateQuantity}
+        onCheckout={handleCheckoutTracking}
+        accentColor={accentColor}
+      />
     </div>
   );
 }
