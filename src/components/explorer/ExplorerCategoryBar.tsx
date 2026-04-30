@@ -42,11 +42,11 @@ export default function ExplorerCategoryBar({
                 className={`flex-shrink-0 flex flex-col items-center gap-2 outline-none transition-opacity duration-300 ${isDimmed ? 'opacity-50' : 'opacity-100'}`}
               >
                 {/* Contenedor Circular más pequeño ajustado a la imagen */}
-                <div className="w-[56px] h-[56px] rounded-full border-[3px] border-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] bg-[#FFF0F0] flex items-center justify-center relative">
+                <div className="w-[56px] h-[56px] rounded-full border-[3px] border-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] bg-[#FFF0F0] flex items-center justify-center relative overflow-hidden">
                   <img 
                     src={cat.image_url || "/placeholder-category.png"} 
                     alt={cat.name}
-                    className="w-8 h-8 object-contain"
+                    className="w-[52px] h-[52px] object-contain"
                   />
                   
                   {/* Borde sutil de selección (opcional, como admin) */}
