@@ -18,14 +18,6 @@ export default function ExplorerLayout({
       <div className="flex flex-col h-full bg-transparent relative overflow-hidden">
         {/* Minimalist Floating Header */}
         <nav className="absolute top-6 left-6 right-6 z-50 flex items-center justify-end gap-3 pointer-events-none">
-          {/* Profile Circle */}
-          <motion.button 
-            whileTap={{ scale: 0.9 }}
-            className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-white/40 flex items-center justify-center text-slate-800 shadow-xl pointer-events-auto hover:scale-105 active:scale-95 transition-all flex-shrink-0"
-          >
-            <User size={22} strokeWidth={2.5} />
-          </motion.button>
-          
           {/* Expanding Search Engine */}
           <motion.div 
             layout
@@ -59,6 +51,14 @@ export default function ExplorerLayout({
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* Profile Circle */}
+          <motion.button 
+            whileTap={{ scale: 0.9 }}
+            className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-white/40 flex items-center justify-center text-slate-800 shadow-xl pointer-events-auto hover:scale-105 active:scale-95 transition-all flex-shrink-0"
+          >
+            <User size={22} strokeWidth={2.5} />
+          </motion.button>
         </nav>
 
         {/* Content Area (Full Map Background) */}

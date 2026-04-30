@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
 import { Loader2, Star, ChevronRight, Navigation, Plus } from "lucide-react";
 import Link from "next/link";
+import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
 
 // Dynamic Import for Map (SSR: false)
 const ExplorerMap = dynamic(() => import("@/components/explorer/ExplorerMap"), { 
@@ -25,6 +26,7 @@ export default function ExplorarPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -128,7 +130,7 @@ export default function ExplorarPage() {
         },
         (error) => {
           if (error.code === 1) {
-            alert("Por favor, habilita los permisos de ubicación en tu navegador para centrar el mapa.");
+            setIsLocationModalOpen(true);
           } else {
             console.warn("Error de ubicación:", error.message);
           }
@@ -309,6 +311,12 @@ export default function ExplorarPage() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Location Permission Modal */}
+      <LocationPermissionModal 
+        isOpen={isLocationModalOpen} 
+        onClose={() => setIsLocationModalOpen(false)} 
+      />
     </div>
   );
 }
