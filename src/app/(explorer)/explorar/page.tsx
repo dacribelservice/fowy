@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
-import { Loader2, Star, ChevronRight } from "lucide-react";
+import { Loader2, Star, ChevronRight, Navigation, Plus } from "lucide-react";
 import Link from "next/link";
 
 // Dynamic Import for Map (SSR: false)
@@ -45,6 +45,7 @@ export default function ExplorarPage() {
 
   // Calculate distance between two coordinates
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) return 0;
     const R = 6371; // Earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -86,8 +87,8 @@ export default function ExplorarPage() {
       // Sort by proximity if user location is available
       if (userLocation && sortedBus.length > 0) {
         sortedBus = [...sortedBus].sort((a, b) => {
-          const distA = getDistance(userLocation[0], userLocation[1], a.latitude, a.longitude);
-          const distB = getDistance(userLocation[0], userLocation[1], b.latitude, b.longitude);
+          const distA = getDistance(userLocation[0], userLocation[1], Number(a.latitude), Number(a.longitude));
+          const distB = getDistance(userLocation[0], userLocation[1], Number(b.latitude), Number(b.longitude));
           return distA - distB;
         });
       } else {
@@ -115,6 +116,25 @@ export default function ExplorarPage() {
       setIsSheetOpen(true);
     } else {
       setIsSheetOpen(false);
+    }
+  };
+
+  const handleCenterUser = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([latitude, longitude]);
+        },
+        (error) => {
+          if (error.code === 1) {
+            alert("Por favor, habilita los permisos de ubicación en tu navegador para centrar el mapa.");
+          } else {
+            console.warn("Error de ubicación:", error.message);
+          }
+        },
+        { enableHighAccuracy: true }
+      );
     }
   };
 
@@ -146,6 +166,25 @@ export default function ExplorarPage() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Floating Action Buttons */}
+      <div 
+        className="absolute right-4 bottom-[180px] z-[25] flex flex-col gap-3"
+      >
+        <button 
+          onClick={handleCenterUser}
+          className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-full shadow-2xl flex items-center justify-center text-white active:scale-90 transition-all border border-white/20"
+          title="Mi ubicación"
+        >
+          <Navigation size={24} className="fill-white" />
+        </button>
+        <button 
+          className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-full shadow-2xl flex items-center justify-center text-white active:scale-90 transition-all border border-white/20"
+          title="Agregar"
+        >
+          <Plus size={28} />
+        </button>
       </div>
 
       {/* Bottom Sheet for Businesses */}
@@ -208,7 +247,7 @@ export default function ExplorarPage() {
                       <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100/50">
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 block">Distancia</span>
                         <p className="text-sm font-black text-slate-800">
-                          {userLocation ? `${getDistance(userLocation[0], userLocation[1], selectedBusiness.latitude, selectedBusiness.longitude).toFixed(1)} km` : "-- km"}
+                          {userLocation ? `${getDistance(userLocation[0], userLocation[1], Number(selectedBusiness.latitude), Number(selectedBusiness.longitude)).toFixed(1)} km` : "-- km"}
                         </p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100/50">
@@ -253,7 +292,7 @@ export default function ExplorarPage() {
                               <img src={biz.logo_url || "/placeholder-business.png"} alt={biz.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                               {userLocation && (
                                 <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[8px] font-black shadow-sm">
-                                  {getDistance(userLocation[0], userLocation[1], biz.latitude, biz.longitude).toFixed(1)} km
+                                  {getDistance(userLocation[0], userLocation[1], Number(biz.latitude), Number(biz.longitude)).toFixed(1)} km
                                 </div>
                               )}
                             </div>
