@@ -138,5 +138,29 @@ Se ha implementado el "Cerebro" del sistema:
 
 ---
 
+## 🔧 FIX: Sincronización Realtime del Explorador (30 de Abril de 2026 - Sesión Nocturna)
 
-*Última actualización: 29 de Abril de 2026 - 12:00 PM*
+**Problema:** Al seleccionar etiquetas (categorías) en el panel del negocio y guardar, los cambios **no se reflejaban** en la página del Explorador. La página entraba en loop infinito de carga.
+
+**Causa raíz (descubierta tras 5 intentos):**
+1. **Bug de `.sort()`**: `hasChanges` usaba `.sort()` que muta el array de React directamente, ocultando el botón "Guardar Cambios".
+2. **RLS bloqueaba UPDATE silenciosamente**: Los `owner_id` de los negocios eran UUIDs ficticios. Como el usuario no tiene sesión activa, `auth.uid() = NULL` y la política RLS rechazaba cada UPDATE sin mostrar error visible.
+
+**Solución aplicada:**
+1. **Fix `.sort()`** → Cambiado a `[...array].sort()` para no mutar estado de React.
+2. **Refactor `explorar/page.tsx`** → Singleton Supabase + `useRef` para eliminar stale closures y loops infinitos.
+3. **Sync `category_id`** → `handleSaveCategories` ahora sincroniza automáticamente `category_id` con el primer tag.
+4. **Política RLS temporal** → Agregada `"DEV: Allow all updates (temporary)"` en Supabase para permitir UPDATE sin auth durante desarrollo.
+
+> ⚠️ **PENDIENTE**: Cuando se implemente el login de partners, reemplazar la política temporal por autenticación real con `auth.uid() = owner_id`.
+
+**Archivos modificados:**
+- `src/app/(explorer)/explorar/page.tsx`
+- `src/app/(partners)/business/menu/page.tsx`
+- `Markdown/solucion.md` (checklist de diagnóstico)
+
+**Backup:** Commit `73c8107` en GitHub (`main`).
+
+---
+
+*Última actualización: 30 de Abril de 2026 - 01:45 AM*

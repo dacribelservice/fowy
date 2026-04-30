@@ -94,5 +94,13 @@ Si quieres crear la App de Comidas usando esta base:
 4.  **Aislamiento**: Las tablas de platos van en `public`, pero el sistema de reservas de mesas va en un esquema de DB llamado `reservations`.
 
 ---
+
+## ⚠️ ALERTA DE SEGURIDAD — Política RLS Temporal (30-Abr-2026)
+
+> ⚠️ **La política `"DEV: Allow all updates (temporary)"` en la tabla `businesses` de Supabase es solo para desarrollo.** Cuando implementemos el login de partners, la reemplazaremos con autenticación real (`auth.uid() = owner_id`). **No desplegar a producción sin reemplazar esta política.**
+
+Referencia: Ver detalles completos en [solucion.md](file:///c:/Users/cange/Documents/fowy/Markdown/solucion.md) y [BITACORA.md](file:///c:/Users/cange/Documents/fowy/Markdown/BITACORA.md).
+
+---
 *Blueprint Dacribel: Ingeniería para Escalar sin Límites.*
 *Diseñado por Antigravity AI para Cristian (CEO).*
