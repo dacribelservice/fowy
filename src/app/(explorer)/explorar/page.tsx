@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +7,9 @@ import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
 import { Loader2, Star, ChevronRight, Navigation, Plus } from "lucide-react";
 import Link from "next/link";
 import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
+
+// Singleton supabase client (outside component to guarantee single instance)
+const supabase = createClient();
 
 // Dynamic Import for Map (SSR: false)
 const ExplorerMap = dynamic(() => import("@/components/explorer/ExplorerMap"), { 
@@ -27,7 +30,16 @@ export default function ExplorarPage() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const supabase = createClient();
+
+  // Refs to hold latest state values (avoids stale closures in callbacks)
+  const categoriesRef = useRef<any[]>([]);
+  const selectedCategoryIdRef = useRef<string | null>(null);
+  const userLocationRef = useRef<[number, number] | null>(null);
+
+  // Keep refs in sync with state
+  useEffect(() => { categoriesRef.current = categories; }, [categories]);
+  useEffect(() => { selectedCategoryIdRef.current = selectedCategoryId; }, [selectedCategoryId]);
+  useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
 
   useEffect(() => {
     // Request Geolocation on Startup
@@ -59,16 +71,26 @@ export default function ExplorarPage() {
     return R * c;
   };
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch Categories
-      const { data: catData } = await supabase
+  // Fetch categories ONCE on mount
+  useEffect(() => {
+    const fetchCats = async () => {
+      const { data } = await supabase
         .from('categories')
         .select('*')
         .order('name', { ascending: true });
-      setCategories(catData || []);
+      if (data) setCategories(data);
+    };
+    fetchCats();
+  }, []);
+
+  // Core fetch function — reads from refs, no stale closures
+  const fetchBusinesses = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      const currentCategories = categoriesRef.current;
+      const currentCategoryId = selectedCategoryIdRef.current;
+      const currentLocation = userLocationRef.current;
 
       // Fetch Businesses
       let query = supabase
@@ -76,25 +98,35 @@ export default function ExplorarPage() {
         .select('*, categories(name)')
         .eq('status', true);
 
-      if (selectedCategoryId) {
-        query = query.eq('category_id', selectedCategoryId);
+      if (currentCategoryId && currentCategories.length > 0) {
+        const selectedCategory = currentCategories.find((c: any) => c.id === currentCategoryId);
+        if (selectedCategory) {
+          query = query.contains('tags', [selectedCategory.name]);
+        }
       }
 
       const { data: busData, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase query error:", error);
+        throw error;
+      }
       
       let sortedBus = busData || [];
       
       // Sort by proximity if user location is available
-      if (userLocation && sortedBus.length > 0) {
+      if (currentLocation && sortedBus.length > 0) {
         sortedBus = [...sortedBus].sort((a, b) => {
-          const distA = getDistance(userLocation[0], userLocation[1], Number(a.latitude), Number(a.longitude));
-          const distB = getDistance(userLocation[0], userLocation[1], Number(b.latitude), Number(b.longitude));
+          const latA = Number(a.latitude);
+          const lonA = Number(a.longitude);
+          const latB = Number(b.latitude);
+          const lonB = Number(b.longitude);
+          
+          const distA = getDistance(currentLocation[0], currentLocation[1], latA, lonA);
+          const distB = getDistance(currentLocation[0], currentLocation[1], latB, lonB);
           return distA - distB;
         });
       } else {
-        // Fallback sorting
         sortedBus = sortedBus.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       }
 
@@ -105,11 +137,51 @@ export default function ExplorarPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, selectedCategoryId, userLocation]);
+  }, []); // No dependencies — reads from refs
 
+  // Store fetchBusinesses in a ref so realtime callback always has latest version
+  const fetchRef = useRef(fetchBusinesses);
+  useEffect(() => { fetchRef.current = fetchBusinesses; }, [fetchBusinesses]);
+
+  // Fetch on mount and when category/location changes
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchBusinesses();
+  }, [fetchBusinesses, selectedCategoryId, userLocation, categories]);
+
+  // Realtime Subscription — stable, never re-subscribes
+  useEffect(() => {
+    const channel = supabase
+      .channel('explorer-businesses-rt')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses'
+        },
+        (payload) => {
+          console.log('Realtime change detected:', payload.eventType);
+          // Always call the latest fetch function via ref
+          fetchRef.current();
+
+          if (payload.new && (payload.new as any).id) {
+            setSelectedBusiness((prev: any) => {
+              if (prev && prev.id === (payload.new as any).id) {
+                return { ...prev, ...(payload.new as any) };
+              }
+              return prev;
+            });
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []); // Empty — runs once, never re-subscribes
 
   const handleSelectCategory = (id: string | null) => {
     setSelectedCategoryId(id);
@@ -229,10 +301,18 @@ export default function ExplorarPage() {
                         <img src={selectedBusiness.logo_url || "/placeholder-business.png"} alt={selectedBusiness.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 pt-2">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-black uppercase text-fowy-red tracking-widest bg-fowy-red/10 px-2 py-0.5 rounded-lg">
-                            {selectedBusiness.categories?.name}
-                          </span>
+                        <div className="flex flex-wrap gap-2 mb-1">
+                          {selectedBusiness.tags && selectedBusiness.tags.length > 0 ? (
+                            selectedBusiness.tags.map((tag: string) => (
+                              <span key={tag} className="text-[10px] font-black uppercase text-fowy-red tracking-widest bg-fowy-red/10 px-2 py-0.5 rounded-lg">
+                                {tag}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[10px] font-black uppercase text-fowy-red tracking-widest bg-fowy-red/10 px-2 py-0.5 rounded-lg">
+                              {selectedBusiness.categories?.name || "Comercio"}
+                            </span>
+                          )}
                           <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg">
                             <Star size={10} className="fill-amber-400 text-amber-400" />
                             <span className="text-[10px] font-black text-amber-600">4.9</span>
@@ -299,7 +379,9 @@ export default function ExplorarPage() {
                               )}
                             </div>
                             <h3 className="text-xs font-black text-slate-800 leading-tight mb-1 truncate">{biz.name}</h3>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate">{biz.categories?.name}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate">
+                              {biz.tags && biz.tags.length > 0 ? biz.tags.join(" • ") : (biz.categories?.name || "Comercio")}
+                            </p>
                           </motion.div>
                         ))}
                       </div>
@@ -320,4 +402,3 @@ export default function ExplorarPage() {
     </div>
   );
 }
-
