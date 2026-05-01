@@ -22,16 +22,16 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
     *   *Requisito:* Crear proyecto en **Google Cloud Console**, configurar pantalla de consentimiento y obtener Client ID/Secret.
     *   *Callback URL:* Configurar `https://[PROJECT_ID].supabase.co/auth/v1/callback` en Google.
 - [x] **1.2 Redirección**: Configurar `URL Configuration` (Site URL) en Supabase para manejar el flujo de `/auth/callback` en desarrollo y producción.
-- [ ] **1.3 SMTP Profesional**: Configurar el envío de correos usando el dominio profesional de FOWY.
+- [x] **1.3 SMTP Profesional**: Configurar el envío de correos usando el dominio profesional de FOWY (Resend + Vercel DNS).
     *   *Acción:* Desactivar el "Built-in email provider" de Supabase y configurar los ajustes SMTP (Host, Port, User, Password) para asegurar entregabilidad.
-- [ ] **1.4 Email Templates**: Personalizar los correos (Confirmación, Reset Password, Magic Link) con HTML/CSS premium siguiendo el estilo *Ethereal*.
+- [x] **1.4 Email Templates**: Personalizar los correos (Confirmación, Reset Password, Magic Link) con HTML/CSS premium siguiendo el estilo *Ethereal*.
 
 ### Fase 2: Desarrollo de UI (Pantallas)
 #### 2.1 Pantalla de Inicio de Sesión (Login)
-- [ ] **2.1.1 Card Master**: Contenedor Glassmorphism centrado.
-- [ ] **2.1.2 Social Login**: Botón de "Continuar con Google".
-- [ ] **2.1.3 Email Form**: Inputs premium para Email y Contraseña.
-- [ ] **2.1.4 Auxiliares**: Enlace "¿Olvidaste tu contraseña?" y "¿Aún no tienes cuenta?".
+- [x] **2.1.1 Card Master**: Contenedor Glassmorphism centrado.
+- [x] **2.1.2 Social Login**: Botón de "Continuar con Google".
+- [x] **2.1.3 Email Form**: Inputs premium para Email y Contraseña.
+- [x] **2.1.4 Auxiliares**: Enlace "¿Olvidaste tu contraseña?" y "¿Aún no tienes cuenta?".
 
 #### 2.2 Pantalla de Registro (Sign Up)
 - [ ] **2.2.1 Social Register**: Botón de registro con Google.
