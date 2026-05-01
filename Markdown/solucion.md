@@ -101,4 +101,41 @@
 | 4 | ✅ Ejecutado | Arquitectura final con refs |
 | 5 | ✅ Ejecutado | Coordenadas actualizadas |
 
+---
+
+## 🚨 Auditoría de Código y Arquitectura (Fase 8.5)
+
+Tras una auditoría profunda del estado actual de la plataforma, se han identificado los siguientes hallazgos críticos para mantener la escalabilidad y el estándar premium de FOWY.
+
+### 🔍 Hallazgos Principales
+
+1.  **Violación de la Regla de las 250 Líneas**:
+    - `explorar/page.tsx` (**405 líneas**): Exceso de responsabilidades visuales (Sheet, List, Detail).
+    - `admin/negocios/page.tsx` (**353 líneas**): Contiene componentes internos y lógica de stats pesada.
+2.  **Inconsistencia en Componentes de UI**:
+    - Uso de `<img>` nativo en el Explorador en lugar de `PremiumImage` (incumplimiento de la regla 3.3 de `conceptos.md`).
+3.  **Componentes "Nómadas"**:
+    - `StatCard` y `SuccessToast` definidos internamente en páginas administrativas en lugar de en `src/components/admin/shared/`.
+4.  **Seguridad RLS**:
+    - Persistencia de la política `"DEV: Allow all updates"` en la tabla `businesses`.
+
+### ✅ Checklist de Refactorización (Próximos Pasos)
+
+- [ ] **Desacoplamiento del Explorador**:
+  - Extraer `BusinessListSheet.tsx`.
+  - Extraer `BusinessDetailSheet.tsx`.
+- [ ] **Estandarización Visual**:
+  - Migrar todas las imágenes del Explorador a `PremiumImage`.
+- [ ] **Migración de ADN Shared**:
+  - Mover `StatCard` y `SuccessToast` a `src/components/admin/shared/`.
+- [ ] **Blindaje de Producción**:
+  - Implementar políticas RLS definitivas basadas en `auth.uid() = owner_id`.
+- [ ] **Optimización de Lógica**:
+  - Mover la lógica de cálculo de estadísticas de negocios a un hook personalizado o servicio de Supabase.
+
+---
+> **Puntuación de Auditoría:** 9.2 / 10  
+> **Estado:** Sobresaliente, pero requiere "poda" de orquestadores para evitar deuda técnica.
+
+
 > **🔍 Pendiente de verificar:** Que al cambiar etiquetas desde el panel del negocio, el explorador refleje el cambio en tiempo real sin recargar la página.

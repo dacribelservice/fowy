@@ -163,4 +163,32 @@ Se ha implementado el "Cerebro" del sistema:
 
 ---
 
-*Última actualización: 30 de Abril de 2026 - 01:45 AM*
+## 🔒 AUTENTICACIÓN Y BLINDAJE DE DATOS (01 de Mayo de 2026 - Sesión Actual)
+
+**Hitos alcanzados:**
+1.  **Flujo de Autenticación Premium**:
+    - Implementación de `LoginForm` y `RegisterForm` con estética **Ethereal High-Tech**.
+    - Integración de **Framer Motion** para transiciones suaves y **Sonner** para notificaciones (toasts) de error/éxito.
+    - Funcionalidades UX: Toggle de visibilidad de contraseña y estados de carga con gradientes FOWY.
+2.  **Migración de Datos de Prueba (Limpieza)**:
+    - Vinculación de negocios a usuarios reales: Se migró el `owner_id` del negocio "Burguer master" al ID real de `elena@fowy.com`.
+    - Eliminación de UUIDs hardcodeados en el código, transicionando a un sistema basado en sesiones reales.
+3.  **Seguridad y Aislamiento (Multi-tenancy)**:
+    - **Notificaciones**: Refactorización de `NotificationProvider.tsx` para filtrar estrictamente por `user_id`, garantizando que ningún usuario vea alertas ajenas.
+    - **Pedidos de Expertos**: Optimización de `useExperts.ts` para resolver el `business_id` del usuario autenticado antes de consultar órdenes, blindando el acceso a datos B2B.
+4.  **Optimización de Arquitectura CSS (Tailwind v4)**:
+    - Reorganización de `globals.css`: Migración de variables a `:root` dentro de `@layer base` para eliminar avisos del linter en VS Code y mejorar la compatibilidad con el motor de Tailwind v4.
+    - Limpieza de directivas `@utility` hacia bloques estándar de capas.
+
+**Archivos clave modificados:**
+- `src/app/globals.css` (Arquitectura CSS)
+- `src/modules/notifications/NotificationProvider.tsx` (Aislamiento de datos)
+- `src/modules/expertos/hooks/useExperts.ts` (Resolución de Business ID)
+- `src/components/auth/LoginForm.tsx` (UI/UX Auth)
+
+**Backup:** Commit `a13dab8` en GitHub (`main`).
+
+---
+
+*Última actualización: 01 de Mayo de 2026 - 00:20 AM*
+
