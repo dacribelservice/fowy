@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FOWY - Tu Ciudad en un Click",
   description: "Explora y conecta con los mejores negocios de tu ciudad.",
+  icons: {
+    icon: "/assets/icono rojo favicon.png",
+  },
 };
 
 export default function RootLayout({

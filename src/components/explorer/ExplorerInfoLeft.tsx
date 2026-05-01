@@ -9,11 +9,19 @@ export const ExplorerInfoLeft = () => {
       {/* Branding Card */}
       <div className="bg-slate-100/95 p-8 rounded-fowy border border-white/50 shadow-xl relative overflow-hidden group">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-fowy-energy rounded-2xl flex items-center justify-center shadow-lg shadow-fowy-energy/20">
-            <span className="text-white font-black text-2xl">F</span>
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-fowy-energy/20 overflow-hidden p-1">
+            <img 
+              src="/assets/icono rojo favicon.png" 
+              alt="FOWY Logo" 
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-slate-800 tracking-tighter">FOWY</h2>
+            <img 
+              src="/assets/fowy png.png" 
+              alt="FOWY" 
+              className="h-8 object-contain mb-1"
+            />
             <p className="text-[10px] font-bold text-fowy-energy uppercase tracking-widest">Explorer Edition</p>
           </div>
         </div>

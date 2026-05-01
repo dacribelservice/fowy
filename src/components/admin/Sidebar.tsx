@@ -38,12 +38,18 @@ export default function Sidebar() {
     <aside className="fixed left-6 top-6 bottom-6 w-72 glass-morphism rounded-fowy shadow-glass hidden xl:flex flex-col p-6 z-50">
       {/* Brand */}
       <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="w-10 h-10 bg-fowy-primary rounded-xl flex items-center justify-center shadow-premium">
-          <span className="text-white font-bold text-xl">F</span>
+        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-premium overflow-hidden">
+          <img 
+            src="/assets/icono rojo favicon.png" 
+            alt="FOWY Logo" 
+            className="w-7 h-7 object-contain"
+          />
         </div>
-        <h1 className="text-2xl font-bold bg-fowy-primary bg-clip-text text-transparent tracking-tight">
-          FOWY
-        </h1>
+        <img 
+          src="/assets/fowy png.png" 
+          alt="FOWY" 
+          className="h-8 object-contain"
+        />
       </div>
 
       {/* Navigation */}
