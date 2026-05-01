@@ -6,6 +6,7 @@ import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import Image from 'next/image'
 
 // Icono de Google personalizado para mayor fidelidad de marca
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -81,20 +82,23 @@ export default function LoginForm() {
       <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-fowy-purple/10 blur-[100px] rounded-full" />
 
       <div className="relative z-10">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-fowy-energy bg-clip-text text-transparent mb-2">
-            Inicia Sesión
-          </h1>
-          <p className="text-slate-500 text-sm font-medium">
-            Entra a la experiencia FOWY
-          </p>
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative w-48 h-20">
+            <Image 
+              src="/assets/fowy png.png" 
+              alt="FOWY Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
         </div>
 
         {/* Social Login - 2.1.2 */}
         <button
           onClick={handleGoogleLogin}
           disabled={isGoogleLoading}
-          className="w-full py-3.5 px-4 mb-6 flex items-center justify-center gap-3 bg-white border border-slate-100 rounded-[20px] text-slate-700 font-semibold hover:bg-slate-50 transition-all shadow-sm active:scale-[0.98] disabled:opacity-70 cursor-pointer"
+          className="w-full py-3.5 px-4 mb-6 flex items-center justify-center gap-3 bg-slate-100/80 border border-slate-200/60 rounded-[20px] text-slate-600 font-semibold hover:bg-slate-200/80 hover:border-slate-300/60 transition-all shadow-sm active:scale-[0.98] disabled:opacity-70 cursor-pointer"
         >
           {isGoogleLoading ? (
             <div className="w-5 h-5 border-2 border-slate-300 border-t-fowy-red rounded-full animate-spin" />
