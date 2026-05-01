@@ -121,17 +121,17 @@ Tras una auditoría profunda del estado actual de la plataforma, se han identifi
 
 ### ✅ Checklist de Refactorización (Próximos Pasos)
 
-- [ ] **Desacoplamiento del Explorador**:
-  - Extraer `BusinessListSheet.tsx`.
-  - Extraer `BusinessDetailSheet.tsx`.
-- [ ] **Estandarización Visual**:
-  - Migrar todas las imágenes del Explorador a `PremiumImage`.
-- [ ] **Migración de ADN Shared**:
-  - Mover `StatCard` y `SuccessToast` a `src/components/admin/shared/`.
-- [ ] **Blindaje de Producción**:
-  - Implementar políticas RLS definitivas basadas en `auth.uid() = owner_id`.
-- [ ] **Optimización de Lógica**:
-  - Mover la lógica de cálculo de estadísticas de negocios a un hook personalizado o servicio de Supabase.
+- [x] **1. Desacoplamiento del Explorador**:
+  - [x] **1.1** Extraer `BusinessListSheet.tsx`.
+  - [x] **1.2** Extraer `BusinessDetailSheet.tsx`.
+- [x] **2. Estandarización Visual**:
+  - [x] **2.1** Migrar todas las imágenes del Explorador a `PremiumImage`.
+- [x] **3. Migración de ADN Shared**:
+  - [x] **3.1** Mover `StatCard` y `SuccessToast` a `src/components/admin/shared/`.
+- [ ] **4. Blindaje de Producción**:
+  - **4.1** Implementar políticas RLS definitivas basadas en `auth.uid() = owner_id`.
+- [ ] **5. Optimización de Lógica**:
+  - **5.1** Mover la lógica de cálculo de estadísticas de negocios a un hook personalizado o servicio de Supabase.
 
 ---
 > **Puntuación de Auditoría:** 9.2 / 10  

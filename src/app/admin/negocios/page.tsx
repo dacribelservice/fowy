@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import DeleteConfirmModal from "@/components/admin/shared/DeleteConfirmModal";
 import Pagination from "@/components/admin/shared/Pagination";
+import StatCard from "@/components/admin/shared/StatCard";
+import SuccessToast from "@/components/admin/shared/SuccessToast";
 
 export default function NegociosPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -296,57 +298,3 @@ export default function NegociosPage() {
   );
 }
 
-function SuccessToast({ show, message, onClose }: { show: boolean, message: string, onClose: () => void }) {
-  useEffect(() => {
-    if (show) {
-      const timer = setTimeout(onClose, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [show, onClose]);
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 bg-slate-900 text-white rounded-3xl shadow-2xl flex items-center gap-3 min-w-[300px]"
-        >
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <CheckCircle2 size={16} className="text-white" />
-          </div>
-          <p className="text-sm font-bold">{message}</p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function StatCard({ title, value, icon, bgColor, percentage, trend, alert }: any) {
-  return (
-    <motion.div 
-      whileHover={{ y: -5 }}
-      className="bg-white p-5 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-sm shadow-slate-200 border border-slate-50 flex flex-col gap-4 relative overflow-hidden"
-    >
-      <div className="flex justify-between items-start">
-        <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl ${bgColor}`}>
-          {React.cloneElement(icon, { size: 18 })}
-        </div>
-        {percentage && (
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-black ${trend === 'down' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
-            {trend === 'down' ? <ArrowDownRight size={10} /> : <ArrowUpRight size={10} />}
-            {percentage}
-          </div>
-        )}
-        {alert && (
-          <div className="animate-pulse flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-black bg-amber-100 text-amber-700">¡Hoy!</div>
-        )}
-      </div>
-      <div>
-        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{title}</p>
-        <h4 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">{value}</h4>
-      </div>
-    </motion.div>
-  );
-}
