@@ -59,136 +59,38 @@ Se ha implementado el "Cerebro" del sistema:
 - **Fase 4 (Cascarón UI)**: COMPLETADA.
 - **Fase 5 (Módulo Negocios)**: COMPLETADA.
 - **Fase 6 (Notificaciones y Feedback)**: COMPLETADA.
-- **Fase 7 (Refactorización de Dashboard)**: COMPLETADA (Desacoplamiento total de componentes).
+- **Fase 7 (Refactorización de Datos)**: COMPLETADA.
 - **Fase 8 (Optimización y Escalabilidad)**: COMPLETADA (Paginación, Imágenes y Blindaje).
+- **Fase 9 (Limpieza y Seguridad)**: COMPLETADA (RLS definitivo y Desacoplamiento de Lógica).
 
 ---
 
-## 🚀 HITOS RECIENTES (27 de Abril de 2026 - Sesión Nocturna)
-1.  **Refactorización Arquitectónica (Componentización)**: 
-    - Desacoplamiento total de la página de edición de negocios (`[id]/page.tsx`) en componentes especializados: `BusinessProfileHeader`, `BusinessLocationManager`, `BusinessModuleManager` y `BusinessPaymentViewer`.
-    - Refactorización del Dashboard Admin en piezas modales reutilizables (`StatsGrid`, `GrowthChart`, `DistributionChart`).
-2.  **Paginación y Búsqueda Server-side**: 
-    - Implementación de carga por bloques (offset/limit) en la tabla de negocios para manejar miles de registros.
-    - Migración de toda la lógica de filtrado (Plan, Estatus, Buscador) al servidor, reduciendo el consumo de memoria en el cliente.
-3.  **Gestión Maestra de Imágenes**: 
-    - **Compresión en Cliente**: Integración de API Canvas para comprimir logos y categorías antes de la subida, ahorrando hasta un 80% de espacio en Storage.
-    - **PremiumImage**: Creación de un componente inteligente para gestionar estados de carga, esqueletos (skeletons) y fallbacks visuales.
-    - **Storage Cleanup**: Lógica automatizada que elimina archivos huérfanos del Storage al borrar un negocio o categoría.
-4.  **Blindaje y Rendimiento de Supabase**: 
-    - **Índices Trigram**: Activación de `pg_trgm` para búsquedas textuales instantáneas.
-    - **Seguridad RLS Auditada**: Eliminación de políticas de desarrollo abiertas; ahora solo el `super_admin` tiene permisos de escritura (CRUD) en tablas críticas y buckets de storage.
-
----
-
-## 🗺️ MAPA E INTERACCIÓN GEOGRÁFICA (En Desarrollo)
-- **Lo que se preparó (Administración)**: Se está estructurando la lógica de ubicación para que los dueños/administradores puedan asignar coordenadas, ciudad y país exactos a cada negocio.
-- **Lo que se quiere lograr (Vista de Usuario/Explorador)**: El objetivo principal para el usuario final es ofrecer una experiencia de descubrimiento espacial. Los usuarios ("exploradores") accederán a un mapa interactivo general donde verán todos los negocios representados como puntos geolocalizados. Podrán navegar por el mapa, descubrir comercios cercanos y hacer clic en los marcadores para ver la información de cada local (estilo "Centro Comercial Virtual").
-
----
-
-## 📌 DECISIONES CRÍTICAS
-1.  **Ocultar Dev Indicators**: Deshabilitado el botón "N" de Next.js.
-2.  **Cero Datos Genéricos**: Estructuras visuales listas para datos reales.
-3.  **Personalización Dinámica**: Identidad visual variable sobre menú único.
-4.  **Activación Modular**: El sistema permitirá habilitar/deshabilitar módulos individualmente.
-5.  **Compresión Forzada**: Toda imagen subida al sistema debe pasar por el proceso de optimización en el cliente para garantizar escalabilidad.
-
-## 🔔 MÓDULO DE NOTIFICACIONES (28-Abr-2026)
-- **Infraestructura**: Integración de Firebase Cloud Messaging (FCM) con Supabase Edge Functions.
-- **Seguridad**: Los secretos de Firebase Admin se gestionan en Supabase Vault (`FIREBASE_SERVICE_ACCOUNT`).
-- **Push & Realtime**: Sistema híbrido que combina Supabase Realtime (para UI activa) y FCM (para notificaciones en segundo plano).
-- **UX Premium**: 
-    - Campana de notificaciones con Glassmorphism y animaciones Framer Motion.
-    - Banner de permisos personalizado para mejorar la tasa de aceptación.
-    - Sistema de alertas sonoras diferenciadas para pedidos y mensajes.
-- **Edge Function**: Desplegada exitosamente la función `send-push` usando Deno y npm interoperability.
-- **Componentes Avanzados (UI/UX)**: 
-    - `NotificationDropdown`: Panel premium con filtros (Todas/Sin leer), blur y animaciones spring.
-    - `NotificationHistory`: Página completa `/admin/notifications` con buscador, estadísticas y lista de historial.
-- **Testing Final**: Infraestructura validada y lista para producción.
-- **Sincronización**: Código respaldado en GitHub (`main`) incluyendo los nuevos archivos de audio y actualización de documentación.
-
----
-
-## 🚀 HITOS RECIENTES (29 de Abril de 2026 - Sesión Actual)
-1.  **Refactorización Estética: Ethereal High-Tech (Flat Design)**: 
-    - Transición agresiva a Light Mode: Eliminación de `slate-900` y negros puros en layouts, botones y componentes.
-    - Implementación de **Glassmorphism v2**: Uso extendido de `backdrop-blur-xl` con bordes blancos traslúcidos para un look "etéreo".
-    - Estandarización de Gradientes: Uso sistemático de `bg-fowy-energy` y `bg-fowy-flow` para botones y estados activos.
-    - Limpieza de Efectos 3D: Eliminación de sombras pesadas y bordes oscuros en favor de superficies planas y sutiles elevaciones hover.
-2.  **Refactorización Modular de Expertos (Fase 10.2)**: 
-    - Desacoplamiento total de `business/expertos/page.tsx` en componentes atómicos: `ExpertCard`, `CategoryBar`, `ExpertDetailModal` y `ExpertOrdersList`.
-    - Extracción de la lógica de negocio a hooks personalizados (`useExperts.ts`) y constantes estáticas.
-3.  **Auditoría de Proyecto Integral**: 
-    - Evaluación de Estructura (8.5), Documentación (9.5), Escalabilidad (8.5) y Visión de Negocio (10.0).
-4.  **Implementación de Notificaciones B2B (Fase 11.2)**: 
-    - Despliegue de disparadores inteligentes en `service_orders` para coordinar la comunicación entre socios y expertos.
-5.  **Sincronización y Backup**: 
-    - Commit y push exitoso a la rama `main` en GitHub con todos los cambios estructurales.
-
-6. **Refinamiento Módulo Explorador (Fase 5 - Estética Final)**: 
-    - Optimización de `MobileFrame` a `340x720` para visualización perfecta en escritorio.
-    - Estética de Mapa "Grey Premium" mediante filtros de saturación y contraste.
-        - [x] **5.5 Category Bar Polish**: Refinamiento estético total: integrado control de flechas clásicas (Arrow Icons), indicador naranja con ancho dinámico proporcional y ajuste de precisión en el scroll para visualización perfecta de la última categoría.
-    - Actualización de paneles laterales y contenedores a **Gris Claro (Zinc-100)** para contraste óptimo y look premium.
-    - Reubicación de Cabecera: Iconos de Perfil y Búsqueda alineados estrictamente al **lado derecho** para mejor ergonomía.
-7. **Sincronización y Backup Estratégico**: 
-    - Realización de copia de seguridad integral en GitHub a solicitud expresa de Cristian (CEO).
-
----
-
-## 🔧 FIX: Sincronización Realtime del Explorador (30 de Abril de 2026 - Sesión Nocturna)
-
-**Problema:** Al seleccionar etiquetas (categorías) en el panel del negocio y guardar, los cambios **no se reflejaban** en la página del Explorador. La página entraba en loop infinito de carga.
-
-**Causa raíz (descubierta tras 5 intentos):**
-1. **Bug de `.sort()`**: `hasChanges` usaba `.sort()` que muta el array de React directamente, ocultando el botón "Guardar Cambios".
-2. **RLS bloqueaba UPDATE silenciosamente**: Los `owner_id` de los negocios eran UUIDs ficticios. Como el usuario no tiene sesión activa, `auth.uid() = NULL` y la política RLS rechazaba cada UPDATE sin mostrar error visible.
-
-**Solución aplicada:**
-1. **Fix `.sort()`** → Cambiado a `[...array].sort()` para no mutar estado de React.
-2. **Refactor `explorar/page.tsx`** → Singleton Supabase + `useRef` para eliminar stale closures y loops infinitos.
-3. **Sync `category_id`** → `handleSaveCategories` ahora sincroniza automáticamente `category_id` con el primer tag.
-4. **Política RLS temporal** → Agregada `"DEV: Allow all updates (temporary)"` en Supabase para permitir UPDATE sin auth durante desarrollo.
-
-> ⚠️ **PENDIENTE**: Cuando se implemente el login de partners, reemplazar la política temporal por autenticación real con `auth.uid() = owner_id`.
-
-**Archivos modificados:**
-- `src/app/(explorer)/explorar/page.tsx`
-- `src/app/(partners)/business/menu/page.tsx`
-- `Markdown/solucion.md` (checklist de diagnóstico)
-
-**Backup:** Commit `73c8107` en GitHub (`main`).
-
----
-
-## 🔒 AUTENTICACIÓN Y BLINDAJE DE DATOS (01 de Mayo de 2026 - Sesión Actual)
+## 🏗️ REFACTORIZACIÓN Y BLINDAJE (01 de Mayo de 2026 - Sesión Nocturna II)
 
 **Hitos alcanzados:**
-1.  **Flujo de Autenticación Premium**:
-    - Implementación de `LoginForm` y `RegisterForm` con estética **Ethereal High-Tech**.
-    - Integración de **Framer Motion** para transiciones suaves y **Sonner** para notificaciones (toasts) de error/éxito.
-    - Funcionalidades UX: Toggle de visibilidad de contraseña y estados de carga con gradientes FOWY.
-2.  **Migración de Datos de Prueba (Limpieza)**:
-    - Vinculación de negocios a usuarios reales: Se migró el `owner_id` del negocio "Burguer master" al ID real de `elena@fowy.com`.
-    - Eliminación de UUIDs hardcodeados en el código, transicionando a un sistema basado en sesiones reales.
-3.  **Seguridad y Aislamiento (Multi-tenancy)**:
-    - **Notificaciones**: Refactorización de `NotificationProvider.tsx` para filtrar estrictamente por `user_id`, garantizando que ningún usuario vea alertas ajenas.
-    - **Pedidos de Expertos**: Optimización de `useExperts.ts` para resolver el `business_id` del usuario autenticado antes de consultar órdenes, blindando el acceso a datos B2B.
-4.  **Optimización de Arquitectura CSS (Tailwind v4)**:
-    - Reorganización de `globals.css`: Migración de variables a `:root` dentro de `@layer base` para eliminar avisos del linter en VS Code y mejorar la compatibilidad con el motor de Tailwind v4.
-    - Limpieza de directivas `@utility` hacia bloques estándar de capas.
+1.  **Desacoplamiento del Explorador**:
+    - Extracción de sub-componentes pesados a `BusinessListSheet.tsx` y `BusinessDetailSheet.tsx`, reduciendo el archivo principal `explorar/page.tsx` de 405 a menos de 200 líneas.
+    - Implementación de `geo.ts` para centralizar la lógica de coordenadas y formateo de distancia.
+2.  **Estandarización de ADN Shared**:
+    - Centralización de componentes administrativos en `src/components/admin/shared/`: `StatCard` y `SuccessToast` ahora son piezas globales reutilizables.
+    - Actualización visual del Explorador: Sustitución de `<img>` nativos por `PremiumImage` para garantizar esqueletos de carga y placeholders de alta calidad.
+3.  **Blindaje de Producción (RLS Definitivo)**:
+    - Aplicación de políticas de seguridad en Supabase para la tabla `businesses`.
+    - **UPDATE/DELETE**: Restringido estrictamente mediante `auth.uid() = owner_id`.
+    - **INSERT**: Solo permitido para usuarios autenticados.
+    - **SELECT**: Mantenido público para garantizar la funcionalidad del mapa.
+4.  **Optimización de Lógica (Custom Hooks)**:
+    - Creación de `useBusinessStats.ts`: Se extrajo toda la lógica de cálculo de KPIs (negocios activos, vencimientos, crecimiento) de la página administrativa.
+    - Mejora de rendimiento: La página de administración ahora solo se encarga de renderizar, delegando el procesamiento de datos al hook especializado.
 
 **Archivos clave modificados:**
-- `src/app/globals.css` (Arquitectura CSS)
-- `src/modules/notifications/NotificationProvider.tsx` (Aislamiento de datos)
-- `src/modules/expertos/hooks/useExperts.ts` (Resolución de Business ID)
-- `src/components/auth/LoginForm.tsx` (UI/UX Auth)
+- `src/app/admin/negocios/page.tsx` (Refactorización visual)
+- `src/hooks/useBusinessStats.ts` (Nueva lógica desacoplada)
+- `src/components/explorer/` (Nuevas Sheets separadas)
+- `src/utils/geo.ts` (Utilidades geográficas)
 
-**Backup:** Commit `a13dab8` en GitHub (`main`).
+**Backup:** Commit `21eeba0` en GitHub (`main`).
 
 ---
 
-*Última actualización: 01 de Mayo de 2026 - 00:20 AM*
-
+*Última actualización: 01 de Mayo de 2026 - 01:15 AM*
