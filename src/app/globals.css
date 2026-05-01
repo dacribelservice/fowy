@@ -65,3 +65,17 @@ body {
     display: none;
   }
 }
+@utility fowy-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid transparent;
+  border-top-color: white;
+  border-right-color: white;
+  border-radius: 50%;
+  animation: fowy-spin 0.8s linear infinite;
+}
+
+@keyframes fowy-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

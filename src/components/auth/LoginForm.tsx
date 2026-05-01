@@ -101,7 +101,7 @@ export default function LoginForm() {
           className="w-full py-3.5 px-4 mb-6 flex items-center justify-center gap-3 bg-slate-100/80 border border-slate-200/60 rounded-[20px] text-slate-600 font-semibold hover:bg-slate-200/80 hover:border-slate-300/60 transition-all shadow-sm active:scale-[0.98] disabled:opacity-70 cursor-pointer"
         >
           {isGoogleLoading ? (
-            <div className="w-5 h-5 border-2 border-slate-300 border-t-fowy-red rounded-full animate-spin" />
+            <div className="fowy-spinner !w-5 !h-5 !border-t-slate-400 !border-right-slate-400" />
           ) : (
             <GoogleIcon className="w-5 h-5" />
           )}
@@ -174,7 +174,7 @@ export default function LoginForm() {
             className="w-full py-4 bg-fowy-energy rounded-[20px] text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-fowy-red/30 hover:shadow-fowy-red/40 hover:translate-y-[-1px] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-70 mt-4 cursor-pointer"
           >
             {isLoading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="fowy-spinner" />
             ) : (
               <>
                 Entrar <ArrowRight className="w-5 h-5" />

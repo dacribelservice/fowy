@@ -49,9 +49,9 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 - [x] **3.4 Middleware Protection**: Implementar `middleware.ts` para proteger rutas `/admin/*` y `/business/*`, validando el rol del usuario en cada petición.
 
 ### Fase 4: Refinamiento y UX
-- [ ] **4.1 Error Handling**: Implementar Toasts Premium para errores de credenciales o red.
-- [ ] **4.2 Loading States**: Skeletons o Spinners con gradientes de FOWY durante la autenticación.
-- [ ] **4.3 Password Visibility**: Toggle (ojo) para mostrar/ocultar contraseñas.
+- [x] **4.1 Error Handling**: Implementar Toasts Premium para errores de credenciales o red.
+- [x] **4.2 Loading States**: Skeletons o Spinners con gradientes de FOWY durante la autenticación.
+- [x] **4.3 Password Visibility**: Toggle (ojo) para mostrar/ocultar contraseñas.
 
 ---
 

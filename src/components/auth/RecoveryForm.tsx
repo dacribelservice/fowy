@@ -101,7 +101,7 @@ export default function RecoveryForm() {
                   className="w-full py-4 bg-fowy-energy rounded-[20px] text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-fowy-red/30 hover:shadow-fowy-red/40 hover:translate-y-[-1px] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-70 cursor-pointer"
                 >
                   {isLoading ? (
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="fowy-spinner" />
                   ) : (
                     <>
                       Enviar Enlace <ArrowRight className="w-5 h-5" />
