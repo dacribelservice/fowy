@@ -137,4 +137,18 @@ Se ha implementado el "Cerebro" del sistema:
 - `src/middleware.ts` (Configuración del Matcher y ejecución)
 - `src/utils/supabase/middleware.ts` (Lógica de validación de sesión y redirección)
 
-*Última actualización: 01 de Mayo de 2026 - 03:55 PM*
+
+---
+
+## 🎨 LIMPIEZA DE UI Y AJUSTES (01 de Mayo de 2026 - Sesión Nocturna VI)
+
+**Hitos alcanzados:**
+1.  **Limpieza del Explorador**:
+    - Eliminación del logo redundante en la esquina superior izquierda del layout.
+    - Eliminación del botón flotante de "Agregar" (+) en la pantalla del mapa para simplificar la interfaz.
+2.  **Ajuste de Navegación**:
+    - Re-alineación de los elementos del header (Búsqueda y Perfil) hacia la derecha para mantener el balance visual tras quitar el logo.
+
+**Backup:** Commit `9257672` en GitHub (`main`).
+
+*Última actualización: 01 de Mayo de 2026 - 04:08 PM*
