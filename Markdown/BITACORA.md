@@ -151,4 +151,22 @@ Se ha implementado el "Cerebro" del sistema:
 
 **Backup:** Commit `9257672` en GitHub (`main`).
 
-*Última actualización: 01 de Mayo de 2026 - 04:08 PM*
+---
+
+## 🔐 MENÚ DE PERFIL Y AUTENTICACIÓN (01 de Mayo de 2026 - Sesión Nocturna VII)
+
+**Hitos alcanzados:**
+1.  **Menú de Perfil Dinámico**:
+    - Implementación de un popup (dropdown) al hacer clic en el icono de perfil en el Explorador.
+    - Opciones añadidas: **Perfil**, **Favoritos**, **Términos y condiciones** (Visuales) y **Cerrar sesión** (Funcional).
+2.  **Experiencia de Usuario (UX)**:
+    - Uso de `AnimatePresence` y `framer-motion` para transiciones suaves de apertura y cierre.
+    - Diseño de "Glass Card" con desenfoque de fondo (`backdrop-blur-2xl`) y bordes ultra-redondeados (`24px`).
+    - Estado activo del botón de perfil: Cambia a un icono de cierre (X) y fondo oscuro para indicar el estado del menú.
+3.  **Lógica de Cierre de Sesión**:
+    - Integración directa con `supabase.auth.signOut()` para limpiar la sesión y actualizar la UI instantáneamente a través del listener de estado de auth.
+
+**Archivos clave:**
+- `src/app/(explorer)/layout.tsx` (Lógica de estado y renderizado del menú)
+
+*Última actualización: 01 de Mayo de 2026 - 04:35 PM*
