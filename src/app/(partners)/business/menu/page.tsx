@@ -37,7 +37,7 @@ interface Business {
 
 export default function MenuManagementPage() {
   const searchParams = useSearchParams();
-  const businessId = searchParams.get("id");
+  const [businessId, setBusinessId] = useState<string | null>(null);
   
   const [business, setBusiness] = useState<Business | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,27 +51,32 @@ export default function MenuManagementPage() {
 
   // Carga inicial de datos
   useEffect(() => {
-    if (!businessId) {
-      setLoading(false);
-      return;
-    }
-
     const fetchData = async () => {
       setLoading(true);
       
-      // 1. Cargar Negocio
+      // 0. Resolver el ID del negocio desde la sesión
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       const { data: bizData } = await supabase
         .from('businesses')
         .select('id, name, tags')
-        .eq('id', businessId)
+        .eq('owner_id', user.id)
         .single();
 
-      if (bizData) {
-        setBusiness(bizData);
-        setSelectedCategories(bizData.tags || []);
+      if (!bizData) {
+        setLoading(false);
+        return;
       }
 
-      // 2. Cargar Categorías Globales (para alineación)
+      setBusinessId(bizData.id);
+      setBusiness(bizData);
+      setSelectedCategories(bizData.tags || []);
+
+      // 1. Cargar Categorías Globales (para alineación)
       const { data: catData } = await supabase
         .from('categories')
         .select('name')
@@ -79,11 +84,11 @@ export default function MenuManagementPage() {
       
       if (catData) setDbCategories(catData.map(c => c.name));
 
-      // 3. Cargar Productos
+      // 2. Cargar Productos
       const { data: prodData } = await supabase
         .from('products')
         .select('*')
-        .eq('business_id', businessId)
+        .eq('business_id', bizData.id)
         .order('created_at', { ascending: false });
 
       if (prodData) setProducts(prodData);
@@ -91,7 +96,7 @@ export default function MenuManagementPage() {
     };
 
     fetchData();
-  }, [businessId]);
+  }, []);
 
   // Persistencia de etiquetas (Guardado Instantáneo)
 

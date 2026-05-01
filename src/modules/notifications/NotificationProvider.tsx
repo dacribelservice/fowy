@@ -46,6 +46,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -58,36 +59,46 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     fetchNotifications();
 
     // Subscribe to new notifications via Supabase Realtime
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          setNotifications(prev => [payload.new, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
-          // Play sound
-          playNotificationSound(payload.new.type === 'order' ? 'order' : 'alert');
+    let channel: any;
 
-          // Show Toast for foreground notifications
-          toast(payload.new.title, {
-            description: payload.new.body,
-            action: {
-              label: 'Ver',
-              onClick: () => console.log('Notification clicked'),
-            },
-          });
-        }
-      )
-      .subscribe();
+    const setupSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      channel = supabase
+        .channel(`user-notifications-${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            setNotifications(prev => [payload.new, ...prev]);
+            setUnreadCount(prev => prev + 1);
+            
+            // Play sound
+            playNotificationSound(payload.new.type === 'order' ? 'order' : 'alert');
+
+            // Show Toast for foreground notifications
+            toast(payload.new.title, {
+              description: payload.new.body,
+              action: {
+                label: 'Ver',
+                onClick: () => console.log('Notification clicked'),
+              },
+            });
+          }
+        )
+        .subscribe();
+    };
+
+    setupSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [supabase]);
 

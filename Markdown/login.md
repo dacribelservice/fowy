@@ -68,20 +68,20 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 Una vez implementada la Fase 1-3 del Login, se debe realizar una auditoría de limpieza para eliminar los "parches" de desarrollo:
 
 ### 1. Supabase: Row Level Security (RLS)
-- [ ] **Eliminar Políticas DEV**: Ejecutar `DROP POLICY "DEV: Allow all updates (temporary)" ON businesses;`.
-- [ ] **Activar Políticas Producción**: Implementar la regla estricta:
+- [x] **Eliminar Políticas DEV**: Ejecutar `DROP POLICY "DEV: Allow all updates (temporary)" ON businesses;`.
+- [x] **Activar Políticas Producción**: Implementar la regla estricta:
   ```sql
   CREATE POLICY "Enable updates for owners" ON businesses
   FOR UPDATE USING (auth.uid() = owner_id);
   ```
-- [ ] **Auditoría de Tablas**: Verificar que `products`, `categories` y `profiles` tengan RLS activo y sin excepciones de "Allow all".
+- [x] **Auditoría de Tablas**: Verificar que `products`, `categories` y `profiles` tengan RLS activo y sin excepciones de "Allow all".
 
 ### 2. Migración de Datos
-- [ ] **Vinculación Real**: Reemplazar los UUIDs ficticios en la columna `owner_id` de la tabla `businesses` por los UUIDs reales de la tabla `auth.users` creados durante el testeo.
+- [x] **Vinculación Real**: Reemplazar los UUIDs ficticios en la columna `owner_id` de la tabla `businesses` por los UUIDs reales de la tabla `auth.users` creados durante el testeo.
 
 ### 3. Código Fuente (Frontend)
-- [ ] **Eliminar IDs Hardcodeados**: Buscar y eliminar cualquier ID de negocio o usuario quemado en el código para pruebas.
-- [ ] **Refactor de Realtime**: Asegurar que las suscripciones a canales de Supabase filtren por el ID del usuario autenticado donde sea posible.
+- [x] **Eliminar IDs Hardcodeados**: Buscar y eliminar cualquier ID de negocio o usuario quemado en el código para pruebas.
+- [x] **Refactor de Realtime**: Asegurar que las suscripciones a canales de Supabase filtren por el ID del usuario autenticado donde sea posible.
 
 ---
 *Dacribel Engine: Sistema de Identidad v1.0 — Actualizado 30/04/2026*

@@ -59,6 +59,19 @@ export function useExperts() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // 1. Get the business ID for this user
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('owner_id', user.id)
+        .single();
+
+      if (!business) {
+        setMyOrders([]);
+        return;
+      }
+
+      // 2. Fetch orders for this business
       const { data, error } = await supabase
         .from('service_orders')
         .select(`
@@ -69,6 +82,7 @@ export function useExperts() {
             specialty
           )
         `)
+        .eq('business_id', business.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

@@ -32,38 +32,66 @@ export default function OrdersPage() {
     // Initialize audio
     audioRef.current = new Audio("/sounds/cash-register.mp3");
 
-    const fetchOrders = async () => {
+    let subscription: any;
+
+    const initializeOrders = async () => {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      // 1. Get the business ID for this user
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('owner_id', user.id)
+        .single();
+
+      if (!business) {
+        setLoading(false);
+        return;
+      }
+
+      // 2. Fetch orders for this business
       const { data, error } = await supabase
         .from('orders')
         .select('*')
+        .eq('business_id', business.id)
         .order('created_at', { ascending: false });
 
       if (data) setOrders(data);
       setLoading(false);
+
+      // 3. Realtime subscription for this business
+      subscription = supabase
+        .channel(`business-orders-${business.id}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'orders',
+            filter: `business_id=eq.${business.id}`
+          },
+          (payload) => {
+            const newOrder = payload.new as Order;
+            setOrders((prev) => [newOrder, ...prev]);
+            
+            // Play sound
+            if (audioRef.current) {
+              audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+            }
+          }
+        )
+        .subscribe();
     };
 
-    fetchOrders();
-
-    // Realtime subscription
-    const subscription = supabase
-      .channel('orders-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'orders' },
-        (payload) => {
-          const newOrder = payload.new as Order;
-          setOrders((prev) => [newOrder, ...prev]);
-          
-          // Play sound
-          if (audioRef.current) {
-            audioRef.current.play().catch(err => console.log("Audio play failed:", err));
-          }
-        }
-      )
-      .subscribe();
+    initializeOrders();
 
     return () => {
-      supabase.removeChannel(subscription);
+      if (subscription) supabase.removeChannel(subscription);
     };
   }, []);
 
