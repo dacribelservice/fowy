@@ -117,7 +117,7 @@ Se ha implementado el "Cerebro" del sistema:
     - Implementación de `proxy.ts` como nuevo estándar de la plataforma.
     - Neutralización del middleware para facilitar el debug de despliegue.
 
-**Backup:** Commit `[Pendiente]` en GitHub (`main`).
+**Backup:** Commit `1851076` en GitHub (`main`).
 
 ---
 
