@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export type RegistrationStep = 'auth' | 'profile' | 'business' | 'success'
+export type RegistrationStep = 'auth' | 'profile' | 'success'
 
 export interface RegistrationFormData {
   email: string
@@ -8,9 +8,6 @@ export interface RegistrationFormData {
   confirmPassword: string
   fullName: string
   phone: string
-  businessName: string
-  businessType: string
-  logoUrl?: string
 }
 
 const initialFormData: RegistrationFormData = {
@@ -19,9 +16,6 @@ const initialFormData: RegistrationFormData = {
   confirmPassword: '',
   fullName: '',
   phone: '',
-  businessName: '',
-  businessType: '',
-  logoUrl: '',
 }
 
 /**
@@ -39,13 +33,11 @@ export function useRegistrationWizard() {
 
   const nextStep = () => {
     if (step === 'auth') setStep('profile')
-    else if (step === 'profile') setStep('business')
-    else if (step === 'business') setStep('success')
+    else if (step === 'profile') setStep('success')
   }
 
   const prevStep = () => {
     if (step === 'profile') setStep('auth')
-    else if (step === 'business') setStep('profile')
   }
 
   const reset = () => {

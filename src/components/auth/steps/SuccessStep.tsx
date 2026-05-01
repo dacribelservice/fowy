@@ -21,8 +21,8 @@ export default function SuccessStep() {
           ¡Todo listo! <PartyPopper className="w-6 h-6 text-fowy-red" />
         </h2>
         <p className="text-slate-400 font-medium">
-          Tu cuenta ha sido creada y tu negocio está en proceso de revisión.
-          Te avisaremos por correo una vez seas aprobado.
+          Tu cuenta ha sido creada exitosamente. 
+          Solo debes confirmar tu registro desde el correo electrónico que te enviamos.
         </p>
       </div>
 

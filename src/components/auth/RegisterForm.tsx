@@ -9,7 +9,6 @@ import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import AuthStep from './steps/AuthStep'
 import ProfileStep from './steps/ProfileStep'
-import BusinessStep from './steps/BusinessStep'
 import SuccessStep from './steps/SuccessStep'
 
 export default function RegisterForm() {
@@ -86,15 +85,6 @@ export default function RegisterForm() {
               <ProfileStep 
                 formData={formData} 
                 updateFormData={updateFormData} 
-                onNext={nextStep}
-                onBack={prevStep}
-                isLoading={isLoading}
-              />
-            )}
-            {step === 'business' && (
-              <BusinessStep 
-                formData={formData} 
-                updateFormData={updateFormData} 
                 onFinish={async () => {
                   setIsLoading(true)
                   const supabase = createClient()
@@ -102,41 +92,22 @@ export default function RegisterForm() {
                     const { data: { session } } = await supabase.auth.getSession()
 
                     if (session) {
-                      // Usuario OAuth (Google): Ya tiene cuenta, actualizamos perfil y creamos negocio
+                      // Usuario OAuth (Google): Ya tiene cuenta, actualizamos perfil
                       const { error: profileError } = await supabase
                         .from('profiles')
                         .update({ 
                           full_name: formData.fullName,
-                          role: 'business_owner'
+                          phone: formData.phone,
+                          role: 'explorer'
                         })
                         .eq('id', session.user.id)
                       
                       if (profileError) throw profileError
 
-                      // Buscar categoría si coincide con el tipo
-                      const { data: categories } = await supabase
-                        .from('categories')
-                        .select('id')
-                        .ilike('name', formData.businessType)
-                        .limit(1)
-
-                      const { error: businessError } = await supabase
-                        .from('businesses')
-                        .insert({
-                          name: formData.businessName,
-                          owner_id: session.user.id,
-                          logo_url: formData.logoUrl,
-                          category_id: categories?.[0]?.id || null,
-                          status: false,
-                          slug: `${formData.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.floor(Math.random() * 1000)}`
-                        })
-
-                      if (businessError) throw businessError
-
                       toast.success('¡Registro completado exitosamente!')
                       nextStep()
                     } else {
-                      // Usuario Email: Usamos signUp atómico (el trigger handle_new_user hace el resto)
+                      // Usuario Email: Usamos signUp atómico
                       const { error } = await supabase.auth.signUp({
                         email: formData.email,
                         password: formData.password,
@@ -144,10 +115,7 @@ export default function RegisterForm() {
                           data: {
                             full_name: formData.fullName,
                             phone: formData.phone,
-                            business_name: formData.businessName,
-                            business_type: formData.businessType,
-                            logo_url: formData.logoUrl,
-                            role: 'business_owner'
+                            role: 'explorer'
                           },
                           emailRedirectTo: `${window.location.origin}/auth/callback`,
                         },
@@ -169,7 +137,6 @@ export default function RegisterForm() {
                 }}
                 onBack={prevStep}
                 isLoading={isLoading}
-                setIsLoading={setIsLoading}
               />
             )}
             {step === 'success' && (

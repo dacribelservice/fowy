@@ -1,20 +1,20 @@
 'use client'
 
-import { User, Phone, ArrowRight, ArrowLeft } from 'lucide-react'
+import { User, Phone, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 interface ProfileStepProps {
   formData: any
   updateFormData: (data: any) => void
-  onNext: () => void
+  onFinish: () => void
   onBack: () => void
   isLoading: boolean
 }
 
-export default function ProfileStep({ formData, updateFormData, onNext, onBack, isLoading }: ProfileStepProps) {
+export default function ProfileStep({ formData, updateFormData, onFinish, onBack, isLoading }: ProfileStepProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onNext()
+    onFinish()
   }
 
   return (
@@ -73,7 +73,7 @@ export default function ProfileStep({ formData, updateFormData, onNext, onBack, 
             disabled={isLoading}
             className="flex-[2] py-4 bg-fowy-energy rounded-[20px] text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-fowy-red/30 hover:shadow-fowy-red/40 hover:translate-y-[-1px] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-70 cursor-pointer"
           >
-            Siguiente <ArrowRight className="w-5 h-5" />
+            Finalizar <CheckCircle2 className="w-5 h-5" />
           </button>
         </div>
       </form>
