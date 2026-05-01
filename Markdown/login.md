@@ -34,9 +34,9 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 - [x] **2.1.4 Auxiliares**: Enlace "¿Olvidaste tu contraseña?" y "¿Aún no tienes cuenta?".
 
 #### 2.2 Pantalla de Registro (Sign Up)
-- [ ] **2.2.1 Social Register**: Botón de registro con Google.
-- [ ] **2.2.2 Email Register**: Formulario de creación de cuenta (Email, Contraseña, Confirmar Contraseña).
-- [ ] **2.2.3 Link**: Enlace "¿Ya tienes cuenta? Inicia sesión".
+- [x] **2.2.1 Social Register**: Botón de registro con Google.
+- [x] **2.2.2 Email Register**: Formulario de creación de cuenta (Email, Contraseña, Confirmar Contraseña).
+- [x] **2.2.3 Link**: Enlace "¿Ya tienes cuenta? Inicia sesión".
 
 #### 2.3 Pantalla de Recuperación
 - [ ] **2.3.1 Recovery Form**: Input de email para envío de enlace mágico.
