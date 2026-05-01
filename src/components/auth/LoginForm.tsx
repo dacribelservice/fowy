@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 // Icono de Google personalizado para mayor fidelidad de marca
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -24,7 +25,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-
+  const router = useRouter()
   const supabase = createClient()
 
   const handleEmailLogin = async (e: React.FormEvent) => {
@@ -41,7 +42,8 @@ export default function LoginForm() {
         toast.error(error.message)
       } else {
         toast.success('¡Bienvenido de nuevo!')
-        // La redirección será manejada por el middleware o el estado de la sesión
+        router.push('/explorar')
+        router.refresh()
       }
     } catch (err) {
       toast.error('Ocurrió un error inesperado')

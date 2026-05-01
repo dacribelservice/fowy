@@ -36,28 +36,12 @@ export default function AuthStep({ formData, updateFormData, onNext, isLoading, 
       return
     }
 
-    setIsLoading(true)
-    
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      if (error) {
-        toast.error(error.message)
-      } else {
-        toast.success('¡Registro exitoso! Revisa tu correo para confirmar.')
-        onNext() // Move to profile step
-      }
-    } catch (err) {
-      toast.error('Ocurrió un error inesperado')
-    } finally {
-      setIsLoading(false)
+    if (formData.password.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres')
+      return
     }
+
+    onNext() // Move to profile step without creating user yet
   }
 
   const handleGoogleRegister = async () => {

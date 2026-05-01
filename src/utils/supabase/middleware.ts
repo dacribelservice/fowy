@@ -31,24 +31,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protective routing
+  // Loose protective routing
   const pathname = request.nextUrl.pathname
 
-  if (
-    !user &&
-    (pathname.startsWith('/admin') || pathname.startsWith('/business'))
-  ) {
+  // Only redirect if unauthenticated and trying to access sensitive areas
+  if (!user && (pathname.startsWith('/admin') || pathname.startsWith('/business'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  // If user is logged in, redirect them away from auth pages
-  if (user && (pathname === '/login' || pathname === '/registro' || pathname === '/recuperar')) {
-    const url = request.nextUrl.clone()
-    // By default, maybe send them to /explorar or a dashboard based on role.
-    // For now, redirect to /explorar
-    url.pathname = '/explorar'
     return NextResponse.redirect(url)
   }
 

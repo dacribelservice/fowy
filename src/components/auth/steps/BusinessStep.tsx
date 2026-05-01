@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 interface BusinessStepProps {
   formData: any
   updateFormData: (data: any) => void
-  onNext: () => void
+  onFinish: () => void
   onBack: () => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
@@ -17,7 +17,7 @@ interface BusinessStepProps {
 export default function BusinessStep({ 
   formData, 
   updateFormData, 
-  onNext, 
+  onFinish, 
   onBack, 
   isLoading, 
   setIsLoading 
@@ -55,7 +55,7 @@ export default function BusinessStep({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onNext()
+    onFinish()
   }
 
   return (

@@ -121,6 +121,20 @@ Se ha implementado el "Cerebro" del sistema:
 
 ---
 
-*Última actualización: 01 de Mayo de 2026 - 01:55 AM*
+## 🛡️ ACTIVACIÓN DE SEGURIDAD Y MIDDLEWARE (01 de Mayo de 2026 - Sesión Nocturna V)
 
+**Hitos alcanzados:**
+1.  **Activación del Escudo Global**:
+    - Renombrado de `src/proxy.ts` a `src/middleware.ts` para cumplir con la convención de Next.js y asegurar que el servidor ejecute la protección.
+    - Actualización de la función exportada a `middleware` para compatibilidad total.
+2.  **Blindaje de Rutas Críticas**:
+    - Configuración de un `matcher` robusto que cubre explícitamente `/admin`, `/business` y todas sus sub-rutas.
+    - Implementación de redirección forzada al `/login` para cualquier acceso no autenticado a estas zonas.
+3.  **Validación de Aislamiento**:
+    - Verificación exitosa en entornos limpios (Modo Incógnito), confirmando que las rutas públicas (como `/explorar`) permanecen accesibles mientras que las privadas están totalmente protegidas.
 
+**Archivos clave:**
+- `src/middleware.ts` (Configuración del Matcher y ejecución)
+- `src/utils/supabase/middleware.ts` (Lógica de validación de sesión y redirección)
+
+*Última actualización: 01 de Mayo de 2026 - 03:55 PM*
