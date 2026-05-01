@@ -156,3 +156,23 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 
 
 > **🔍 Pendiente de verificar:** Que al cambiar etiquetas desde el panel del negocio, el explorador refleje el cambio en tiempo real sin recargar la página.
+
+---
+
+### ✂️ Fase 7: Desacoplamiento de Orquestadores (Poda de Deuda Técnica)
+
+Para alcanzar el estándar 10/10, se deben transformar los componentes "pesados" en vistas puras, moviendo toda la lógica a hooks especializados.
+
+- [ ] **1. Poda del Explorador (`explorar/page.tsx`)**:
+  - [ ] **1.1** Crear `useExplorerManager.ts` para centralizar geolocalización, búsqueda y filtrado de categorías.
+  - [ ] **1.2** Reducir el componente de página a < 150 líneas delegando la gestión de estados al hook.
+- [ ] **2. Poda de Administración de Negocios (`admin/negocios/page.tsx`)**:
+  - [ ] **2.1** Crear `useAdminBusinessManager.ts` para manejar aprobaciones, rechazos y edición de negocios.
+  - [ ] **2.2** Extraer la lógica de estadísticas masivas a una función de utilidad o hook dedicado.
+- [ ] **3. Poda de Finanzas (`finanzas/page.tsx`)**:
+  - [ ] **3.1** Crear `useFinanceManager.ts` para centralizar el cálculo de saldos disponibles, pendientes e historial de retiros.
+  - [ ] **3.2** Asegurar precisión financiera separando los cálculos de la lógica de renderizado de gráficos.
+- [ ] **4. Refactorización de Formularios Críticos (`RegisterForm.tsx`)**:
+  - [ ] **4.1** Implementar `useRegistrationWizard.ts` para manejar el estado de múltiples pasos y validaciones.
+  - [ ] **4.2** Desacoplar la lógica de carga de archivos (Logos/Documentos) a un servicio reutilizable.
+
