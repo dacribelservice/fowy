@@ -15,17 +15,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  in_stock: boolean;
-  is_active: boolean;
-  category_name: string;
-}
+import { useProductManager, type Product } from "@/hooks/useProductManager";
 
 interface Business {
   id: string;
@@ -40,24 +30,27 @@ export default function MenuManagementPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
   
   const [business, setBusiness] = useState<Business | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingBiz, setLoadingBiz] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   
   const supabase = createClient();
+  const { 
+    products, 
+    loading: loadingProds, 
+    toggleStock 
+  } = useProductManager(businessId);
 
-  // Carga inicial de datos
+  // Carga inicial de datos del negocio
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchBusinessData = async () => {
+      setLoadingBiz(true);
       
-      // 0. Resolver el ID del negocio desde la sesión
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setLoading(false);
+        setLoadingBiz(false);
         return;
       }
 
@@ -67,38 +60,23 @@ export default function MenuManagementPage() {
         .eq('owner_id', user.id)
         .single();
 
-      if (!bizData) {
-        setLoading(false);
-        return;
+      if (bizData) {
+        setBusinessId(bizData.id);
+        setBusiness(bizData);
+        setSelectedCategories(bizData.tags || []);
       }
 
-      setBusinessId(bizData.id);
-      setBusiness(bizData);
-      setSelectedCategories(bizData.tags || []);
-
-      // 1. Cargar Categorías Globales (para alineación)
       const { data: catData } = await supabase
         .from('categories')
         .select('name')
         .order('name', { ascending: true });
       
       if (catData) setDbCategories(catData.map(c => c.name));
-
-      // 2. Cargar Productos
-      const { data: prodData } = await supabase
-        .from('products')
-        .select('*')
-        .eq('business_id', bizData.id)
-        .order('created_at', { ascending: false });
-
-      if (prodData) setProducts(prodData);
-      setLoading(false);
+      setLoadingBiz(false);
     };
 
-    fetchData();
-  }, []);
-
-  // Persistencia de etiquetas (Guardado Instantáneo)
+    fetchBusinessData();
+  }, [supabase]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
@@ -112,56 +90,43 @@ export default function MenuManagementPage() {
 
   const handleSaveCategories = async () => {
     if (!businessId) return;
-    
     setSaveStatus("saving");
 
-    // Buscamos el ID de la primera categoría seleccionada para mantener sincronizado category_id
     let categoryIdToSync = null;
     if (selectedCategories.length > 0) {
-      // Necesitamos el ID de la categoría cuyo nombre es selectedCategories[0]
-      // Ya tenemos dbCategories (nombres), pero necesitamos los IDs. 
-      // Por simplicidad en este paso, buscaremos el ID en la tabla categories.
       const { data: catRecord } = await supabase
         .from('categories')
         .select('id')
         .eq('name', selectedCategories[0])
         .single();
       
-      if (catRecord) {
-        categoryIdToSync = catRecord.id;
-      }
+      if (catRecord) categoryIdToSync = catRecord.id;
     }
     
     const { error } = await supabase
       .from('businesses')
       .update({ 
         tags: selectedCategories,
-        category_id: categoryIdToSync // Sincronización automática
+        category_id: categoryIdToSync 
       })
       .eq('id', businessId);
 
     if (error) {
       console.error("Error saving categories:", error);
-      alert("Error al guardar las categorías. Por favor, verifica tus permisos.");
+      alert("Error al guardar las categorías.");
       setSaveStatus("idle");
     } else {
       setSaveStatus("saved");
-      // Update local business state to reflect saved changes
       setBusiness(prev => prev ? { ...prev, tags: selectedCategories } : null);
       setTimeout(() => setSaveStatus("idle"), 2000);
     }
   };
 
-  const toggleStock = async (id: string, currentStock: boolean) => {
-    const { error } = await supabase
-      .from('products')
-      .update({ in_stock: !currentStock })
-      .eq('id', id);
-
-    if (!error) {
-      setProducts(prev => prev.map(p => p.id === id ? { ...p, in_stock: !currentStock } : p));
-    }
+  const handleToggleStock = async (id: string, currentStock: boolean) => {
+    await toggleStock(id, currentStock);
   };
+
+  const loading = loadingBiz || loadingProds;
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -348,7 +313,7 @@ export default function MenuManagementPage() {
                     </div>
                     
                     <button 
-                      onClick={() => toggleStock(product.id, product.in_stock)}
+                      onClick={() => handleToggleStock(product.id, product.in_stock)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
                         product.in_stock ? 'bg-[#7B61FF]' : 'bg-slate-200'
                       }`}

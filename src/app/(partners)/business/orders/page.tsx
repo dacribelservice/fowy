@@ -12,99 +12,36 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface Order {
-  id: string;
-  customer_name: string;
-  customer_phone: string;
-  items: any[];
-  total_amount: number;
-  status: 'pending' | 'completed' | 'cancelled';
-  created_at: string;
-}
+import { useOrderManager } from "@/hooks/useOrderManager";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const supabase = createClient();
+  
+  const { 
+    orders, 
+    loading: loadingOrders, 
+    updateOrderStatus 
+  } = useOrderManager(businessId);
 
   useEffect(() => {
-    // Initialize audio
-    audioRef.current = new Audio("/sounds/cash-register.mp3");
-
-    let subscription: any;
-
-    const initializeOrders = async () => {
-      setLoading(true);
+    const fetchBusinessId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+      if (!user) return;
 
-      // 1. Get the business ID for this user
       const { data: business } = await supabase
         .from('businesses')
         .select('id')
         .eq('owner_id', user.id)
         .single();
 
-      if (!business) {
-        setLoading(false);
-        return;
-      }
-
-      // 2. Fetch orders for this business
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('business_id', business.id)
-        .order('created_at', { ascending: false });
-
-      if (data) setOrders(data);
-      setLoading(false);
-
-      // 3. Realtime subscription for this business
-      subscription = supabase
-        .channel(`business-orders-${business.id}`)
-        .on(
-          'postgres_changes',
-          { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'orders',
-            filter: `business_id=eq.${business.id}`
-          },
-          (payload) => {
-            const newOrder = payload.new as Order;
-            setOrders((prev) => [newOrder, ...prev]);
-            
-            // Play sound
-            if (audioRef.current) {
-              audioRef.current.play().catch(err => console.log("Audio play failed:", err));
-            }
-          }
-        )
-        .subscribe();
+      if (business) setBusinessId(business.id);
     };
 
-    initializeOrders();
+    fetchBusinessId();
+  }, [supabase]);
 
-    return () => {
-      if (subscription) supabase.removeChannel(subscription);
-    };
-  }, []);
-
-  const updateOrderStatus = async (id: string, status: 'completed' | 'cancelled') => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', id);
-
-    if (!error) {
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    }
-  };
+  const loading = !businessId || loadingOrders;
 
   return (
     <div className="space-y-8">

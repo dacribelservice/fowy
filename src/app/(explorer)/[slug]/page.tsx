@@ -108,8 +108,11 @@ export default function BusinessMenuPage() {
     if (!business) return;
     
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
       await supabase.from('orders').insert({
         business_id: business.id,
+        customer_id: user?.id || null,
         customer_name: formData.name,
         customer_phone: formData.phone,
         items: businessItems,

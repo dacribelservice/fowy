@@ -139,12 +139,12 @@ Tras una auditoría profunda del estado actual de la plataforma, se han identifi
 
 Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo rigor de seguridad y desacoplamiento en el resto de la infraestructura.
 
-- [ ] **1. Blindaje de Productos (`products`)**:
-  - [ ] **1.1** Sustituir políticas permisivas por RLS basado en `business_id` y propiedad.
-  - [ ] **1.2** Crear `useProductManager.ts` para desacoplar la gestión de inventario de la UI.
-- [ ] **2. Blindaje de Pedidos (`orders`)**:
-  - [ ] **2.1** Implementar RLS que solo permita lectura al Comprador (`customer_id`) y al Vendedor (`business_id -> owner_id`).
-  - [ ] **2.2** Centralizar estados de flujo de pedidos (Pendiente, Preparando, Enviado) en un Hook de servicio.
+- [x] **1. Blindaje de Productos (`products`)**:
+  - [x] **1.1** Sustituir políticas permisivas por RLS basado en `business_id` y propiedad.
+  - [x] **1.2** Crear `useProductManager.ts` para desacoplar la gestión de inventario de la UI.
+- [x] **2. Blindaje de Pedidos (`orders`)**:
+  - [x] **2.1** Implementar RLS que solo permita lectura al Comprador (`customer_id`) y al Vendedor (`business_id -> owner_id`).
+  - [x] **2.2** Centralizar estados de flujo de pedidos (Pendiente, Preparando, Enviado) en un Hook de servicio.
 - [ ] **3. Blindaje de Servicios (`service_orders`)**:
   - [ ] **3.1** Asegurar que solo el Experto asignado y el Negocio contratante tengan visibilidad del progreso.
 - [ ] **4. Seguridad de Almacenamiento (Storage)**:
