@@ -14,15 +14,23 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useServiceOrderManager } from "@/hooks/useServiceOrderManager";
+import { useFinanceManager } from "@/hooks/useFinanceManager";
 import { toast } from "sonner";
 
 export default function ExpertPanelPage() {
   const { 
     orders, 
-    loading, 
+    loading: ordersLoading, 
     actionLoading, 
     handleUpdateDelivery: updateDelivery 
   } = useServiceOrderManager('professional');
+
+  const {
+    stats,
+    loading: financeLoading,
+  } = useFinanceManager('professional');
+
+  const loading = ordersLoading || financeLoading;
 
   const handleUpdateDelivery = async (orderId: string) => {
     const url = prompt("Introduce la URL de entrega (Drive, Canva, etc.):");
@@ -84,7 +92,7 @@ export default function ExpertPanelPage() {
             <span className="font-bold text-slate-500">En Custodia</span>
           </div>
           <p className="text-3xl font-black text-slate-800">
-            ${orders.filter(o => o.status === 'in_escrow' || o.status === 'completed').reduce((acc, o) => acc + o.professional_net, 0).toFixed(2)}
+            ${stats?.pendingBalance?.toFixed(2) || '0.00'}
           </p>
         </div>
         <div className="glass-morphism p-6 rounded-[2rem] border border-white/40">
@@ -95,10 +103,11 @@ export default function ExpertPanelPage() {
             <span className="font-bold text-slate-500">Total Ganado</span>
           </div>
           <p className="text-3xl font-black text-slate-800">
-            ${orders.filter(o => o.status === 'funds_released').reduce((acc, o) => acc + o.professional_net, 0).toFixed(2)}
+            ${stats?.availableBalance?.toFixed(2) || '0.00'}
           </p>
         </div>
       </div>
+
 
       {/* Orders List */}
       <div className="space-y-4">

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { storageService } from "@/services/storageService";
 
 export default function BusinessProfilePage() {
   const [activeTab, setActiveTab] = useState<'branding' | 'plan' | 'modules'>('branding');
@@ -110,19 +111,10 @@ export default function BusinessProfilePage() {
 
     try {
       setUploading(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${business.id}/${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('payment-proofs')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('payment-proofs')
-        .getPublicUrl(filePath);
+      const publicUrl = await storageService.uploadFile(file, 'payment-proofs', {
+        path: business.id,
+        shouldCompress: false // Comprobantes de pago no se comprimen para no perder legibilidad
+      });
 
       const { error: insertError } = await supabase
         .from('payment_proofs')

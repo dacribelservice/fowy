@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Lock, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Eye, EyeOff, ShieldCheck, User, Phone, CheckCircle2 } from 'lucide-react'
+import { useRegistrationWizard } from '@/hooks/useRegistrationWizard'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import Link from 'next/link'
@@ -19,11 +20,17 @@ const GoogleIcon = ({ className }: { className?: string }) => (
 )
 
 export default function RegisterForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const { 
+    step, 
+    formData, 
+    updateFormData, 
+    isLoading, 
+    setIsLoading, 
+    nextStep, 
+    prevStep 
+  } = useRegistrationWizard()
+
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
   const supabase = createClient()
@@ -31,7 +38,7 @@ export default function RegisterForm() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       toast.error('Las contraseñas no coinciden')
       return
     }
@@ -40,8 +47,8 @@ export default function RegisterForm() {
     
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: formData.email,
+        password: formData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -137,8 +144,8 @@ export default function RegisterForm() {
               <input
                 type="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={(e) => updateFormData({ email: e.target.value })}
                 placeholder="tu@email.com"
                 className="w-full pl-12 pr-4 py-3 bg-white/40 border border-white/60 rounded-[20px] focus:outline-none focus:ring-4 focus:ring-fowy-red/10 focus:border-fowy-red/30 transition-all placeholder:text-slate-300 font-medium text-sm"
               />
@@ -154,8 +161,8 @@ export default function RegisterForm() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={(e) => updateFormData({ password: e.target.value })}
                 placeholder="Mínimo 6 caracteres"
                 className="w-full pl-12 pr-12 py-3 bg-white/40 border border-white/60 rounded-[20px] focus:outline-none focus:ring-4 focus:ring-fowy-red/10 focus:border-fowy-red/30 transition-all placeholder:text-slate-300 font-medium text-sm"
               />
@@ -178,8 +185,8 @@ export default function RegisterForm() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={(e) => updateFormData({ confirmPassword: e.target.value })}
                 placeholder="Repite tu contraseña"
                 className="w-full pl-12 pr-4 py-3 bg-white/40 border border-white/60 rounded-[20px] focus:outline-none focus:ring-4 focus:ring-fowy-red/10 focus:border-fowy-red/30 transition-all placeholder:text-slate-300 font-medium text-sm"
               />
