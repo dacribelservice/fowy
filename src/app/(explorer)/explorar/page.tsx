@@ -73,12 +73,7 @@ export default function ExplorarPage() {
         >
           <Navigation size={24} className="fill-white" />
         </button>
-        <button 
-          className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-full shadow-2xl flex items-center justify-center text-white active:scale-90 transition-all border border-white/20"
-          title="Agregar"
-        >
-          <Plus size={28} />
-        </button>
+
       </div>
 
       {/* Bottom Sheet for Businesses */}
