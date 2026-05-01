@@ -18,10 +18,10 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 ## 📋 CHECKLIST DE IMPLEMENTACIÓN
 
 ### Fase 1: Configuración de Backend (Supabase & Google)
-- [ ] **1.1 Proveedores**: Habilitar Google Auth en el Dashboard de Supabase.
+- [x] **1.1 Proveedores**: Habilitar Google Auth en el Dashboard de Supabase.
     *   *Requisito:* Crear proyecto en **Google Cloud Console**, configurar pantalla de consentimiento y obtener Client ID/Secret.
     *   *Callback URL:* Configurar `https://[PROJECT_ID].supabase.co/auth/v1/callback` en Google.
-- [ ] **1.2 Redirección**: Configurar `URL Configuration` (Site URL) en Supabase para manejar el flujo de `/auth/callback` en desarrollo y producción.
+- [x] **1.2 Redirección**: Configurar `URL Configuration` (Site URL) en Supabase para manejar el flujo de `/auth/callback` en desarrollo y producción.
 - [ ] **1.3 SMTP Profesional**: Configurar el envío de correos usando el dominio profesional de FOWY.
     *   *Acción:* Desactivar el "Built-in email provider" de Supabase y configurar los ajustes SMTP (Host, Port, User, Password) para asegurar entregabilidad.
 - [ ] **1.4 Email Templates**: Personalizar los correos (Confirmación, Reset Password, Magic Link) con HTML/CSS premium siguiendo el estilo *Ethereal*.
