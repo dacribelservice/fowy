@@ -145,10 +145,10 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 - [x] **2. Blindaje de Pedidos (`orders`)**:
   - [x] **2.1** Implementar RLS que solo permita lectura al Comprador (`customer_id`) y al Vendedor (`business_id -> owner_id`).
   - [x] **2.2** Centralizar estados de flujo de pedidos (Pendiente, Preparando, Enviado) en un Hook de servicio.
-- [ ] **3. Blindaje de Servicios (`service_orders`)**:
-  - [ ] **3.1** Asegurar que solo el Experto asignado y el Negocio contratante tengan visibilidad del progreso.
+- [x] **3. Blindaje de Servicios (`service_orders`)**:
+  - [x] **3.1** Asegurar que solo el Experto asignado y el Negocio contratante tengan visibilidad del progreso. (Implementado via RLS y Hook `useServiceOrderManager`)
 - [ ] **4. Seguridad de Almacenamiento (Storage)**:
-  - [ ] **4.1** Aplicar políticas de Buckets para que los usuarios no puedan borrar fotos de otros negocios.
+  - [x] **4.1** Aplicar políticas de Buckets para que los usuarios no puedan borrar fotos de otros negocios. (Implementado via RLS en `storage.objects`)
 
 ---
 > **Puntuación de Auditoría:** 9.2 / 10  

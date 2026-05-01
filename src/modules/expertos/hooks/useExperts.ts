@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { FALLBACK_EXPERTOS } from "@/modules/expertos/constants";
+import { useServiceOrderManager } from "@/hooks/useServiceOrderManager";
 
 export function useExperts() {
   const [expertos, setExpertos] = useState<any[]>([]);
   const [selectedExpert, setSelectedExpert] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [view, setView] = useState<'marketplace' | 'orders'>('marketplace');
-  const [myOrders, setMyOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const supabase = createClient();
@@ -53,51 +53,9 @@ export function useExperts() {
     }
   }, [supabase]);
 
-  const fetchMyOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // 1. Get the business ID for this user
-      const { data: business } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('owner_id', user.id)
-        .single();
-
-      if (!business) {
-        setMyOrders([]);
-        return;
-      }
-
-      // 2. Fetch orders for this business
-      const { data, error } = await supabase
-        .from('service_orders')
-        .select(`
-          *,
-          professional:profiles!professional_id (
-            full_name,
-            avatar_url,
-            specialty
-          )
-        `)
-        .eq('business_id', business.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMyOrders(data || []);
-    } catch (error) {
-      console.error("Error fetching my orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
-
   useEffect(() => {
     if (view === 'marketplace') fetchExpertos();
-    else fetchMyOrders();
-  }, [view, fetchExpertos, fetchMyOrders]);
+  }, [view, fetchExpertos]);
 
   const filteredExpertos = useMemo(() => {
     return activeCategory === "Todos" 
@@ -105,80 +63,25 @@ export function useExperts() {
       : expertos.filter(e => e.category === activeCategory);
   }, [expertos, activeCategory]);
 
-  const handleReleaseFunds = useCallback(async (orderId: string) => {
-    try {
-      setLoading(true);
-      const { error } = await supabase
-        .from('service_orders')
-        .update({ status: 'funds_released' })
-        .eq('id', orderId);
+  const { 
+    orders: myOrders, 
+    loading: ordersLoading, 
+    handleHire: hireExpert, 
+    handleReleaseFunds: releaseFunds,
+    refresh: fetchMyOrders
+  } = useServiceOrderManager('business');
 
-      if (error) throw error;
-      toast.success("¡Pago liberado!", { description: "Gracias por confiar en FOWY Experts." });
-      fetchMyOrders();
-    } catch (error) {
-      toast.error("Error al liberar fondos");
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase, fetchMyOrders]);
-
-  const handleHire = useCallback(async (expert: any, plan: any) => {
-    try {
-      setLoading(true);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Debes iniciar sesión para contratar");
-        return;
-      }
-
-      const { data: business } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('owner_id', user.id)
-        .single();
-
-      if (!business) {
-        toast.error("No tienes un negocio registrado para realizar esta operación");
-        return;
-      }
-
-      // Calculate amounts
-      const totalAmount = typeof plan.price === 'string' 
-        ? parseFloat(plan.price.replace('$', '')) 
-        : plan.price;
-      const commission = totalAmount * 0.20;
-      const professionalNet = totalAmount - commission;
-
-      const professionalId = expert.id;
-
-      const { error } = await supabase.from('service_orders').insert({
-        business_id: business.id,
-        professional_id: professionalId,
-        plan_name: plan.name,
-        amount: totalAmount,
-        fowy_commission: commission,
-        professional_net: professionalNet,
-        status: 'pending_payment',
-        notes: `Contratación de ${plan.name} para ${expert.name}`
-      });
-
-      if (error) throw error;
-
-      toast.success("¡Orden de contratación creada!", {
-        description: "FOWY se pondrá en contacto para procesar el pago en custodia."
-      });
+  const handleHire = async (expert: any, plan: any) => {
+    const result = await hireExpert(expert.id, plan);
+    if (result.success) {
       setSelectedExpert(null);
       setView('orders');
-
-    } catch (error: any) {
-      console.error("Error hiring:", error);
-      toast.error("Error al procesar la contratación");
-    } finally {
-      setLoading(false);
     }
-  }, [supabase]);
+  };
+
+  const handleReleaseFunds = async (orderId: string) => {
+    await releaseFunds(orderId);
+  };
 
   return {
     expertos,

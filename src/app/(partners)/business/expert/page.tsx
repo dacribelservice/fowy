@@ -13,73 +13,21 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createClient } from "@/utils/supabase/client";
+import { useServiceOrderManager } from "@/hooks/useServiceOrderManager";
 import { toast } from "sonner";
 
 export default function ExpertPanelPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState<string | null>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('service_orders')
-        .select(`
-          *,
-          businesses (
-            name,
-            logo_url
-          )
-        `)
-        .eq('professional_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setOrders(data || []);
-    } catch (error: any) {
-      console.error("Error fetching orders:", error);
-      toast.error("Error al cargar tus pedidos");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { 
+    orders, 
+    loading, 
+    actionLoading, 
+    handleUpdateDelivery: updateDelivery 
+  } = useServiceOrderManager('professional');
 
   const handleUpdateDelivery = async (orderId: string) => {
     const url = prompt("Introduce la URL de entrega (Drive, Canva, etc.):");
     if (!url) return;
-
-    try {
-      setUpdating(orderId);
-      const { error } = await supabase
-        .from('service_orders')
-        .update({ 
-          delivery_url: url,
-          status: 'completed',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
-
-      if (error) throw error;
-      
-      toast.success("¡Entrega enviada!", {
-        description: "El cliente ha sido notificado para revisar y liberar los fondos."
-      });
-      fetchOrders();
-    } catch (error: any) {
-      toast.error("Error al actualizar la entrega");
-    } finally {
-      setUpdating(null);
-    }
+    await updateDelivery(orderId, url);
   };
 
   const getStatusColor = (status: string) => {
@@ -208,11 +156,11 @@ export default function ExpertPanelPage() {
                   )}
                   {order.status !== 'funds_released' && order.status !== 'pending_payment' && (
                     <button 
-                      disabled={updating === order.id}
+                      disabled={actionLoading === order.id}
                       onClick={() => handleUpdateDelivery(order.id)}
                       className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:opacity-90 transition-all flex items-center gap-2"
                     >
-                      {updating === order.id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
+                      {actionLoading === order.id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
                       {order.delivery_url ? 'Actualizar Entrega' : 'Enviar Entrega'}
                     </button>
                   )}
