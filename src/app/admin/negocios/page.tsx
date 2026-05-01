@@ -16,6 +16,7 @@ import DeleteConfirmModal from "@/components/admin/shared/DeleteConfirmModal";
 import Pagination from "@/components/admin/shared/Pagination";
 import StatCard from "@/components/admin/shared/StatCard";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
+import { useBusinessStats } from "@/hooks/useBusinessStats";
 
 export default function NegociosPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -30,12 +31,7 @@ export default function NegociosPage() {
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const [globalStats, setGlobalStats] = useState({
-    total: 0,
-    activos: 0,
-    vencimientos: 0,
-    diff: 0
-  });
+  const { globalStats, refreshStats } = useBusinessStats();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
@@ -44,44 +40,6 @@ export default function NegociosPage() {
   const [toast, setToast] = useState({ show: false, message: "" });
   const supabase = createClient();
 
-  // 1. Obtener Stats Globales (independiente de filtros)
-  const fetchGlobalStats = useCallback(async () => {
-    try {
-      const { data: businesses } = await supabase
-        .from('businesses')
-        .select('created_at, status, payment_date');
-
-      if (businesses) {
-        const total = businesses.length;
-        const activos = businesses.filter((b: any) => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
-        const hoy = new Date();
-        const en7Dias = new Date();
-        en7Dias.setDate(hoy.getDate() + 7);
-        
-        const vencimientos = businesses.filter((b: any) => {
-          if (!b.payment_date) return false;
-          const fechaPago = new Date(b.payment_date);
-          return fechaPago >= hoy && fechaPago <= en7Dias;
-        }).length;
-
-        const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-        const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
-        const nuevosMesPasado = businesses.filter((b: any) => {
-          const d = new Date(b.created_at);
-          return d >= inicioMesPasado && d < inicioMesActual;
-        }).length;
-
-        let diff = 0;
-        if (nuevosMesPasado > 0) diff = ((nuevosEsteMes - nuevosMesPasado) / nuevosMesPasado) * 100;
-        else if (nuevosEsteMes > 0) diff = 100;
-
-        setGlobalStats({ total, activos, vencimientos, diff: Math.round(diff) });
-      }
-    } catch (e) {
-      console.error("Error stats:", e);
-    }
-  }, [supabase]);
 
   // 2. Obtener Datos Paginados y Filtrados
   const fetchData = useCallback(async () => {
@@ -134,8 +92,7 @@ export default function NegociosPage() {
 
   useEffect(() => {
     fetchData();
-    fetchGlobalStats();
-  }, [fetchData, fetchGlobalStats]);
+  }, [fetchData]);
 
   // Reset a página 1 al filtrar
   useEffect(() => {
@@ -190,6 +147,7 @@ export default function NegociosPage() {
 
       setToast({ show: true, message: "✅ Eliminado correctamente" });
       fetchData();
+      refreshStats();
     } catch (error: any) {
       console.error(`Error deleting ${deleteConfig.type}:`, error);
       setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
@@ -279,8 +237,8 @@ export default function NegociosPage() {
         />
       </section>
 
-      <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} supabase={supabase} setToast={setToast} />
-      <AddBusinessModal isOpen={isBusinessModalOpen} onClose={() => setIsBusinessModalOpen(false)} onSuccess={fetchData} supabase={supabase} setToast={setToast} />
+      <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => { fetchData(); refreshStats(); }} supabase={supabase} setToast={setToast} />
+      <AddBusinessModal isOpen={isBusinessModalOpen} onClose={() => setIsBusinessModalOpen(false)} onSuccess={() => { fetchData(); refreshStats(); }} supabase={supabase} setToast={setToast} />
       <DeleteConfirmModal 
         isOpen={isDeleteModalOpen} 
         onClose={() => setIsDeleteModalOpen(false)} 

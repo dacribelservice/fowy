@@ -129,9 +129,9 @@ Tras una auditoría profunda del estado actual de la plataforma, se han identifi
 - [x] **3. Migración de ADN Shared**:
   - [x] **3.1** Mover `StatCard` y `SuccessToast` a `src/components/admin/shared/`.
 - [ ] **4. Blindaje de Producción**:
-  - **4.1** Implementar políticas RLS definitivas basadas en `auth.uid() = owner_id`.
+  - [x] **4.1** Implementar políticas RLS definitivas basadas en `auth.uid() = owner_id`.
 - [ ] **5. Optimización de Lógica**:
-  - **5.1** Mover la lógica de cálculo de estadísticas de negocios a un hook personalizado o servicio de Supabase.
+  - [x] **5.1** Mover la lógica de cálculo de estadísticas de negocios a un hook personalizado o servicio de Supabase.
 
 ---
 > **Puntuación de Auditoría:** 9.2 / 10  
