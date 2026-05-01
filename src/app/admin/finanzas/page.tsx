@@ -7,6 +7,7 @@ import {
   ShieldCheck, 
   CheckCircle2,
   Calendar,
+  Clock,
   ArrowUpRight,
   ArrowDownRight
 } from "lucide-react";

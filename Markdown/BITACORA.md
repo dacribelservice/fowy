@@ -93,4 +93,34 @@ Se ha implementado el "Cerebro" del sistema:
 
 ---
 
-*Última actualización: 01 de Mayo de 2026 - 01:15 AM*
+## 📦 BACKUP Y REGISTRO (01 de Mayo de 2026 - Sesión Nocturna III)
+
+**Hitos alcanzados:**
+1.  **Registro Multi-paso (Wizard)**:
+    - Implementación de `useRegistrationWizard.ts` para manejar el estado complejo del registro.
+    - Creación de componentes modulares para cada paso: `AuthStep`, `ProfileStep`, `BusinessStep` y `SuccessStep`.
+2.  **Centralización de Storage**:
+    - Creación de `storageService.ts` para desacoplar la lógica de subida de archivos (imágenes de perfiles, logos de negocios, etc.) de los componentes.
+3.  **Gestión Financiera**:
+    - Implementación de `useFinanceManager.ts` y `financeUtils.ts` para centralizar cálculos y lógica administrativa.
+
+**Backup:** Commit `268401a` en GitHub (`main`).
+
+---
+
+## 🛠️ ESTABILIZACIÓN Y DEPLOY (01 de Mayo de 2026 - Sesión Nocturna IV)
+
+**Hitos alcanzados:**
+1.  **Corrección de Build**: Solución del error `Cannot find name 'Clock'` en el módulo de finanzas mediante la importación correcta de Lucide.
+2.  **Migración a Proxy (Next.js 16)**:
+    - Eliminación de `middleware.ts` por deprecación.
+    - Implementación de `proxy.ts` como nuevo estándar de la plataforma.
+    - Neutralización del middleware para facilitar el debug de despliegue.
+
+**Backup:** Commit `[Pendiente]` en GitHub (`main`).
+
+---
+
+*Última actualización: 01 de Mayo de 2026 - 01:55 AM*
+
+
