@@ -39,8 +39,8 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 - [x] **2.2.3 Link**: Enlace "¿Ya tienes cuenta? Inicia sesión".
 
 #### 2.3 Pantalla de Recuperación
-- [ ] **2.3.1 Recovery Form**: Input de email para envío de enlace mágico.
-- [ ] **2.3.2 Feedback**: Modal de éxito tras envío del correo con estética FOWY.
+- [x] **2.3.1 Recovery Form**: Input de email para envío de enlace mágico.
+- [x] **2.3.2 Feedback**: Modal de éxito tras envío del correo con estética FOWY.
 
 ### Fase 3: Lógica y Conexión (Logic)
 - [ ] **3.1 Auth Callback**: Crear `app/auth/callback/route.ts` para intercambiar el código por sesión y persistir la cookie de Supabase.
