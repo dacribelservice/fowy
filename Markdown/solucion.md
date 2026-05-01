@@ -163,12 +163,12 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 
 Para alcanzar el estándar 10/10, se deben transformar los componentes "pesados" en vistas puras, moviendo toda la lógica a hooks especializados.
 
-- [ ] **1. Poda del Explorador (`explorar/page.tsx`)**:
-  - [ ] **1.1** Crear `useExplorerManager.ts` para centralizar geolocalización, búsqueda y filtrado de categorías.
-  - [ ] **1.2** Reducir el componente de página a < 150 líneas delegando la gestión de estados al hook.
+- [x] **1. Poda del Explorador (`explorar/page.tsx`)**:
+  - [x] **1.1** Crear `useExplorerManager.ts` para centralizar geolocalización, búsqueda y filtrado de categorías.
+  - [x] **1.2** Reducir el componente de página a < 150 líneas delegando la gestión de estados al hook.
 - [ ] **2. Poda de Administración de Negocios (`admin/negocios/page.tsx`)**:
-  - [ ] **2.1** Crear `useAdminBusinessManager.ts` para manejar aprobaciones, rechazos y edición de negocios.
-  - [ ] **2.2** Extraer la lógica de estadísticas masivas a una función de utilidad o hook dedicado.
+  - [x] **2.1** Crear `useAdminBusinessManager.ts` para manejar aprobaciones, rechazos y edición de negocios.
+  - [x] **2.2** Extraer la lógica de estadísticas masivas a una función de utilidad o hook dedicado.
 - [ ] **3. Poda de Finanzas (`finanzas/page.tsx`)**:
   - [ ] **3.1** Crear `useFinanceManager.ts` para centralizar el cálculo de saldos disponibles, pendientes e historial de retiros.
   - [ ] **3.2** Asegurar precisión financiera separando los cálculos de la lógica de renderizado de gráficos.

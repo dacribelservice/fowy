@@ -17,145 +17,49 @@ import Pagination from "@/components/admin/shared/Pagination";
 import StatCard from "@/components/admin/shared/StatCard";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
 import { useBusinessStats } from "@/hooks/useBusinessStats";
+import { useAdminBusinessManager } from "@/hooks/useAdminBusinessManager";
 
 export default function NegociosPage() {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Fase 8.1 y 8.2: Paginación y Búsqueda Server-side
+  // UI States (Controlled by User)
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8); 
-  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-
-  const { globalStats, refreshStats } = useBusinessStats();
-
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteConfig, setDeleteConfig] = useState<{ id: string, name: string, type: 'category' | 'business', imageUrl?: string } | null>(null);
-  const [toast, setToast] = useState({ show: false, message: "" });
-  const supabase = createClient();
 
+  // Phase 7: Desacoplamiento de Orquestadores
+  const {
+    categories,
+    businesses,
+    loading,
+    totalCount,
+    globalStats,
+    fetchData,
+    refreshStats,
+    handleDeleteCategory,
+    handleDeleteBusiness,
+    confirmDelete,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    deleteConfig,
+    toast,
+    setToast,
+    supabase
+  } = useAdminBusinessManager({
+    currentPage,
+    pageSize,
+    searchTerm,
+    filterPlan,
+    filterStatus
+  });
 
-  // 2. Obtener Datos Paginados y Filtrados
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      const { data: catData } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: true });
-      setCategories(catData || []);
-
-      let query = supabase
-        .from('businesses')
-        .select('*', { count: 'exact' });
-
-      // Filtro de búsqueda (Nombre o ID)
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,id.ilike.%${searchTerm}%`);
-      }
-
-      // Filtro de Plan
-      if (filterPlan !== "all") {
-        query = query.eq('plan', filterPlan);
-      }
-
-      // Filtro de Estatus
-      if (filterStatus !== "all") {
-        query = query.eq('status', filterStatus === "active");
-      }
-
-      const from = (currentPage - 1) * pageSize;
-      const to = from + pageSize - 1;
-
-      const { data: busData, count, error } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-
-      setBusinesses((busData as any) || []);
-      setTotalCount(count || 0);
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase, currentPage, pageSize, searchTerm, filterPlan, filterStatus]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  // Reset a página 1 al filtrar
+  // Reset a página 1 al filtrar (Lógica de UI)
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterPlan, filterStatus]);
-
-  const handleDeleteCategory = (id: string) => {
-    const cat = categories.find(c => c.id === id);
-    setDeleteConfig({ id, name: cat?.name || 'esta categoría', type: 'category', imageUrl: cat?.image_url });
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleDeleteBusiness = (business: Business) => {
-    setDeleteConfig({ id: business.id, name: business.name, type: 'business', imageUrl: business.logo_url });
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteConfig) return;
-    
-    try {
-      // 1. Storage Cleanup (Fase 8.3)
-      if (deleteConfig.imageUrl) {
-        try {
-          const bucket = deleteConfig.type === 'category' ? 'categories' : 'logos';
-          // Extraer el nombre del archivo de la URL pública
-          const fileName = deleteConfig.imageUrl.split('/').pop();
-          if (fileName) {
-            await supabase.storage.from(bucket).remove([fileName]);
-            console.log(`Storage: ${fileName} eliminado de ${bucket}`);
-          }
-        } catch (storageErr) {
-          console.error("Error cleaning up storage:", storageErr);
-          // Continuamos con la eliminación de DB incluso si falla el storage
-        }
-      }
-
-      // 2. Database Deletion
-      const table = deleteConfig.type === 'category' ? 'categories' : 'businesses';
-      const { error, count } = await supabase
-        .from(table)
-        .delete({ count: 'exact' })
-        .eq('id', deleteConfig.id);
-      
-      if (error) throw error;
-      
-      // Si no hubo error pero tampoco se borró nada (count 0), suele ser por RLS
-      if (count === 0) {
-        setToast({ show: true, message: "⚠️ No se pudo eliminar: Permisos insuficientes." });
-        return;
-      }
-
-      setToast({ show: true, message: "✅ Eliminado correctamente" });
-      fetchData();
-      refreshStats();
-    } catch (error: any) {
-      console.error(`Error deleting ${deleteConfig.type}:`, error);
-      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
-    } finally {
-      setIsDeleteModalOpen(false);
-      setDeleteConfig(null);
-    }
-  };
 
   if (loading) {
     return (
@@ -165,6 +69,7 @@ export default function NegociosPage() {
       </div>
     );
   }
+
 
   return (
     <div className="pb-32 px-4 sm:px-8 max-w-full lg:max-w-[1600px] mx-auto">
