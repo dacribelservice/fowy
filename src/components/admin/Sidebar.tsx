@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
 import { 
   LayoutDashboard, 
   Store, 
@@ -16,6 +16,8 @@ import {
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter, usePathname } from "next/navigation";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -33,6 +35,46 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error("Error fetching admin profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "AD";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   return (
     <aside className="fixed left-6 top-6 bottom-6 w-72 glass-morphism rounded-fowy shadow-glass hidden xl:flex flex-col p-6 z-50">
@@ -88,15 +130,22 @@ export default function Sidebar() {
       <div className="mt-auto pt-6 border-t border-white/20">
         <div className="flex items-center gap-3 p-2 mb-4">
           <div className="w-10 h-10 rounded-full bg-fowy-secondary flex items-center justify-center text-white font-bold">
-            JD
+            {loading ? "..." : getInitials(profile?.full_name || "Admin")}
           </div>
-          <div>
-            <p className="text-sm font-bold text-slate-800 leading-none">Juan Doe</p>
-            <p className="text-xs text-slate-500 mt-1">Super Admin</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-slate-800 leading-none truncate">
+              {loading ? "Cargando..." : profile?.full_name || "Admin"}
+            </p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1.5">
+              {loading ? "Verificando..." : (profile?.role?.replace('_', ' ') || "Usuario")}
+            </p>
           </div>
         </div>
-        <button className="flex items-center gap-4 px-4 py-3 w-full rounded-fowy text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all">
-          <LogOut size={20} />
+        <button 
+          onClick={handleSignOut}
+          className="flex items-center gap-4 px-4 py-3 w-full rounded-fowy text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all group"
+        >
+          <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
           <span className="font-medium">Salir</span>
         </button>
       </div>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Search, Bell, Settings } from "lucide-react";
+import { Search } from "lucide-react";
 
 export function DashboardHeader() {
   return (
@@ -27,12 +27,6 @@ export function DashboardHeader() {
             className="w-full sm:w-64 pl-10 pr-4 py-3 sm:py-2 bg-white/50 border border-white/20 rounded-[15px] sm:rounded-fowy focus:outline-none focus:ring-2 focus:ring-fowy-red/20 transition-all shadow-sm"
           />
         </div>
-        <button className="p-3 sm:p-2.5 glass-morphism rounded-xl sm:rounded-fowy text-slate-600 hover:text-fowy-red transition-all shadow-sm">
-          <Bell size={20} />
-        </button>
-        <button className="p-3 sm:p-2.5 glass-morphism rounded-xl sm:rounded-fowy text-slate-600 hover:text-fowy-purple transition-all shadow-sm">
-          <Settings size={20} />
-        </button>
       </div>
     </div>
   );
