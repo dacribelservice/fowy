@@ -196,5 +196,29 @@ Se ha implementado el "Cerebro" del sistema:
 
 **Backup:** Commit `28611d4` en GitHub (`main`).
 
-*Última actualización: 01 de Mayo de 2026 - 06:45 PM*
 
+---
+
+## 🤝 VINCULACIÓN Y ACCESO DE SOCIOS - FASE 12 (01 de Mayo de 2026 - Sesión Nocturna IX)
+
+**Hitos alcanzados:**
+1.  **Flujo de Asignación Administrativa**:
+    - Refactorización de `AddBusinessModal.tsx` para incluir el campo **"Email del Dueño"**.
+    - Implementación de validación en tiempo real: El sistema verifica que el usuario exista en la tabla `profiles` antes de permitir la creación del negocio.
+    - Centralización de lógica: Se movió la persistencia y subida de assets al hook `useAdminBusinessManager.ts`.
+2.  **Automatización de Gobernanza (Supabase)**:
+    - **Elevación de Roles**: Creación de la función y trigger `handle_business_owner_elevation`. Ahora, cuando un administrador asigna un negocio a un usuario `explorer`, su rol cambia automáticamente a `business_owner`.
+    - **Blindaje RLS Pro**: Se actualizaron las políticas de la tabla `businesses`. Solo el `super_admin` puede insertar, y solo el `owner_id` (dueño) puede actualizar o eliminar su propio registro.
+3.  **Experiencia del Socio (Dashboard)**:
+    - **Detección Inteligente**: El layout del explorador (`ExplorerLayout.tsx`) ahora consulta si el usuario autenticado posee algún negocio.
+    - **Acceso Dinámico**: Si el usuario es socio, se inyecta la opción **"Mi Negocio"** en el menú de perfil, redirigiendo a `/business/dashboard`.
+
+**Archivos clave modificados:**
+- `src/components/admin/businesses/AddBusinessModal.tsx` (UI de asignación)
+- `src/hooks/useAdminBusinessManager.ts` (Orquestador de creación)
+- `src/app/(explorer)/layout.tsx` (Inyección de navegación para socios)
+- `Markdown/HOJA_DE_RUTA.md` (Actualización de estado)
+
+**Backup:** Commit realizado en GitHub (`main`).
+
+*Última actualización: 01 de Mayo de 2026 - 08:30 PM*

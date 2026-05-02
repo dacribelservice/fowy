@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { MobileFrame } from "@/components/explorer/MobileFrame";
 import { PageTransition } from "@/components/explorer/PageTransition";
-import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck } from "lucide-react";
+import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck, Store } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
@@ -18,16 +18,26 @@ export default function ExplorerLayout({
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasBusiness, setHasBusiness] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
-      const { data } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      setProfile(data);
+      setProfile(profileData);
+
+      // Check if user is a business owner
+      const { data: businessData } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('owner_id', userId)
+        .maybeSingle();
+      
+      setHasBusiness(!!businessData);
     };
 
     const checkUser = async () => {
@@ -129,7 +139,8 @@ export default function ExplorerLayout({
                         {/* Menu Options */}
                         {[
                           { icon: User, label: "Perfil", disabled: true },
-                          ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin...", href: "/admin/dashboard" }] : []),
+                          ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin Panel", href: "/admin/dashboard" }] : []),
+                          ...(hasBusiness ? [{ icon: Store, label: "Mi Negocio", href: "/business" }] : []),
                           { icon: Heart, label: "Favoritos", disabled: true },
                           { icon: FileText, label: "Términos y condiciones", disabled: true },
                         ].map((item, idx) => {
