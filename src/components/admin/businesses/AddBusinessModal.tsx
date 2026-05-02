@@ -1,9 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Store, Link as LinkIcon, MapPin, Phone, CreditCard } from "lucide-react";
+import { X, Upload, Store, Link as LinkIcon, MapPin, Phone, CreditCard, Mail } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { storageService } from "@/services/storageService";
 
 interface AddBusinessModalProps {
   isOpen: boolean;
@@ -11,9 +10,10 @@ interface AddBusinessModalProps {
   onSuccess: () => void;
   supabase: any;
   setToast: (config: { show: boolean, message: string }) => void;
+  onSave: (data: any) => Promise<{ success: boolean, error?: string }>;
 }
 
-export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase, setToast }: AddBusinessModalProps) {
+export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase, setToast, onSave }: AddBusinessModalProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [city, setCity] = useState("");
@@ -23,6 +23,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
   const [logo, setLogo] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-generate slug from name
@@ -45,51 +46,35 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
   };
 
   const handleSave = async () => {
-    if (!name || !slug || !logo) return;
+    if (!name || !slug || !logo || !ownerEmail) return;
     setLoading(true);
 
     try {
-      // 1. Upload Logo using centralized service
-      const publicUrl = await storageService.uploadFile(logo, 'logos', {
-        maxWidth: 800,
-        quality: 0.7
+      const result = await onSave({
+        name,
+        slug,
+        city,
+        country,
+        phone: whatsapp,
+        plan,
+        ownerEmail,
+        logo
       });
 
-      // 2. Insert Business
-      const { error: dbError } = await supabase
-        .from('businesses')
-        .insert([{
-          name,
-          slug,
-          logo_url: publicUrl,
-          city,
-          country,
-          plan,
-          phone: whatsapp,
-          status: true,
-          payment_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0], // Next month default
-          modules: {
-            standard: true,
-            pro: plan === "pro" || plan === "premium",
-            premium: plan === "premium"
-          }
-        }]);
-
-      if (dbError) throw dbError;
-
-      setToast({ show: true, message: "✅ Negocio creado correctamente" });
-      onSuccess();
-      onClose();
-      // Reset
-      setName("");
-      setCity("");
-      setCountry("");
-      setWhatsapp("");
-      setLogo(null);
-      setPreview(null);
+      if (result.success) {
+        onSuccess();
+        onClose();
+        // Reset
+        setName("");
+        setCity("");
+        setCountry("");
+        setWhatsapp("");
+        setOwnerEmail("");
+        setLogo(null);
+        setPreview(null);
+      }
     } catch (error: any) {
-      console.error("Error creating business:", error);
-      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
+      console.error("Error in Modal handleSave:", error);
     } finally {
       setLoading(false);
     }
@@ -231,12 +216,29 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
                     <option value="premium">Premium</option>
                   </select>
                 </div>
+
+                {/* Email del Dueño */}
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                    <Mail size={12} className="text-fowy-primary" /> Email del Dueño (Socio)
+                  </label>
+                  <input 
+                    type="email" 
+                    placeholder="socio@ejemplo.com"
+                    className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-fowy-orange/20 outline-none transition-all font-bold text-slate-700"
+                    value={ownerEmail}
+                    onChange={(e) => setOwnerEmail(e.target.value)}
+                  />
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider ml-1">
+                    El socio debe estar registrado previamente en FOWY.
+                  </p>
+                </div>
               </div>
 
               {/* Action Button */}
               <button 
                 onClick={handleSave}
-                disabled={!name || !logo || loading}
+                disabled={!name || !logo || !ownerEmail || loading}
                 className="w-full py-6 rounded-3xl bg-fowy-primary text-white font-black uppercase tracking-[0.3em] shadow-xl shadow-fowy-red/30 hover:shadow-fowy-red/40 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale flex items-center justify-center gap-3"
               >
                 {loading ? (

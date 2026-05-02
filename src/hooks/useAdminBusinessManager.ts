@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Business } from "@/components/admin/businesses/BusinessList";
 import { useBusinessStats } from "@/hooks/useBusinessStats";
+import { storageService } from "@/services/storageService";
 
 const supabase = createClient();
 
@@ -158,6 +159,68 @@ export function useAdminBusinessManager(options: ManagerOptions) {
     }
   };
 
+  const createBusiness = async (data: {
+    name: string;
+    slug: string;
+    city: string;
+    country: string;
+    phone: string;
+    plan: string;
+    ownerEmail: string;
+    logo: File;
+  }) => {
+    try {
+      // 1. Resolve Owner ID from Email
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', data.ownerEmail.trim().toLowerCase())
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error("No se encontró ningún usuario con ese correo electrónico. El socio debe registrarse primero.");
+      }
+
+      // 2. Upload Logo
+      const publicUrl = await storageService.uploadFile(data.logo, 'logos', {
+        maxWidth: 800,
+        quality: 0.7
+      });
+
+      // 3. Insert Business
+      const { error: dbError } = await supabase
+        .from('businesses')
+        .insert([{
+          name: data.name,
+          slug: data.slug,
+          logo_url: publicUrl,
+          city: data.city,
+          country: data.country,
+          plan: data.plan,
+          phone: data.phone,
+          status: true,
+          owner_id: profile.id,
+          payment_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+          modules: {
+            standard: true,
+            pro: data.plan === "pro" || data.plan === "premium",
+            premium: data.plan === "premium"
+          }
+        }]);
+
+      if (dbError) throw dbError;
+
+      setToast({ show: true, message: "✅ Negocio creado correctamente" });
+      fetchData();
+      refreshStats();
+      return { success: true };
+    } catch (error: any) {
+      console.error("Error creating business:", error);
+      setToast({ show: true, message: `❌ Error: ${error.message}` });
+      return { success: false, error: error.message };
+    }
+  };
+
   return {
     categories,
     businesses,
@@ -170,6 +233,7 @@ export function useAdminBusinessManager(options: ManagerOptions) {
     handleDeleteBusiness,
     confirmDelete,
     updateBusinessStatus,
+    createBusiness,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     deleteConfig,

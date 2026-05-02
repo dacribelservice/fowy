@@ -146,10 +146,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ## 🔗 FASE 12: VINCULACIÓN Y ACCESO DE SOCIOS (ADMIN ↔ SOCIO)
 *Objetivo: Permitir que el Admin asigne dueños a los negocios y que estos accedan a su panel privado.*
 
-- [ ] **12.1 Refactorización de Creación (Admin)**:
-    - [ ] 12.1.1 Modificar `AddBusinessModal.tsx` para añadir el campo "Email del Dueño" (Input con estilo Glassmorphism y validación).
-    - [ ] 12.1.2 Implementar búsqueda/validación de usuario en Supabase antes de la creación.
-    - [ ] 12.1.3 Actualizar el orquestador `useAdminBusinessManager.ts` para persistir el `owner_id` en la tabla `businesses`.
+- [x] **12.1 Refactorización de Creación (Admin)**:
+    - [x] 12.1.1 Modificar `AddBusinessModal.tsx` para añadir el campo "Email del Dueño" (Input con estilo Glassmorphism y validación).
+    - [x] 12.1.2 Implementar búsqueda/validación de usuario en Supabase antes de la creación.
+    - [x] 12.1.3 Actualizar el orquestador `useAdminBusinessManager.ts` para persistir el `owner_id` en la tabla `businesses`.
 - [ ] **12.2 Gobernanza de Roles y Permisos**:
     - [ ] 12.2.1 Crear lógica (Trigger o Edge Function) para elevar el rol del usuario de `explorer` a `business_owner` al ser vinculado.
     - [ ] 12.2.2 Auditar políticas RLS en la tabla `businesses` para permitir lectura/escritura al `owner_id` correspondiente.

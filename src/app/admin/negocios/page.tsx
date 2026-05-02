@@ -42,6 +42,8 @@ export default function NegociosPage() {
     handleDeleteCategory,
     handleDeleteBusiness,
     confirmDelete,
+    updateBusinessStatus,
+    createBusiness,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     deleteConfig,
@@ -143,7 +145,14 @@ export default function NegociosPage() {
       </section>
 
       <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => { fetchData(); refreshStats(); }} supabase={supabase} setToast={setToast} />
-      <AddBusinessModal isOpen={isBusinessModalOpen} onClose={() => setIsBusinessModalOpen(false)} onSuccess={() => { fetchData(); refreshStats(); }} supabase={supabase} setToast={setToast} />
+      <AddBusinessModal 
+        isOpen={isBusinessModalOpen} 
+        onClose={() => setIsBusinessModalOpen(false)} 
+        onSuccess={() => { fetchData(); refreshStats(); }} 
+        onSave={createBusiness}
+        supabase={supabase} 
+        setToast={setToast} 
+      />
       <DeleteConfirmModal 
         isOpen={isDeleteModalOpen} 
         onClose={() => setIsDeleteModalOpen(false)} 
