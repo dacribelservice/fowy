@@ -16,7 +16,7 @@
 | **conceptos.md** | Reglas de código obligatorias: límite de 250 líneas por archivo, desacoplamiento, imports dinámicos, paginación obligatoria, compresión de imágenes, prohibición de `alert()` nativos. | Al escribir o refactorizar cualquier código. SIEMPRE relevante. |
 | **diseño.md** | Tokens de diseño visual: paleta de colores (gradientes Energy/Flow), tipografía (Inter/Poppins), componentes (cards, sidebar, buttons), micro-animaciones y responsividad. | Al modificar UI, estilos o crear componentes visuales nuevos. |
 | **nucleo.md** | Checklist de construcción del núcleo (Fases 1-4): infraestructura, cerebro DB, cascarón UI. Todas completadas. | Solo como referencia histórica. Rara vez necesario. |
-| **login.md** | Hoja de ruta del módulo de autenticación: backend Supabase (Google Auth, email templates), UI (login, registro, recuperación) y lógica (callbacks, middleware). **TODO pendiente `[ ]`.** | Al implementar el sistema de login/registro. |
+| **login.md** | Hoja de ruta del módulo de autenticación: backend Supabase (Google Auth, email templates), UI (login, registro, recuperación) y lógica (callbacks, middleware). **COMPLETADO ✅** | Al implementar o ajustar el sistema de login/registro. |
 | **notificaciones.md** | Arquitectura completa de notificaciones: FCM + Supabase Realtime, tabla de eventos por rol, UI (campana, toasts, historial), Edge Function `send-push`. Todo completado. | Al modificar o debuggear notificaciones push/realtime. |
 | **solucion.md** | Documentación del bug de sincronización Explorador↔Panel de negocio: 5 pasos de diagnóstico, causa raíz (RLS + `.sort()` mutation + stale closures), arquitectura final con `useRef` + singleton. | Solo si hay bugs en el explorador o en la sincronización realtime. |
 
@@ -62,7 +62,7 @@
 ## ⚠️ Alertas Activas
 
 1. **RLS Temporal**: La política `"DEV: Allow all updates (temporary)"` en la tabla `businesses` de Supabase **debe reemplazarse** cuando se implemente el login de partners. Ver `proyecto.md` y `solucion.md`.
-2. **Login Pendiente**: Todo el módulo de autenticación está sin implementar (`login.md`). Sin auth, el usuario no tiene sesión y las políticas RLS seguras no funcionan.
+2. **Registro Simplificado**: El flujo de registro ha sido optimizado para ser directo (Auth -> Perfil -> Éxito), asignando el rol `explorer` por defecto. La creación de negocios ahora es una tarea exclusiva del administrador.
 
 ---
 *Índice generado el 30 de Abril de 2026 — Actualizar al agregar nuevos archivos .md*

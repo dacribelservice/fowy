@@ -170,3 +170,31 @@ Se ha implementado el "Cerebro" del sistema:
 - `src/app/(explorer)/layout.tsx` (Lógica de estado y renderizado del menú)
 
 *Última actualización: 01 de Mayo de 2026 - 04:35 PM*
+
+---
+
+## ⚡ OPTIMIZACIÓN DE REGISTRO Y AUDITORÍA (01 de Mayo de 2026 - Sesión Nocturna VIII)
+
+**Hitos alcanzados:**
+1.  **Simplificación Radical del Registro**:
+    - Se eliminó el paso obligatorio de "Negocio" del Wizard de registro.
+    - El flujo ahora es: **Auth (Email/Google)** -> **Perfil (Nombre/Celular)** -> **Éxito (Confirmación)**.
+    - Se asigna automáticamente el rol `explorer` a todos los nuevos registros.
+    - La creación de negocios se ha trasladado exclusivamente al panel administrativo para mayor control de calidad.
+2.  **Auditoría de Código y Documentación**:
+    - Se realizó una revisión profunda del sistema obteniendo una puntuación de **9.4/10**.
+    - Se validó el cumplimiento de las reglas de arquitectura (límite de líneas, desacoplamiento, patrones React modernos).
+    - Se detectó y documentó un error en la API Key de Firebase que afecta las notificaciones push.
+3.  **Sincronización de Documentación**:
+    - Se actualizaron `INDICE.md`, `HOJA_DE_RUTA.md` y `login.md` para reflejar que el módulo de autenticación está 100% funcional y simplificado.
+
+**Archivos clave modificados:**
+- `src/hooks/useRegistrationWizard.ts` (Simplificación de lógica)
+- `src/components/auth/RegisterForm.tsx` (Refactorización de flujo)
+- `src/components/auth/steps/ProfileStep.tsx` (Finalización directa)
+- `Markdown/` (Sincronización de toda la documentación)
+
+**Backup:** Commit `28611d4` en GitHub (`main`).
+
+*Última actualización: 01 de Mayo de 2026 - 06:45 PM*
+

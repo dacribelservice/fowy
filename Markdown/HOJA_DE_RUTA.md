@@ -91,8 +91,8 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🌍 FASE 8: MÓDULO EXPLORADOR (Futuro)
-- [ ] **8.1 Mapa de Descubrimiento**: Vista global de negocios geolocalizados.
+## 🌍 FASE 8: MÓDULO EXPLORADOR (En progreso 🏗️)
+- [x] **8.1 Mapa de Descubrimiento**: Vista global de negocios geolocalizados (Leaflet + RT).
 - [ ] **8.2 Menú Digital Premium**: Interfaz de pedidos optimizada para móvil.
 - [ ] **8.3 Checkout WhatsApp**: Generación de mensaje estructurado y registro en DB.
 

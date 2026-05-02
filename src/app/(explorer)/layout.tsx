@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { MobileFrame } from "@/components/explorer/MobileFrame";
 import { PageTransition } from "@/components/explorer/PageTransition";
-import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight } from "lucide-react";
+import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
@@ -15,15 +15,26 @@ export default function ExplorerLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchProfile = async (userId: string) => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      setProfile(data);
+    };
+
     const checkUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
+        if (user) await fetchProfile(user.id);
       } finally {
         setIsLoading(false);
       }
@@ -31,7 +42,13 @@ export default function ExplorerLayout({
     checkUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const newUser = session?.user ?? null;
+      setUser(newUser);
+      if (newUser) {
+        fetchProfile(newUser.id);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -112,21 +129,43 @@ export default function ExplorerLayout({
                         {/* Menu Options */}
                         {[
                           { icon: User, label: "Perfil", disabled: true },
+                          ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin...", href: "/admin/dashboard" }] : []),
                           { icon: Heart, label: "Favoritos", disabled: true },
                           { icon: FileText, label: "Términos y condiciones", disabled: true },
-                        ].map((item, idx) => (
-                          <button
-                            key={idx}
-                            disabled={item.disabled}
-                            className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group"
-                          >
-                            <div className="flex items-center gap-3">
-                              <item.icon size={18} strokeWidth={2} className="text-slate-400 group-hover:text-slate-800 transition-colors" />
-                              <span className="text-sm font-bold">{item.label}</span>
-                            </div>
-                            <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-800 transition-colors" />
-                          </button>
-                        ))}
+                        ].map((item, idx) => {
+                          const isLink = 'href' in item;
+                          const content = (
+                            <>
+                              <div className="flex items-center gap-3">
+                                <item.icon size={18} strokeWidth={2} className="text-slate-400 group-hover:text-slate-800 transition-colors" />
+                                <span className="text-sm font-bold">{item.label}</span>
+                              </div>
+                              <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-800 transition-colors" />
+                            </>
+                          );
+
+                          if (isLink) {
+                            return (
+                              <Link
+                                key={idx}
+                                href={item.href as string}
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group"
+                              >
+                                {content}
+                              </Link>
+                            );
+                          }
+
+                          return (
+                            <button
+                              key={idx}
+                              disabled={(item as any).disabled}
+                              className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group"
+                            >
+                              {content}
+                            </button>
+                          );
+                        })}
 
                         <div className="h-px bg-slate-100 my-1 mx-2" />
 
