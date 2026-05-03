@@ -30,7 +30,7 @@ export const MobileFrame = ({ children }: { children: React.ReactNode }) => {
         <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[25px] bg-black rounded-b-[18px] z-50"></div>
 
         {/* Contenido de la Aplicación */}
-        <div className="flex-grow overflow-y-auto scrollbar-hide relative bg-white">
+        <div className="flex-grow relative bg-white flex flex-col h-full overflow-hidden">
           {children}
         </div>
 
