@@ -50,9 +50,10 @@ Para evitar que los archivos crezcan descontroladamente, seguimos esta jerarquí
 
 ---
 
-## 🛡️ 5. SEGURIDAD Y DATOS
-1.  **RLS (Row Level Security)**: Las políticas de Supabase deben ser auditadas. Solo el rol `super_admin` puede tener permisos de edición en el panel administrativo.
-2.  **Índices**: Al crear nuevas columnas de búsqueda, se debe crear su índice correspondiente en PostgreSQL (usar `pg_trgm` para texto).
+## ⚡ 6. ESTABILIDAD REALTIME (REGLAS CRÍTICAS)
+1.  **Singleton de Supabase**: Para suscripciones persistentes, el cliente de Supabase debe ser instanciado a nivel de módulo (fuera del componente) para evitar colisiones de estado en React 19.
+2.  **Patrón `useRef` para Stale Closures**: Toda función que deba acceder a estados actualizados dentro de un callback de Realtime debe ser referenciada vía `useRef`. Prohibido depender de estados volátiles directamente en los listeners.
+3.  **IDs de Canal Únicos**: Cada suscripción debe generar un ID de canal único (`channel-${Math.random()}`) para prevenir errores de "canal ya existente" durante el Fast Refresh o navegación rápida.
 
 ---
-*Este documento es dinámico y debe actualizarse cuando se adopte un nuevo patrón arquitectónico.*
+*Este documento es dinámico y fue consolidado el 03 de Mayo de 2026 tras la auditoría de estabilidad de la Fase 13.*

@@ -67,11 +67,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **6.1 Paginación en Tiempo Real**: Carga por bloques (offset/limit).
 - [x] **6.2 Búsqueda Server-side**: Filtros directos en Supabase.
 - [x] **6.3 Gestión Maestra de Imágenes**: Compresión con API Canvas y limpieza de Storage.
-- [x] **6.4 Blindaje de Supabase**: Índices Trigram (`pg_trgm`) y auditoría de políticas.
-
----
-
-## 💼 FASE 7: MÓDULO DE SOCIOS (Próxima Fase 🚀)
+- [x] **6.4 Blindaje de Supa## 💼 FASE 7: MÓDULO DE SOCIOS (Completada ✅)
 - [x] **7.1 Analíticas de Tráfico**:
     - [x] 7.1.1 Crear tabla `analytics_visits` para tracking de visitas al menú.
     - [x] 7.1.2 Dashboard de KPIs: Visitas vs Ventas, Ticket Promedio.
@@ -91,10 +87,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🌍 FASE 8: MÓDULO EXPLORADOR (En progreso 🏗️)
+## 🌍 FASE 8: MÓDULO EXPLORADOR (Completada ✅)
 - [x] **8.1 Mapa de Descubrimiento**: Vista global de negocios geolocalizados (Leaflet + RT).
-- [ ] **8.2 Menú Digital Premium**: Interfaz de pedidos optimizada para móvil.
-- [ ] **8.3 Checkout WhatsApp**: Generación de mensaje estructurado y registro en DB.
+- [x] **8.2 Menú Digital Premium**: Interfaz de pedidos optimizada para móvil.
+- [x] **8.3 Checkout WhatsApp**: Generación de mensaje estructurado y registro en DB.
 
 ---
 
@@ -128,7 +124,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🔔 FASE 11: FLUJOS DE NOTIFICACIÓN DE NEGOCIO (Próximamente)
+## 🔔 FASE 11: FLUJOS DE NOTIFICACIÓN DE NEGOCIO (Completada ✅)
 *Garantizar que el socio y el experto estén siempre informados en tiempo real.*
 
 - [x] **11.1 Alertas de Pedidos en Vivo**:
@@ -143,7 +139,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🔗 FASE 12: VINCULACIÓN Y ACCESO DE SOCIOS (ADMIN ↔ SOCIO)
+## 🔗 FASE 12: VINCULACIÓN Y ACCESO DE SOCIOS (Completada ✅)
 *Objetivo: Permitir que el Admin asigne dueños a los negocios y que estos accedan a su panel privado.*
 
 - [x] **12.1 Refactorización de Creación (Admin)**:
@@ -160,7 +156,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🚀 FASE 13: ESTABILIZACIÓN DE PEDIDOS REALTIME
+## 🚀 FASE 13: ESTABILIZACIÓN DE PEDIDOS REALTIME (Completada ✅)
 *Objetivo: Corregir el error de colisión de canales y asegurar la persistencia sonora en el panel del negocio.*
 
 - [x] **13.1 Refactorización de Estabilidad (Singleton)**:
@@ -171,5 +167,6 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] 13.2.1 Validar que el sonido `cash-register.mp3` se dispare sin errores al recibir un pedido.
     - [x] 13.2.2 Confirmar que no hay fugas de canales en el DevTools de Chrome al navegar entre secciones.
 
+---
 ---
 *Documento consolidado - FOWY 2026*

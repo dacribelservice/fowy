@@ -33,10 +33,12 @@ Este documento define la hoja de ruta para la implementación del sistema de acc
 - [x] **2.1.3 Email Form**: Inputs premium para Email y Contraseña.
 - [x] **2.1.4 Auxiliares**: Enlace "¿Olvidaste tu contraseña?" y "¿Aún no tienes cuenta?".
 
-#### 2.2 Pantalla de Registro (Sign Up)
+#### 2.2 Pantalla de Registro (Sign Up) — Simplificado ✅
 - [x] **2.2.1 Social Register**: Botón de registro con Google.
-- [x] **2.2.2 Email Register**: Formulario de creación de cuenta (Email, Contraseña, Confirmar Contraseña).
-- [x] **2.2.3 Link**: Enlace "¿Ya tienes cuenta? Inicia sesión".
+- [x] **2.2.2 Email Register**: Formulario de creación directa (Email/Contraseña).
+- [x] **2.2.3 Perfil Instantáneo**: Paso de "Nombre y Celular" que finaliza el registro.
+- [x] **2.2.4 Auto-Role**: Asignación automática del rol `explorer`.
+- [x] **2.2.5 Redirección**: Enlace "¿Ya tienes cuenta? Inicia sesión".
 
 #### 2.3 Pantalla de Recuperación
 - [x] **2.3.1 Recovery Form**: Input de email para envío de enlace mágico.

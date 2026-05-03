@@ -56,5 +56,5 @@ Este rol representa al cliente B2B de FOWY. Su interfaz es un centro operativo p
     *   Usuario (Explorer): `alert.mp3`.
 
 ---
-*Blueprint de Rol v6 - Actualizado Abril 2026*
+*Blueprint de Rol v7 - Actualizado 03 de Mayo de 2026*
 

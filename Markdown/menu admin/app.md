@@ -2,44 +2,38 @@
 
 > ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
-> **Estado**: Planificación / Fase 1
-> **Tecnología**: Next.js 14+ (App Router), Supabase, Vercel.
+> **Estado**: Fase 13 (Estabilidad Realtime) - **COMPLETADA ✅**
+> **Tecnología**: Next.js 15 (App Router), Supabase, Vercel.
 
 ---
 
 ## 🔗 ENLACES DE DESARROLLO (Localhost)
-- **Link del Admin**: http://localhost:3000/admin/dashboard
+- **Link del Admin**: http://localhost:3000/admin/negocios
 - **Link del Negocio**: http://localhost:3000/business/orders
 - **Link del Usuario**: http://localhost:3000/explorar
 
 ---
 
 ## 🏛️ EL NÚCLEO (The Mall)
-El núcleo es el sistema operativo de la app. Gestiona usuarios, seguridad y navegación global. Si un módulo falla, el núcleo lo aísla.
+El núcleo es el sistema operativo de la app. Gestiona usuarios, seguridad y navegación global.
 
-### 📂 Estructura de Carpetas (ADN Modular)
+### 📂 Estructura de Carpetas Real (ADN Modular)
 
 ```text
 root/
 ├── app/
-│   ├── (auth)/               <-- Puerta de entrada (Login/Registro)
-│   ├── (core)/               <-- El "Mall". Interfaz base y explorador.
-│   ├── (admin)/              <-- Dashboard Super Admin & Profesionales.
-│   ├── (partners)/           <-- Dashboard Vendedores y Dueños de Negocio.
-│   ├── (extensions)/         <-- LOS LOCALES (Sandbox Modular)
-│   │   ├── menu-digital/     - Módulo de cartas QR.
-│   │   ├── delivery/         - Módulo de logística.
-│   │   ├── inventory/        - Módulo de stock.
-│   │   └── layout.tsx        - Escudo térmico (Global Extension Layout).
-│   └── api/                  <-- Pasarela de datos y Webhooks.
+│   ├── (auth)/               <-- Login/Registro (Simplificado)
+│   ├── (explorer)/           <-- El Explorador (Mobile-First Shell)
+│   ├── (partners)/           <-- Panel de Socios (/business/*)
+│   ├── admin/                <-- Panel de Super Administrador
+│   └── api/                  <-- Webhooks y funciones de servidor.
 ├── components/
-│   ├── shared/               - UI Atoms (Botones, Inputs con Glassmorfismo).
-│   ├── layout/               - Shells (Navbars, Sidebars independientes).
-│   └── modules/              - Lógica visual aislada de cada extensión.
-├── lib/
-│   ├── core/                 - Clientes de Supabase y funciones críticas.
-│   └── modules/              - SDKs internos de cada extensión.
-└── supabase/                 <-- El Búnker de Datos.
+│   ├── admin/                - Componentes administrativos (shared/businesses)
+│   ├── auth/                 - Formularios de acceso
+│   └── explorer/             - Componentes del mapa y sheets
+├── hooks/                    - Orquestadores (useOrderManager, useExplorerManager)
+├── services/                 - Lógica de negocio (storageService, authService)
+└── utils/                    - Helpers (geo.ts, supabase/client)
 ```
 
 ---

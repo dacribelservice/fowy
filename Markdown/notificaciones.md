@@ -104,6 +104,8 @@ Esta lista debe seguirse en orden secuencial para garantizar la integridad del s
 - [x] **6.3 Dashboard Integration**: Mostrar indicadores de alerta en el perfil del socio para eventos no leídos.
 
 ---
-*Diseño de Sistema v6 (Checklist Actualizada) - Abril 2026*
+*Diseño de Sistema v7.0 (Actualizado 03-May-2026)*
 
-
+> 🚨 **ESTADO DEL CANAL PUSH**: Se mantiene el problema con las credenciales de Firebase (VAPID/API Key) en el entorno de producción. Las notificaciones Push (FCM) están **en pausa** técnica.
+> 
+> ✅ **CANAL MAESTRO OPERATIVO**: El sistema de **Supabase Realtime** es el canal primario y redundante. Está 100% operativo, garantizando la entrega de alertas visuales y sonoras (`cash-register.mp3`) en tiempo real mientras la aplicación esté abierta o en segundo plano en el navegador.

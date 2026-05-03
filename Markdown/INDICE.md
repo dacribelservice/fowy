@@ -61,8 +61,8 @@
 
 ## ⚠️ Alertas Activas
 
-1. **RLS Temporal**: La política `"DEV: Allow all updates (temporary)"` en la tabla `businesses` de Supabase **debe reemplazarse** cuando se implemente el login de partners. Ver `proyecto.md` y `solucion.md`.
-2. **Registro Simplificado**: El flujo de registro ha sido optimizado para ser directo (Auth -> Perfil -> Éxito), asignando el rol `explorer` por defecto. La creación de negocios ahora es una tarea exclusiva del administrador.
+1. **Firebase API Key**: Se ha detectado un error en la configuración de la API Key de Firebase que afecta las notificaciones push. Requiere validación en la consola de Firebase.
+2. **Registro Simplificado**: El flujo de registro ha sido optimizado para ser directo (Auth -> Perfil -> Éxito), asignando el rol `explorer` por defecto.
 
 ---
-*Índice generado el 30 de Abril de 2026 — Actualizar al agregar nuevos archivos .md*
+*Última actualización de la biblioteca: 03 de Mayo de 2026 — Reflejando Consolidación Final y Fase 13*
