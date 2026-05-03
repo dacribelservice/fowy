@@ -168,5 +168,29 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] 13.2.2 Confirmar que no hay fugas de canales en el DevTools de Chrome al navegar entre secciones.
 
 ---
+
+## 🥗 FASE 14: GESTIÓN DE CATEGORÍAS Y PRODUCTOS (BUSINESS)
+*Objetivo: Resolver botones huérfanos y permitir que cada negocio organice su menú con categorías propias e independientes.*
+
+- [ ] **14.1 Diagnóstico e Infraestructura de Datos**:
+    - [ ] 14.1.1 **Corrección de Eventos**: Vincular manejadores `onClick` a los botones "+ Nuevo Producto" y "Agregar Producto".
+    - [ ] 14.1.2 **Base de Datos**: Crear tabla `product_menu_categories` (id, business_id, name, order_index).
+    - [ ] 14.1.3 **Seguridad RLS**: Configurar políticas para que el `business_owner` solo gestione sus categorías locales.
+- [ ] **14.2 Gestor de Categorías del Negocio (DNA Modular)**:
+    - [ ] 14.2.1 Crear componente `<MenuCategoryManager />` con diseño Glassmorphism (blanco traslúcido + `backdrop-blur`).
+    - [ ] 14.2.2 Implementar CRUD de categorías locales usando chips animados con `framer-motion`.
+- [ ] **14.3 Modal de Producto Premium (The Engine)**:
+    - [ ] 14.3.1 Desarrollar `<ProductFormModal />` independiente (Estilo SideSheet lateral).
+    - [ ] 14.3.2 **Multimedia Pro**: Integrar `compressImage` (ahorro 80%) y visualización con `PremiumImage`.
+    - [ ] 14.3.3 **Selector Inteligente**: Inyectar dinámicamente solo las categorías creadas por el socio en el paso 14.2.
+    - [ ] 14.3.4 **Atributos de Venta**: Toggles para "Nuevo", "Oferta", "Recomendado" y switch de `in_stock`.
+- [ ] **14.4 Integración y Feedback**:
+    - [ ] 14.4.1 Conectar formulario con `useProductManager.addProduct` asegurando la inyección automática del `business_id`.
+    - [ ] 14.4.2 Implementar `SuccessToast` (No alerts nativos) y refresco animado del grid de productos.
+- [ ] **14.5 Sincronización con Explorador**:
+    - [ ] 14.5.1 Actualizar vista `/explorar` para agrupar productos bajo sus categorías locales.
+    - [ ] 14.5.2 Validar desaparición del mensaje "NO HAY PRODUCTOS" tras la primera creación exitosa.
+
+---
 ---
 *Documento consolidado - FOWY 2026*
