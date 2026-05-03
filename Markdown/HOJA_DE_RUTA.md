@@ -159,4 +159,17 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] 12.3.3 Implementar redirección inteligente al Dashboard de Socio (`/business/dashboard`).
 
 ---
+
+## 🚀 FASE 13: ESTABILIZACIÓN DE PEDIDOS REALTIME
+*Objetivo: Corregir el error de colisión de canales y asegurar la persistencia sonora en el panel del negocio.*
+
+- [x] **13.1 Refactorización de Estabilidad (Singleton)**:
+    - [x] 13.1.1 Extraer `createClient()` de `useOrderManager.ts` y `OrdersPage.tsx` para convertirlos en Singletons estables.
+    - [x] 13.1.2 Implementar patrón `useRef` en el Hook de órdenes para evitar *stale closures* en las suscripciones.
+    - [x] 13.1.3 Ajustar dependencias del `useEffect` e implementar **IDs de canal únicos** (vía `Math.random()`) para evitar colisiones en React 19.
+- [x] **13.2 Verificación Operativa**:
+    - [x] 13.2.1 Validar que el sonido `cash-register.mp3` se dispare sin errores al recibir un pedido.
+    - [x] 13.2.2 Confirmar que no hay fugas de canales en el DevTools de Chrome al navegar entre secciones.
+
+---
 *Documento consolidado - FOWY 2026*

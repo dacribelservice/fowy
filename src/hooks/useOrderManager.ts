@@ -15,16 +15,23 @@ export interface Order {
   created_at: string;
 }
 
+const supabase = createClient();
+
 export function useOrderManager(businessId: string | null) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const supabase = createClient();
+  const ordersRef = useRef<Order[]>([]);
+
+  // Sincronizar ref con estado para evitar stale closures en el callback
+  useEffect(() => {
+    ordersRef.current = orders;
+  }, [orders]);
 
   // Inicializar sonido
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && !audioRef.current) {
       audioRef.current = new Audio("/sounds/cash-register.mp3");
     }
   }, []);
@@ -50,7 +57,7 @@ export function useOrderManager(businessId: string | null) {
     } finally {
       setLoading(false);
     }
-  }, [businessId, supabase]);
+  }, [businessId]);
 
   const updateOrderStatus = async (id: string, status: Order['status']) => {
     try {
@@ -69,12 +76,15 @@ export function useOrderManager(businessId: string | null) {
     }
   };
 
-  // Suscripción Realtime
+  // Suscripción Realtime Estable
   useEffect(() => {
     if (!businessId) return;
 
+    console.log(`Setting up Realtime for business: ${businessId}`);
+
+    const channelId = `business-orders-${businessId}-${Math.random().toString(36).substring(7)}`;
     const channel = supabase
-      .channel(`business-orders-${businessId}`)
+      .channel(channelId)
       .on(
         'postgres_changes',
         { 
@@ -84,8 +94,15 @@ export function useOrderManager(businessId: string | null) {
           filter: `business_id=eq.${businessId}`
         },
         (payload) => {
+          console.log("New order received via Realtime:", payload.new);
           const newOrder = payload.new as Order;
-          setOrders((prev) => [newOrder, ...prev]);
+          
+          // Usar actualización funcional para evitar dependencias
+          setOrders((prev) => {
+            // Evitar duplicados por si acaso
+            if (prev.some(o => o.id === newOrder.id)) return prev;
+            return [newOrder, ...prev];
+          });
           
           // Reproducir sonido de notificación
           if (audioRef.current) {
@@ -93,12 +110,15 @@ export function useOrderManager(businessId: string | null) {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`Realtime status for ${businessId}:`, status);
+      });
 
     return () => {
+      console.log(`Cleaning up Realtime for business: ${businessId}`);
       supabase.removeChannel(channel);
     };
-  }, [businessId, supabase]);
+  }, [businessId]);
 
   // Carga inicial
   useEffect(() => {

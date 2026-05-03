@@ -14,9 +14,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useOrderManager } from "@/hooks/useOrderManager";
 
+const supabase = createClient();
+
 export default function OrdersPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
-  const supabase = createClient();
   
   const { 
     orders, 
@@ -39,7 +40,7 @@ export default function OrdersPage() {
     };
 
     fetchBusinessId();
-  }, [supabase]);
+  }, []);
 
   const loading = !businessId || loadingOrders;
 
