@@ -40,8 +40,9 @@ export function useProductManager(businessId: string | null) {
 
       if (fetchError) throw fetchError;
       setProducts(data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
@@ -61,8 +62,9 @@ export function useProductManager(businessId: string | null) {
       if (addError) throw addError;
       setProducts(prev => [data, ...prev]);
       return data;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return null;
     }
   };
@@ -79,8 +81,9 @@ export function useProductManager(businessId: string | null) {
       if (updateError) throw updateError;
       setProducts(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
       return data;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return null;
     }
   };
@@ -95,8 +98,9 @@ export function useProductManager(businessId: string | null) {
       if (deleteError) throw deleteError;
       setProducts(prev => prev.filter(p => p.id !== id));
       return true;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return false;
     }
   };

@@ -108,8 +108,9 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
 
       if (onSuccess) onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error al guardar el producto");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Ocurrió un error al guardar el producto";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

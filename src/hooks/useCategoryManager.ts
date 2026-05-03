@@ -32,8 +32,9 @@ export function useCategoryManager(businessId: string | null) {
 
       if (fetchError) throw fetchError;
       setCategories(data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       console.error("Error fetching categories:", err);
     } finally {
       setLoading(false);
@@ -61,8 +62,9 @@ export function useCategoryManager(businessId: string | null) {
       if (addError) throw addError;
       setCategories(prev => [...prev, data]);
       return data;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return null;
     }
   };
@@ -79,8 +81,9 @@ export function useCategoryManager(businessId: string | null) {
       if (updateError) throw updateError;
       setCategories(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
       return data;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return null;
     }
   };
@@ -95,8 +98,9 @@ export function useCategoryManager(businessId: string | null) {
       if (deleteError) throw deleteError;
       setCategories(prev => prev.filter(c => c.id !== id));
       return true;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       return false;
     }
   };
@@ -118,8 +122,9 @@ export function useCategoryManager(businessId: string | null) {
         .upsert(updates);
 
       if (upsertError) throw upsertError;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      setError(errorMsg);
       fetchCategories(); // Rollback
     }
   };
