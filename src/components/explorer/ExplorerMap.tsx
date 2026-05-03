@@ -113,7 +113,7 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness }: Ex
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{biz.categories?.name}</span>
+                        <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{biz.category_name}</span>
                         <div className="flex items-center gap-0.5">
                           <Star size={8} className="fill-amber-400 text-amber-400" />
                           <span className="text-[8px] font-black">4.9</span>

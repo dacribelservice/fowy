@@ -72,10 +72,10 @@ export function useAdminBusinessManager(options: ManagerOptions) {
 
       if (error) throw error;
 
-      setBusinesses((busData as any) || []);
+      setBusinesses((busData as unknown as Business[]) || []);
       setTotalCount(count || 0);
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export function useAdminBusinessManager(options: ManagerOptions) {
           if (fileName) {
             await supabase.storage.from(bucket).remove([fileName]);
           }
-        } catch (storageErr) {
+        } catch (storageErr: unknown) {
           console.error("Error cleaning up storage:", storageErr);
         }
       }
@@ -132,9 +132,10 @@ export function useAdminBusinessManager(options: ManagerOptions) {
       setToast({ show: true, message: "✅ Eliminado correctamente" });
       fetchData();
       refreshStats();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error deleting ${deleteConfig.type}:`, error);
-      setToast({ show: true, message: `❌ Error: ${error.message || "Error desconocido"}` });
+      const message = error instanceof Error ? error.message : "Error desconocido";
+      setToast({ show: true, message: `❌ Error: ${message}` });
     } finally {
       setIsDeleteModalOpen(false);
       setDeleteConfig(null);
@@ -154,8 +155,9 @@ export function useAdminBusinessManager(options: ManagerOptions) {
       setToast({ show: true, message: `✅ Negocio ${status ? 'activado' : 'desactivado'} correctamente` });
       fetchData();
       refreshStats();
-    } catch (error: any) {
-      setToast({ show: true, message: `❌ Error al actualizar estatus: ${error.message}` });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Error desconocido";
+      setToast({ show: true, message: `❌ Error al actualizar estatus: ${message}` });
     }
   };
 
@@ -214,10 +216,11 @@ export function useAdminBusinessManager(options: ManagerOptions) {
       fetchData();
       refreshStats();
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating business:", error);
-      setToast({ show: true, message: `❌ Error: ${error.message}` });
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : "Error desconocido";
+      setToast({ show: true, message: `❌ Error: ${message}` });
+      return { success: false, error: message };
     }
   };
 

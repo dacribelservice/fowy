@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { 
   X, 
   Upload, 
@@ -116,13 +116,13 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
     }
   };
 
-  const overlayVariants = {
+  const overlayVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
     exit: { opacity: 0 }
   };
 
-  const sheetVariants = {
+  const sheetVariants: Variants = {
     hidden: { x: "100%" },
     visible: { x: 0, transition: { type: "spring", damping: 25, stiffness: 200 } },
     exit: { x: "100%", transition: { ease: "easeInOut", duration: 0.3 } }

@@ -118,9 +118,9 @@ export function useExplorerManager() {
         { event: '*', schema: 'public', table: 'businesses' },
         (payload) => {
           fetchRef.current();
-          if (payload.new && (payload.new as any).id) {
+          if (payload.new && (payload.new as { id?: string }).id) {
             setSelectedBusiness((prev: any) => {
-              if (prev && prev.id === (payload.new as any).id) {
+              if (prev && prev.id === (payload.new as { id: string }).id) {
                 return { ...prev, ...(payload.new as any) };
               }
               return prev;

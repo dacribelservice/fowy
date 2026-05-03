@@ -51,8 +51,9 @@ export function useOrderManager(businessId: string | null) {
 
       if (fetchError) throw fetchError;
       setOrders(data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error desconocido";
+      setError(message);
       console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
@@ -70,8 +71,9 @@ export function useOrderManager(businessId: string | null) {
       
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
       return true;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error desconocido";
+      setError(message);
       return false;
     }
   };

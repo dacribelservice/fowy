@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { 
   Plus, 
   X, 
@@ -41,7 +41,7 @@ export default function MenuCategoryManager({ businessId, onClose }: MenuCategor
     setIsAdding(false);
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { 
       opacity: 1, 
@@ -51,7 +51,7 @@ export default function MenuCategoryManager({ businessId, onClose }: MenuCategor
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
     exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } }

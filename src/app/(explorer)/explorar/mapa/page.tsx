@@ -19,6 +19,7 @@ const ExplorerMap = dynamic(() => import("@/components/explorer/ExplorerMap"), {
 
 export default function MapaPage() {
   const [businesses, setBusinesses] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -34,8 +35,16 @@ export default function MapaPage() {
 
       if (error) throw error;
       setBusinesses(data || []);
+
+      // Fetch categories for the filter
+      const { data: catData } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+      if (catData) setCategories(catData);
+
     } catch (error) {
-      console.error("Error fetching map businesses:", error);
+      console.error("Error fetching map data:", error);
     } finally {
       setLoading(false);
     }
@@ -71,10 +80,12 @@ export default function MapaPage() {
       </div>
 
       <div className="flex-1 relative">
-        <ExplorerMap businesses={businesses.map(b => ({
-          ...b,
-          category_name: b.categories?.name
-        }))} />
+        <ExplorerMap 
+          businesses={businesses.map(b => ({
+            ...b,
+            category_name: Array.isArray(b.categories) ? b.categories[0]?.name : b.categories?.name
+          }))} 
+        />
       </div>
     </div>
   );

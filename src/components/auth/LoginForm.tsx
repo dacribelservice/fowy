@@ -46,6 +46,7 @@ export default function LoginForm() {
         router.refresh()
       }
     } catch (err) {
+      console.error("Login error:", err);
       toast.error('Ocurrió un error inesperado')
     } finally {
       setIsLoading(false)
@@ -67,6 +68,7 @@ export default function LoginForm() {
         setIsGoogleLoading(false)
       }
     } catch (err) {
+      console.error("Google login error:", err);
       toast.error('Error al conectar con Google')
       setIsGoogleLoading(false)
     }

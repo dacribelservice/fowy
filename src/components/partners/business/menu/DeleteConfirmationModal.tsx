@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { AlertTriangle, X, Trash2, CheckCircle2 } from "lucide-react";
 
 interface DeleteConfirmationModalProps {
@@ -21,19 +21,19 @@ export default function DeleteConfirmationModal({
   description,
   isLoading = false
 }: DeleteConfirmationModalProps) {
-  const overlayVariants = {
+  const overlayVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
     exit: { opacity: 0 }
   };
 
-  const modalVariants = {
+  const modalVariants: Variants = {
     hidden: { scale: 0.9, opacity: 0, y: 20 },
     visible: { 
       scale: 1, 
       opacity: 1, 
       y: 0,
-      transition: { type: "spring", damping: 25, stiffness: 300 } 
+      transition: { type: "spring" as const, damping: 25, stiffness: 300 } 
     },
     exit: { 
       scale: 0.9, 
