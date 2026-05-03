@@ -12,6 +12,9 @@ export interface Product {
   image_url: string;
   in_stock: boolean;
   is_active: boolean;
+  is_new: boolean;
+  is_offer: boolean;
+  is_recommended: boolean;
   category_name: string;
   created_at?: string;
 }

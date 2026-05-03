@@ -66,7 +66,7 @@ export default function ExplorerLayout({
 
   return (
     <MobileFrame>
-      <div className="flex flex-col h-full bg-transparent relative overflow-hidden">
+      <div className="flex flex-col min-h-full bg-transparent relative">
         {/* Minimalist Floating Header */}
         <nav className="absolute top-6 left-6 right-6 z-50 flex items-center justify-end gap-3 pointer-events-none">
 

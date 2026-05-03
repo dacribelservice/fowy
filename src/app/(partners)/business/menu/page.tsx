@@ -12,10 +12,17 @@ import {
   Image as ImageIcon,
   Tag,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProductManager, type Product } from "@/hooks/useProductManager";
+import MenuCategoryManager from "@/components/partners/business/menu/MenuCategoryManager";
+import ProductFormModal from "@/components/partners/business/menu/ProductFormModal";
+import DeleteConfirmationModal from "@/components/partners/business/menu/DeleteConfirmationModal";
+import PremiumImage from "@/components/admin/shared/PremiumImage";
 
 interface Business {
   id: string;
@@ -35,12 +42,20 @@ export default function MenuManagementPage() {
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<Product | undefined>(undefined);
+  const [productToDeleteId, setProductToDeleteId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const supabase = createClient();
   const { 
     products, 
     loading: loadingProds, 
-    toggleStock 
+    toggleStock,
+    deleteProduct,
+    refreshProducts 
   } = useProductManager(businessId);
 
   // Carga inicial de datos del negocio
@@ -126,6 +141,30 @@ export default function MenuManagementPage() {
     await toggleStock(id, currentStock);
   };
 
+  const handleEditProduct = (product: Product) => {
+    setProductToEdit(product);
+    setIsProductModalOpen(true);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setProductToDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteProduct = async () => {
+    if (!productToDeleteId) return;
+    setIsDeleting(true);
+    await deleteProduct(productToDeleteId);
+    setIsDeleting(false);
+    setIsDeleteModalOpen(false);
+    setProductToDeleteId(null);
+  };
+
+  const handleAddNewProduct = () => {
+    setProductToEdit(undefined);
+    setIsProductModalOpen(true);
+  };
+
   const loading = loadingBiz || loadingProds;
 
   const filteredProducts = products.filter(p => 
@@ -171,10 +210,22 @@ export default function MenuManagementPage() {
             Administra tus productos, precios y etiquetas en tiempo real.
           </p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-fowy-secondary text-white rounded-2xl font-bold shadow-premium hover:opacity-90 transition-all">
-          <Plus size={20} />
-          Nuevo Producto
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsCategoryManagerOpen(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 glass-morphism text-slate-600 rounded-2xl font-bold border border-white/50 hover:bg-white transition-all"
+          >
+            <Layers size={20} className="text-fowy-secondary" />
+            Gestionar Secciones
+          </button>
+          <button 
+            onClick={handleAddNewProduct}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-fowy-secondary text-white rounded-2xl font-bold shadow-premium hover:opacity-90 transition-all"
+          >
+            <Plus size={20} />
+            Nuevo Producto
+          </button>
+        </div>
       </div>
 
       {/* Etiquetas del Negocio */}
@@ -275,17 +326,24 @@ export default function MenuManagementPage() {
                 className="glass-morphism rounded-fowy overflow-hidden group shadow-sm border border-white/40 hover:shadow-premium transition-all duration-300"
               >
                 <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
-                      <ImageIcon size={40} className="mb-2 opacity-50" />
-                      <span className="text-xs font-medium italic">Sin imagen</span>
-                    </div>
-                  )}
-                  <div className="absolute top-3 right-3">
-                    <button className="p-2 bg-white/80 backdrop-blur-md rounded-full text-slate-600 hover:text-fowy-secondary shadow-sm transition-all">
-                      <MoreVertical size={16} />
+                  <PremiumImage 
+                    src={product.image_url} 
+                    alt={product.name} 
+                    className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                    fallbackType="generic"
+                  />
+                  <div className="absolute top-3 right-3 flex items-center gap-2">
+                    <button 
+                      onClick={() => handleEditProduct(product)}
+                      className="p-2 bg-white/80 backdrop-blur-md rounded-full text-slate-600 hover:text-fowy-secondary shadow-sm transition-all hover:scale-110 active:scale-95"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="p-2 bg-white/80 backdrop-blur-md rounded-full text-slate-600 hover:text-red-500 shadow-sm transition-all hover:scale-110 active:scale-95"
+                    >
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -332,6 +390,7 @@ export default function MenuManagementPage() {
 
           <motion.button 
             whileHover={{ scale: 1.02 }}
+            onClick={handleAddNewProduct}
             className="border-2 border-dashed border-slate-200 rounded-fowy p-6 flex flex-col items-center justify-center text-slate-400 hover:border-[#7B61FF]/40 hover:bg-white/50 hover:text-[#7B61FF] transition-all min-h-[300px] shadow-sm group"
           >
             <div className="w-12 h-12 bg-slate-50 group-hover:bg-[#7B61FF]/10 rounded-full flex items-center justify-center mb-4 transition-colors">
@@ -342,6 +401,49 @@ export default function MenuManagementPage() {
           </motion.button>
         </div>
       )}
+      {/* Category Manager Modal */}
+      <AnimatePresence>
+        {isCategoryManagerOpen && businessId && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCategoryManagerOpen(false)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            />
+            <MenuCategoryManager 
+              businessId={businessId} 
+              onClose={() => setIsCategoryManagerOpen(false)} 
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Product Form Modal */}
+      <AnimatePresence>
+        {isProductModalOpen && businessId && (
+          <ProductFormModal 
+            businessId={businessId}
+            productToEdit={productToEdit}
+            onClose={() => {
+              setIsProductModalOpen(false);
+              setProductToEdit(undefined);
+            }}
+            onSuccess={refreshProducts}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteProduct}
+        title="¿Eliminar Producto?"
+        description="Esta acción no se puede deshacer. El producto desaparecerá de tu menú inmediatamente."
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

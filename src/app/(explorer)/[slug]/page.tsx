@@ -24,6 +24,7 @@ import CartSheet from "@/components/explorer/CartSheet";
 export default function BusinessMenuPage() {
   const { slug } = useParams();
   const [business, setBusiness] = useState<any | null>(null);
+  const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,6 +59,15 @@ export default function BusinessMenuPage() {
         return;
       }
       setBusiness(busData);
+
+      // Fetch Local Categories
+      const { data: catData } = await supabase
+        .from('product_menu_categories')
+        .select('*')
+        .eq('business_id', busData.id)
+        .order('order_index', { ascending: true });
+      
+      setCategories(catData || []);
 
       // Fetch Products
       const { data: prodData } = await supabase
@@ -251,6 +261,7 @@ export default function BusinessMenuPage() {
           {products.length > 0 ? (
             <ProductGrid 
               products={filteredProducts} 
+              categories={categories}
               cart={businessItems} 
               onAdd={handleAddToCart} 
               onRemove={removeFromCart} 

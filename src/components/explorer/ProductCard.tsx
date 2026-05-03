@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Minus, Star } from 'lucide-react';
+import PremiumImage from '@/components/admin/shared/PremiumImage';
 
 interface ProductCardProps {
   product: any;
@@ -17,7 +18,7 @@ export default function ProductCard({ product, onAdd, onRemove, quantity }: Prod
       className="bg-white rounded-[32px] p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all group flex flex-col h-full"
     >
       <div className="relative aspect-square rounded-[24px] overflow-hidden bg-slate-50 mb-4 flex-shrink-0">
-        <img 
+        <PremiumImage 
           src={product.image_url || "/placeholder-product.png"} 
           alt={product.name} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
