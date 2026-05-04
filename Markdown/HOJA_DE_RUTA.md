@@ -198,70 +198,60 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-### 🖼️ 15.1 Hero Slider de Banners
+### 🖼️ 15.1 Hero Slider de Banners & Perfil
 - [ ] **15.1.1 DB — Tabla `business_banners`**: Crear tabla `(id, business_id, image_url, order_index, created_at)` con RLS para escritura exclusiva del `owner_id`.
-- [ ] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage` (máximo 5 banners, formato recomendado 16:9).
-- [ ] **15.1.3 Componente `<MenuHeroSlider />`**: Carrusel auto-play (3s) con transición `fade` via `framer-motion`. Muestra banners del negocio o imagen de portada como fallback.
-- [ ] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider con el color de marca del negocio.
-- [ ] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre el perfil/sesión al hacer clic.
+- [ ] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage`.
+- [ ] **15.1.3 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
+- [ ] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
+- [ ] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre perfil/sesión.
 
 ---
 
 ### 🏪 15.2 Barra de Identidad del Negocio
-- [ ] **15.2.1 Componente `<BusinessIdentityBar />`**: Sección debajo del slider con logo circular (`PremiumImage`, `rounded-full`, borde blanco), nombre del negocio en `font-bold` (700).
-- [ ] **15.2.2 Estado ABIERTO/CERRADO**: Punto verde (●) o rojo basado en la lógica de horarios ya implementada en Fase 7. Texto "ABIERTO" / "CERRADO" en `font-semibold`.
-- [ ] **15.2.3 Rating con Estrellas**: Icono ⭐ y promedio numérico (calculado desde tabla `orders` o campo `rating` de `businesses`). Si no hay reseñas, ocultar el bloque.
-- [ ] **15.2.4 Distancia Real (Geolocalización)**: Usar `navigator.geolocation` para obtener coordenadas del usuario y calcular distancia en km/m al negocio (lat/lng ya existentes en DB). Mostrar "DISTANCIA X.Xkm" con ícono 📍.
+- [ ] **15.2.1 Componente `<BusinessIdentityBar />`**: Logo circular (`PremiumImage`), nombre del negocio (`font-bold`), y calificación.
+- [ ] **15.2.2 Estado ABIERTO/CERRADO**: Punto verde (●) o rojo con texto basado en lógica de horarios.
+- [ ] **15.2.3 Rating & Distancia**: Mostrar "⭐ 4.9" y "📍 Distancia X.X km" usando geolocalización del navegador.
 
 ---
 
 ### 🔍 15.3 Buscador de Productos
-- [ ] **15.3.1 Componente `<MenuProductSearch />`**: Input con ícono de lupa, estilo Glassmorphism (`backdrop-blur-md`, borde traslúcido, `rounded-fowy`). Placeholder "Buscar producto...".
-- [ ] **15.3.2 Filtrado Reactivo**: Filtrar el array de productos en memoria del cliente (no server-side, ya que el catálogo por negocio es pequeño) con `debounce` de 300ms.
-- [ ] **15.3.3 Estado Vacío**: Si no hay resultados mostrar ilustración/mensaje "No encontramos ese producto 🍽️" con micro-animación de entrada.
+- [ ] **15.3.1 Componente `<MenuProductSearch />`**: Input con ícono de lupa, estilo Glassmorphism.
+- [ ] **15.3.2 Filtrado Reactivo**: Búsqueda en tiempo real sobre el catálogo del negocio.
 
 ---
 
 ### 🏷️ 15.4 Pills de Categorías con Branding Dinámico
-- [ ] **15.4.1 Componente `<MenuCategoryPills />`**: Carrusel horizontal scrolleable sin scrollbar visible. Pill "Todos" siempre en primera posición.
-- [ ] **15.4.2 Color Dinámico de la Categoría Activa**: La pill seleccionada usa el `accent_color` del negocio (ya existente en DB desde Fase 7.4) como fondo. Las pills inactivas usan borde con el mismo color a 30% de opacidad.
-- [ ] **15.4.3 Animación de Selección**: Transición de fondo con `framer-motion` (`layout` animation) al cambiar de categoría activa.
-- [ ] **15.4.4 Filtrado del Grid**: Al seleccionar una categoría filtrar el `<ProductGrid />` mostrando solo los productos de esa categoría local (`product_menu_categories`).
+- [ ] **15.4.1 Componente `<MenuCategoryPills />`**: Carrusel horizontal de categorías locales.
+- [ ] **15.4.2 Color Dinámico**: La categoría activa usa el `accent_color` del negocio como fondo.
 
 ---
 
 ### 🃏 15.5 Grid de Productos Premium (2 Columnas)
-- [ ] **15.5.1 Refactorizar `<ProductCard />`**: Rediseño completo de la tarjeta. Imagen a `aspect-square` con `rounded-[16px]`, sombra suave. Máximo 250 líneas en el componente.
-- [ ] **15.5.2 Ícono 🔥 Promo Badge**: Si el producto tiene el toggle `is_promo: true` (ya en DB desde Fase 14.3.4), mostrar ícono de fuego en la esquina superior izquierda de la imagen con fondo translúcido rojo.
-- [ ] **15.5.3 Botón Favorito ❤️**: Corazón en la esquina superior derecha de la imagen. Estado `filled` (rojo) si está en favoritos, `outline` si no. Sin login → mostrar popup de confirmación (ver 15.6).
-- [ ] **15.5.4 Nombre y Descripción**: `font-semibold` para el nombre, descripción en 2 líneas máximo con `line-clamp-2` y color gris suave.
-- [ ] **15.5.5 Precio**: `font-bold` (700), tamaño destacado, color texto oscuro.
-- [ ] **15.5.6 Botón `+` con Color Dinámico**: Botón circular con el `accent_color` del negocio. Al hacer clic agrega al carrito con micro-animación de confirmación (escala 1.2 → 1.0 + bounce). Llama al hook `useCart` ya existente.
-- [ ] **15.5.7 Producto Agotado**: Si `in_stock: false`, superponer overlay semitransparente con texto "Agotado" y deshabilitar botón `+` y favorito.
+- [ ] **15.5.1 Refactorizar `<ProductCard />`**: Rediseño completo con imagen `aspect-square`.
+- [ ] **15.5.2 Ícono 🔥 Promo Badge**: Mostrar fuego en productos marcados como oferta.
+- [ ] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Disparar Gate de Login.
+- [ ] **15.5.4 Botón `+` (Add to Cart)**: Botón circular con el `accent_color` del negocio.
 
 ---
 
 ### ❤️ 15.6 Sistema de Favoritos (Con Gate de Login)
-- [ ] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla `(id, user_id, product_id, business_id, created_at)` con RLS para que cada usuario solo vea y gestione sus propios favoritos.
-- [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle (agregar/quitar), fetch de favoritos del usuario logueado y estado local optimista.
-- [ ] **15.6.3 Modal de Login Gate `<FavoriteLoginModal />`**: Si el usuario NO está logueado y presiona ❤️, mostrar popup con mensaje "¿Quieres guardar tus favoritos?" + 2 botones: **"Iniciar Sesión"** (redirige a `/login`) y **"Cancelar"** (cierra modal). Diseño Glassmorphism con `framer-motion` entrada desde abajo.
-- [ ] **15.6.4 Sincronización Visual**: El corazón cambia de estado instantáneamente (optimistic UI) y se sincroniza con Supabase en segundo plano.
+- [ ] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
+- [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
+- [ ] **15.6.3 Modal `<FavoriteLoginModal />`**: Popup con mensaje "¿Quieres guardar tus favoritos?" + botones "Iniciar Sesión" y "Cancelar".
 
 ---
 
 ### 🎨 15.7 Sistema de Branding Dinámico Global
-- [ ] **15.7.1 `BusinessThemeProvider`**: Contexto React que inyecta el `accent_color` del negocio como variable CSS `--brand-color` en el scope del menú.
-- [ ] **15.7.2 Tokens de Color Aplicados**: El `--brand-color` se aplica a: pills de categoría activa, botón `+`, burbuja del carrito, botones de acción intermedios.
-- [ ] **15.7.3 Checkout WhatsApp — Verde Fijo**: El botón final "📲 Enviar pedido por WhatsApp" **siempre** usará verde (`#25D366`) independientemente del color de marca. Nunca cambia.
+- [ ] **15.7.1 `BusinessThemeProvider`**: Inyectar `accent_color` como variable CSS `--brand-color`.
+- [ ] **15.7.2 Tokens Aplicados**: Aplicar color a categorías, botón `+` y elementos de acción.
+- [ ] **15.7.3 Checkout WhatsApp — Verde Fijo**: El botón final de envío siempre es verde (`#25D366`).
 
 ---
 
-### ✅ 15.8 Integración, Calidad y Pruebas
-- [ ] **15.8.1 Auditoría de Líneas**: Verificar que `[slug]/page.tsx` y cada componente nuevo no superen las **250 líneas** (regla `conceptos.md`).
-- [ ] **15.8.2 `PremiumImage` en Todo**: Reemplazar cualquier `<img>` directo por `<PremiumImage>` para manejar esqueletos de carga y errores.
-- [ ] **15.8.3 Carga Lazy del Grid**: Implementar `IntersectionObserver` para carga progresiva de tarjetas al hacer scroll (sin paginación forzada, ya que el catálogo es pequeño).
-- [ ] **15.8.4 Prueba Multi-Negocio**: Validar que el branding (color, logo, banners) cambia correctamente al navegar entre dos negocios distintos sin residuos de caché visual.
-- [ ] **15.8.5 Prueba Mobile vs Desktop Shell**: Confirmar que el diseño se ve correcto dentro del frame de celular (desktop) y en full-screen (mobile) según arquitectura de `rol-usuario.md`.
+### ✅ 15.8 Calidad y Optimización
+- [ ] **15.8.1 Modularización**: Separar cada sección en componentes pequeños (<250 líneas).
+- [ ] **15.8.2 `PremiumImage`**: Carga con esqueletos y manejo de errores.
+- [ ] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
 
 ---
 ---

@@ -269,13 +269,102 @@ Se ha implementado el "Cerebro" del sistema:
 - **Próximo Paso**: Iniciar Fase 9 (Auditoría de Seguridad Final y SEO) una vez Cristian (CEO) lo autorice.
 
 ---
-*Fin de la sesión de consolidación. Sistema FOWY listo para escala industrial.*
 
-**Estado del Sistema**: 
-- **Seguridad**: 10/10 (RLS Total + Middleware Activo).
-- **Modularidad**: 10/10 (Páginas < 250 líneas, Hooks especializados).
-- **Documentación**: 10/10 (Sincronizada al 100% con el código).
+## 🍔 REDISEÑO MENÚ DIGITAL "CRAVE EXPRESS" - DETALLE OPERATIVO (04 de Mayo de 2026)
+**Estado**: 🟡 PLANIFICADO / POR INICIAR
+**Contexto**: Se busca una experiencia "Mobile-First" premium, eliminando la simplicidad actual por un diseño vibrante con branding dinámico.
 
-**Backup**: Documentación actualizada. Código intacto según la Regla de Oro.
+### 1. Hero & Branding Superior (Slider & Overlay)
+- **Componente `<MenuHeroSlider />`**: 
+    - Implementar un carrusel de alta fidelidad con `framer-motion`.
+    - **Indicadores (Dots)**: Puntos sutiles en la base de la imagen para indicar el número de banners.
+    - **Fallback**: Si el negocio no tiene banners en `business_banners`, usar la imagen de portada principal.
+- **Header Overlay**:
+    - **User Avatar**: Posicionado en la esquina superior derecha (`top-4 right-4`). Círculo blanco con la imagen del perfil (`avatar_url`).
+    - **Acción**: Al tocarlo, abre el menú lateral/popup de perfil (ya existente en el layout).
 
-*Última actualización: 03 de Mayo de 2026 - 04:00 AM*
+### 2. Identidad del Negocio (Identity Bar)
+- **Visual**: Logo circular que "muerde" levemente el slider (solapamiento visual).
+- **Información Crítica**:
+    - Nombre del negocio en `font-bold` y tamaño grande.
+    - **Status Dot**: Indicador tipo "Live" (Verde = Abierto, Rojo = Cerrado) basado en `business_hours`.
+    - **📍 GPS Real**: Cálculo de distancia dinámica entre el usuario (`navigator.geolocation`) y las coordenadas del negocio en DB. Mostrar en formato "A 1.2 km de ti".
+
+### 3. Grid de Productos & Micro-Interacciones
+- **Card Design**: 2 columnas en móvil. Borde redondeado (`rounded-2xl`) y sombra `shadow-sm`.
+- **Badges Contextuales**:
+    - **Badge Fuego 🔥**: En productos con `is_promo: true`. Icono animado o color naranja vibrante.
+    - **Favoritos ❤️**: Icono de corazón en la esquina superior derecha de la imagen.
+- **Login Gate (Lógica de Favoritos)**:
+    - Al hacer clic en el corazón SIN sesión activa:
+    - Mostrar **Modal Glassmorphism** central.
+    - Texto: *"¿Quieres guardar este producto? Inicia sesión para gestionar tus favoritos."*
+    - Botones: `[ Iniciar Sesión ]` (Branding color) y `[ Cancelar ]` (Neutro).
+- **Add to Cart**: Botón circular con icono `+`. Debe usar el `accent_color` del negocio de forma obligatoria.
+
+### 4. Branding & Checkout (Estrategia de Color)
+- **Tokens Dinámicos**: Inyectar `accent_color` mediante variables CSS. Afectará a:
+    - Category Pills (Fondo de categoría activa).
+    - Botones `+` de los productos.
+    - Botón de "Finalizar Pedido" en el carrito.
+- **Excepción Crítica**: El botón final de **"Enviar pedido por WhatsApp"** (donde se introducen datos finales) será **SIEMPRE VERDE** (`#25D366`) para generar confianza y reconocimiento del canal.
+
+## 🧹 LIMPIEZA TÉCNICA Y MODULARIZACIÓN COMPLETADA (04 de Mayo de 2026)
+**Estado**: ✅ COMPLETADO
+**Objetivo**: Eliminar redundancias en el panel de socios y migrar hacia una arquitectura de páginas independientes para mayor velocidad.
+
+### 1. Eliminación de Duplicidades
+- **Panel de Socio**: Se auditó el menú lateral y la interfaz principal, eliminando funciones y accesos repetidos que causaban confusión.
+- **Consolidación de Lógica**: Toda la lógica de gestión de marca y horarios se unificó en un solo flujo, eliminando códigos huérfanos.
+
+### 2. Migración a Páginas Independientes (Modularidad)
+- **Independización de Perfil**: El módulo de "Perfil y Branding" se ha movido exitosamente a su propia ruta dedicada (`/business/perfil`), eliminando la carga pesada en el dashboard principal.
+- **Rutas Limpias**: Cada sección del panel de socios (`Pedidos`, `Menú`, `Perfil`, `Finanzas`) ahora opera de forma aislada y eficiente.
+
+---
+
+## 🍔 REDISEÑO MENÚ DIGITAL "CRAVE EXPRESS" - DETALLE OPERATIVO (04 de Mayo de 2026)
+**Estado**: 🟡 PLANIFICADO / POR INICIAR
+**Contexto**: Con la base técnica ya limpia y modularizada, se iniciará la transformación visual premium.
+
+### 1. Hero & Branding Superior (Slider & Overlay)
+- **Componente `<MenuHeroSlider />`**: 
+    - Implementar un carrusel de alta fidelidad con `framer-motion`.
+    - **Indicadores (Dots)**: Puntos sutiles en la base de la imagen para indicar el número de banners.
+    - **Fallback**: Si el negocio no tiene banners en `business_banners`, usar la imagen de portada principal.
+- **Header Overlay**:
+    - **User Avatar**: Posicionado en la esquina superior derecha (`top-4 right-4`). Círculo blanco con la imagen del perfil (`avatar_url`).
+    - **Acción**: Al tocarlo, abre el menú lateral/popup de perfil (ya existente en el layout).
+
+### 2. Identidad del Negocio (Identity Bar)
+- **Visual**: Logo circular que "muerde" levemente el slider (solapamiento visual).
+- **Información Crítica**:
+    - Nombre del negocio en `font-bold` y tamaño grande.
+    - **Status Dot**: Indicador tipo "Live" (Verde = Abierto, Rojo = Cerrado) basado en `business_hours`.
+    - **📍 GPS Real**: Cálculo de distancia dinámica entre el usuario (`navigator.geolocation`) y las coordenadas del negocio en DB. Mostrar en formato "A 1.2 km de ti".
+
+### 3. Grid de Productos & Micro-Interacciones
+- **Card Design**: 2 columnas en móvil. Borde redondeado (`rounded-2xl`) y sombra `shadow-sm`.
+- **Badges Contextuales**:
+    - **Badge Fuego 🔥**: En productos con `is_promo: true`. Icono animado o color naranja vibrante.
+    - **Favoritos ❤️**: Icono de corazón en la esquina superior derecha de la imagen.
+- **Login Gate (Lógica de Favoritos)**:
+    - Al hacer clic en el corazón SIN sesión activa:
+    - Mostrar **Modal Glassmorphism** central.
+    - Texto: *"¿Quieres guardar este producto? Inicia sesión para gestionar tus favoritos."*
+    - Botones: `[ Iniciar Sesión ]` (Branding color) y `[ Cancelar ]` (Neutro).
+- **Add to Cart**: Botón circular con icono `+`. Debe usar el `accent_color` del negocio de forma obligatoria.
+
+### 4. Branding & Checkout (Estrategia de Color)
+- **Tokens Dinámicos**: Inyectar `accent_color` mediante variables CSS. Afectará a:
+    - Category Pills (Fondo de categoría activa).
+    - Botones `+` de los productos.
+    - Botón de "Finalizar Pedido" en el carrito.
+- **Excepción Crítica**: El botón final de **"Enviar pedido por WhatsApp"** (donde se introducen datos finales) será **SIEMPRE VERDE** (`#25D366`) para generar confianza y reconocimiento del canal.
+
+---
+*Fin de la sesión de planificación. Se deja el sistema listo para que la IA/Desarrollador inicie con el componente de Slider y la tabla de banners.*
+
+**Backup**: Bitácora y Hoja de Ruta sincronizadas. **No se modificó código en esta sesión por instrucción expresa.**
+
+*Última actualización: 04 de Mayo de 2026 - 12:50 AM*
