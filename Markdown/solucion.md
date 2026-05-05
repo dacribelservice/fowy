@@ -182,9 +182,9 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 > **Objetivo:** Lograr el "WOW" factor del diseño Premium (Imagen 2) mediante un entorno de desarrollo aislado (Sandbox) en la ruta `/[slug]/crave-vision`, manteniendo el marco del celular pero reconstruyendo todo el interior desde cero.
 
 - [ ] **Bloque 1: Entorno de Desarrollo Aislado**
-  - [ ] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
-  - [ ] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
-  - [ ] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
+  - [x] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
+  - [x] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
+  - [x] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
 
 - [ ] **Bloque 2: Header y Branding V3 (Diseño Real de Imagen 2)**
   - [ ] **2.1** Layout "Logo-Left/Text-Right": Romper el centrado actual. El logo circular a la izquierda y el nombre/detalles a la derecha.

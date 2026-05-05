@@ -65,4 +65,4 @@
 2. **Registro Simplificado**: El flujo de registro ha sido optimizado para ser directo (Auth -> Perfil -> Éxito), asignando el rol `explorer` por defecto.
 
 ---
-*Última actualización de la biblioteca: 03 de Mayo de 2026 — Reflejando Consolidación Final y Fase 13*
+*Última actualización de la biblioteca: 05 de Mayo de 2026 — Reflejando Alineación Crave Vision*

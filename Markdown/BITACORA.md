@@ -394,3 +394,25 @@ Se ha implementado el "Cerebro" del sistema:
 **Backup**: Sincronización de documentación completada. **Código fuente intacto** por instrucción de seguridad.
 
 ---
+
+## 💎 ESTRATEGIA "CRAVE VISION" - SESIÓN XIII (05 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: 🔵 ALINEADO / LISTO PARA EJECUCIÓN
+
+### 🎯 Análisis de Situación
+Se ha realizado un escaneo profundo del sistema actual para asegurar una transición fluida hacia el nuevo diseño premium:
+- **Producción (`[slug]/page.tsx`)**: Se identificó el uso de componentes V2 y la lógica de datos basada en Supabase. El sistema está bien desacoplado, lo que permitirá un "Hot-Swap" limpio al finalizar.
+- **Sandbox (`crave-vision/page.tsx`)**: Entorno huérfano confirmado y listo. Actualmente es un "Lienzo en Blanco" que reside dentro del `MobileFrame`.
+- **Datos Mock (`mock-crave.ts`)**: Se validó el set de datos de "Neon Burger & Co" como fuente de verdad para las pruebas estéticas de alta fidelidad.
+
+### 🏗️ Estrategia de Rediseño (WOW Factor)
+La misión es reconstruir la interfaz del usuario final desde cero en el Sandbox, siguiendo este orden de construcción:
+1.  **Bloque 2**: Header y Branding V3 (Layout Logo-Left, meta-datos premium, slider integrado).
+2.  **Bloque 3**: Buscador Glassmorphism y Carrusel de Categorías V3.
+3.  **Bloque 4**: Product Card V3 (Bordes 3xl, sombras suaves, tipografías bold).
+4.  **Bloque 5**: Integración de lógica real (`useCart`, `useExplorerManager`) y reemplazo en producción.
+
+**Nota de Seguridad**: Se confirma que el código fuente de producción permanece intacto. Todas las iteraciones se realizarán exclusivamente en la ruta de Sandbox hasta recibir autorización para el despliegue final.
+
+---
+*Última actualización: 05 de Mayo de 2026 - 01:35 AM*
