@@ -177,43 +177,29 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 ---
 *Auditoría Final 02-May-2026: 9.8 / 10 — Sistema Limpio y Escalable.*
 
-### 🍔 Fase 8: Re-Diseño de Menú "Crave Express" (Implementación por Bloques)
+### 🎨 Fase 8: Re-Diseño "Crave Vision" (Sandbox Experimental)
 
-> **Objetivo:** Replicar con exactitud el diseño UI Premium (Imagen 2) para el menú del negocio en el explorador, asegurando estética "wow" y el estricto desacoplamiento (Una responsabilidad, un archivo) dictado en `conceptos.md`.
+> **Objetivo:** Lograr el "WOW" factor del diseño Premium (Imagen 2) mediante un entorno de desarrollo aislado (Sandbox) en la ruta `/[slug]/crave-vision`, manteniendo el marco del celular pero reconstruyendo todo el interior desde cero.
 
-- [ ] **Bloque 1: Slider de Experiencia (`MenuHeroSliderV2.tsx`)**
-  - [ ] **1.1** Implementar contenedor `full-width` en la parte superior con bordes inferiores fuertemente redondeados (`rounded-b-3xl` o superior).
-  - [ ] **1.2** Integrar gradiente oscuro suave (`bg-gradient-to-b`) sobre las imágenes para garantizar el contraste y la legibilidad de iconos.
-  - [ ] **1.3** Añadir paginación minimalista integrada (dots blancos semitransparentes, el activo más grande/opaco) posicionada en la base interior del slider.
-  - [ ] **1.4** *Regla de Oro Ruteo:* El botón de "Atrás" (flecha) debe ir sobre el slider (esquina superior izquierda). El botón global de Perfil ya persiste en la app, verificar que no interfiera en `z-index`.
+- [ ] **Bloque 1: Entorno de Desarrollo Aislado**
+  - [ ] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
+  - [ ] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
+  - [ ] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
 
-- [ ] **Bloque 2: Branding y Detalles del Negocio (`BusinessBrandHeader.tsx`)**
-  - [ ] **2.1** Logo Circular Solapado: Posicionar la foto de perfil del negocio (logo) centrada y superpuesta visualmente entre el fin del slider y el inicio del área blanca (usando margen negativo superior).
-  - [ ] **2.2** Tipografía Premium: Renderizar el nombre del negocio centrado con fuente muy gruesa (`font-extrabold`, `text-2xl` o `text-3xl`) y espaciado ajustado.
-  - [ ] **2.3** Fila de Meta-datos Compacta: Diseñar un contenedor flex centrado con separadores sutiles (ej: `•`).
-    - [ ] Indicador de Estado: Punto pulsante verde con texto "ABIERTO".
-    - [ ] Rating: Icono de estrella dorada + texto "4.5".
-    - [ ] Distancia: Texto estilo "DISTANCIA 4.6K" en gris secundario.
+- [ ] **Bloque 2: Header y Branding V3 (Diseño Real de Imagen 2)**
+  - [ ] **2.1** Layout "Logo-Left/Text-Right": Romper el centrado actual. El logo circular a la izquierda y el nombre/detalles a la derecha.
+  - [ ] **2.2** Meta-datos Premium: Implementar badges de "Abierto", Rating y Distancia con el espaciado y tipografía exacta de la referencia.
+  - [ ] **2.3** Slider de Banners: Adaptar el slider para que se integre visualmente con la nueva cabecera sin cortes bruscos.
 
-- [ ] **Bloque 3: Buscador y Filtros de Categoría (`MenuSearchAndFiltersV2.tsx`)**
-  - [ ] **3.1** Buscador Expansible (o Flotante): Barra de búsqueda en forma de cápsula (`rounded-full`, fondo `bg-slate-100`) con un placeholder claro (ej: "Buscar productos..."). Icono de lupa a la izquierda.
-  - [ ] **3.2** Carrusel de Categorías: Lista de píldoras horizontales permitiendo scroll libre nativo (ocultando el scrollbar con clase `hide-scrollbar`).
-  - [ ] **3.3** Estados Activos/Inactivos:
-    - *Activo:* Borde o fondo de acento (rojo suave), color de texto vibrante (rojo puro).
-    - *Inactivo:* Fondo blanco, texto gris y borde muy sutil (`border-slate-200`).
+- [ ] **Bloque 3: Búsqueda y Navegación "Glassmorphism"**
+  - [ ] **3.1** Buscador Flotante: Implementar la cápsula de búsqueda con efectos de desenfoque (`backdrop-blur`) y sombras profundas.
+  - [ ] **3.2** Carrusel de Categorías V3: Píldoras con micro-interacciones al hacer scroll y estados activos ultra-vibrantes.
 
-- [ ] **Bloque 4: Grid de Productos Premium (`ProductCardV2.tsx` y `ProductGridV2.tsx`)**
-  - [ ] **4.1** Grid Dinámico: Usar `grid-cols-2` con un `gap` intermedio (ej: `gap-4`) con padding lateral para que respire.
-  - [ ] **4.2** `ProductCardV2.tsx`: Tarjeta con estética de vidrio/material.
-    - [ ] Fondo blanco puro con sombra suave (`shadow-md` o sombra custom elegante), y bordes muy redondeados (`rounded-2xl`).
-  - [ ] **4.3** Imagen del Producto: Parte superior de la tarjeta (proporción tipo 4:3 o 1:1), ocupando todo el ancho de la tarjeta.
-  - [ ] **4.4** Badges y Superposiciones:
-    - [ ] Esquina Superior Izquierda: Etiqueta "Hot" o Fuego.
-    - [ ] Esquina Superior Derecha: Icono de corazón transparente/delineado para favoritos.
-  - [ ] **4.5** Información de la Tarjeta: Título en bold (truncado a 1 línea), descripción/subtítulo (truncado a 2 líneas), y en la fila inferior precio grande (`text-lg font-bold`).
-  - [ ] **4.6** Botón (+) de Agregar: Círculo acentuado en color rojo vibrante (u otro de marca) ubicado flotando sobre la esquina inferior derecha del bloque blanco (fuera de los bordes o ajustado en la esquina) o dentro de la fila del precio.
+- [ ] **Bloque 4: La Joya de la Corona - Product Card V3**
+  - [ ] **4.1** Estética de Producto: Rediseñar la tarjeta con bordes `3xl`, sombras suaves y tipografías `bold` de alta legibilidad.
+  - [ ] **4.2** Botón de Acción Flotante: El botón "+" debe ser una pieza visual destacada, usando el color de acento de la marca con gradiente sutil.
+  - [ ] **4.3** Grid de 2 Columnas: Ajustar el `gap` y padding para que los productos "respiren" en pantalla móvil.
 
-- [ ] **Ensamblaje Final en la Página (`src/app/(explorer)/[slug]/page.tsx`)**
-  - [ ] **5.1** Reemplazar los componentes antiguos inyectando `MenuHeroSliderV2`, `BusinessBrandHeader`, `MenuSearchAndFiltersV2` y `ProductGridV2`.
-  - [ ] **5.2** Validar las interacciones: El scroll vertical debe funcionar perfecto en la vista del menú. El botón global de inicio de sesión no entra en conflicto.
-  - [ ] **5.3** Asegurar hidratación: Conectar el componente V2 de grid a la lista de productos filtrados que ya se obtiene de Supabase.
+- [ ] **Bloque 5: Integración y Reemplazo de Producción**
+  - [ ] **5.1** Conexión de Lógica: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
+  - [ ] **5.2** Hot-Swap: Una vez aprobado el diseño en el sandbox, reemplazar la página de producción `[slug]/page.tsx` con el código validado.

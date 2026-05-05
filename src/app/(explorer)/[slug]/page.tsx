@@ -18,10 +18,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
-import ProductGrid from "@/components/explorer/ProductGrid";
+import { ProductGridV2 } from "@/components/explorer/ProductGridV2";
 import CartSheet from "@/components/explorer/CartSheet";
-import { MenuHeroSlider } from "@/components/explorer/MenuHeroSlider";
-import { BusinessIdentityBar } from "@/components/explorer/BusinessIdentityBar";
+import { MenuHeroSliderV2 } from "@/components/explorer/MenuHeroSliderV2";
+import { BusinessBrandHeader } from "@/components/explorer/BusinessBrandHeader";
+import { MenuSearchAndFiltersV2 } from "@/components/explorer/MenuSearchAndFiltersV2";
 import { useAuth } from "../../../hooks/useAuth";
 
 export default function BusinessMenuPage() {
@@ -32,6 +33,7 @@ export default function BusinessMenuPage() {
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
   const supabase = createClient();
@@ -105,13 +107,25 @@ export default function BusinessMenuPage() {
   }, [fetchData]);
 
   const filteredProducts = useMemo(() => {
-    if (!searchTerm) return products;
-    return products.filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [products, searchTerm]);
+    let filtered = products;
+
+    if (selectedCategoryId) {
+      const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+      if (selectedCategory) {
+        filtered = filtered.filter(p => p.category_name === selectedCategory.name);
+      }
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [products, searchTerm, selectedCategoryId, categories]);
 
   // Analytics: Record Visit
   const recordVisit = useCallback(async (businessId: string) => {
@@ -199,44 +213,38 @@ export default function BusinessMenuPage() {
       <div className="max-w-4xl mx-auto md:px-6">
         {/* Business Hero (15.1) */}
         <div className="relative">
-          <MenuHeroSlider 
+          <MenuHeroSliderV2 
             banners={banners} 
             fallbackImage={business.logo_url} 
             businessName={business.name} 
-            user={user}
           />
         </div>
 
         {/* Business Identity Bar (15.2.1) */}
-        <BusinessIdentityBar business={business} />
+        <BusinessBrandHeader business={business} />
 
-        <div className="h-8" />
+        <div className="h-4" />
 
         {/* Search Bar - Premium */}
-        <div className="px-6 mb-12">
-          <div className="relative group">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-slate-900 transition-colors">
-              <Search size={22} />
-            </div>
-            <input 
-              type="text" 
-              placeholder="¿Qué se te antoja hoy?" 
-              className="w-full pl-16 pr-6 py-5 bg-white rounded-[30px] border border-slate-100 shadow-sm outline-none focus:ring-4 focus:ring-slate-900/5 transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+        <MenuSearchAndFiltersV2 
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onSelectCategory={setSelectedCategoryId}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          accentColor={accentColor}
+        />
 
         {/* Product Grid Components */}
         <div className="px-6">
           {products.length > 0 ? (
-            <ProductGrid 
+            <ProductGridV2 
               products={filteredProducts} 
               categories={categories}
               cart={businessItems} 
               onAdd={handleAddToCart} 
               onRemove={removeFromCart} 
+              accentColor={accentColor}
             />
           ) : (
             <div className="py-20 text-center">
