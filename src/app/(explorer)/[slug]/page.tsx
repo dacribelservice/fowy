@@ -21,6 +21,8 @@ import { useCart } from "@/hooks/useCart";
 import ProductGrid from "@/components/explorer/ProductGrid";
 import CartSheet from "@/components/explorer/CartSheet";
 import { MenuHeroSlider } from "@/components/explorer/MenuHeroSlider";
+import { BusinessIdentityBar } from "@/components/explorer/BusinessIdentityBar";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function BusinessMenuPage() {
   const { slug } = useParams();
@@ -34,6 +36,7 @@ export default function BusinessMenuPage() {
   
   const supabase = createClient();
   const router = useRouter();
+  const { user } = useAuth();
 
   // Initialize Cart Hook
   const { 
@@ -192,69 +195,22 @@ export default function BusinessMenuPage() {
   const accentColor = business.color_identity || "#FF5A5F";
 
   return (
-    <div className="min-h-screen bg-[#FBFAFF] pb-40">
-      {/* Header Sticky */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/40 shadow-sm">
-        <div className="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
-          <button 
-            onClick={() => router.back()} 
-            className="w-12 h-12 rounded-[18px] bg-white border border-slate-100 flex items-center justify-center text-slate-800 shadow-sm active:scale-90 transition-all"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          
-          <div className="flex-1 flex flex-col items-center overflow-hidden">
-             <h1 className="text-sm font-black text-slate-800 truncate w-full text-center tracking-tight">{business.name}</h1>
-             <div className="flex items-center gap-2">
-               <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg">
-                 <Star size={10} className="fill-amber-400 text-amber-400" />
-                 <span className="text-[10px] font-black text-amber-600">4.9</span>
-               </div>
-               <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">120+ reseñas</span>
-             </div>
-          </div>
-
-          <button className="w-12 h-12 rounded-[18px] bg-white border border-slate-100 flex items-center justify-center text-slate-800 shadow-sm active:scale-90 transition-all">
-            <Info size={20} />
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto">
-        {/* Business Hero */}
-        <div className="relative px-6 pt-6">
+    <div className="min-h-screen bg-[#FBFAFF] pb-40 relative">
+      <div className="max-w-4xl mx-auto md:px-6">
+        {/* Business Hero (15.1) */}
+        <div className="relative">
           <MenuHeroSlider 
             banners={banners} 
             fallbackImage={business.logo_url} 
             businessName={business.name} 
+            user={user}
           />
         </div>
 
-        <div className="relative px-4 pb-10">
-          <div className="relative z-10 flex flex-col items-center -mt-16">
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="w-32 h-32 rounded-[45px] overflow-hidden border-8 border-white shadow-2xl shadow-slate-900/10 mb-6 bg-white relative z-20"
-            >
-              <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
-            </motion.div>
-            
-            <div className="text-center">
-              <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-3">{business.name}</h2>
-              <div className="flex items-center justify-center gap-4">
-                <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                  <MapPin size={14} className="text-slate-300" />
-                  {business.city}
-                </div>
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                <div className="text-green-500 text-[10px] font-black uppercase tracking-[0.2em]">
-                  Abierto ahora
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Business Identity Bar (15.2.1) */}
+        <BusinessIdentityBar business={business} />
+
+        <div className="h-8" />
 
         {/* Search Bar - Premium */}
         <div className="px-6 mb-12">
