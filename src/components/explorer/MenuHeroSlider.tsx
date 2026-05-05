@@ -59,7 +59,7 @@ export function MenuHeroSlider({ banners, fallbackImage, businessName, user }: M
         </motion.div>
       </AnimatePresence>
 
-      {/* Top Bar Overlay (15.1.5) */}
+      {/* Top Bar Overlay (15.1.5 - Removed duplicate avatar, using global layout instead) */}
       <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-50">
         <button 
           onClick={() => router.back()}
@@ -67,32 +67,6 @@ export function MenuHeroSlider({ banners, fallbackImage, businessName, user }: M
         >
           <ArrowLeft size={24} />
         </button>
-
-        <Link href={user ? "/perfil" : "/login"}>
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 pr-5 rounded-full shadow-2xl"
-          >
-            <div className="w-10 h-10 rounded-full border-2 border-white/40 overflow-hidden bg-slate-800 flex items-center justify-center">
-              {user?.user_metadata?.avatar_url || user?.avatar_url ? (
-                <img 
-                  src={user.user_metadata?.avatar_url || user.avatar_url} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User size={20} className="text-white" />
-              )}
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest leading-none">Mi Cuenta</span>
-              <span className="text-xs font-black text-white truncate max-w-[100px]">
-                {user ? (user.user_metadata?.full_name || "Usuario") : "Ingresar"}
-              </span>
-            </div>
-          </motion.div>
-        </Link>
       </div>
 
       {/* Center Branding (Subtle) */}

@@ -6,6 +6,7 @@ import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCh
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function ExplorerLayout({
   children,
@@ -20,6 +21,8 @@ export default function ExplorerLayout({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasBusiness, setHasBusiness] = useState(false);
   const supabase = createClient();
+  const pathname = usePathname();
+  const isExplorerRoot = pathname === "/explorar";
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
@@ -66,45 +69,47 @@ export default function ExplorerLayout({
 
   return (
     <MobileFrame>
-      <div className="flex flex-col min-h-full bg-transparent relative">
+      <div className="flex flex-col h-full bg-transparent relative">
         {/* Minimalist Floating Header */}
         <nav className="absolute top-6 left-6 right-6 z-50 flex items-center justify-end gap-3 pointer-events-none">
 
 
           <div className="flex items-center gap-3">
             {/* Expanding Search Engine */}
-            <motion.div 
-              layout
-              initial={false}
-              animate={{ 
-                width: isSearchOpen ? "calc(100% - 132px)" : "48px",
-              }}
-              transition={{ type: "spring", damping: 20, stiffness: 200 }}
-              className="h-12 bg-white/80 backdrop-blur-xl border border-white/40 rounded-full shadow-xl pointer-events-auto flex items-center overflow-hidden"
-            >
-              <button 
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="w-12 h-12 flex items-center justify-center text-slate-800 flex-shrink-0 hover:bg-white/10 transition-colors"
+            {isExplorerRoot && (
+              <motion.div 
+                layout
+                initial={false}
+                animate={{ 
+                  width: isSearchOpen ? "calc(100% - 132px)" : "48px",
+                }}
+                transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                className="h-12 bg-white/80 backdrop-blur-xl border border-white/40 rounded-full shadow-xl pointer-events-auto flex items-center overflow-hidden"
               >
-                {isSearchOpen ? <X size={20} strokeWidth={2.5} /> : <Search size={22} strokeWidth={2.5} />}
-              </button>
-              
-              <AnimatePresence>
-                {isSearchOpen && (
-                  <motion.input
-                    autoFocus
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    type="text"
-                    placeholder="¿Qué buscas hoy?"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className="w-full bg-transparent border-none outline-none text-sm font-bold text-slate-800 placeholder:text-slate-400 pr-4"
-                  />
-                )}
-              </AnimatePresence>
-            </motion.div>
+                <button 
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className="w-12 h-12 flex items-center justify-center text-slate-800 flex-shrink-0 hover:bg-white/10 transition-colors"
+                >
+                  {isSearchOpen ? <X size={20} strokeWidth={2.5} /> : <Search size={22} strokeWidth={2.5} />}
+                </button>
+                
+                <AnimatePresence>
+                  {isSearchOpen && (
+                    <motion.input
+                      autoFocus
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      type="text"
+                      placeholder="¿Qué buscas hoy?"
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      className="w-full bg-transparent border-none outline-none text-sm font-bold text-slate-800 placeholder:text-slate-400 pr-4"
+                    />
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
 
             {/* Profile / Login Button with Loading Shield */}
             {isLoading ? (
@@ -138,11 +143,11 @@ export default function ExplorerLayout({
 
                         {/* Menu Options */}
                         {[
-                          { icon: User, label: "Perfil", disabled: true },
+                          { icon: User, label: "Perfil" },
                           ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin Panel", href: "/admin/dashboard" }] : []),
                           ...(hasBusiness ? [{ icon: Store, label: "Mi Negocio", href: "/business" }] : []),
-                          { icon: Heart, label: "Favoritos", disabled: true },
-                          { icon: FileText, label: "Términos y condiciones", disabled: true },
+                          { icon: Heart, label: "Favoritos" },
+                          { icon: FileText, label: "Términos y condiciones" },
                         ].map((item, idx) => {
                           const isLink = 'href' in item;
                           const content = (
@@ -170,7 +175,6 @@ export default function ExplorerLayout({
                           return (
                             <button
                               key={idx}
-                              disabled={(item as any).disabled}
                               className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group"
                             >
                               {content}
@@ -216,7 +220,7 @@ export default function ExplorerLayout({
         </nav>
 
         {/* Content Area (Full Map Background) */}
-        <main className="flex-1 relative">
+        <main className="flex-1 relative overflow-y-auto">
           <PageTransition>
             {children}
           </PageTransition>

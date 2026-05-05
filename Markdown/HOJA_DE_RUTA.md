@@ -208,14 +208,14 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **15.1.3 Gestión de Storage**: Implementar lógica de eliminación automática en el Storage al borrar o reemplazar banners (Concepto 3.4).
 - [x] **15.1.4 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
 - [x] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
-- [ ] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre perfil/sesión.
+- [x] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre perfil/sesión.
 
 ---
 
 ### 🏪 15.2 Barra de Identidad del Negocio
-- [ ] **15.2.1 Componente `<BusinessIdentityBar />`**: Logo circular (`PremiumImage`), nombre del negocio (`font-bold`), y calificación.
-- [ ] **15.2.2 Estado ABIERTO/CERRADO**: Punto verde (●) o rojo con texto basado en lógica de horarios.
-- [ ] **15.2.3 Rating & Distancia**: Mostrar "⭐ 4.9" y "📍 Distancia X.X km" usando geolocalización del navegador.
+- [x] **15.2.1 Componente `<BusinessIdentityBar />`**: Logo circular (`PremiumImage`), nombre del negocio (`font-bold`), y calificación.
+- [x] **15.2.2 Estado ABIERTO/CERRADO**: Punto verde (●) o rojo con texto basado en lógica de horarios.
+- [x] **15.2.3 Rating & Distancia**: Mostrar "⭐ 4.9" y "📍 Distancia X.X km" usando geolocalización del navegador.
 
 ---
 
