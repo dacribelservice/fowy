@@ -10,10 +10,12 @@ import {
   Smartphone,
   Clock,
   AlertCircle,
-  Loader2
+  Loader2,
+  Hash
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { ColorPickerFowy } from "@/components/partners/branding/ColorPicker";
 
 export default function BusinessProfilePage() {
   const [business, setBusiness] = useState<any>(null);
@@ -159,29 +161,11 @@ export default function BusinessProfilePage() {
             </div>
 
             <div className="space-y-4 pt-6">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">Color de Marca (Menú Digital)</label>
-              <div className="flex flex-wrap gap-4 items-center">
-                {['#FF5A5F', '#7B61FF', '#4D8BFF', '#FF9A3D', '#10B981', '#000000'].map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setBusiness({...business, color_identity: color})}
-                    className={`w-14 h-14 rounded-2xl border-4 transition-all ${
-                      business?.color_identity === color ? 'border-white ring-4 ring-fowy-secondary/20 scale-110' : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-                <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-dashed border-slate-300 flex items-center justify-center hover:border-fowy-secondary transition-colors group">
-                  <input 
-                    type="color" 
-                    value={business?.color_identity || "#FF5A5F"}
-                    onChange={(e) => setBusiness({...business, color_identity: e.target.value})}
-                    className="absolute inset-0 w-[200%] h-[200%] cursor-pointer -translate-x-1/4 -translate-y-1/4"
-                  />
-                  <Palette size={20} className="text-slate-400 group-hover:text-fowy-secondary" />
-                </div>
-              </div>
-              <p className="text-xs text-slate-400 font-medium italic">El color seleccionado se aplicará a botones y categorías en tu menú QR.</p>
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">Identidad Visual</label>
+              <ColorPickerFowy 
+                color={business?.color_identity || "#FF5A5F"} 
+                onChange={(color) => setBusiness({...business, color_identity: color})}
+              />
             </div>
           </div>
 

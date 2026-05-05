@@ -199,7 +199,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 🖼️ 15.1 Hero Slider de Banners & Perfil
-- [ ] **15.1.1 DB — Tabla `business_banners`**: Crear tabla `(id, business_id, image_url, order_index, created_at)` con RLS para escritura exclusiva del `owner_id`.
+- [x] **15.1.1 DB — Tabla `business_banners`**: Crear tabla `(id, business_id, image_url, order_index, created_at)` con RLS para escritura exclusiva del `owner_id`.
 - [ ] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage`.
 - [ ] **15.1.3 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
 - [ ] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
@@ -235,7 +235,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### ❤️ 15.6 Sistema de Favoritos (Con Gate de Login)
-- [ ] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
+- [x] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
 - [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
 - [ ] **15.6.3 Modal `<FavoriteLoginModal />`**: Popup con mensaje "¿Quieres guardar tus favoritos?" + botones "Iniciar Sesión" y "Cancelar".
 
