@@ -201,7 +201,8 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ### 🖼️ 15.1 Hero Slider de Banners & Perfil
 - [x] **15.1.1 DB — Tabla `business_banners`**: Crear tabla `(id, business_id, image_url, order_index, created_at)` con RLS para escritura exclusiva del `owner_id`.
 - [ ] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage`.
-- [ ] **15.1.3 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
+- [ ] **15.1.3 Gestión de Storage**: Implementar lógica de eliminación automática en el Storage al borrar o reemplazar banners (Concepto 3.4).
+- [ ] **15.1.4 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
 - [ ] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
 - [ ] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre perfil/sesión.
 
@@ -216,7 +217,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ### 🔍 15.3 Buscador de Productos
 - [ ] **15.3.1 Componente `<MenuProductSearch />`**: Input con ícono de lupa, estilo Glassmorphism.
-- [ ] **15.3.2 Filtrado Reactivo**: Búsqueda en tiempo real sobre el catálogo del negocio.
+- [ ] **15.3.2 Filtrado Server-Side**: Implementar búsqueda reactiva consultando directamente a la DB (Supabase) para optimizar memoria en móvil (Concepto 3.2).
 
 ---
 
@@ -231,6 +232,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [ ] **15.5.2 Ícono 🔥 Promo Badge**: Mostrar fuego en productos marcados como oferta.
 - [ ] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Disparar Gate de Login.
 - [ ] **15.5.4 Botón `+` (Add to Cart)**: Botón circular con el `accent_color` del negocio.
+- [ ] **15.5.5 Vista de Detalle (Product Modal)**: Al hacer clic en la foto del producto, abrir un popup/modal con imagen ampliada, descripción completa y detalles.
 
 ---
 
@@ -254,5 +256,18 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [ ] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
 
 ---
+ 
+### 📊 15.9 Historial de Pedidos & Sistema de Rating (Explorer)
+*Objetivo: Permitir que el usuario gestione sus compras y califique negocios para alimentar el sistema de confianza.*
+- [ ] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
+- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium siguiendo los tokens de `diseño.md` (Glassmorphism + Blur).
+- [ ] **15.9.3 Lógica de Estados & Filtros**: Pestañas para filtrar por `Activos`, `Completados` y `Cancelados`.
+- [ ] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito para manejar grandes volúmenes de pedidos (Concepto 3.1).
+- [ ] **15.9.5 Sistema de Calificación (Rating)**:
+    - [ ] Habilitar estrellas (1-5) exclusivamente en pedidos con estado `Realizado`.
+    - [ ] **Seguridad**: Validar en Supabase que el usuario no duplique votos por negocio.
+    - [ ] **Sincronización**: Actualización del promedio en la `BusinessIdentityBar`.
+
 ---
-*Documento consolidado - FOWY 2026*
+---
+ *Documento consolidado - FOWY 2026*
