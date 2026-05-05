@@ -12,7 +12,8 @@ import {
   LogOut,
   Puzzle,
   Sparkles,
-  Briefcase
+  Briefcase,
+  Palette
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
@@ -29,7 +30,8 @@ const mainItems = [
 ];
 
 const perfilItems = [
-  { name: "Branding & Perfil", href: "/business/perfil", icon: User },
+  { name: "Perfil General", href: "/business/perfil", icon: User },
+  { name: "Branding & Banners", href: "/business/branding", icon: Palette },
   { name: "Mi Plan (Pagos)", href: "/business/finanzas", icon: CreditCard },
   { name: "Mis Módulos", href: "/business/modulos", icon: Puzzle },
   { name: "Expertos FOWY", href: "/business/expertos", icon: Sparkles },

@@ -67,7 +67,11 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **6.1 Paginación en Tiempo Real**: Carga por bloques (offset/limit).
 - [x] **6.2 Búsqueda Server-side**: Filtros directos en Supabase.
 - [x] **6.3 Gestión Maestra de Imágenes**: Compresión con API Canvas y limpieza de Storage.
-- [x] **6.4 Blindaje de Supa## 💼 FASE 7: MÓDULO DE SOCIOS (Completada ✅)
+- [x] **6.4 Blindaje de Supabase**: RLS avanzado para buckets de Storage.
+
+---
+
+## 💼 FASE 7: MÓDULO DE SOCIOS (Completada ✅)
 - [x] **7.1 Analíticas de Tráfico**:
     - [x] 7.1.1 Crear tabla `analytics_visits` para tracking de visitas al menú.
     - [x] 7.1.2 Dashboard de KPIs: Visitas vs Ventas, Ticket Promedio.
@@ -200,10 +204,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ### 🖼️ 15.1 Hero Slider de Banners & Perfil
 - [x] **15.1.1 DB — Tabla `business_banners`**: Crear tabla `(id, business_id, image_url, order_index, created_at)` con RLS para escritura exclusiva del `owner_id`.
-- [ ] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage`.
-- [ ] **15.1.3 Gestión de Storage**: Implementar lógica de eliminación automática en el Storage al borrar o reemplazar banners (Concepto 3.4).
-- [ ] **15.1.4 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
-- [ ] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
+- [x] **15.1.2 Panel Negocio — Uploader de Banners**: Añadir sección "Banners del Menú" en el panel del socio (`/business/branding`) con carga múltiple usando `compressImage`.
+- [x] **15.1.3 Gestión de Storage**: Implementar lógica de eliminación automática en el Storage al borrar o reemplazar banners (Concepto 3.4).
+- [x] **15.1.4 Componente `<MenuHeroSlider />`**: Carrusel auto-play con transición suave. Muestra banners del negocio o imagen de portada como fallback.
+- [x] **15.1.4 Dots de Paginación**: Indicador de posición activa en la parte inferior del slider.
 - [ ] **15.1.5 Avatar del Usuario (Header Overlay)**: Botón circular en la esquina superior derecha del slider que muestra avatar del usuario logueado o ícono genérico. Abre perfil/sesión.
 
 ---

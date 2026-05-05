@@ -3,19 +3,19 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { 
-  Palette, 
-  Upload, 
   Save, 
   Store, 
   Smartphone,
   Clock,
   AlertCircle,
   Loader2,
-  Hash
+  MapPin,
+  Sparkles,
+  ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ColorPickerFowy } from "@/components/partners/branding/ColorPicker";
+import Link from "next/link";
 
 export default function BusinessProfilePage() {
   const [business, setBusiness] = useState<any>(null);
@@ -64,7 +64,6 @@ export default function BusinessProfilePage() {
       .from('businesses')
       .update({
         name: business.name,
-        color_identity: business.color_identity,
         phone: business.phone,
         city: business.city,
         schedules: business.schedules
@@ -73,7 +72,6 @@ export default function BusinessProfilePage() {
 
     if (!error) {
       toast.success("Perfil actualizado con éxito");
-      document.documentElement.style.setProperty('--business-color', business.color_identity);
     } else {
       toast.error("Error al actualizar el perfil");
     }
@@ -83,7 +81,7 @@ export default function BusinessProfilePage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <Loader2 size={40} className="text-slate-900 animate-spin" />
-      <p className="text-slate-500 font-bold">Cargando configuración...</p>
+      <p className="text-slate-500 font-bold">Cargando perfil...</p>
     </div>
   );
 
@@ -95,7 +93,7 @@ export default function BusinessProfilePage() {
       <div>
         <h3 className="text-2xl font-black text-slate-800">No se encontró el negocio</h3>
         <p className="text-slate-500 mt-2 max-w-md">
-          Parece que no tienes un negocio vinculado a tu cuenta. Contacta con el administrador para activarlo.
+          Parece que no tienes un negocio vinculado a tu cuenta.
         </p>
       </div>
     </div>
@@ -107,10 +105,10 @@ export default function BusinessProfilePage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-4xl font-black text-slate-800 tracking-tight">
-            Identidad del Negocio
+            Configuración General
           </h2>
           <p className="text-slate-500 mt-2 text-lg">
-            Gestiona tu marca, logotipo y horarios de atención.
+            Gestiona la información operativa y horarios de tu negocio.
           </p>
         </div>
         
@@ -128,14 +126,14 @@ export default function BusinessProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Basic Info */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 space-y-8">
+          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 space-y-8 shadow-sm">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
               <Store size={24} className="text-slate-900" />
-              Información de Marca
+              Datos del Establecimiento
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nombre Comercial</label>
                 <input 
                   type="text" 
@@ -145,6 +143,7 @@ export default function BusinessProfilePage() {
                   placeholder="Ej. Burger Master"
                 />
               </div>
+              
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">WhatsApp de Pedidos</label>
                 <div className="relative">
@@ -158,26 +157,32 @@ export default function BusinessProfilePage() {
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-4 pt-6">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">Identidad Visual</label>
-              <ColorPickerFowy 
-                color={business?.color_identity || "#FF5A5F"} 
-                onChange={(color) => setBusiness({...business, color_identity: color})}
-              />
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Ciudad</label>
+                <div className="relative">
+                  <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                  <input 
+                    type="text" 
+                    value={business?.city || ""}
+                    onChange={(e) => setBusiness({...business, city: e.target.value})}
+                    className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
+                    placeholder="Ej. Medellín"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Schedules */}
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100">
+          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
               <Clock size={24} className="text-slate-900" />
               Horarios de Atención
             </h3>
             <div className="grid gap-3">
               {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((dia) => (
-                <div key={dia} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all group">
+                <div key={dia} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all group hover:border-slate-200">
                   <span className="text-sm font-black text-slate-700 w-24 group-hover:text-fowy-secondary transition-colors">{dia}</span>
                   <div className="flex items-center gap-4">
                     <input 
@@ -224,36 +229,33 @@ export default function BusinessProfilePage() {
           </div>
         </div>
 
-        {/* Sidebar branding */}
+        {/* Sidebar Call to Action for Branding */}
         <div className="space-y-8">
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 w-full text-left">Logo de Marca</p>
-            <div className="w-48 h-48 rounded-[3rem] bg-slate-50 flex items-center justify-center relative group overflow-hidden mb-8 border-4 border-white ring-1 ring-slate-100">
-              {business?.logo_url ? (
-                <img src={business.logo_url} alt="Logo" className="w-full h-full object-cover" />
-              ) : (
-                <div className="flex flex-col items-center gap-3 opacity-20 group-hover:opacity-40 transition-opacity">
-                  <Store size={80} className="text-slate-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Subir Imagen</span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                <Upload size={40} className="text-white" />
+          <Link href="/business/branding" className="block group">
+            <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center shadow-sm group-hover:border-fowy-secondary transition-all">
+              <div className="w-20 h-20 bg-fowy-secondary/10 rounded-3xl flex items-center justify-center text-fowy-secondary mb-6 group-hover:scale-110 transition-transform">
+                <Sparkles size={40} />
+              </div>
+              <h4 className="text-xl font-black text-slate-800 mb-2">Branding & Banners</h4>
+              <p className="text-sm text-slate-500 font-medium mb-8">
+                Configura tu logo, colores y el slider de banners para tu menú digital.
+              </p>
+              <div className="flex items-center gap-2 text-fowy-secondary font-black text-xs uppercase tracking-widest">
+                Configurar ahora <ChevronRight size={16} />
               </div>
             </div>
-            <button className="px-8 py-3 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl text-xs font-black hover:border-fowy-secondary hover:text-fowy-secondary transition-all">
-              Cambiar Logotipo
-            </button>
-          </div>
+          </Link>
 
-          <div className="p-8 rounded-[2.5rem] bg-fowy-flow text-white relative overflow-hidden group shadow-lg shadow-fowy-purple/20">
-            <div className="absolute -top-10 -right-10 p-10 opacity-10 group-hover:rotate-12 transition-transform duration-700">
-              <Palette size={140} />
-            </div>
-            <h4 className="text-lg font-black mb-2 relative z-10 text-white">Potencia tu Branding</h4>
-            <p className="text-xs text-slate-300 font-medium leading-relaxed relative z-10 opacity-90">
-              Un logo claro y un color consistente aumentan la retención de clientes. ¡Mantén tu imagen profesional!
-            </p>
+          <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white relative overflow-hidden group shadow-xl">
+             <div className="relative z-10">
+               <h4 className="text-lg font-black mb-2">Soporte Operativo</h4>
+               <p className="text-xs text-slate-400 font-medium leading-relaxed opacity-90">
+                 Si tienes problemas con tus horarios o ubicación, contacta a nuestro equipo de soporte.
+               </p>
+               <button className="mt-6 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                 Contactar Soporte
+               </button>
+             </div>
           </div>
         </div>
       </div>

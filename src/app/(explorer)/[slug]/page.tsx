@@ -20,12 +20,14 @@ import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import ProductGrid from "@/components/explorer/ProductGrid";
 import CartSheet from "@/components/explorer/CartSheet";
+import { MenuHeroSlider } from "@/components/explorer/MenuHeroSlider";
 
 export default function BusinessMenuPage() {
   const { slug } = useParams();
   const [business, setBusiness] = useState<any | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -78,6 +80,15 @@ export default function BusinessMenuPage() {
         .order('category_name', { ascending: true });
 
       setProducts(prodData || []);
+
+      // Fetch Banners
+      const { data: bannersData } = await supabase
+        .from('business_banners')
+        .select('*')
+        .eq('business_id', busData.id)
+        .order('order_index', { ascending: true });
+      
+      setBanners(bannersData || []);
 
     } catch (error) {
       console.error("Error fetching business menu:", error);
@@ -211,15 +222,20 @@ export default function BusinessMenuPage() {
 
       <div className="max-w-3xl mx-auto">
         {/* Business Hero */}
-        <div className="relative px-4 pt-10 pb-10">
-          {/* Decorative background */}
-          <div className="absolute inset-0 top-0 h-40 bg-gradient-to-b from-slate-50 to-transparent z-0" />
-          
-          <div className="relative z-10 flex flex-col items-center">
+        <div className="relative px-6 pt-6">
+          <MenuHeroSlider 
+            banners={banners} 
+            fallbackImage={business.logo_url} 
+            businessName={business.name} 
+          />
+        </div>
+
+        <div className="relative px-4 pb-10">
+          <div className="relative z-10 flex flex-col items-center -mt-16">
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-32 h-32 rounded-[45px] overflow-hidden border-8 border-white shadow-2xl shadow-slate-900/10 mb-6 bg-white"
+              className="w-32 h-32 rounded-[45px] overflow-hidden border-8 border-white shadow-2xl shadow-slate-900/10 mb-6 bg-white relative z-20"
             >
               <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
             </motion.div>
