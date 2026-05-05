@@ -176,3 +176,44 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 
 ---
 *Auditoría Final 02-May-2026: 9.8 / 10 — Sistema Limpio y Escalable.*
+
+### 🍔 Fase 8: Re-Diseño de Menú "Crave Express" (Implementación por Bloques)
+
+> **Objetivo:** Replicar con exactitud el diseño UI Premium (Imagen 2) para el menú del negocio en el explorador, asegurando estética "wow" y el estricto desacoplamiento (Una responsabilidad, un archivo) dictado en `conceptos.md`.
+
+- [ ] **Bloque 1: Slider de Experiencia (`MenuHeroSliderV2.tsx`)**
+  - [ ] **1.1** Implementar contenedor `full-width` en la parte superior con bordes inferiores fuertemente redondeados (`rounded-b-3xl` o superior).
+  - [ ] **1.2** Integrar gradiente oscuro suave (`bg-gradient-to-b`) sobre las imágenes para garantizar el contraste y la legibilidad de iconos.
+  - [ ] **1.3** Añadir paginación minimalista integrada (dots blancos semitransparentes, el activo más grande/opaco) posicionada en la base interior del slider.
+  - [ ] **1.4** *Regla de Oro Ruteo:* El botón de "Atrás" (flecha) debe ir sobre el slider (esquina superior izquierda). El botón global de Perfil ya persiste en la app, verificar que no interfiera en `z-index`.
+
+- [ ] **Bloque 2: Branding y Detalles del Negocio (`BusinessBrandHeader.tsx`)**
+  - [ ] **2.1** Logo Circular Solapado: Posicionar la foto de perfil del negocio (logo) centrada y superpuesta visualmente entre el fin del slider y el inicio del área blanca (usando margen negativo superior).
+  - [ ] **2.2** Tipografía Premium: Renderizar el nombre del negocio centrado con fuente muy gruesa (`font-extrabold`, `text-2xl` o `text-3xl`) y espaciado ajustado.
+  - [ ] **2.3** Fila de Meta-datos Compacta: Diseñar un contenedor flex centrado con separadores sutiles (ej: `•`).
+    - [ ] Indicador de Estado: Punto pulsante verde con texto "ABIERTO".
+    - [ ] Rating: Icono de estrella dorada + texto "4.5".
+    - [ ] Distancia: Texto estilo "DISTANCIA 4.6K" en gris secundario.
+
+- [ ] **Bloque 3: Buscador y Filtros de Categoría (`MenuSearchAndFiltersV2.tsx`)**
+  - [ ] **3.1** Buscador Expansible (o Flotante): Barra de búsqueda en forma de cápsula (`rounded-full`, fondo `bg-slate-100`) con un placeholder claro (ej: "Buscar productos..."). Icono de lupa a la izquierda.
+  - [ ] **3.2** Carrusel de Categorías: Lista de píldoras horizontales permitiendo scroll libre nativo (ocultando el scrollbar con clase `hide-scrollbar`).
+  - [ ] **3.3** Estados Activos/Inactivos:
+    - *Activo:* Borde o fondo de acento (rojo suave), color de texto vibrante (rojo puro).
+    - *Inactivo:* Fondo blanco, texto gris y borde muy sutil (`border-slate-200`).
+
+- [ ] **Bloque 4: Grid de Productos Premium (`ProductCardV2.tsx` y `ProductGridV2.tsx`)**
+  - [ ] **4.1** Grid Dinámico: Usar `grid-cols-2` con un `gap` intermedio (ej: `gap-4`) con padding lateral para que respire.
+  - [ ] **4.2** `ProductCardV2.tsx`: Tarjeta con estética de vidrio/material.
+    - [ ] Fondo blanco puro con sombra suave (`shadow-md` o sombra custom elegante), y bordes muy redondeados (`rounded-2xl`).
+  - [ ] **4.3** Imagen del Producto: Parte superior de la tarjeta (proporción tipo 4:3 o 1:1), ocupando todo el ancho de la tarjeta.
+  - [ ] **4.4** Badges y Superposiciones:
+    - [ ] Esquina Superior Izquierda: Etiqueta "Hot" o Fuego.
+    - [ ] Esquina Superior Derecha: Icono de corazón transparente/delineado para favoritos.
+  - [ ] **4.5** Información de la Tarjeta: Título en bold (truncado a 1 línea), descripción/subtítulo (truncado a 2 líneas), y en la fila inferior precio grande (`text-lg font-bold`).
+  - [ ] **4.6** Botón (+) de Agregar: Círculo acentuado en color rojo vibrante (u otro de marca) ubicado flotando sobre la esquina inferior derecha del bloque blanco (fuera de los bordes o ajustado en la esquina) o dentro de la fila del precio.
+
+- [ ] **Ensamblaje Final en la Página (`src/app/(explorer)/[slug]/page.tsx`)**
+  - [ ] **5.1** Reemplazar los componentes antiguos inyectando `MenuHeroSliderV2`, `BusinessBrandHeader`, `MenuSearchAndFiltersV2` y `ProductGridV2`.
+  - [ ] **5.2** Validar las interacciones: El scroll vertical debe funcionar perfecto en la vista del menú. El botón global de inicio de sesión no entra en conflicto.
+  - [ ] **5.3** Asegurar hidratación: Conectar el componente V2 de grid a la lista de productos filtrados que ya se obtiene de Supabase.
