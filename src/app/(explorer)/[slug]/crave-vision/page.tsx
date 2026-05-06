@@ -15,10 +15,37 @@ export default function CraveVisionSandbox() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleAddToCart = (product: any) => {
     setCartItems((prev) => [...prev, product]);
   };
+
+  const handleRemoveOne = (productId: string) => {
+    setCartItems((prev) => {
+      const idx = prev.findIndex((item) => item.id === productId);
+      if (idx > -1) {
+        const next = [...prev];
+        next.splice(idx, 1);
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const handleAddOne = (product: any) => {
+    setCartItems((prev) => [...prev, product]);
+  };
+
+  const groupedCart = cartItems.reduce((acc: any[], item: any) => {
+    const existing = acc.find((x) => x.id === item.id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      acc.push({ ...item, quantity: 1 });
+    }
+    return acc;
+  }, []);
 
   // Auto-slide para el banner
   useEffect(() => {
@@ -28,6 +55,13 @@ export default function CraveVisionSandbox() {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  // Cerrar bottom sheet automáticamente si el carrito queda vacío
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      setIsCartOpen(false);
+    }
+  }, [cartItems]);
 
   return (
     <div className="absolute inset-0 bg-white overflow-hidden flex flex-col">
@@ -238,10 +272,11 @@ export default function CraveVisionSandbox() {
       </div>
       </div>
 
-      {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL) */}
+      {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL & BOTTOM SHEET) */}
       <AnimatePresence>
-        {cartItems.length > 0 && (
+        {cartItems.length > 0 && !isCartOpen && (
           <motion.div
+            onClick={() => setIsCartOpen(true)}
             initial={{ 
               width: "64px", 
               height: "64px", 
@@ -323,6 +358,130 @@ export default function CraveVisionSandbox() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            {/* Backdrop Overlay con Blur y Oscurecimiento */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCartOpen(false)}
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm z-[90]"
+            />
+
+            {/* Bottom Sheet con Efecto Vidrio Premium */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="absolute bottom-0 left-0 right-0 z-[100] rounded-t-[40px] overflow-hidden flex flex-col max-h-[85%]"
+              style={{
+                // Glassmorphism ultra-premium super marcado, idéntico al del carrito (Magic Pill)
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.3) 100%)",
+                backdropFilter: "blur(24px) saturate(180%)",
+                WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                border: "1px solid rgba(255, 255, 255, 0.6)",
+                borderTop: "2px solid rgba(255, 255, 255, 0.9)",
+                borderBottom: "none",
+                boxShadow: "0 -20px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)",
+              }}
+            >
+              {/* Drag Handle & Header */}
+              <div className="w-full pt-3 pb-5 px-6 shrink-0 flex flex-col items-center border-b border-white/20">
+                <div className="w-12 h-1.5 bg-slate-400/30 rounded-full mb-4" />
+                <div className="w-full flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-[20px] font-black text-slate-900 tracking-tight">Mi Pedido</h2>
+                    <span 
+                      className="text-[12px] font-bold px-2.5 py-0.5 rounded-full text-white shadow-sm"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                        boxShadow: `0 2px 6px ${MOCK_BUSINESS.accent_color}40`
+                      }}
+                    >
+                      {cartItems.length}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setIsCartOpen(false)}
+                    className="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-slate-800 transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+
+              {/* List of Grouped Items */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 max-h-[45vh] scrollbar-hide">
+                {groupedCart.map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between bg-white/40 p-3 rounded-2xl border border-white/30 backdrop-blur-sm shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 shrink-0 border border-white/50">
+                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-900 text-[14px] leading-tight line-clamp-2">{item.name}</span>
+                        <span className="text-[13px] font-semibold text-slate-500 mt-0.5">${item.price.toLocaleString("es-CO")}</span>
+                      </div>
+                    </div>
+
+                    {/* Controles de cantidad de alta fidelidad con efectos de profundidad */}
+                    <div className="flex items-center gap-2.5">
+                      <button
+                        onClick={() => handleRemoveOne(item.id)}
+                        className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-200 active:scale-90 border border-slate-100 shadow-md hover:shadow-lg"
+                        style={{
+                          boxShadow: "0 4px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
+                        }}
+                      >
+                        <span className="text-[18px] font-bold leading-none select-none" style={{ color: MOCK_BUSINESS.accent_color }}>-</span>
+                      </button>
+                      <span className="text-[14px] font-black text-slate-800 w-6 text-center select-none">{item.quantity}</span>
+                      <button
+                        onClick={() => handleAddOne(item)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 border border-white/10"
+                        style={{
+                          background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                          boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}50, inset 0 -1px 2px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.3)`
+                        }}
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer with Total and Finalize Button */}
+              <div className="p-6 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-slate-500 font-bold text-[14px] uppercase tracking-wider">Total del Pedido</span>
+                  <span className="text-[24px] font-black text-slate-900 tracking-tight">
+                    ${cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO")}
+                  </span>
+                </div>
+
+                {/* Botón Finalizar */}
+                <button
+                  className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
+                  style={{
+                    background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                    boxShadow: `0 10px 25px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`
+                  }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Finalizar Pedido
+                  </span>
+                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
