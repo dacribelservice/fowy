@@ -15,13 +15,19 @@ interface MenuHeroSliderV2Props {
   banners: Banner[];
   fallbackImage?: string;
   businessName: string;
+  showBackButton?: boolean;
 }
 
-export function MenuHeroSliderV2({ banners, fallbackImage, businessName }: MenuHeroSliderV2Props) {
+export function MenuHeroSliderV2({ 
+  banners, 
+  fallbackImage, 
+  businessName,
+  showBackButton = true 
+}: MenuHeroSliderV2Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-  const images = banners.length > 0 
+  const images = banners && banners.length > 0 
     ? banners.map(b => b.image_url) 
     : fallbackImage ? [fallbackImage] : [];
 
@@ -39,13 +45,13 @@ export function MenuHeroSliderV2({ banners, fallbackImage, businessName }: MenuH
 
   return (
     <div className="group relative w-full aspect-[4/3] md:aspect-[21/9] overflow-hidden rounded-b-[2.5rem] bg-slate-900 shadow-xl">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0"
         >
           <PremiumImage
@@ -60,14 +66,16 @@ export function MenuHeroSliderV2({ banners, fallbackImage, businessName }: MenuH
       </AnimatePresence>
 
       {/* Back Button Overlay */}
-      <div className="absolute top-4 left-4 z-50">
-        <button 
-          onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg hover:bg-black/40 transition-all active:scale-95"
-        >
-          <ArrowLeft size={20} />
-        </button>
-      </div>
+      {showBackButton && (
+        <div className="absolute top-4 left-4 z-50">
+          <button 
+            onClick={() => router.back()}
+            className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg hover:bg-black/40 transition-all active:scale-95"
+          >
+            <ArrowLeft size={20} />
+          </button>
+        </div>
+      )}
 
       {/* Pagination dots (Integrated minimal dots) */}
       {images.length > 1 && (

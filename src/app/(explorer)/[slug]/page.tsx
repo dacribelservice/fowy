@@ -1,136 +1,102 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronLeft, 
-  Star, 
-  Info, 
-  MapPin, 
-  Search, 
-  ShoppingBag, 
-  X, 
-  Minus, 
-  Plus,
-  ChevronRight
-} from "lucide-react";
-import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
-import { ProductGridV2 } from "@/components/explorer/ProductGridV2";
-import CartSheet from "@/components/explorer/CartSheet";
-import { MenuHeroSliderV2 } from "@/components/explorer/MenuHeroSliderV2";
-import { BusinessBrandHeader } from "@/components/explorer/BusinessBrandHeader";
-import { MenuSearchAndFiltersV2 } from "@/components/explorer/MenuSearchAndFiltersV2";
-import { useAuth } from "../../../hooks/useAuth";
 
+import { CraveHeaderCompact } from "@/components/explorer/CraveHeaderCompact";
+import { MenuHeroSliderV2 } from "@/components/explorer/MenuHeroSliderV2";
+import { CraveBusinessHeader } from "@/components/explorer/CraveBusinessHeader";
+import { CraveSearchBar } from "@/components/explorer/CraveSearchBar";
+import { CraveCategoryBar } from "@/components/explorer/CraveCategoryBar";
+import { CraveProductCard } from "@/components/explorer/CraveProductCard";
+import { CraveProductDetailModal } from "@/components/explorer/CraveProductDetailModal";
+import { CraveMagicCart } from "@/components/explorer/CraveMagicCart";
+import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
+
+/**
+ * BusinessMenuPage: El nuevo molde de producción premium de Crave Vision.
+ * Totalmente modularizado, tipo-seguro y conectado en tiempo real al core de FOWY.
+ */
 export default function BusinessMenuPage() {
   const { slug } = useParams();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Database States
   const [business, setBusiness] = useState<any | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  
+
   const supabase = createClient();
-  const router = useRouter();
-  const { user } = useAuth();
-
-  // Initialize Cart Hook
-  const { 
-    businessItems, 
-    businessTotal, 
-    businessCount, 
-    addToCart, 
-    removeFromCart,
-    updateQuantity
-  } = useCart(business?.id);
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch Business
-      const { data: busData, error: busError } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('slug', slug)
-        .single();
-
-      if (busError || !busData) {
-        console.error("Business not found");
-        return;
-      }
-      setBusiness(busData);
-
-      // Fetch Local Categories
-      const { data: catData } = await supabase
-        .from('product_menu_categories')
-        .select('*')
-        .eq('business_id', busData.id)
-        .order('order_index', { ascending: true });
-      
-      setCategories(catData || []);
-
-      // Fetch Products
-      const { data: prodData } = await supabase
-        .from('products')
-        .select('*')
-        .eq('business_id', busData.id)
-        .eq('is_active', true)
-        .order('category_name', { ascending: true });
-
-      setProducts(prodData || []);
-
-      // Fetch Banners
-      const { data: bannersData } = await supabase
-        .from('business_banners')
-        .select('*')
-        .eq('business_id', busData.id)
-        .order('order_index', { ascending: true });
-      
-      setBanners(bannersData || []);
-
-    } catch (error) {
-      console.error("Error fetching business menu:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug, supabase]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    async function fetchData() {
+      if (!slug) return;
+      try {
+        setLoading(true);
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products;
+        // Fetch Business
+        const { data: busData, error: busError } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("slug", slug)
+          .single();
 
-    if (selectedCategoryId) {
-      const selectedCategory = categories.find(c => c.id === selectedCategoryId);
-      if (selectedCategory) {
-        filtered = filtered.filter(p => p.category_name === selectedCategory.name);
+        if (busError || !busData) {
+          console.error("Business not found in Production Menu:", busError);
+          return;
+        }
+        setBusiness(busData);
+
+        // Fetch Categories
+        const { data: catData } = await supabase
+          .from("product_menu_categories")
+          .select("*")
+          .eq("business_id", busData.id)
+          .order("order_index", { ascending: true });
+
+        setCategories(catData || []);
+
+        // Fetch Products
+        const { data: prodData } = await supabase
+          .from("products")
+          .select("*")
+          .eq("business_id", busData.id)
+          .eq("is_active", true)
+          .order("category_name", { ascending: true });
+
+        setProducts(prodData || []);
+
+        // Fetch Banners
+        const { data: bannersData } = await supabase
+          .from("business_banners")
+          .select("*")
+          .eq("business_id", busData.id)
+          .order("order_index", { ascending: true });
+
+        setBanners(bannersData || []);
+      } catch (error) {
+        console.error("Error fetching data in Production Menu:", error);
+      } finally {
+        setLoading(false);
       }
     }
-
-    if (searchTerm) {
-      filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    return filtered;
-  }, [products, searchTerm, selectedCategoryId, categories]);
+    fetchData();
+  }, [slug, supabase]);
 
   // Analytics: Record Visit
   const recordVisit = useCallback(async (businessId: string) => {
     try {
-      await supabase.from('analytics_visits').insert({
+      await supabase.from("analytics_visits").insert({
         business_id: businessId,
         path: window.location.pathname,
         user_agent: navigator.userAgent,
@@ -141,54 +107,121 @@ export default function BusinessMenuPage() {
     }
   }, [supabase]);
 
-  // Analytics: Record Order
-  const handleCheckoutTracking = async (formData: any) => {
-    if (!business) return;
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      await supabase.from('orders').insert({
-        business_id: business.id,
-        customer_id: user?.id || null,
-        customer_name: formData.name,
-        customer_phone: formData.phone,
-        items: businessItems,
-        total_amount: businessTotal,
-        status: 'pending'
-      });
-    } catch (e) {
-      console.error("Error recording order:", e);
-    }
-  };
-
   useEffect(() => {
     if (business?.id) {
       recordVisit(business.id);
     }
   }, [business?.id, recordVisit]);
 
-  const handleAddToCart = (product: any) => {
+  // Initialize global cart hook for this specific business
+  const { businessItems, addToCart, removeFromCart } = useCart(business?.id);
+
+  // Derive flatCartItems for backwards compatibility with existing view components
+  const flatCartItems = businessItems.flatMap((item) =>
+    Array(item.quantity).fill({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image_url: item.image_url,
+      business_id: item.business_id,
+      business_name: item.business_name,
+    })
+  );
+
+  const handleAddToCart = (product: any, quantity: number = 1) => {
+    if (!business) return;
+    for (let i = 0; i < quantity; i++) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: product.image_url,
+        business_id: business.id,
+        business_name: business.name,
+      });
+    }
+  };
+
+  const handleRemoveOne = (productId: string) => {
+    removeFromCart(productId);
+  };
+
+  const handleAddOne = (product: any) => {
+    if (!business) return;
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image_url: product.image_url,
       business_id: business.id,
-      business_name: business.name
+      business_name: business.name,
     });
   };
 
+  // Cerrar bottom sheet automáticamente si el carrito queda vacío
+  useEffect(() => {
+    if (flatCartItems.length === 0) {
+      setIsCartOpen(false);
+    }
+  }, [flatCartItems.length]);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-slate-100 rounded-full" />
-          <div className="w-16 h-16 border-4 border-t-slate-900 rounded-full animate-spin absolute top-0" />
+      <div className="absolute inset-0 bg-[#ededed] overflow-y-auto flex flex-col scrollbar-hide pb-10">
+        {/* Banner Slider Skeleton */}
+        <div className="w-full h-[21rem] bg-gradient-to-br from-slate-200/50 to-slate-300/30 animate-pulse relative flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-slate-300 border-t-transparent rounded-full animate-spin absolute" />
         </div>
-        <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Preparando la mesa</p>
-          <p className="text-[8px] font-bold text-slate-300 mt-1 uppercase">Dacribel Engine v1.3</p>
+
+        {/* Business Header Skeleton */}
+        <div className="relative px-6 -mt-14 z-20 flex items-start gap-5 animate-pulse">
+          {/* Logo Circle Skeleton */}
+          <div className="w-28 h-28 rounded-full border-[5px] border-white bg-gradient-to-br from-slate-200 to-slate-300/80 shadow-sm shrink-0" />
+
+          {/* Details Skeleton */}
+          <div className="pt-16 flex-1 space-y-3">
+            <div className="h-6 bg-slate-300/60 rounded-full w-3/4" />
+            <div className="flex gap-4">
+              <div className="h-4 bg-slate-300/60 rounded-full w-1/4" />
+              <div className="h-4 bg-slate-300/60 rounded-full w-1/4" />
+            </div>
+          </div>
+        </div>
+
+        {/* Search & Categories Skeleton */}
+        <div className="px-6 mt-8 space-y-6 animate-pulse">
+          {/* Search Bar Skeleton */}
+          <div className="h-12 bg-white/60 backdrop-blur-md rounded-full w-full border border-white/40" />
+          
+          {/* Categories Bar Skeleton */}
+          <div className="flex gap-3 overflow-x-hidden">
+            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-16 shrink-0 border border-white/40" />
+            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-24 shrink-0 border border-white/40" />
+            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-20 shrink-0 border border-white/40" />
+            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-28 shrink-0 border border-white/40" />
+          </div>
+        </div>
+
+        {/* Product Cards Grid Skeleton */}
+        <div className="px-4 mt-6 flex-1 animate-pulse">
+          <div className="grid grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/60 overflow-hidden flex flex-col p-3 space-y-3">
+                {/* Image placeholder */}
+                <div className="h-28 w-full bg-slate-200/50 rounded-2xl" />
+                {/* Title & Desc placeholder */}
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-slate-200/60 rounded-full w-5/6" />
+                  <div className="h-3 bg-slate-200/40 rounded-full w-2/3" />
+                </div>
+                {/* Footer placeholder */}
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-5 bg-slate-200/60 rounded-full w-1/3" />
+                  <div className="w-8 h-8 rounded-full bg-slate-200/60" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -196,112 +229,155 @@ export default function BusinessMenuPage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8 text-center">
-        <h1 className="text-2xl font-black text-slate-800 mb-2">Negocio no encontrado</h1>
-        <p className="text-slate-500 mb-8">El enlace que seguiste podría estar roto o el negocio ya no está activo.</p>
-        <Link href="/explorar" className="px-8 py-4 bg-slate-900 text-white rounded-full font-black uppercase text-xs tracking-widest">
+      <div className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center gap-6">
+        <h1 className="text-xl font-black text-slate-800 uppercase tracking-wider">Menú No Disponible</h1>
+        <p className="text-sm text-slate-500">No pudimos encontrar este negocio o el enlace no es válido.</p>
+        <button 
+          onClick={() => router.push("/explorar")}
+          className="px-6 py-3 bg-slate-900 text-white rounded-full font-black uppercase text-[10px] tracking-widest cursor-pointer hover:bg-slate-800 transition-colors"
+        >
           Volver a Explorar
-        </Link>
+        </button>
       </div>
     );
   }
 
   const accentColor = business.color_identity || "#FF5A5F";
+  const logoUrl = business.logo_url || "";
+  const businessName = business.name || "";
+  const isOpen = business.is_open ?? true;
+  const rating = business.rating || 4.8;
+  const distance = business.distance || "1.2 km";
+
+  // Filtered Products List
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let matchesCategory = true;
+    if (selectedCategory !== "all") {
+      const activeCat = categories.find((c) => c.id === selectedCategory);
+      if (activeCat) {
+        matchesCategory = product.category_name === activeCat.name;
+      } else {
+        matchesCategory = false;
+      }
+    }
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="min-h-screen bg-[#FBFAFF] pb-40 relative">
-      <div className="max-w-4xl mx-auto md:px-6">
-        {/* Business Hero (15.1) */}
-        <div className="relative">
-          <MenuHeroSliderV2 
-            banners={banners} 
-            fallbackImage={business.logo_url} 
-            businessName={business.name} 
+    <div 
+      className="absolute inset-0 bg-[#ededed] overflow-hidden flex flex-col"
+      style={{
+        "--accent-color": accentColor,
+        "--accent-color-90": `${accentColor}e6`,
+        "--accent-color-40": `${accentColor}66`,
+        "--accent-color-10": `${accentColor}1a`,
+      } as React.CSSProperties}
+    >
+      <CraveHeaderCompact 
+        isScrolled={isScrolled} 
+        logoUrl={logoUrl} 
+        name={businessName} 
+        isOpen={isOpen} 
+        rating={rating} 
+        distance={distance} 
+      />
+
+      <div 
+        onScroll={(e) => {
+          const scrollTop = e.currentTarget.scrollTop;
+          setIsScrolled(scrollTop > 120);
+        }}
+        className="flex-1 overflow-y-auto pb-20 relative"
+      >
+        {/* BLOQUE 2: HEADER Y BRANDING V3 */}
+        
+        {/* 2.3 SLIDER DE BANNERS */}
+        <MenuHeroSliderV2 
+          banners={banners.map(b => ({ id: String(b.id), image_url: b.image_url }))} 
+          fallbackImage={business.banner_url || logoUrl} 
+          businessName={businessName} 
+          showBackButton={false} 
+        />
+
+        {/* 2.1 & 2.2 IDENTITY BAR (Logo-Left / Text-Right) */}
+        <CraveBusinessHeader 
+          logoUrl={logoUrl} 
+          name={businessName} 
+          isOpen={isOpen} 
+          rating={rating} 
+          distance={distance} 
+        />
+
+        {/* BLOQUE 3: BÚSQUEDA Y NAVEGACIÓN */}
+        <div className="px-6 mt-8 space-y-6">
+          <CraveSearchBar 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+          />
+          <CraveCategoryBar 
+            categories={categories} 
+            selectedCategory={selectedCategory} 
+            onCategorySelect={setSelectedCategory} 
+            accentColor={accentColor}
           />
         </div>
 
-        {/* Business Identity Bar (15.2.1) */}
-        <BusinessBrandHeader business={business} />
-
-        <div className="h-4" />
-
-        {/* Search Bar - Premium */}
-        <MenuSearchAndFiltersV2 
-          categories={categories}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          accentColor={accentColor}
-        />
-
-        {/* Product Grid Components */}
-        <div className="px-6">
-          {products.length > 0 ? (
-            <ProductGridV2 
-              products={filteredProducts} 
-              categories={categories}
-              cart={businessItems} 
-              onAdd={handleAddToCart} 
-              onRemove={removeFromCart} 
-              accentColor={accentColor}
-            />
+        {/* BLOQUE 4: LA JOYA DE LA CORONA - PRODUCT CARD V3 */}
+        <div className="px-4 pb-24 mt-4">
+          {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {filteredProducts.map((product) => (
+                <CraveProductCard
+                  key={product.id}
+                  product={product}
+                  onSelect={() => setSelectedDetailProduct(product)}
+                  onAddToCart={() => handleAddToCart(product)}
+                  accentColor={accentColor}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="py-20 text-center">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
-                <ShoppingBag size={32} />
-              </div>
-              <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No hay productos disponibles</p>
+            <div className="py-12 text-center text-slate-400">
+              <p className="text-sm font-bold uppercase tracking-wider">No se encontraron productos</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Premium Floating Cart Button */}
+      {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL & BOTTOM SHEET) */}
+      <CraveMagicCart
+        cartItems={flatCartItems}
+        onClick={() => setIsCartOpen(true)}
+        accentColor={accentColor}
+        isVisible={flatCartItems.length > 0 && !isCartOpen}
+      />
+
+      <CraveCheckoutSheet
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={flatCartItems}
+        onAddOne={handleAddOne}
+        onRemoveOne={handleRemoveOne}
+        accentColor={accentColor}
+        businessName={businessName}
+      />
+
+      {/* DETALLES DE PRODUCTO - POPUP ULTRA PREMIUM */}
       <AnimatePresence>
-        {businessCount > 0 && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-10 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[400px] z-[100]"
-          >
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)` }}
-              className="w-full p-2 pl-6 rounded-[35px] text-white flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.2)] active:scale-95 transition-all group overflow-hidden relative"
-            >
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              
-              <div className="flex items-center gap-4">
-                <div className="bg-white text-slate-900 w-10 h-10 rounded-[18px] flex items-center justify-center font-black text-sm shadow-xl">
-                  {businessCount}
-                </div>
-                <span className="font-black uppercase tracking-[0.2em] text-[10px]">Ver mi orden</span>
-              </div>
-              
-              <div className="flex items-center gap-4 bg-black/10 px-6 py-4 rounded-[30px] backdrop-blur-md">
-                <span className="font-black text-lg tracking-tighter">${businessTotal.toLocaleString()}</span>
-                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </button>
-          </motion.div>
+        {selectedDetailProduct && (
+          <CraveProductDetailModal
+            product={selectedDetailProduct}
+            onClose={() => setSelectedDetailProduct(null)}
+            onAddToCart={handleAddToCart}
+            accentColor={accentColor}
+          />
         )}
       </AnimatePresence>
 
-      {/* Cart Sheet Component */}
-      <CartSheet 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={businessItems}
-        total={businessTotal}
-        businessName={business.name}
-        businessPhone={business.phone || ""}
-        onUpdateQuantity={updateQuantity}
-        onCheckout={handleCheckoutTracking}
-        accentColor={accentColor}
-      />
     </div>
   );
 }

@@ -214,58 +214,58 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 ### 🗂️ Checklist de Modularización y Extracción (Pieza por Pieza)
 
 #### 🧱 Bloque 1: Cabecera, Banners e Identidad Visual (La Primera Impresión WOW)
-- [ ] **1.1** **Extraer `CraveHeaderCompact.tsx`**:
+- [x] **1.1** **Extraer `CraveHeaderCompact.tsx`**:
   - Aislar el header flotante colapsable controlado por el estado de scroll `isScrolled`.
   - Debe contener el botón de retorno, título del negocio, rating, distancia y estado abierto/cerrado con transiciones suaves en opacity/translate Y.
-- [ ] **1.2** **Perfeccionar `MenuHeroSliderV2.tsx`**:
+- [x] **1.2** **Perfeccionar `MenuHeroSliderV2.tsx`**:
   - Integrar el componente existente con las transiciones dinámicas del sandbox (`scale: 1.05` de Framer Motion en el inicio de renderizado de la imagen).
   - Asegurar soporte para fallback a `business.logo_url` si no existen banners cargados en `business_banners`.
-- [ ] **1.3** **Extraer `CraveBusinessHeader.tsx` (Identity Bar)**:
+- [x] **1.3** **Extraer `CraveBusinessHeader.tsx` (Identity Bar)**:
   - Componente que aloja la estructura "Logo-Left / Text-Right" superpuesta al banner.
   - Sincronizar el logo del negocio, badge dinámico de "ABIERTO" / "CERRADO", rating y la distancia del usuario al comercio.
 
 #### 🔍 Bloque 2: Filtros de Búsqueda y Navegación Dinámica
-- [ ] **2.1** **Extraer `CraveSearchBar.tsx`**:
+- [x] **2.1** **Extraer `CraveSearchBar.tsx`**:
   - Cápsula de búsqueda en formato píldora translúcida (`backdrop-blur-md`).
   - Lógica para filtrar de forma síncrona el catálogo de productos basado en las entradas del usuario.
-- [ ] **2.2** **Extraer `CraveCategoryBar.tsx`**:
+- [x] **2.2** **Extraer `CraveCategoryBar.tsx`**:
   - Carrusel horizontal con desplazamiento táctil ultra-suave.
   - Control de estados activos y hover mediante gradientes dinámicos controlados por el color de acento de marca (`accent_color`).
 
 #### 🍔 Bloque 3: Catálogo Premium de Productos (La Joya de la Corona)
-- [ ] **3.1** **Extraer `CraveProductCard.tsx`**:
+- [x] **3.1** **Extraer `CraveProductCard.tsx`**:
   - Tarjeta de producto de doble columna con bordes hiper-redondeados (`rounded-3xl`) y sombra premium.
   - Componentes internos: Badge de promo flotante (si aplica), botón de favoritos (corazón) con fondo esmerilado, título, descripción reducida, precio formateado y botón de añadir flotante con el `accent_color`.
-- [ ] **3.2** **Extraer `CraveProductDetailModal.tsx`**:
+- [x] **3.2** **Extraer `CraveProductDetailModal.tsx`**:
   - Modal de detalles con efecto de entrada `AnimatePresence`.
   - Muestra imagen completa de alta resolución, descripción, precio expandido, selector táctil de cantidad (`-` / `+`) y botón CTA con color de acento para agregar la cantidad deseada al carrito.
 
 #### 🛒 Bloque 4: La Experiencia de Compra (Magic Cart & Checkout)
-- [ ] **4.1** **Extraer `CraveMagicCart.tsx`**:
+- [x] **4.1** **Extraer `CraveMagicCart.tsx`**:
   - Componente de tipo "Magic Pill" flotante de vidrio esmerilado que nace con animación de rebote (`spring`) al agregar el primer artículo.
   - Muestra el conteo de ítems, el total acumulado y controla la apertura del panel expandible (Bottom Sheet).
-- [ ] **4.2** **Extraer `CraveCheckoutSheet.tsx` (Checkout Form)**:
+- [x] **4.2** **Extraer `CraveCheckoutSheet.tsx` (Checkout Form)**:
   - Formulario premium e intuitivo para capturar la información del pedido dentro del Bottom Sheet de Framer Motion.
   - **Ubicación GPS Inteligente (Fórmula 3.4)**: Input limpio con botón de localización satelital en tiempo real; muestra un check de confirmación tras capturar la dirección.
   - **Métodos de Pago**: Selector dinámico con iconos elegantes (Efectivo con cambio exacto, Nequi, Bancolombia, Daviplata).
   - **WhatsApp API Integration**: Recolectar toda la información, formatearla con una estructura impecable y abrir el enlace directo a la API de WhatsApp con el mensaje pre-cargado.
 
 #### 🔌 Bloque 5: La "Sanación" (Conexión de Cables de Supabase en el Sandbox)
-- [ ] **5.1** **Conectar `useExplorerManager`**:
+- [x] **5.1** **Conectar `useExplorerManager`**:
   - Sustituir los datos de prueba (`MOCK_BUSINESS`) del sandbox por la data en tiempo real recuperada del hook.
   - Sincronizar dinámicamente: `business.name`, `business.logo_url`, `business.accent_color`, `banners`, `categories` y `products`.
-- [ ] **5.2** **Conectar `useCart`**:
+- [x] **5.2** **Conectar `useCart`**:
   - Reemplazar el estado local `cartItems` por la persistencia y reactividad nativa del carrito global de FOWY.
   - Probar flujos de sumas, restas y vaciado del carrito desde los componentes modulares.
-- [ ] **5.3** **Validación y Manejo de Carga**:
+- [x] **5.3** **Validación y Manejo de Carga**:
   - Integrar skeletons de carga sobre la estructura de la cabecera, categorías y productos para evitar parpadeos visuales desagradables.
 
 #### 🚀 Bloque 6: Reemplazo Seguro de Producción (Hot-Swap)
-- [ ] **6.1** **Fusión del Orquestador**:
+- [x] **6.1** **Fusión del Orquestador**:
   - Limpiar por completo `src/app/(explorer)/[slug]/page.tsx` de todo el código de producción obsoleto.
   - Pegar el orquestador limpio y optimizado obtenido de `crave-vision` (que ahora mide menos de 150 líneas y solo importa los subcomponentes creados).
-- [ ] **6.2** **Pruebas de Regresión y Eliminación de Sandbox**:
+- [x] **6.2** **Pruebas de Regresión y Adaptación de Sandbox**:
   - Verificar que el menú digital en producción se comporte de forma premium y reactiva.
-  - Eliminar de forma segura la ruta sandbox `src/app/(explorer)/[slug]/crave-vision/` para mantener el árbol de carpetas limpio de código muerto.
+  - Implementar un redirect ultraligero en la ruta sandbox `src/app/(explorer)/[slug]/crave-vision/` para limpiar automáticamente el caché HMR de Turbopack y guiar al usuario al menú premium.
 - [ ] **6.3** **Backup Seguro**:
   - Generar commit del re-diseño modularizado y documentar la migración exitosa.
