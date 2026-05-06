@@ -125,17 +125,16 @@ export default function CraveVisionSandbox() {
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 border ${
+            className={`px-[10px] py-[5px] rounded-full text-sm font-bold whitespace-nowrap transition-all duration-200 active:scale-90 border ${
               selectedCategory === "all"
-                ? "shadow-md scale-105"
+                ? "border-transparent text-white"
                 : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
             }`}
             style={
               selectedCategory === "all"
                 ? {
-                    backgroundColor: MOCK_BUSINESS.accent_color,
-                    borderColor: MOCK_BUSINESS.accent_color,
-                    color: "#fff",
+                    background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                    boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.3)`,
                   }
                 : {}
             }
@@ -147,17 +146,16 @@ export default function CraveVisionSandbox() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 border flex items-center gap-2 ${
+              className={`px-[10px] py-[5px] rounded-full text-sm font-bold whitespace-nowrap transition-all duration-200 active:scale-90 border flex items-center gap-2 ${
                 selectedCategory === cat.id
-                  ? "shadow-md scale-105"
+                  ? "border-transparent text-white"
                   : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
               }`}
               style={
                 selectedCategory === cat.id
                   ? {
-                      backgroundColor: MOCK_BUSINESS.accent_color,
-                      borderColor: MOCK_BUSINESS.accent_color,
-                      color: "#fff",
+                      background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                      boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.3)`,
                     }
                   : {}
               }

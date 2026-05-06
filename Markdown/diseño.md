@@ -30,7 +30,13 @@ Basado en el concepto visual "SaaS High-Tech" con enfoque en Glassmorfismo y deg
 ## 🧊 3. COMPONENTES Y EFECTOS
 *   **Cards:** Bordes redondeados de `20px` (clase `rounded-fowy`), sombra muy suave (`shadow-sm`) y borde de `1px` casi invisible.
 *   **Sidebar:** Efecto Glassmorphism lateral, iconos estilo "Outline" (lineales) con colores de degradado al estar activos.
-*   **Buttons:** Efecto de elevación al hover, transición suave de 0.3s.
+*   **Buttons (Diseño Premium Táctil):**
+    *   **Centrado Matemático Perfecto:** Uso de íconos vectoriales pulidos (ej. Lucide) o texto en contenedores con `flex items-center justify-center` para una alineación milimétrica.
+    *   **Efecto de Profundidad 3D:**
+        *   *Biselado Sutil (Inner Shadow/Border):* Borde superior casi blanco y transparente, junto con sombra interior inferior para dar relieve físico y evitar el aspecto plano.
+        *   *Gradiente de Volumen:* Uso del color principal (o `accent_color`) en un gradiente muy sutil (ligeramente más claro arriba, más oscuro abajo) para aportar volumen.
+    *   **Glow (Sombra de Luz Exterior):** Uso de sombra proyectada suave y difuminada del mismo color del botón, creando un elegante "halo de luz", en lugar de la clásica sombra gris o negra.
+    *   **Micro-interacción (El "Click" Perfecto):** Efecto de escala al presionar (ej. `active:scale-90` en Tailwind) para simular que el botón se hunde físicamente por unos milisegundos, otorgando satisfacción táctil.
 *   **Inputs:** Fondos traslúcidos con bordes redondeados.
 
 ---
