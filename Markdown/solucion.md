@@ -181,6 +181,11 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 
 > **Objetivo:** Lograr el "WOW" factor del diseño Premium (Imagen 2) mediante un entorno de desarrollo aislado (Sandbox) en la ruta `/[slug]/crave-vision`, manteniendo el marco del celular pero reconstruyendo todo el interior desde cero.
 
+> **💡 Contexto Arquitectónico (Estrategia de Trabajo para la Siguiente Sesión):**
+> 1. **Prototipado Monolítico (Sandbox):** Toda la vista, incluyendo el diseño del carrito y pantallas pendientes, se está construyendo conjuntamente en `crave-vision/page.tsx` usando estados locales (`useState`) para simular la navegación. Esto permite iterar visualmente rápido sin afectar producción.
+> 2. **Comentarios como "Líneas de Corte":** El código está delimitado visualmente con comentarios (ej. `/* BLOQUE 4 */`) que marcan exactamente dónde empieza y termina cada pieza.
+> 3. **Desacoplamiento Final:** En el Bloque 5, una vez el flujo y diseño estén 100% aprobados, estas secciones se extraerán en módulos limpios (ej. `ProductCardV3`, `CategorySliderV3`), conectándose a la base de datos real (unir los cables) para finalmente reemplazar la vista en producción.
+
 - [ ] **Bloque 1: Entorno de Desarrollo Aislado**
   - [x] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
   - [x] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
@@ -191,15 +196,32 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **2.2** Meta-datos Premium: Implementar badges de "Abierto", Rating y Distancia con el espaciado y tipografía exacta de la referencia.
   - [x] **2.3** Slider de Banners: Adaptar el slider para que se integre visualmente con la nueva cabecera sin cortes bruscos.
 
-- [ ] **Bloque 3: Búsqueda y Navegación "Glassmorphism"**
-  - [ ] **3.1** Buscador Flotante: Implementar la cápsula de búsqueda con efectos de desenfoque (`backdrop-blur`) y sombras profundas.
-  - [ ] **3.2** Carrusel de Categorías V3: Píldoras con micro-interacciones al hacer scroll y estados activos ultra-vibrantes.
+- [x] **Bloque 3: Búsqueda y Navegación "Glassmorphism"**
+  - [x] **3.1** Buscador Flotante: Implementar la cápsula de búsqueda con efectos de desenfoque (`backdrop-blur`) y sombras profundas.
+  - [x] **3.2** Carrusel de Categorías V3: Píldoras con micro-interacciones al hacer scroll y estados activos ultra-vibrantes.
 
-- [ ] **Bloque 4: La Joya de la Corona - Product Card V3**
-  - [ ] **4.1** Estética de Producto: Rediseñar la tarjeta con bordes `3xl`, sombras suaves y tipografías `bold` de alta legibilidad.
-  - [ ] **4.2** Botón de Acción Flotante: El botón "+" debe ser una pieza visual destacada, usando el color de acento de la marca con gradiente sutil.
-  - [ ] **4.3** Grid de 2 Columnas: Ajustar el `gap` y padding para que los productos "respiren" en pantalla móvil.
+- [x] **Bloque 4: La Joya de la Corona - Product Card V3**
+  - [x] **4.1** Estética de Producto: Rediseñar la tarjeta con bordes `3xl`, sombras suaves y tipografías `bold` de alta legibilidad.
+  - [x] **4.2** Botón de Acción Flotante: El botón "+" debe ser una pieza visual destacada, usando el color de acento de la marca con gradiente sutil.
+  - [x] **4.3** Grid de 2 Columnas: Ajustar el `gap` y padding para que los productos "respiren" en pantalla móvil.
+  - [ ] **4.4** Ícono de Favoritos (Corazón): Implementar en la esquina superior derecha de la imagen un ícono minimalista con estilo premium (fondo tipo glassmorphism o sombra suave) que resalte sobre la foto.
 
-- [ ] **Bloque 5: Integración y Reemplazo de Producción**
-  - [ ] **5.1** Conexión de Lógica: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
-  - [ ] **5.2** Hot-Swap: Una vez aprobado el diseño en el sandbox, reemplazar la página de producción `[slug]/page.tsx` con el código validado.
+- [ ] **Bloque 5: La Experiencia del Carrito (Micro-Interacciones Premium)**
+  - [ ] **5.1** Nacimiento del Carrito (Efecto "Pill" Expansivo): Al agregar un producto, aparece un círculo en la parte inferior que se expande fluidamente (framer-motion spring) hacia una cápsula redondeada.
+  - [ ] **5.2** Diseño Glassmorphism: La cápsula debe usar efecto vidrio esmerilado (`backdrop-blur` fuerte, borde sutil brillante) mostrando el total a la izquierda y el ícono de carrito a la derecha.
+  - [ ] **5.3** Apertura del Bottom Sheet: Al tocar la cápsula de vidrio, se desliza hacia arriba el panel (Bottom Sheet) del carrito.
+  - [ ] **5.4** Controles de Cantidad Alta Fidelidad: Botones `-` y `+` circulares con efecto de profundidad (sombras sutiles "levantadas") utilizando el color de acento del negocio.
+  - [ ] **5.5** Botón "Finalizar": Un botón destacado dentro del Bottom Sheet para proceder al pago, aplicando el `accent_color`.
+
+- [ ] **Bloque 6: Vista de Checkout (Finalización del pedido)**
+  - [ ] **6.1** Formulario Visual Premium: Captura de Nombre, Celular y Notas del pedido con estética limpia.
+  - [ ] **6.2** Resumen de Orden: Detalle de productos seleccionados y el Total a pagar.
+  - [ ] **6.3** CTA Principal Seguro: Botón final de "Enviar pedido por WhatsApp" obligatoriamente en color Verde (`#25D366`) para transmitir confianza.
+
+- [ ] **Bloque 7: Inyección de Identidad de Marca (Colores Dinámicos)**
+  - [ ] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.
+  - [ ] **7.2** Aplicación estricta en: Píldoras de categorías activas, botón `+` de product cards, badge de `(promo)`, y botón "Finalizar" del carrito.
+
+- [ ] **Bloque 8: Integración y Reemplazo de Producción (Hot-Swap)**
+  - [ ] **8.1** Conexión de Lógica: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
+  - [ ] **8.2** Hot-Swap Final: Una vez aprobado el diseño completo en el sandbox, reemplazar la página de producción `[slug]/page.tsx` con el código validado.

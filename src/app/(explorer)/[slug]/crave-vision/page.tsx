@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Search, Plus } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -12,6 +12,8 @@ import { MapPin, Star } from "lucide-react";
 export default function CraveVisionSandbox() {
   const { slug } = useParams();
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Auto-slide para el banner
   useEffect(() => {
@@ -102,6 +104,129 @@ export default function CraveVisionSandbox() {
         </div>
       </div>
 
+      {/* BLOQUE 3: BÚSQUEDA Y NAVEGACIÓN */}
+      <div className="px-6 mt-8 space-y-6">
+        
+        {/* 3.1 Buscador Flotante Glassmorphism */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <Search className="w-5 h-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar producto..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-slate-100/80 backdrop-blur-md border border-slate-200 text-slate-800 text-[15px] font-medium rounded-full py-3.5 pl-12 pr-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all"
+          />
+        </div>
+
+        {/* 3.2 Carrusel de Categorías V3 */}
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 border ${
+              selectedCategory === "all"
+                ? "shadow-md scale-105"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+            }`}
+            style={
+              selectedCategory === "all"
+                ? {
+                    backgroundColor: MOCK_BUSINESS.accent_color,
+                    borderColor: MOCK_BUSINESS.accent_color,
+                    color: "#fff",
+                  }
+                : {}
+            }
+          >
+            Todos
+          </button>
+          
+          {MOCK_BUSINESS.categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 border flex items-center gap-2 ${
+                selectedCategory === cat.id
+                  ? "shadow-md scale-105"
+                  : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+              }`}
+              style={
+                selectedCategory === cat.id
+                  ? {
+                      backgroundColor: MOCK_BUSINESS.accent_color,
+                      borderColor: MOCK_BUSINESS.accent_color,
+                      color: "#fff",
+                    }
+                  : {}
+              }
+            >
+              <span>{cat.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* BLOQUE 4: LA JOYA DE LA CORONA - PRODUCT CARD V3 */}
+      <div className="px-4 pb-24 mt-4">
+        <div className="grid grid-cols-2 gap-4">
+          {MOCK_BUSINESS.products
+            .filter((product) => {
+              const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+              const matchesCategory = selectedCategory === "all" || product.category_id === selectedCategory;
+              return matchesSearch && matchesCategory;
+            })
+            .map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group"
+              >
+                {/* Product Image */}
+                <div className="h-32 w-full relative overflow-hidden bg-slate-50">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {product.is_promo && (
+                    <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                      Promo
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div className="p-3 flex-1 flex flex-col">
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <p className="text-slate-500 text-[11px] mt-1 line-clamp-2 flex-1 leading-snug">
+                    {product.description}
+                  </p>
+
+                  {/* Price and Action Button */}
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="font-bold text-slate-900 text-[15px]">
+                      ${product.price.toLocaleString("es-CO")}
+                    </span>
+
+                    {/* Floating Action Button Premium */}
+                    <button
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 hover:brightness-110 border border-white/20"
+                      style={{
+                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                        boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.3)`
+                      }}
+                    >
+                      <Plus className="w-4 h-4 stroke-[2.5]" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
     </div>
   );
 }
