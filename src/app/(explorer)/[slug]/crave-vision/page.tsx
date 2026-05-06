@@ -1,6 +1,9 @@
 "use client";
 import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { MOCK_BUSINESS } from "@/data/mock-crave";
+import { MapPin, Star } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -8,52 +11,97 @@ import { motion } from "framer-motion";
  */
 export default function CraveVisionSandbox() {
   const { slug } = useParams();
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  // Auto-slide para el banner
+  useEffect(() => {
+    if (!MOCK_BUSINESS.banners || MOCK_BUSINESS.banners.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % MOCK_BUSINESS.banners.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Sandbox Indicator (Solo para desarrollo) */}
-      <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Crave Vision Sandbox</p>
-          <p className="text-xs font-bold text-slate-800">Negocio: <span className="text-orange-500">{slug}</span></p>
-        </div>
-        <div className="flex gap-2">
-           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-           <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-           <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+    <div className="flex flex-col min-h-screen bg-white relative pb-20">
+      {/* BLOQUE 2: HEADER Y BRANDING V3 */}
+      
+      {/* 2.3 SLIDER DE BANNERS */}
+      <div className="relative w-full h-[280px] bg-slate-900 rounded-b-[40px] overflow-hidden shadow-sm">
+        <AnimatePresence mode="popLayout">
+          <motion.img
+            key={currentBannerIndex}
+            src={MOCK_BUSINESS.banners[currentBannerIndex]?.image_url || MOCK_BUSINESS.banner_url}
+            alt="Banner"
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
+
+        {/* Gradiente sutil inferior para legibilidad de los puntos */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+
+        {/* Indicadores (Dots) animados */}
+        <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
+          {MOCK_BUSINESS.banners.map((_, idx) => (
+            <motion.div
+              key={idx}
+              className={`h-2.5 rounded-full bg-white transition-all duration-500 ease-in-out ${
+                idx === currentBannerIndex ? "w-8 opacity-100" : "w-2.5 opacity-50"
+              }`}
+              layout
+            />
+          ))}
         </div>
       </div>
 
-      {/* Main Content Area - LIENZO EN BLANCO */}
-      <div className="flex-grow flex flex-col items-center justify-center p-10 text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-[240px]"
-        >
-          {/* Icono de Diseño */}
-          <div className="w-20 h-20 bg-gradient-to-br from-orange-50 to-white rounded-[30px] flex items-center justify-center mx-auto mb-6 shadow-sm border border-orange-100">
-            <span className="text-3xl">✨</span>
-          </div>
+      {/* 2.1 & 2.2 IDENTITY BAR (Logo-Left / Text-Right) */}
+      <div className="relative px-6 -mt-14 z-20 flex items-start gap-5">
+        {/* Logo Circular */}
+        <div className="w-28 h-28 rounded-full border-[5px] border-white overflow-hidden shadow-sm bg-white shrink-0">
+          <img 
+            src={MOCK_BUSINESS.logo_url} 
+            alt={MOCK_BUSINESS.name} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Detalles del Negocio */}
+        <div className="pt-14 flex-1 min-w-0">
+          <h1 className="text-[22px] font-semibold text-slate-900 tracking-tight leading-none truncate">
+            {MOCK_BUSINESS.name}
+          </h1>
           
-          <h2 className="text-xl font-black text-slate-900 leading-tight">Lienzo en Blanco Preparado</h2>
-          <p className="text-sm text-slate-400 mt-4 font-medium leading-relaxed">
-            Estamos listos para construir el diseño <span className="text-slate-900 font-bold">Premium V3</span> desde cero, pieza por pieza.
-          </p>
+          {/* 2.2 Meta-datos Premium */}
+          <div className="mt-2 flex items-center gap-3">
+            {/* Estado: Abierto / Cerrado */}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-3 h-3 rounded-full ${MOCK_BUSINESS.is_open ? 'bg-[#34C759]' : 'bg-red-500'}`}></span>
+              <span className={`text-[14px] font-bold tracking-wide ${MOCK_BUSINESS.is_open ? 'text-[#34C759]' : 'text-red-600'}`}>
+                {MOCK_BUSINESS.is_open ? 'ABIERTO' : 'CERRADO'}
+              </span>
+            </div>
 
-          <div className="mt-8 flex flex-col gap-3">
-             <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
-                <div className="h-full w-1/3 bg-orange-500 rounded-full"></div>
-             </div>
-             <p className="text-[9px] font-black uppercase tracking-widest text-slate-300">Esperando primer bloque de diseño...</p>
+            {/* Rating */}
+            <div className="flex items-center gap-1">
+              <Star className="w-[18px] h-[18px] fill-[#FFCC00] text-[#FFCC00]" />
+              <span className="text-[14px] font-bold text-slate-900">{MOCK_BUSINESS.rating}</span>
+            </div>
           </div>
-        </motion.div>
+
+          <div className="mt-1 flex items-center gap-1 text-slate-500">
+            <MapPin className="w-3.5 h-3.5" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider">
+              DISTANCIA {MOCK_BUSINESS.distance}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Footer Placeholder */}
-      <div className="p-6 bg-slate-50/50">
-         <div className="h-12 w-full bg-white rounded-2xl border border-slate-100 border-dashed"></div>
-      </div>
     </div>
   );
 }

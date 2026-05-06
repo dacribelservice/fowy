@@ -186,10 +186,10 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
   - [x] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
 
-- [ ] **Bloque 2: Header y Branding V3 (Diseño Real de Imagen 2)**
-  - [ ] **2.1** Layout "Logo-Left/Text-Right": Romper el centrado actual. El logo circular a la izquierda y el nombre/detalles a la derecha.
-  - [ ] **2.2** Meta-datos Premium: Implementar badges de "Abierto", Rating y Distancia con el espaciado y tipografía exacta de la referencia.
-  - [ ] **2.3** Slider de Banners: Adaptar el slider para que se integre visualmente con la nueva cabecera sin cortes bruscos.
+- [x] **Bloque 2: Header y Branding V3 (Diseño Real de Imagen 2)**
+  - [x] **2.1** Layout "Logo-Left/Text-Right": Romper el centrado actual. El logo circular a la izquierda y el nombre/detalles a la derecha.
+  - [x] **2.2** Meta-datos Premium: Implementar badges de "Abierto", Rating y Distancia con el espaciado y tipografía exacta de la referencia.
+  - [x] **2.3** Slider de Banners: Adaptar el slider para que se integre visualmente con la nueva cabecera sin cortes bruscos.
 
 - [ ] **Bloque 3: Búsqueda y Navegación "Glassmorphism"**
   - [ ] **3.1** Buscador Flotante: Implementar la cápsula de búsqueda con efectos de desenfoque (`backdrop-blur`) y sombras profundas.
