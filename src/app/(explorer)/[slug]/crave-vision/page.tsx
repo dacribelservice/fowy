@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star, Search, Plus } from "lucide-react";
+import { MapPin, Star, Search, Plus, Heart, ShoppingCart } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -14,6 +14,11 @@ export default function CraveVisionSandbox() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [cartItems, setCartItems] = useState<any[]>([]);
+
+  const handleAddToCart = (product: any) => {
+    setCartItems((prev) => [...prev, product]);
+  };
 
   // Auto-slide para el banner
   useEffect(() => {
@@ -25,7 +30,8 @@ export default function CraveVisionSandbox() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white relative pb-20">
+    <div className="absolute inset-0 bg-white overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-y-auto pb-20 relative">
       {/* BLOQUE 2: HEADER Y BRANDING V3 */}
       
       {/* 2.3 SLIDER DE BANNERS */}
@@ -188,10 +194,14 @@ export default function CraveVisionSandbox() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {product.is_promo && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                    <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10">
                       Promo
                     </div>
                   )}
+                  {/* Ícono de Favoritos (Corazón) - Premium Glassmorphism */}
+                  <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-sm transition-all active:scale-90 hover:bg-white/30 z-10">
+                    <Heart className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                  </button>
                 </div>
 
                 {/* Product Info */}
@@ -211,6 +221,7 @@ export default function CraveVisionSandbox() {
 
                     {/* Floating Action Button Premium */}
                     <button
+                      onClick={() => handleAddToCart(product)}
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 hover:brightness-110 border border-white/20"
                       style={{
                         background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
@@ -225,6 +236,96 @@ export default function CraveVisionSandbox() {
             ))}
         </div>
       </div>
+      </div>
+
+      {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL) */}
+      <AnimatePresence>
+        {cartItems.length > 0 && (
+          <motion.div
+            initial={{ 
+              width: "64px", 
+              height: "64px", 
+              borderRadius: "32px", 
+              opacity: 0, 
+              y: 60, 
+              x: "-50%",
+              scale: 0.5 
+            }}
+            animate={{ 
+              width: "92%", 
+              height: "72px", 
+              borderRadius: "36px", 
+              opacity: 1, 
+              y: 0, 
+              x: "-50%",
+              scale: 1 
+            }}
+            exit={{ 
+              opacity: 0, 
+              y: 60, 
+              scale: 0.8, 
+              x: "-50%",
+              width: "64px"
+            }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 280, 
+              damping: 22,
+              mass: 0.8
+            }}
+            className="absolute bottom-6 left-1/2 z-50 overflow-hidden cursor-pointer flex items-center justify-between"
+            style={{
+              // Glassmorphism ultra-premium super marcado
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.3) 100%)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              WebkitBackdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.6)",
+              borderTop: "1px solid rgba(255, 255, 255, 0.9)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(255,255,255,0.1)",
+            }}
+          >
+            <motion.div 
+              className="flex items-center justify-between w-full h-full px-5"
+              initial={{ opacity: 0, scale: 0.9, filter: "blur(5px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ delay: 0.15, duration: 0.4, type: "spring", stiffness: 300 }}
+            >
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">
+                  Ver Pedido
+                </span>
+                <span className="text-[22px] font-black text-slate-900 leading-none tracking-tight">
+                  ${cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO")}
+                </span>
+              </div>
+              
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 relative"
+                style={{
+                   background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                   boxShadow: `0 8px 20px ${MOCK_BUSINESS.accent_color}80, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`
+                }}
+              >
+                <ShoppingCart className="w-[20px] h-[20px] stroke-[2.5]" />
+                <AnimatePresence mode="popLayout">
+                  <motion.div 
+                    key={cartItems.length}
+                    initial={{ scale: 0, y: 10, rotate: -45 }}
+                    animate={{ scale: 1, y: 0, rotate: 0 }}
+                    exit={{ scale: 0, y: -10, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                    className="absolute -top-1.5 -right-1.5 bg-slate-900 text-white text-[12px] w-[24px] h-[24px] flex items-center justify-center rounded-full font-bold border-[2.5px] border-white shadow-md"
+                  >
+                    {cartItems.length}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

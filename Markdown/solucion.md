@@ -204,11 +204,11 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **4.1** Estética de Producto: Rediseñar la tarjeta con bordes `3xl`, sombras suaves y tipografías `bold` de alta legibilidad.
   - [x] **4.2** Botón de Acción Flotante: El botón "+" debe ser una pieza visual destacada, usando el color de acento de la marca con gradiente sutil.
   - [x] **4.3** Grid de 2 Columnas: Ajustar el `gap` y padding para que los productos "respiren" en pantalla móvil.
-  - [ ] **4.4** Ícono de Favoritos (Corazón): Implementar en la esquina superior derecha de la imagen un ícono minimalista con estilo premium (fondo tipo glassmorphism o sombra suave) que resalte sobre la foto.
+  - [x] **4.4** Ícono de Favoritos (Corazón): Implementar en la esquina superior derecha de la imagen un ícono minimalista con estilo premium (fondo tipo glassmorphism o sombra suave) que resalte sobre la foto.
 
 - [ ] **Bloque 5: La Experiencia del Carrito (Micro-Interacciones Premium)**
-  - [ ] **5.1** Nacimiento del Carrito (Efecto "Pill" Expansivo): Al agregar un producto, aparece un círculo en la parte inferior que se expande fluidamente (framer-motion spring) hacia una cápsula redondeada.
-  - [ ] **5.2** Diseño Glassmorphism: La cápsula debe usar efecto vidrio esmerilado (`backdrop-blur` fuerte, borde sutil brillante) mostrando el total a la izquierda y el ícono de carrito a la derecha.
+  - [x] **5.1** Nacimiento del Carrito (Efecto "Pill" Expansivo): Al agregar un producto, aparece un círculo en la parte inferior que se expande fluidamente (framer-motion spring) hacia una cápsula redondeada.
+  - [x] **5.2** Diseño Glassmorphism: La cápsula debe usar efecto vidrio esmerilado (`backdrop-blur` fuerte, borde sutil brillante) mostrando el total a la izquierda y el ícono de carrito a la derecha.
   - [ ] **5.3** Apertura del Bottom Sheet: Al tocar la cápsula de vidrio, se desliza hacia arriba el panel (Bottom Sheet) del carrito.
   - [ ] **5.4** Controles de Cantidad Alta Fidelidad: Botones `-` y `+` circulares con efecto de profundidad (sombras sutiles "levantadas") utilizando el color de acento del negocio.
   - [ ] **5.5** Botón "Finalizar": Un botón destacado dentro del Bottom Sheet para proceder al pago, aplicando el `accent_color`.
