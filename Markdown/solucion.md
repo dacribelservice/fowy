@@ -218,9 +218,9 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **6.2** Resumen de Orden: Detalle de productos seleccionados y el Total a pagar.
   - [x] **6.3** CTA Principal Seguro: Botón final de "Enviar pedido por WhatsApp" obligatoriamente en color Verde (`#25D366`) para transmitir confianza.
 
-- [ ] **Bloque 7: Inyección de Identidad de Marca (Colores Dinámicos)**
-  - [ ] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.
-  - [ ] **7.2** Aplicación estricta en: Píldoras de categorías activas, botón `+` de product cards, badge de `(promo)`, y botón "Finalizar" del carrito.
+- [x] **Bloque 7: Inyección de Identidad de Marca (Colores Dinámicos)**
+  - [x] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.
+  - [x] **7.2** Aplicación estricta en: Píldoras de categorías activas, botón `+` de product cards, badge de `(promo)`, y botón "Finalizar" del carrito.
 
 - [ ] **Bloque 8: Integración y Reemplazo de Producción (Hot-Swap)**
   - [ ] **8.1** Conexión de Lógica: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.

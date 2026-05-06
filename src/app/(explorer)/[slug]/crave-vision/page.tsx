@@ -1,9 +1,9 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone, Banknote, Smartphone, Landmark, Wallet, CreditCard } from "lucide-react";
+import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone, Banknote, Smartphone, Landmark, Wallet, CreditCard, Trash2 } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -11,6 +11,7 @@ import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone
  */
 export default function CraveVisionSandbox() {
   const { slug } = useParams();
+  const router = useRouter();
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -24,6 +25,7 @@ export default function CraveVisionSandbox() {
   const [cashChange, setCashChange] = useState("");
   const [customPaymentMethod, setCustomPaymentMethod] = useState("");
   const [validationError, setValidationError] = useState("");
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
 
   const handleSendWhatsApp = () => {
     if (!customerName.trim() || !customerPhone.trim()) {
@@ -134,7 +136,28 @@ ${itemsText}
   }, [isCartOpen]);
 
   return (
-    <div className="absolute inset-0 bg-white overflow-hidden flex flex-col">
+    <div 
+      className="absolute inset-0 bg-white overflow-hidden flex flex-col"
+      style={{
+        "--accent-color": MOCK_BUSINESS.accent_color,
+        "--accent-color-90": `${MOCK_BUSINESS.accent_color}e6`,
+        "--accent-color-40": `${MOCK_BUSINESS.accent_color}66`,
+        "--accent-color-10": `${MOCK_BUSINESS.accent_color}1a`,
+      } as React.CSSProperties}
+    >
+      {/* Botón de Atrás (Efecto Vidrio Premium) - Fijo sobre el scroll */}
+      <motion.button
+        onClick={() => router.back()}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="absolute top-6 left-6 z-40 w-11 h-11 bg-white/20 hover:bg-white/30 border border-white/35 rounded-full flex items-center justify-center backdrop-blur-md text-white shadow-lg shadow-black/10 transition-colors duration-200 cursor-pointer"
+        title="Regresar al mapa"
+      >
+        <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+      </motion.button>
+
       <div className="flex-1 overflow-y-auto pb-20 relative">
       {/* BLOQUE 2: HEADER Y BRANDING V3 */}
       
@@ -183,7 +206,7 @@ ${itemsText}
         </div>
 
         {/* Detalles del Negocio */}
-        <div className="pt-14 flex-1 min-w-0">
+        <div className="pt-16 flex-1 min-w-0">
           <h1 className="text-[22px] font-semibold text-slate-900 tracking-tight leading-none truncate">
             {MOCK_BUSINESS.name}
           </h1>
@@ -291,14 +314,23 @@ ${itemsText}
                 className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group"
               >
                 {/* Product Image */}
-                <div className="h-32 w-full relative overflow-hidden bg-slate-50">
+                <div 
+                  onClick={() => setSelectedDetailProduct(product)}
+                  className="h-32 w-full relative overflow-hidden bg-slate-50 cursor-pointer"
+                >
                   <img
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {product.is_promo && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10">
+                    <div 
+                      className="absolute top-2 left-2 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10"
+                      style={{
+                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                        boxShadow: `0 2px 6px ${MOCK_BUSINESS.accent_color}40`,
+                      }}
+                    >
                       Promo
                     </div>
                   )}
@@ -310,12 +342,17 @@ ${itemsText}
 
                 {/* Product Info */}
                 <div className="p-3 flex-1 flex flex-col">
-                  <h3 className="font-bold text-slate-900 text-sm leading-tight line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-slate-500 text-[11px] mt-1 line-clamp-2 flex-1 leading-snug">
-                    {product.description}
-                  </p>
+                  <div 
+                    onClick={() => setSelectedDetailProduct(product)}
+                    className="cursor-pointer flex-1 flex flex-col"
+                  >
+                    <h3 className="font-bold text-slate-900 text-sm leading-tight line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-slate-500 text-[11px] mt-1 line-clamp-2 flex-1 leading-snug">
+                      {product.description}
+                    </p>
+                  </div>
 
                   {/* Price and Action Button */}
                   <div className="flex items-center justify-between mt-3">
@@ -526,12 +563,37 @@ ${itemsText}
                           <div className="flex items-center gap-2.5">
                             <button
                               onClick={() => handleRemoveOne(item.id)}
-                              className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-200 active:scale-90 border border-slate-100 shadow-md hover:shadow-lg"
+                              className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-200 active:scale-90 border border-slate-100 shadow-md hover:shadow-lg overflow-hidden"
                               style={{
                                 boxShadow: "0 4px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
                               }}
                             >
-                              <span className="text-[18px] font-bold leading-none select-none" style={{ color: MOCK_BUSINESS.accent_color }}>-</span>
+                              <AnimatePresence mode="wait" initial={false}>
+                                {item.quantity === 1 ? (
+                                  <motion.span
+                                    key="trash"
+                                    initial={{ opacity: 0, scale: 0.6 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.6 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="flex items-center justify-center text-rose-500"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 stroke-[2.2]" />
+                                  </motion.span>
+                                ) : (
+                                  <motion.span
+                                    key="minus"
+                                    initial={{ opacity: 0, scale: 0.6 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.6 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="text-[18px] font-bold leading-none select-none flex items-center justify-center pb-0.5"
+                                    style={{ color: MOCK_BUSINESS.accent_color }}
+                                  >
+                                    -
+                                  </motion.span>
+                                )}
+                              </AnimatePresence>
                             </button>
                             <span className="text-[14px] font-black text-slate-800 w-6 text-center select-none">{item.quantity}</span>
                             <button
@@ -800,6 +862,100 @@ ${itemsText}
                 )}
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* DETALLES DE PRODUCTO - POPUP ULTRA PREMIUM */}
+      <AnimatePresence>
+        {selectedDetailProduct && (
+          <>
+            {/* Backdrop Blur Oscuro */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedDetailProduct(null)}
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-md z-[110]"
+            />
+
+            {/* Modal Container */}
+            <div className="absolute inset-x-0 bottom-0 top-0 flex items-center justify-center p-6 z-[120] pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ type: "spring", damping: 25, stiffness: 350 }}
+                className="bg-white/90 backdrop-blur-xl rounded-[32px] overflow-hidden shadow-2xl border border-white/60 flex flex-col w-full max-w-[340px] pointer-events-auto relative"
+                style={{
+                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.8)"
+                }}
+              >
+                {/* Botón Cerrar Flotante */}
+                <button
+                  onClick={() => setSelectedDetailProduct(null)}
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/15 backdrop-blur-md flex items-center justify-center border border-white/20 text-white hover:bg-black/30 active:scale-90 transition-all z-20 shadow-md"
+                >
+                  <svg className="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Imagen del Producto en Alta Resolución */}
+                <div className="h-56 w-full relative overflow-hidden bg-slate-100 shrink-0">
+                  <img
+                    src={selectedDetailProduct.image_url}
+                    alt={selectedDetailProduct.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {selectedDetailProduct.is_promo && (
+                    <div 
+                      className="absolute top-4 left-4 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10"
+                      style={{
+                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                      }}
+                    >
+                      Promo
+                    </div>
+                  )}
+                </div>
+
+                {/* Información y Texto */}
+                <div className="p-6 flex-1 overflow-y-auto">
+                  <h2 className="text-xl font-black text-slate-900 leading-tight">
+                    {selectedDetailProduct.name}
+                  </h2>
+                  <p className="text-slate-500 text-[13px] mt-2.5 leading-relaxed">
+                    {selectedDetailProduct.description}
+                  </p>
+                </div>
+
+                {/* Footer con Precio y Botón Agregar */}
+                <div className="p-6 bg-white/40 border-t border-white/20 shrink-0 flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Precio</span>
+                    <span className="text-[20px] font-black text-slate-900 leading-none">
+                      ${selectedDetailProduct.price.toLocaleString("es-CO")}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      handleAddToCart(selectedDetailProduct);
+                      setSelectedDetailProduct(null);
+                    }}
+                    className="flex-1 py-3.5 rounded-full text-white font-bold text-[14px] tracking-wide transition-all duration-300 active:scale-95 shadow-md flex items-center justify-center gap-2"
+                    style={{
+                      background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                      boxShadow: `0 8px 20px ${MOCK_BUSINESS.accent_color}40, inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.3)`
+                    }}
+                  >
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    Agregar
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
