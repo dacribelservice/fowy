@@ -181,12 +181,27 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 
 > **Objetivo:** Lograr el "WOW" factor del diseño Premium (Imagen 2) mediante un entorno de desarrollo aislado (Sandbox) en la ruta `/[slug]/crave-vision`, manteniendo el marco del celular pero reconstruyendo todo el interior desde cero.
 
-> **💡 Contexto Arquitectónico (Estrategia de Trabajo para la Siguiente Sesión):**
-> 1. **Prototipado Monolítico (Sandbox):** Toda la vista, incluyendo el diseño del carrito y pantallas pendientes, se está construyendo conjuntamente en `crave-vision/page.tsx` usando estados locales (`useState`) para simular la navegación. Esto permite iterar visualmente rápido sin afectar producción.
-> 2. **Comentarios como "Líneas de Corte":** El código está delimitado visualmente con comentarios (ej. `/* BLOQUE 4 */`) que marcan exactamente dónde empieza y termina cada pieza.
-> 3. **Desacoplamiento Final:** En el Bloque 5, una vez el flujo y diseño estén 100% aprobados, estas secciones se extraerán en módulos limpios (ej. `ProductCardV3`, `CategorySliderV3`), conectándose a la base de datos real (unir los cables) para finalmente reemplazar la vista en producción.
+---
 
-- [ ] **Bloque 1: Entorno de Desarrollo Aislado**
+### 📝 Resumen del Contexto (Listo para Desacoplamiento)
+
+> **Estado Actual:** El prototipo monolítico premium de la página de Sandbox (`src/app/(explorer)/[slug]/crave-vision/page.tsx`) ha sido completado y pulido al 100%, logrando la experiencia de usuario estética de nivel "WOW" requerida por Cristian. El diseño ya pasó por revisión y está listo para integrarse a producción.
+>
+> **✨ Logros Completados en el Sandbox:**
+> - **Header Compacto & Scroll Dinámico:** Cabecera flotante colapsable que aparece sutilmente al hacer scroll hacia arriba y contiene el nombre, distancia, rating y estado del negocio.
+> - **Branding V3 Premium:** Logo a la izquierda con badges minimalistas de color ("Abierto" en verde, Rating en amarillo con estrella).
+> - **Categorías & Búsqueda "Glassmorphism":** Buscador tipo píldora translúcido y selector de categorías con transiciones activas dinámicas gobernadas por el `accent_color`.
+> - **Tarjetas de Producto V3:** Rediseño con bordes redondeados amplios (`3xl`), sombras suaves, icono de favoritos (corazón) y botón "+" dinámico.
+> - **Carrito "Magic Pill":** Píldora esmerilada flotante que nace fluidamente de la parte inferior y expande un Bottom Sheet de checkout completo al pulsarla.
+> - **Ubicación GPS Inteligente:** Campo de dirección limpio con un botón de GPS que, tras capturar la ubicación, muestra un icono de check verde minimalista (`#34C759`) sin saturar visualmente el input.
+> - **Integración de WhatsApp:** Los datos recogidos (incluyendo enlace de mapas y método de pago) se formatean en un mensaje ultra estructurado.
+
+---
+
+> **💡 Contexto Arquitectónico (Estrategia de Desacoplamiento para Producción):**
+> Para garantizar la máxima estabilidad de la plataforma sin tocar directamente las vistas activas de forma abrupta, dividiremos las ~1,100 líneas del archivo monolítico en componentes pequeños y limpios utilizando un checklist paso a paso. Una vez desacoplados, los conectaremos a la DB mediante los hooks reales de Fowy (`useExplorerManager` y `useCart`) y realizaremos el reemplazo en producción (Hot-Swap).
+
+- [x] **Bloque 1: Entorno de Desarrollo Aislado**
   - [x] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
   - [x] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
   - [x] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
@@ -222,6 +237,7 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.
   - [x] **7.2** Aplicación estricta en: Píldoras de categorías activas, botón `+` de product cards, badge de `(promo)`, y botón "Finalizar" del carrito.
 
-- [ ] **Bloque 8: Integración y Reemplazo de Producción (Hot-Swap)**
-  - [ ] **8.1** Conexión de Lógica: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
-  - [ ] **8.2** Hot-Swap Final: Una vez aprobado el diseño completo en el sandbox, reemplazar la página de producción `[slug]/page.tsx` con el código validado.
+- [ ] **Bloque 8: Integración, Desacoplamiento y Reemplazo de Producción (Hot-Swap)**
+  - [ ] **8.1** Planificar Componentes: Dividir el sandbox monolítico en archivos separados (`CraveHeaderCompact.tsx`, `CraveProductCard.tsx`, `CraveMagicCart.tsx`, etc.).
+  - [ ] **8.2** Conexión de Lógica Real: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
+  - [ ] **8.3** Hot-Swap Final: Una vez verificado el paso de los cables de datos, reemplazar de forma segura la página de producción `[slug]/page.tsx` con el código modular validado.
