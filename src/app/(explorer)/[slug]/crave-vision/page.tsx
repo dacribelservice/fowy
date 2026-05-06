@@ -26,6 +26,7 @@ export default function CraveVisionSandbox() {
   const [customPaymentMethod, setCustomPaymentMethod] = useState("");
   const [validationError, setValidationError] = useState("");
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const handleSendWhatsApp = () => {
     if (!customerName.trim() || !customerPhone.trim()) {
@@ -158,7 +159,66 @@ ${itemsText}
         <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
       </motion.button>
 
-      <div className="flex-1 overflow-y-auto pb-20 relative">
+      {/* Header Compacto Colapsable (Efecto Vidrio Premium) - Se desliza tras el scroll */}
+      <AnimatePresence>
+        {isScrolled && (
+          <motion.div
+            initial={{ y: -80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="absolute top-0 left-0 right-0 h-[72px] bg-white/80 backdrop-blur-md border-b border-slate-100/80 shadow-sm z-30 flex items-center justify-between px-6 pl-20"
+          >
+            {/* Logo y Nombre del Negocio */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200/50 shadow-inner bg-slate-100 flex-shrink-0">
+                <img 
+                  src={MOCK_BUSINESS.logo_url} 
+                  alt={MOCK_BUSINESS.name} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-slate-800 leading-tight">
+                  {MOCK_BUSINESS.name}
+                </span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {/* Abierto en Verde Premium (#34C759) */}
+                  <span 
+                    className="text-[10px] font-bold flex items-center gap-1.5"
+                    style={{ color: MOCK_BUSINESS.is_open ? "#34C759" : "#EF4444" }}
+                  >
+                    <span 
+                      className="w-1.5 h-1.5 rounded-full animate-pulse" 
+                      style={{ backgroundColor: MOCK_BUSINESS.is_open ? "#34C759" : "#EF4444" }}
+                    />
+                    {MOCK_BUSINESS.is_open ? "Abierto" : "Cerrado"}
+                  </span>
+                  
+                  <span className="text-[10px] text-slate-300">•</span>
+                  
+                  {/* Ranking en Amarillo Premium (#FFCC00) */}
+                  <div className="flex items-center gap-1 font-bold text-[10px]">
+                    <Star 
+                      className="w-3 h-3" 
+                      style={{ fill: "#FFCC00", stroke: "#FFCC00" }} 
+                    />
+                    <span className="text-slate-600">{MOCK_BUSINESS.rating}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div 
+        onScroll={(e) => {
+          const scrollTop = e.currentTarget.scrollTop;
+          setIsScrolled(scrollTop > 120);
+        }}
+        className="flex-1 overflow-y-auto pb-20 relative"
+      >
       {/* BLOQUE 2: HEADER Y BRANDING V3 */}
       
       {/* 2.3 SLIDER DE BANNERS */}
