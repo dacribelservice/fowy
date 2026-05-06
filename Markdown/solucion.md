@@ -199,45 +199,73 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 ---
 
 > **💡 Contexto Arquitectónico (Estrategia de Desacoplamiento para Producción):**
-> Para garantizar la máxima estabilidad de la plataforma sin tocar directamente las vistas activas de forma abrupta, dividiremos las ~1,100 líneas del archivo monolítico en componentes pequeños y limpios utilizando un checklist paso a paso. Una vez desacoplados, los conectaremos a la DB mediante los hooks reales de Fowy (`useExplorerManager` y `useCart`) y realizaremos el reemplazo en producción (Hot-Swap).
+> 
+> Para garantizar la máxima estabilidad de la plataforma y evitar arrastrar deuda técnica, aplicaremos la **Estrategia de Sanación de Componentes sobre el Sandbox**. 
+>
+> En lugar de intentar parchar o remendar la página de producción actual ([page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/%28explorer%29/%5Bslug%5D/page.tsx)) —la cual cuenta con una gran cantidad de código legacy, hooks antiguos e ineficiencias acumuladas— se ha tomado la decisión estratégica de **jubilar la página vieja de producción** y utilizar el prototipo premium del Sandbox ([crave-vision/page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/%28explorer%29/%5Bslug%5D/crave-vision/page.tsx)) como el nuevo molde dorado de producción.
+>
+> ### 🎯 El Plan de "Sanación en Paralelo" (Hot-Swap)
+> 1. **Extracción Modular**: El archivo monolítico de ~1,100 líneas del sandbox se desmantelará pieza por pieza, transformándolo en componentes pequeños, desacoplados y auto-contenidos dentro de `src/components/explorer/`.
+> 2. **Cableado Seguro (Sanación)**: Conectaremos cada componente con los cables de datos reales de Supabase mediante los hooks del core de FOWY (`useExplorerManager` y `useCart`) directamente en la ruta del sandbox para verificar el comportamiento real sin tocar la producción actual.
+> 3. **Hot-Swap**: Al validar que el sandbox está 100% funcional y óptimo con la base de datos real, realizaremos un reemplazo total sobre el orquestador de producción principal.
 
-- [x] **Bloque 1: Entorno de Desarrollo Aislado**
-  - [x] **1.1** Crear la ruta huérfana `src/app/(explorer)/[slug]/crave-vision/page.tsx`.
-  - [x] **1.2** Implementar el "Lienzo en Blanco": Cargar el `MobileFrame` pero limpiar todo el contenido interior del menú actual.
-  - [x] **1.3** Inyectar Datos Mock de Alta Calidad: JSON de productos y banners con fotos reales para visualizar el diseño final sin depender de la DB.
+---
 
-- [x] **Bloque 2: Header y Branding V3 (Diseño Real de Imagen 2)**
-  - [x] **2.1** Layout "Logo-Left/Text-Right": Romper el centrado actual. El logo circular a la izquierda y el nombre/detalles a la derecha.
-  - [x] **2.2** Meta-datos Premium: Implementar badges de "Abierto", Rating y Distancia con el espaciado y tipografía exacta de la referencia.
-  - [x] **2.3** Slider de Banners: Adaptar el slider para que se integre visualmente con la nueva cabecera sin cortes bruscos.
+### 🗂️ Checklist de Modularización y Extracción (Pieza por Pieza)
 
-- [x] **Bloque 3: Búsqueda y Navegación "Glassmorphism"**
-  - [x] **3.1** Buscador Flotante: Implementar la cápsula de búsqueda con efectos de desenfoque (`backdrop-blur`) y sombras profundas.
-  - [x] **3.2** Carrusel de Categorías V3: Píldoras con micro-interacciones al hacer scroll y estados activos ultra-vibrantes.
+#### 🧱 Bloque 1: Cabecera, Banners e Identidad Visual (La Primera Impresión WOW)
+- [ ] **1.1** **Extraer `CraveHeaderCompact.tsx`**:
+  - Aislar el header flotante colapsable controlado por el estado de scroll `isScrolled`.
+  - Debe contener el botón de retorno, título del negocio, rating, distancia y estado abierto/cerrado con transiciones suaves en opacity/translate Y.
+- [ ] **1.2** **Perfeccionar `MenuHeroSliderV2.tsx`**:
+  - Integrar el componente existente con las transiciones dinámicas del sandbox (`scale: 1.05` de Framer Motion en el inicio de renderizado de la imagen).
+  - Asegurar soporte para fallback a `business.logo_url` si no existen banners cargados en `business_banners`.
+- [ ] **1.3** **Extraer `CraveBusinessHeader.tsx` (Identity Bar)**:
+  - Componente que aloja la estructura "Logo-Left / Text-Right" superpuesta al banner.
+  - Sincronizar el logo del negocio, badge dinámico de "ABIERTO" / "CERRADO", rating y la distancia del usuario al comercio.
 
-- [x] **Bloque 4: La Joya de la Corona - Product Card V3**
-  - [x] **4.1** Estética de Producto: Rediseñar la tarjeta con bordes `3xl`, sombras suaves y tipografías `bold` de alta legibilidad.
-  - [x] **4.2** Botón de Acción Flotante: El botón "+" debe ser una pieza visual destacada, usando el color de acento de la marca con gradiente sutil.
-  - [x] **4.3** Grid de 2 Columnas: Ajustar el `gap` y padding para que los productos "respiren" en pantalla móvil.
-  - [x] **4.4** Ícono de Favoritos (Corazón): Implementar en la esquina superior derecha de la imagen un ícono minimalista con estilo premium (fondo tipo glassmorphism o sombra suave) que resalte sobre la foto.
+#### 🔍 Bloque 2: Filtros de Búsqueda y Navegación Dinámica
+- [ ] **2.1** **Extraer `CraveSearchBar.tsx`**:
+  - Cápsula de búsqueda en formato píldora translúcida (`backdrop-blur-md`).
+  - Lógica para filtrar de forma síncrona el catálogo de productos basado en las entradas del usuario.
+- [ ] **2.2** **Extraer `CraveCategoryBar.tsx`**:
+  - Carrusel horizontal con desplazamiento táctil ultra-suave.
+  - Control de estados activos y hover mediante gradientes dinámicos controlados por el color de acento de marca (`accent_color`).
 
-- [x] **Bloque 5: La Experiencia del Carrito (Micro-Interacciones Premium)**
-  - [x] **5.1** Nacimiento del Carrito (Efecto "Pill" Expansivo): Al agregar un producto, aparece un círculo en la parte inferior que se expande fluidamente (framer-motion spring) hacia una cápsula redondeada.
-  - [x] **5.2** Diseño Glassmorphism: La cápsula debe usar efecto vidrio esmerilado (`backdrop-blur` fuerte, borde sutil brillante) mostrando el total a la izquierda y el ícono de carrito a la derecha.
-  - [x] **5.3** Apertura del Bottom Sheet: Al tocar la cápsula de vidrio, se desliza hacia arriba el panel (Bottom Sheet) del carrito.
-  - [x] **5.4** Controles de Cantidad Alta Fidelidad: Botones `-` y `+` circulares con efecto de profundidad (sombras sutiles "levantadas") utilizando el color de acento del negocio.
-  - [x] **5.5** Botón "Finalizar": Un botón destacado dentro del Bottom Sheet para proceder al pago, aplicando el `accent_color`.
+#### 🍔 Bloque 3: Catálogo Premium de Productos (La Joya de la Corona)
+- [ ] **3.1** **Extraer `CraveProductCard.tsx`**:
+  - Tarjeta de producto de doble columna con bordes hiper-redondeados (`rounded-3xl`) y sombra premium.
+  - Componentes internos: Badge de promo flotante (si aplica), botón de favoritos (corazón) con fondo esmerilado, título, descripción reducida, precio formateado y botón de añadir flotante con el `accent_color`.
+- [ ] **3.2** **Extraer `CraveProductDetailModal.tsx`**:
+  - Modal de detalles con efecto de entrada `AnimatePresence`.
+  - Muestra imagen completa de alta resolución, descripción, precio expandido, selector táctil de cantidad (`-` / `+`) y botón CTA con color de acento para agregar la cantidad deseada al carrito.
 
-- [x] **Bloque 6: Vista de Checkout (Finalización del pedido)**
-  - [x] **6.1** Formulario Visual Premium: Captura de Nombre, Celular y Notas del pedido con estética limpia.
-  - [x] **6.2** Resumen de Orden: Detalle de productos seleccionados y el Total a pagar.
-  - [x] **6.3** CTA Principal Seguro: Botón final de "Enviar pedido por WhatsApp" obligatoriamente en color Verde (`#25D366`) para transmitir confianza.
+#### 🛒 Bloque 4: La Experiencia de Compra (Magic Cart & Checkout)
+- [ ] **4.1** **Extraer `CraveMagicCart.tsx`**:
+  - Componente de tipo "Magic Pill" flotante de vidrio esmerilado que nace con animación de rebote (`spring`) al agregar el primer artículo.
+  - Muestra el conteo de ítems, el total acumulado y controla la apertura del panel expandible (Bottom Sheet).
+- [ ] **4.2** **Extraer `CraveCheckoutSheet.tsx` (Checkout Form)**:
+  - Formulario premium e intuitivo para capturar la información del pedido dentro del Bottom Sheet de Framer Motion.
+  - **Ubicación GPS Inteligente (Fórmula 3.4)**: Input limpio con botón de localización satelital en tiempo real; muestra un check de confirmación tras capturar la dirección.
+  - **Métodos de Pago**: Selector dinámico con iconos elegantes (Efectivo con cambio exacto, Nequi, Bancolombia, Daviplata).
+  - **WhatsApp API Integration**: Recolectar toda la información, formatearla con una estructura impecable y abrir el enlace directo a la API de WhatsApp con el mensaje pre-cargado.
 
-- [x] **Bloque 7: Inyección de Identidad de Marca (Colores Dinámicos)**
-  - [x] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.
-  - [x] **7.2** Aplicación estricta en: Píldoras de categorías activas, botón `+` de product cards, badge de `(promo)`, y botón "Finalizar" del carrito.
+#### 🔌 Bloque 5: La "Sanación" (Conexión de Cables de Supabase en el Sandbox)
+- [ ] **5.1** **Conectar `useExplorerManager`**:
+  - Sustituir los datos de prueba (`MOCK_BUSINESS`) del sandbox por la data en tiempo real recuperada del hook.
+  - Sincronizar dinámicamente: `business.name`, `business.logo_url`, `business.accent_color`, `banners`, `categories` y `products`.
+- [ ] **5.2** **Conectar `useCart`**:
+  - Reemplazar el estado local `cartItems` por la persistencia y reactividad nativa del carrito global de FOWY.
+  - Probar flujos de sumas, restas y vaciado del carrito desde los componentes modulares.
+- [ ] **5.3** **Validación y Manejo de Carga**:
+  - Integrar skeletons de carga sobre la estructura de la cabecera, categorías y productos para evitar parpadeos visuales desagradables.
 
-- [ ] **Bloque 8: Integración, Desacoplamiento y Reemplazo de Producción (Hot-Swap)**
-  - [ ] **8.1** Planificar Componentes: Dividir el sandbox monolítico en archivos separados (`CraveHeaderCompact.tsx`, `CraveProductCard.tsx`, `CraveMagicCart.tsx`, etc.).
-  - [ ] **8.2** Conexión de Lógica Real: Sustituir los datos Mock por el hook `useExplorerManager` y el sistema de carrito `useCart`.
-  - [ ] **8.3** Hot-Swap Final: Una vez verificado el paso de los cables de datos, reemplazar de forma segura la página de producción `[slug]/page.tsx` con el código modular validado.
+#### 🚀 Bloque 6: Reemplazo Seguro de Producción (Hot-Swap)
+- [ ] **6.1** **Fusión del Orquestador**:
+  - Limpiar por completo `src/app/(explorer)/[slug]/page.tsx` de todo el código de producción obsoleto.
+  - Pegar el orquestador limpio y optimizado obtenido de `crave-vision` (que ahora mide menos de 150 líneas y solo importa los subcomponentes creados).
+- [ ] **6.2** **Pruebas de Regresión y Eliminación de Sandbox**:
+  - Verificar que el menú digital en producción se comporte de forma premium y reactiva.
+  - Eliminar de forma segura la ruta sandbox `src/app/(explorer)/[slug]/crave-vision/` para mantener el árbol de carpetas limpio de código muerto.
+- [ ] **6.3** **Backup Seguro**:
+  - Generar commit del re-diseño modularizado y documentar la migración exitosa.
