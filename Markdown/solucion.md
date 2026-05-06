@@ -213,10 +213,10 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **5.4** Controles de Cantidad Alta Fidelidad: Botones `-` y `+` circulares con efecto de profundidad (sombras sutiles "levantadas") utilizando el color de acento del negocio.
   - [x] **5.5** Botón "Finalizar": Un botón destacado dentro del Bottom Sheet para proceder al pago, aplicando el `accent_color`.
 
-- [ ] **Bloque 6: Vista de Checkout (Finalización del pedido)**
-  - [ ] **6.1** Formulario Visual Premium: Captura de Nombre, Celular y Notas del pedido con estética limpia.
-  - [ ] **6.2** Resumen de Orden: Detalle de productos seleccionados y el Total a pagar.
-  - [ ] **6.3** CTA Principal Seguro: Botón final de "Enviar pedido por WhatsApp" obligatoriamente en color Verde (`#25D366`) para transmitir confianza.
+- [x] **Bloque 6: Vista de Checkout (Finalización del pedido)**
+  - [x] **6.1** Formulario Visual Premium: Captura de Nombre, Celular y Notas del pedido con estética limpia.
+  - [x] **6.2** Resumen de Orden: Detalle de productos seleccionados y el Total a pagar.
+  - [x] **6.3** CTA Principal Seguro: Botón final de "Enviar pedido por WhatsApp" obligatoriamente en color Verde (`#25D366`) para transmitir confianza.
 
 - [ ] **Bloque 7: Inyección de Identidad de Marca (Colores Dinámicos)**
   - [ ] **7.1** Sincronización de variables CSS: Asegurar que el `accent_color` gobierne la interfaz.

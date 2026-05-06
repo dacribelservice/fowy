@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star, Search, Plus, Heart, ShoppingCart } from "lucide-react";
+import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -16,6 +16,42 @@ export default function CraveVisionSandbox() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout">("cart");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [orderNotes, setOrderNotes] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const handleSendWhatsApp = () => {
+    if (!customerName.trim() || !customerPhone.trim()) {
+      setValidationError("Por favor, ingresa tu nombre y celular para enviar el pedido.");
+      return;
+    }
+
+    const itemsText = groupedCart
+      .map((item) => `• ${item.quantity}x ${item.name} ($${(item.price * item.quantity).toLocaleString("es-CO")})`)
+      .join("\n");
+
+    const totalText = cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO");
+
+    const message = `🍔 ¡Nuevo pedido para *${MOCK_BUSINESS.name}*!
+
+👤 *Cliente:* ${customerName.trim()}
+📞 *Celular:* ${customerPhone.trim()}
+
+🛒 *Detalle del Pedido:*
+${itemsText}
+
+📝 *Notas:* ${orderNotes.trim() ? orderNotes.trim() : "Ninguna"}
+
+💰 *Total a Pagar:* $${totalText}
+
+*¡Gracias por tu compra!*`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=573000000000&text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   const handleAddToCart = (product: any) => {
     setCartItems((prev) => [...prev, product]);
@@ -62,6 +98,13 @@ export default function CraveVisionSandbox() {
       setIsCartOpen(false);
     }
   }, [cartItems]);
+
+  useEffect(() => {
+    if (!isCartOpen) {
+      setCheckoutStep("cart");
+      setValidationError("");
+    }
+  }, [isCartOpen]);
 
   return (
     <div className="absolute inset-0 bg-white overflow-hidden flex flex-col">
@@ -396,16 +439,28 @@ export default function CraveVisionSandbox() {
                 <div className="w-12 h-1.5 bg-slate-400/30 rounded-full mb-4" />
                 <div className="w-full flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-[20px] font-black text-slate-900 tracking-tight">Mi Pedido</h2>
-                    <span 
-                      className="text-[12px] font-bold px-2.5 py-0.5 rounded-full text-white shadow-sm"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
-                        boxShadow: `0 2px 6px ${MOCK_BUSINESS.accent_color}40`
-                      }}
-                    >
-                      {cartItems.length}
-                    </span>
+                    {checkoutStep === "checkout" && (
+                      <button 
+                        onClick={() => setCheckoutStep("cart")}
+                        className="mr-1.5 p-1 rounded-full hover:bg-black/5 active:scale-90 transition-all flex items-center justify-center"
+                      >
+                        <ArrowLeft className="w-5 h-5 text-slate-700" />
+                      </button>
+                    )}
+                    <h2 className="text-[20px] font-black text-slate-900 tracking-tight">
+                      {checkoutStep === "cart" ? "Mi Pedido" : "Datos de Envío"}
+                    </h2>
+                    {checkoutStep === "cart" && (
+                      <span 
+                        className="text-[12px] font-bold px-2.5 py-0.5 rounded-full text-white shadow-sm"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                          boxShadow: `0 2px 6px ${MOCK_BUSINESS.accent_color}40`
+                        }}
+                      >
+                        {cartItems.length}
+                      </span>
+                    )}
                   </div>
                   <button 
                     onClick={() => setIsCartOpen(false)}
@@ -416,69 +471,201 @@ export default function CraveVisionSandbox() {
                 </div>
               </div>
 
-              {/* List of Grouped Items */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 max-h-[45vh] scrollbar-hide">
-                {groupedCart.map((item: any) => (
-                  <div key={item.id} className="flex items-center justify-between bg-white/40 p-3 rounded-2xl border border-white/30 backdrop-blur-sm shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 shrink-0 border border-white/50">
-                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 text-[14px] leading-tight line-clamp-2">{item.name}</span>
-                        <span className="text-[13px] font-semibold text-slate-500 mt-0.5">${item.price.toLocaleString("es-CO")}</span>
-                      </div>
-                    </div>
+              {/* Contenido Dinámico: Carrito o Formulario de Checkout */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide max-h-[48vh]">
+                <AnimatePresence mode="wait">
+                  {checkoutStep === "cart" ? (
+                    <motion.div
+                      key="cart-view"
+                      initial={{ opacity: 0, x: -15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 15 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4"
+                    >
+                      {groupedCart.map((item: any) => (
+                        <div key={item.id} className="flex items-center justify-between bg-white/40 p-3 rounded-2xl border border-white/30 backdrop-blur-sm shadow-sm">
+                          <div className="flex items-center gap-3">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 shrink-0 border border-white/50">
+                              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-900 text-[14px] leading-tight line-clamp-2">{item.name}</span>
+                              <span className="text-[13px] font-semibold text-slate-500 mt-0.5">${item.price.toLocaleString("es-CO")}</span>
+                            </div>
+                          </div>
 
-                    {/* Controles de cantidad de alta fidelidad con efectos de profundidad */}
-                    <div className="flex items-center gap-2.5">
-                      <button
-                        onClick={() => handleRemoveOne(item.id)}
-                        className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-200 active:scale-90 border border-slate-100 shadow-md hover:shadow-lg"
-                        style={{
-                          boxShadow: "0 4px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
-                        }}
-                      >
-                        <span className="text-[18px] font-bold leading-none select-none" style={{ color: MOCK_BUSINESS.accent_color }}>-</span>
-                      </button>
-                      <span className="text-[14px] font-black text-slate-800 w-6 text-center select-none">{item.quantity}</span>
-                      <button
-                        onClick={() => handleAddOne(item)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 border border-white/10"
-                        style={{
-                          background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
-                          boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}50, inset 0 -1px 2px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.3)`
-                        }}
-                      >
-                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                          {/* Controles de cantidad de alta fidelidad con efectos de profundidad */}
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              onClick={() => handleRemoveOne(item.id)}
+                              className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-200 active:scale-90 border border-slate-100 shadow-md hover:shadow-lg"
+                              style={{
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
+                              }}
+                            >
+                              <span className="text-[18px] font-bold leading-none select-none" style={{ color: MOCK_BUSINESS.accent_color }}>-</span>
+                            </button>
+                            <span className="text-[14px] font-black text-slate-800 w-6 text-center select-none">{item.quantity}</span>
+                            <button
+                              onClick={() => handleAddOne(item)}
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 border border-white/10"
+                              style={{
+                                background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                                boxShadow: `0 4px 10px ${MOCK_BUSINESS.accent_color}50, inset 0 -1px 2px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.3)`
+                              }}
+                            >
+                              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="checkout-view"
+                      initial={{ opacity: 0, x: 15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -15 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-5"
+                    >
+                      {/* 6.1 FORMULARIO VISUAL PREMIUM */}
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">Tu Nombre</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                              <User className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Escribe tu nombre completo"
+                              value={customerName}
+                              onChange={(e) => {
+                                setCustomerName(e.target.value);
+                                if (validationError) setValidationError("");
+                              }}
+                              className={`w-full bg-white/60 border ${validationError && !customerName.trim() ? 'border-red-400 focus:ring-red-300' : 'border-slate-200/80 focus:ring-slate-300'} text-slate-800 text-[14px] font-medium rounded-2xl py-3 pl-11 pr-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all`}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">Celular / WhatsApp</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                              <Phone className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <input
+                              type="tel"
+                              placeholder="Ej: 300 123 4567"
+                              value={customerPhone}
+                              onChange={(e) => {
+                                setCustomerPhone(e.target.value);
+                                if (validationError) setValidationError("");
+                              }}
+                              className={`w-full bg-white/60 border ${validationError && !customerPhone.trim() ? 'border-red-400 focus:ring-red-300' : 'border-slate-200/80 focus:ring-slate-300'} text-slate-800 text-[14px] font-medium rounded-2xl py-3 pl-11 pr-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all`}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">Notas del Pedido <span className="text-[10px] font-normal text-slate-400 lowercase">(opcional)</span></label>
+                          <textarea
+                            placeholder="Ej: Hamburguesa sin cebolla, salsas aparte..."
+                            value={orderNotes}
+                            onChange={(e) => setOrderNotes(e.target.value)}
+                            rows={2}
+                            className="w-full bg-white/60 border border-slate-200/80 text-slate-800 text-[14px] font-medium rounded-2xl py-3 px-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 6.2 RESUMEN DE ORDEN */}
+                      <div className="bg-white/40 border border-white/40 rounded-2xl p-4 backdrop-blur-md shadow-sm space-y-3">
+                        <div className="flex items-center justify-between border-b border-black/5 pb-2">
+                          <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest">Resumen de Orden</span>
+                          <span className="text-[12px] font-bold text-slate-500">{cartItems.length} {cartItems.length === 1 ? "ítem" : "ítems"}</span>
+                        </div>
+                        <div className="max-h-[120px] overflow-y-auto space-y-2.5 scrollbar-hide">
+                          {groupedCart.map((item: any) => (
+                            <div key={item.id} className="flex justify-between items-start text-[14px]">
+                              <div className="flex items-start gap-2 min-w-0">
+                                <span className="font-bold text-slate-900 bg-slate-200/50 rounded px-1.5 py-0.5 text-[11px] leading-none mt-0.5">{item.quantity}x</span>
+                                <span className="font-semibold text-slate-800 truncate leading-tight">{item.name}</span>
+                              </div>
+                              <span className="font-bold text-slate-950 shrink-0">${(item.price * item.quantity).toLocaleString("es-CO")}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex justify-between items-center border-t border-black/5 pt-2 mt-1">
+                          <span className="text-[13px] font-bold text-slate-800">Total:</span>
+                          <span className="text-[18px] font-black text-slate-950">${cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO")}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* Footer with Total and Finalize Button */}
+              {/* Footer with Total and Stepper Action Button */}
               <div className="p-6 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-slate-500 font-bold text-[14px] uppercase tracking-wider">Total del Pedido</span>
-                  <span className="text-[24px] font-black text-slate-900 tracking-tight">
-                    ${cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO")}
-                  </span>
-                </div>
+                {checkoutStep === "cart" ? (
+                  <>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-slate-500 font-bold text-[14px] uppercase tracking-wider">Total del Pedido</span>
+                      <span className="text-[24px] font-black text-slate-900 tracking-tight">
+                        ${cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO")}
+                      </span>
+                    </div>
 
-                {/* Botón Finalizar */}
-                <button
-                  className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
-                  style={{
-                    background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
-                    boxShadow: `0 10px 25px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`
-                  }}
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Finalizar Pedido
-                  </span>
-                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
+                    {/* Botón Finalizar */}
+                    <button
+                      onClick={() => setCheckoutStep("checkout")}
+                      className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
+                      style={{
+                        background: `linear-gradient(135deg, ${MOCK_BUSINESS.accent_color}e6 0%, ${MOCK_BUSINESS.accent_color} 100%)`,
+                        boxShadow: `0 10px 25px ${MOCK_BUSINESS.accent_color}66, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`
+                      }}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        Finalizar Pedido
+                      </span>
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {validationError && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-50 text-red-500 text-xs font-bold px-4 py-2.5 rounded-xl border border-red-100 text-center"
+                      >
+                        {validationError}
+                      </motion.div>
+                    )}
+
+                    {/* 6.3 CTA PRINCIPAL SEGURO (WhatsApp en Verde oficial con logotipo) */}
+                    <button
+                      onClick={handleSendWhatsApp}
+                      className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
+                      style={{
+                        background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                        boxShadow: "0 10px 25px rgba(37, 211, 102, 0.4), inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)"
+                      }}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        <svg className="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.431 2.522 1.226 3.51l-.85 3.1 3.173-.833a5.71 5.71 0 0 0 2.219.49h.003c3.18 0 5.768-2.586 5.768-5.767 0-3.18-2.587-5.766-5.771-5.766zm3.385 8.192c-.146.411-.741.802-1.018.852-.271.05-.595.076-.983-.049-.241-.077-.541-.18-.916-.341-1.583-.681-2.593-2.291-2.671-2.399-.079-.107-.638-.846-.638-1.613 0-.766.402-1.144.545-1.292.144-.148.315-.185.421-.185h.295c.086 0 .201.003.29.213.098.232.336.818.365.877.029.058.048.127.01.205-.039.078-.059.127-.118.195-.059.068-.122.152-.176.205-.063.063-.129.131-.055.258.073.127.327.538.701.871.482.43 0.887.562 1.014.629.127.068.201.058.276-.029.074-.088.315-.366.399-.488.083-.122.167-.102.282-.059.115.044.733.346.858.409.127.064.21.093.24.147.03.054.03.312-.116.723zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                        </svg>
+                        Enviar pedido por WhatsApp
+                      </span>
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </>
