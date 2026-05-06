@@ -269,11 +269,11 @@ export default function CraveVisionSandbox() {
             }}
             transition={{ 
               type: "spring", 
-              stiffness: 280, 
-              damping: 22,
-              mass: 0.8
+              stiffness: 90, 
+              damping: 14,
+              mass: 1.1
             }}
-            className="absolute bottom-6 left-1/2 z-50 overflow-hidden cursor-pointer flex items-center justify-between"
+            className="absolute bottom-10 left-1/2 z-50 overflow-hidden cursor-pointer flex items-center justify-between"
             style={{
               // Glassmorphism ultra-premium super marcado
               background: "linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.3) 100%)",
@@ -287,9 +287,9 @@ export default function CraveVisionSandbox() {
           >
             <motion.div 
               className="flex items-center justify-between w-full h-full px-5"
-              initial={{ opacity: 0, scale: 0.9, filter: "blur(5px)" }}
+              initial={{ opacity: 0, scale: 0.9, filter: "blur(4px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              transition={{ delay: 0.15, duration: 0.4, type: "spring", stiffness: 300 }}
+              transition={{ delay: 0.35, duration: 0.45, ease: "easeOut" }}
             >
               <div className="flex flex-col whitespace-nowrap">
                 <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">
