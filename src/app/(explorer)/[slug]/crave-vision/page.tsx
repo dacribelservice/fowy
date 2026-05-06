@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone } from "lucide-react";
+import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone, Banknote, Smartphone, Landmark, Wallet, CreditCard } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -20,6 +20,9 @@ export default function CraveVisionSandbox() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"efectivo" | "nequi" | "bancolombia" | "daviplata" | "otro" | "">("");
+  const [cashChange, setCashChange] = useState("");
+  const [customPaymentMethod, setCustomPaymentMethod] = useState("");
   const [validationError, setValidationError] = useState("");
 
   const handleSendWhatsApp = () => {
@@ -28,11 +31,34 @@ export default function CraveVisionSandbox() {
       return;
     }
 
+    if (!paymentMethod) {
+      setValidationError("Por favor, selecciona un método de pago.");
+      return;
+    }
+
+    if (paymentMethod === "otro" && !customPaymentMethod.trim()) {
+      setValidationError("Por favor, escribe tu método de pago personalizado.");
+      return;
+    }
+
     const itemsText = groupedCart
       .map((item) => `• ${item.quantity}x ${item.name} ($${(item.price * item.quantity).toLocaleString("es-CO")})`)
       .join("\n");
 
     const totalText = cartItems.reduce((acc, curr) => acc + curr.price, 0).toLocaleString("es-CO");
+
+    let paymentDetail = "";
+    if (paymentMethod === "efectivo") {
+      paymentDetail = `💵 Efectivo${cashChange.trim() ? ` (Lleva cambio de: $${cashChange.trim()})` : " (Paga con el valor exacto)"}`;
+    } else if (paymentMethod === "nequi") {
+      paymentDetail = "📱 Nequi";
+    } else if (paymentMethod === "bancolombia") {
+      paymentDetail = "🏦 Bancolombia";
+    } else if (paymentMethod === "daviplata") {
+      paymentDetail = "📱 Daviplata";
+    } else if (paymentMethod === "otro") {
+      paymentDetail = `💳 Otro: ${customPaymentMethod.trim()}`;
+    }
 
     const message = `🍔 ¡Nuevo pedido para *${MOCK_BUSINESS.name}*!
 
@@ -43,6 +69,7 @@ export default function CraveVisionSandbox() {
 ${itemsText}
 
 📝 *Notas:* ${orderNotes.trim() ? orderNotes.trim() : "Ninguna"}
+💳 *Método de Pago:* ${paymentDetail}
 
 💰 *Total a Pagar:* $${totalText}
 
@@ -579,6 +606,111 @@ ${itemsText}
                             rows={2}
                             className="w-full bg-white/60 border border-slate-200/80 text-slate-800 text-[14px] font-medium rounded-2xl py-3 px-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all resize-none"
                           />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 px-1">Método de Pago</label>
+                          <div className="space-y-2.5">
+                            {[
+                              { id: "efectivo", name: "Efectivo", icon: Banknote },
+                              { id: "nequi", name: "Nequi", icon: Smartphone },
+                              { id: "bancolombia", name: "Bancolombia", icon: Landmark },
+                              { id: "daviplata", name: "Daviplata", icon: Wallet },
+                              { id: "otro", name: "Otro", icon: CreditCard }
+                            ].map((method) => {
+                              const isSelected = paymentMethod === method.id;
+                              const IconComponent = method.icon;
+                              return (
+                                <div key={method.id} className="space-y-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setPaymentMethod(method.id as any);
+                                      if (validationError) setValidationError("");
+                                    }}
+                                    className={`w-full flex items-center justify-between backdrop-blur-sm rounded-2xl py-3.5 px-4 shadow-sm transition-all duration-300 text-left ${
+                                      isSelected 
+                                        ? 'bg-white/75 border-2 shadow-md' 
+                                        : 'bg-white/40 border border-white/30 hover:bg-white/60'
+                                    }`}
+                                    style={{
+                                      borderColor: isSelected ? MOCK_BUSINESS.accent_color : 'transparent',
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <IconComponent 
+                                        className="w-5 h-5 transition-colors duration-300"
+                                        style={{ color: isSelected ? MOCK_BUSINESS.accent_color : '#64748B' }}
+                                      />
+                                      <span className="text-[14px] font-bold text-slate-800">{method.name}</span>
+                                    </div>
+                                    <div 
+                                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300"
+                                      style={{
+                                        borderColor: isSelected ? MOCK_BUSINESS.accent_color : 'rgba(15, 23, 42, 0.15)',
+                                        backgroundColor: isSelected ? `${MOCK_BUSINESS.accent_color}10` : 'transparent',
+                                      }}
+                                    >
+                                      {isSelected && (
+                                        <motion.div 
+                                          layoutId="activePaymentCircle"
+                                          className="w-2.5 h-2.5 rounded-full"
+                                          style={{ backgroundColor: MOCK_BUSINESS.accent_color }}
+                                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                        />
+                                      )}
+                                    </div>
+                                  </button>
+
+                                  <AnimatePresence>
+                                    {method.id === "efectivo" && isSelected && (
+                                      <motion.div
+                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        animate={{ opacity: 1, height: "auto", marginTop: 8 }}
+                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden px-1"
+                                      >
+                                        <div className="relative">
+                                          <input
+                                            type="text"
+                                            placeholder="¿Con cuánto vas a pagar? (Ej: 50.000)"
+                                            value={cashChange}
+                                            onChange={(e) => setCashChange(e.target.value)}
+                                            className="w-full bg-white/70 border border-slate-200/80 focus:ring-slate-300 text-slate-800 text-[13px] font-semibold rounded-2xl py-3 pl-4 pr-24 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all"
+                                          />
+                                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 uppercase tracking-widest pointer-events-none">
+                                            Devuelta de
+                                          </div>
+                                        </div>
+                                      </motion.div>
+                                    )}
+
+                                    {method.id === "otro" && isSelected && (
+                                      <motion.div
+                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        animate={{ opacity: 1, height: "auto", marginTop: 8 }}
+                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden px-1"
+                                      >
+                                        <input
+                                          type="text"
+                                          placeholder="Escribe tu método de pago..."
+                                          value={customPaymentMethod}
+                                          onChange={(e) => {
+                                            setCustomPaymentMethod(e.target.value);
+                                            if (validationError) setValidationError("");
+                                          }}
+                                          className={`w-full bg-white/70 border ${validationError && !customPaymentMethod.trim() ? 'border-red-400 focus:ring-red-300' : 'border-slate-200/80 focus:ring-slate-300'} text-slate-800 text-[13px] font-semibold rounded-2xl py-3 px-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all`}
+                                        />
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
 
