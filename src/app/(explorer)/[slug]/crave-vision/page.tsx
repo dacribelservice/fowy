@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { MOCK_BUSINESS } from "@/data/mock-crave";
-import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone, Banknote, Smartphone, Landmark, Wallet, CreditCard, Trash2 } from "lucide-react";
+import { MapPin, Star, Search, Plus, Heart, ShoppingCart, ArrowLeft, User, Phone, Banknote, Smartphone, Landmark, Wallet, CreditCard, Trash2, Check } from "lucide-react";
 
 /**
  * CraveVisionSandbox: El "Lienzo en Blanco" para el Re-Diseño Premium.
@@ -20,6 +20,9 @@ export default function CraveVisionSandbox() {
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout">("cart");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [gpsLocation, setGpsLocation] = useState("");
+  const [isLocating, setIsLocating] = useState(false);
   const [orderNotes, setOrderNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"efectivo" | "nequi" | "bancolombia" | "daviplata" | "otro" | "">("");
   const [cashChange, setCashChange] = useState("");
@@ -28,9 +31,37 @@ export default function CraveVisionSandbox() {
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const handleShareLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setValidationError("La geolocalización no está soportada por tu navegador o dispositivo.");
+      return;
+    }
+    setIsLocating(true);
+    setValidationError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        setGpsLocation(mapsUrl);
+        setIsLocating(false);
+      },
+      (error) => {
+        setIsLocating(false);
+        console.error("Error getting location", error);
+        setValidationError("No se pudo obtener tu ubicación. Por favor, escríbela manualmente.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   const handleSendWhatsApp = () => {
     if (!customerName.trim() || !customerPhone.trim()) {
       setValidationError("Por favor, ingresa tu nombre y celular para enviar el pedido.");
+      return;
+    }
+
+    if (!customerAddress.trim() && !gpsLocation) {
+      setValidationError("Por favor, ingresa tu dirección de entrega o comparte tu ubicación.");
       return;
     }
 
@@ -63,10 +94,20 @@ export default function CraveVisionSandbox() {
       paymentDetail = `💳 Otro: ${customPaymentMethod.trim()}`;
     }
 
+    let locationText = "";
+    if (customerAddress.trim() && gpsLocation) {
+      locationText = `${customerAddress.trim()}\n📍 *Ubicación GPS:* ${gpsLocation}`;
+    } else if (customerAddress.trim()) {
+      locationText = customerAddress.trim();
+    } else if (gpsLocation) {
+      locationText = `📍 *Ubicación GPS (Ver Mapa):* ${gpsLocation}`;
+    }
+
     const message = `🍔 ¡Nuevo pedido para *${MOCK_BUSINESS.name}*!
 
 👤 *Cliente:* ${customerName.trim()}
 📞 *Celular:* ${customerPhone.trim()}
+📍 *Dirección de Entrega:* ${locationText}
 
 🛒 *Detalle del Pedido:*
 ${itemsText}
@@ -728,6 +769,50 @@ ${itemsText}
                             rows={2}
                             className="w-full bg-white/60 border border-slate-200/80 text-slate-800 text-[14px] font-medium rounded-2xl py-3 px-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all resize-none"
                           />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">Dirección de Entrega</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                              <MapPin className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Escribe tu dirección de entrega"
+                              value={customerAddress}
+                              onChange={(e) => {
+                                setCustomerAddress(e.target.value);
+                                if (validationError) setValidationError("");
+                              }}
+                              className={`w-full bg-white/60 border ${validationError && !customerAddress.trim() && !gpsLocation ? 'border-red-400 focus:ring-red-300' : 'border-slate-200/80 focus:ring-slate-300'} text-slate-800 text-[14px] font-medium rounded-2xl py-3 pl-11 pr-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all`}
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleShareLocation}
+                            disabled={isLocating}
+                            className="mt-2.5 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-slate-700 bg-white/30 hover:bg-white/50 border border-white/40 shadow-sm text-xs font-bold transition-all active:scale-[0.98] backdrop-blur-sm cursor-pointer"
+                            style={gpsLocation ? { borderColor: '#34C759', backgroundColor: 'rgba(52, 199, 89, 0.08)' } : {}}
+                          >
+                            {isLocating ? (
+                              <>
+                                <span className="w-3.5 h-3.5 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
+                                <span>Obteniendo ubicación...</span>
+                              </>
+                            ) : gpsLocation ? (
+                              <>
+                                <Check className="w-4 h-4 text-[#34C759] stroke-[3]" />
+                                <span className="text-[#2FAD51]">Ubicación GPS capturada</span>
+                              </>
+                            ) : (
+                              <>
+                                <MapPin className="w-4 h-4 text-[#34C759] animate-pulse" />
+                                <span>Compartir mi ubicación actual</span>
+                              </>
+                            )}
+                          </button>
                         </div>
 
                         <div>
