@@ -24,13 +24,13 @@ export const MobileFrame = ({ children }: { children: React.ReactNode }) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative w-full h-screen md:w-[400px] md:h-[720px] bg-white md:rounded-[40px] md:shadow-[0_0_0_10px_#111,0_30px_100px_rgba(0,0,0,0.4)] overflow-hidden z-10 flex flex-col border-none md:border-[6px] md:border-black shadow-2xl"
+        className="relative w-full h-screen md:w-[400px] md:h-[720px] bg-[#ededed] md:rounded-[40px] md:shadow-[0_0_0_10px_#111,0_30px_100px_rgba(0,0,0,0.4)] overflow-hidden z-10 flex flex-col border-none md:border-[6px] md:border-black shadow-2xl"
       >
         {/* Notch / Dynamic Island simulado (Solo PC) */}
         <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[25px] bg-black rounded-b-[18px] z-50"></div>
 
         {/* Contenido de la Aplicación */}
-        <div className="flex-grow relative bg-white flex flex-col h-full overflow-hidden">
+        <div className="flex-grow relative bg-[#ededed] flex flex-col h-full overflow-hidden">
           {children}
         </div>
 

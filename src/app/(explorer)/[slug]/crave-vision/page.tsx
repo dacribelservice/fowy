@@ -179,7 +179,7 @@ ${itemsText}
 
   return (
     <div 
-      className="absolute inset-0 bg-white overflow-hidden flex flex-col"
+      className="absolute inset-0 bg-[#ededed] overflow-hidden flex flex-col"
       style={{
         "--accent-color": MOCK_BUSINESS.accent_color,
         "--accent-color-90": `${MOCK_BUSINESS.accent_color}e6`,
