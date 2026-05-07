@@ -220,57 +220,57 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 🔍 15.3 Buscador de Productos
-- [ ] **15.3.1 Componente `<MenuProductSearch />`**: Input con ícono de lupa, estilo Glassmorphism.
+- [x] **15.3.1 Componente `<CraveSearchBar />`**: Input con ícono de lupa, estilo Glassmorphism.
 - [ ] **15.3.2 Filtrado Server-Side**: Implementar búsqueda reactiva consultando directamente a la DB (Supabase) para optimizar memoria en móvil (Concepto 3.2).
 
 ---
 
 ### 🏷️ 15.4 Pills de Categorías con Branding Dinámico
-- [ ] **15.4.1 Componente `<MenuCategoryPills />`**: Carrusel horizontal de categorías locales.
-- [ ] **15.4.2 Color Dinámico**: La categoría activa usa el `accent_color` del negocio como fondo.
+- [x] **15.4.1 Componente `<CraveCategoryBar />`**: Carrusel horizontal de categorías locales.
+- [x] **15.4.2 Color Dinámico**: La categoría activa usa el `accent_color` del negocio como fondo.
 
 ---
 
 ### 🃏 15.5 Grid de Productos Premium (2 Columnas)
-- [ ] **15.5.1 Refactorizar `<ProductCard />`**: Rediseño completo con imagen `aspect-square`.
-- [ ] **15.5.2 Ícono 🔥 Promo Badge**: Mostrar fuego en productos marcados como oferta.
-- [ ] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Disparar Gate de Login.
-- [ ] **15.5.4 Botón `+` (Add to Cart)**: Botón circular con el `accent_color` del negocio.
-- [ ] **15.5.5 Vista de Detalle (Product Modal)**: Al hacer clic en la foto del producto, abrir un popup/modal con imagen ampliada, descripción completa y detalles.
+- [x] **15.5.1 Refactorizar `<CraveProductCard />`**: Rediseño completo con imagen `aspect-square`.
+- [x] **15.5.2 Insignia PROMO**: Reemplazada por el texto/insignia "PROMO" (diseño definitivo aprobado).
+- [ ] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Al darle clic lo envía a loguearse.
+- [x] **15.5.4 Botón `+` (Add to Cart)**: Botón circular con el `accent_color` del negocio.
+- [x] **15.5.5 Vista de Detalle (Product Modal)**: Al hacer clic en la foto del producto, abrir un popup/modal con imagen ampliada, descripción completa y detalles.
 
 ---
 
 ### ❤️ 15.6 Sistema de Favoritos (Con Gate de Login)
 - [x] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
 - [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
-- [ ] **15.6.3 Modal `<FavoriteLoginModal />`**: Popup con mensaje "¿Quieres guardar tus favoritos?" + botones "Iniciar Sesión" y "Cancelar".
+- [ ] **15.6.3 Flujo Gate de Login**: Si el usuario no está logueado, al dar clic en el corazón lo envía a loguearse.
 
 ---
 
 ### 🎨 15.7 Sistema de Branding Dinámico Global
-- [ ] **15.7.1 `BusinessThemeProvider`**: Inyectar `accent_color` como variable CSS `--brand-color`.
-- [ ] **15.7.2 Tokens Aplicados**: Aplicar color a categorías, botón `+` y elementos de acción.
-- [ ] **15.7.3 Checkout WhatsApp — Verde Fijo**: El botón final de envío siempre es verde (`#25D366`).
+- [x] **15.7.1 Inyección de Variable CSS `--brand-color`**: Inyectar `accent_color` en el contenedor principal de `page.tsx`.
+- [x] **15.7.2 Tokens Aplicados**: Aplicar color a categorías, botón `+` y elementos de acción.
+- [x] **15.7.3 Checkout WhatsApp — Verde Fijo**: El botón final de envío siempre es verde (`#25D366`).
 
 ---
 
 ### ✅ 15.8 Calidad y Optimización
-- [ ] **15.8.1 Modularización**: Separar cada sección en componentes pequeños (<250 líneas).
-- [ ] **15.8.2 `PremiumImage`**: Carga con esqueletos y manejo de errores.
+- [x] **15.8.1 Modularización**: Separar cada sección en componentes pequeños.
+- [x] **15.8.2 `PremiumImage`**: Carga con esqueletos y manejo de errores.
 - [ ] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
 
 ---
  
 ### 📊 15.9 Historial de Pedidos & Sistema de Rating (Explorer)
-*Objetivo: Permitir que el usuario gestione sus compras y califique negocios para alimentar el sistema de confianza.*
+*Objetivo: Permitir que el cliente gestione sus compras y califique negocios una vez completado el pedido.*
 - [ ] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
-- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium siguiendo los tokens de `diseño.md` (Glassmorphism + Blur).
-- [ ] **15.9.3 Lógica de Estados & Filtros**: Pestañas para filtrar por `Activos`, `Completados` y `Cancelados`.
-- [ ] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito para manejar grandes volúmenes de pedidos (Concepto 3.1).
+- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial.
+- [ ] **15.9.3 Lógica de Estados**: Visualizar y filtrar pedidos por estados: `completado`, `pendiente` y `cancelado`.
+- [ ] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito.
 - [ ] **15.9.5 Sistema de Calificación (Rating)**:
-    - [ ] Habilitar estrellas (1-5) exclusivamente en pedidos con estado `Realizado`.
+    - [ ] **Habilitación Condicional**: El cliente podrá calificar el negocio con estrellas (1-5) únicamente cuando el negocio cambie el estado del pedido a `completado`.
     - [ ] **Seguridad**: Validar en Supabase que el usuario no duplique votos por negocio.
-    - [ ] **Sincronización**: Actualización del promedio en la `BusinessIdentityBar`.
+    - [ ] **Sincronización**: Actualización automática del promedio del negocio en `BusinessIdentityBar`.
 
 ---
 ---
