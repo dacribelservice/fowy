@@ -264,7 +264,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ### 📊 15.9 Historial de Pedidos & Sistema de Rating (Explorer)
 *Objetivo: Permitir que el cliente gestione sus compras y califique negocios una vez completado el pedido.*
 - [ ] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
-- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial.
+- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial (con estilo de vidrio/Glassmorphism idéntico al carrito).
 - [ ] **15.9.3 Lógica de Estados**: Visualizar y filtrar pedidos por estados: `completado`, `pendiente` y `cancelado`.
 - [ ] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito.
 - [ ] **15.9.5 Sistema de Calificación (Rating)**:
