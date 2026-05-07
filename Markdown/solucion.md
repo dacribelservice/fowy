@@ -267,5 +267,5 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
 - [x] **6.2** **Pruebas de Regresión y Adaptación de Sandbox**:
   - Verificar que el menú digital en producción se comporte de forma premium y reactiva.
   - Implementar un redirect ultraligero en la ruta sandbox `src/app/(explorer)/[slug]/crave-vision/` para limpiar automáticamente el caché HMR de Turbopack y guiar al usuario al menú premium.
-- [ ] **6.3** **Backup Seguro**:
+- [x] **6.3** **Backup Seguro**:
   - Generar commit del re-diseño modularizado y documentar la migración exitosa.
