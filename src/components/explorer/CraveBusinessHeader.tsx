@@ -9,14 +9,16 @@ interface CraveBusinessHeaderProps {
   isOpen?: boolean;
   rating?: number;
   distance?: string;
+  votesCount?: number;
 }
 
 export function CraveBusinessHeader({
   logoUrl,
   name,
   isOpen = true,
-  rating = 5.0,
+  rating = 0.0,
   distance,
+  votesCount = 0,
 }: CraveBusinessHeaderProps) {
   return (
     <div className="relative px-6 -mt-14 z-20 flex items-start gap-5">
@@ -53,8 +55,19 @@ export function CraveBusinessHeader({
 
           {/* Rating */}
           <div className="flex items-center gap-1">
-            <Star className="w-[18px] h-[18px] fill-[#FFCC00] text-[#FFCC00]" />
-            <span className="text-[14px] font-bold text-slate-900">{rating}</span>
+            <Star 
+              className="w-[18px] h-[18px]" 
+              style={{
+                fill: votesCount === 0 ? "#CBD5E1" : "#FFCC00",
+                color: votesCount === 0 ? "#CBD5E1" : "#FFCC00"
+              }}
+            />
+            <span className="text-[14px] font-bold text-slate-900">
+              {votesCount === 0 ? "0.0" : rating}
+            </span>
+            <span className="text-[12px] text-slate-400 font-semibold ml-0.5">
+              ({votesCount})
+            </span>
           </div>
         </div>
 

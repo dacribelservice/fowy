@@ -44,6 +44,7 @@ export default function BusinessMenuPage() {
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
+    votesCount,
   } = useBusinessMenuData(slug);
 
   useBusinessAnalytics(business?.id);
@@ -115,7 +116,7 @@ export default function BusinessMenuPage() {
   const logoUrl = business.logo_url || "";
   const businessName = business.name || "";
   const isOpen = business.is_open ?? true;
-  const rating = business.rating || 4.8;
+  const rating = business.rating ?? 0.0;
   const distance = business.distance || "1.2 km";
 
 
@@ -137,6 +138,7 @@ export default function BusinessMenuPage() {
         isOpen={isOpen} 
         rating={rating} 
         distance={distance} 
+        votesCount={votesCount}
       />
 
       <div 
@@ -163,6 +165,7 @@ export default function BusinessMenuPage() {
           isOpen={isOpen} 
           rating={rating} 
           distance={distance} 
+          votesCount={votesCount}
         />
 
         {/* BLOQUE 3: BÚSQUEDA Y NAVEGACIÓN */}

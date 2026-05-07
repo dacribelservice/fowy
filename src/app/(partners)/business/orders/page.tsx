@@ -77,28 +77,28 @@ export default function OrdersPage() {
             <div className="flex items-center gap-3.5 mt-3 px-1">
               <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 border border-amber-500/10 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-widest">
                 <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                <span className="text-[13px]">{businessRating > 0 ? businessRating.toFixed(1) : "N/A"}</span>
+                <span className="text-[13px]">
+                  {ratingCount > 0 && businessRating > 0 ? businessRating.toFixed(1) : "0.0"}
+                </span>
               </div>
-              {businessRating > 0 && (
-                <div className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((starVal) => {
-                    const isFull = starVal <= Math.round(businessRating);
-                    return (
-                      <Star
-                        key={starVal}
-                        className={`w-4 h-4 ${
-                          isFull 
-                            ? "fill-amber-400 text-amber-400" 
-                            : "text-slate-200 fill-slate-50"
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
-              )}
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((starVal) => {
+                  const isFull = ratingCount > 0 && businessRating > 0 && starVal <= Math.round(businessRating);
+                  return (
+                    <Star
+                      key={starVal}
+                      className={`w-4 h-4 ${
+                        isFull 
+                          ? "fill-amber-400 text-amber-400" 
+                          : "text-slate-200 fill-slate-50"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
               <span className="text-xs font-semibold text-slate-400">
                 {ratingCount === 0 
-                  ? "Aún sin calificaciones de clientes" 
+                  ? "(0) Aún sin calificaciones de clientes" 
                   : `(${ratingCount} ${ratingCount === 1 ? "opinión" : "opiniones"})`
                 }
               </span>

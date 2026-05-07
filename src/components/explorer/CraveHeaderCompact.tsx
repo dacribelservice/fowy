@@ -12,6 +12,7 @@ interface CraveHeaderCompactProps {
   rating?: number;
   distance?: string;
   onBack?: () => void;
+  votesCount?: number;
 }
 
 export function CraveHeaderCompact({
@@ -19,9 +20,10 @@ export function CraveHeaderCompact({
   logoUrl,
   name,
   isOpen = true,
-  rating = 5.0,
+  rating = 0.0,
   distance,
   onBack,
+  votesCount = 0,
 }: CraveHeaderCompactProps) {
   const router = useRouter();
   const handleBack = onBack || (() => router.back());
@@ -83,13 +85,21 @@ export function CraveHeaderCompact({
 
                   <span className="text-[10px] text-slate-300">•</span>
 
-                  {/* Ranking en Amarillo Premium (#FFCC00) */}
+                  {/* Ranking en Amarillo Premium (#FFCC00) o Gris si no hay votos */}
                   <div className="flex items-center gap-1 font-bold text-[10px]">
                     <Star
                       className="w-3 h-3"
-                      style={{ fill: "#FFCC00", stroke: "#FFCC00" }}
+                      style={{ 
+                        fill: votesCount === 0 ? "#CBD5E1" : "#FFCC00", 
+                        stroke: votesCount === 0 ? "#CBD5E1" : "#FFCC00" 
+                      }}
                     />
-                    <span className="text-slate-600">{rating}</span>
+                    <span className="text-slate-600">
+                      {votesCount === 0 ? "0.0" : rating}
+                    </span>
+                    <span className="text-slate-400 font-semibold ml-0.5">
+                      ({votesCount})
+                    </span>
                   </div>
 
                   {distance && (

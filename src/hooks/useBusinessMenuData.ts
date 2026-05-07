@@ -19,6 +19,7 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
   const [loading, setLoading] = useState(true);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [productsLoading, setProductsLoading] = useState(true);
+  const [votesCount, setVotesCount] = useState<number>(0);
 
   const supabase = createClient();
 
@@ -52,6 +53,17 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
           return;
         }
         setBusiness(busData);
+
+        // Obtener cantidad exacta de calificaciones (votos reales)
+        const { count, error: countError } = await supabase
+          .from("business_ratings")
+          .select("*", { count: "exact", head: true })
+          .eq("business_id", busData.id);
+
+        if (countError) {
+          console.error("Error counting business ratings:", countError);
+        }
+        setVotesCount(count || 0);
 
         // Obtener categorías del menú
         const { data: catData } = await supabase
@@ -138,5 +150,6 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
     selectedCategory,
     setSelectedCategory,
     debouncedSearchQuery,
+    votesCount,
   };
 }
