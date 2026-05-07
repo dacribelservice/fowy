@@ -265,14 +265,14 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
  
 ### 📊 15.9 Historial de Pedidos & Sistema de Rating (Explorer)
 *Objetivo: Permitir que el cliente gestione sus compras y califique negocios una vez completado el pedido.*
-- [ ] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
-- [ ] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial (con estilo de vidrio/Glassmorphism idéntico al carrito).
-- [ ] **15.9.3 Lógica de Estados**: Visualizar y filtrar pedidos por estados: `completado`, `pendiente` y `cancelado`.
-- [ ] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito.
-- [ ] **15.9.5 Sistema de Calificación (Rating)**:
-    - [ ] **Habilitación Condicional**: El cliente podrá calificar el negocio con estrellas (1-5) únicamente cuando el negocio cambie el estado del pedido a `completado`.
-    - [ ] **Seguridad**: Validar en Supabase que el usuario no duplique votos por negocio.
-    - [ ] **Sincronización**: Actualización automática del promedio del negocio en `BusinessIdentityBar`.
+- [x] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
+- [x] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial (con estilo de vidrio/Glassmorphism idéntico al carrito).
+- [x] **15.9.3 Lógica de Estados**: Visualizar y filtrar pedidos por estados: `completado`, `pendiente` y `cancelado`.
+- [x] **15.9.4 Paginación de Historial**: Implementar carga por bloques o scroll infinito.
+- [x] **15.9.5 Sistema de Calificación (Rating)**:
+    - [x] **Habilitación Condicional**: El cliente podrá calificar el negocio con estrellas (1-5) únicamente cuando el negocio cambie el estado del pedido a `completado`.
+    - [x] **Seguridad**: Validar en Supabase que el usuario no duplique votos por negocio.
+    - [x] **Sincronización**: Actualización automática del promedio del negocio en `BusinessIdentityBar`.
 
 ---
 

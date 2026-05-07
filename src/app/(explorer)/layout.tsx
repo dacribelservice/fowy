@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { MobileFrame } from "@/components/explorer/MobileFrame";
 import { PageTransition } from "@/components/explorer/PageTransition";
-import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck, Store } from "lucide-react";
+import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck, Store, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import { UserFavoritesSheet } from "@/components/explorer/UserFavoritesSheet";
+import { UserOrdersSheet } from "@/components/explorer/UserOrdersSheet";
 
 export default function ExplorerLayout({
   children,
@@ -18,6 +19,7 @@ export default function ExplorerLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const { addToCart } = useCart();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -151,6 +153,7 @@ export default function ExplorerLayout({
                           ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin Panel", href: "/admin/dashboard" }] : []),
                           ...(hasBusiness ? [{ icon: Store, label: "Mi Negocio", href: "/business" }] : []),
                           { icon: Heart, label: "Favoritos" },
+                          { icon: ShoppingBag, label: "Mis Pedidos" },
                           { icon: FileText, label: "Términos y condiciones" },
                         ].map((item, idx) => {
                           const isLink = 'href' in item;
@@ -182,6 +185,9 @@ export default function ExplorerLayout({
                               onClick={() => {
                                 if (item.label === "Favoritos") {
                                   setIsFavoritesOpen(true);
+                                  setIsMenuOpen(false);
+                                } else if (item.label === "Mis Pedidos") {
+                                  setIsOrdersOpen(true);
                                   setIsMenuOpen(false);
                                 }
                               }}
@@ -248,6 +254,27 @@ export default function ExplorerLayout({
               business_id: product.business_id,
               business_name: product.business_name,
             });
+          }}
+        />
+
+        <UserOrdersSheet
+          isOpen={isOrdersOpen}
+          onClose={() => setIsOrdersOpen(false)}
+          onReorder={(items, businessId, businessName) => {
+            items.forEach((item) => {
+              const qty = item.quantity || 1;
+              for (let i = 0; i < qty; i++) {
+                addToCart({
+                  id: item.id || item.product_id,
+                  name: item.name,
+                  price: item.price,
+                  image_url: item.image_url || "",
+                  business_id: businessId,
+                  business_name: businessName,
+                });
+              }
+            });
+            setIsOrdersOpen(false);
           }}
         />
       </div>
