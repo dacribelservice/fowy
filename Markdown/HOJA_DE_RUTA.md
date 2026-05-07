@@ -234,7 +234,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ### 🃏 15.5 Grid de Productos Premium (2 Columnas)
 - [x] **15.5.1 Refactorizar `<CraveProductCard />`**: Rediseño completo con imagen `aspect-square`.
 - [x] **15.5.2 Insignia PROMO**: Reemplazada por el texto/insignia "PROMO" (diseño definitivo aprobado).
-- [ ] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Al darle clic lo envía a loguearse.
+- [x] **15.5.3 Botón Favorito ❤️**: Corazón interactivo. Si no hay login -> Al darle clic lo envía a loguearse.
 - [x] **15.5.4 Botón `+` (Add to Cart)**: Botón circular con el `accent_color` del negocio.
 - [x] **15.5.5 Vista de Detalle (Product Modal)**: Al hacer clic en la foto del producto, abrir un popup/modal con imagen ampliada, descripción completa y detalles.
 
@@ -242,10 +242,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ### ❤️ 15.6 Sistema de Favoritos (Con Gate de Login)
 - [x] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
-- [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
-- [ ] **15.6.3 Flujo Gate de Login**: Si el usuario no está logueado, al dar clic en el corazón lo envía a loguearse.
-- [ ] **15.6.4 Componente `<UserFavoritesSheet />`**: SideSheet/Bottom Sheet premium con estilo de vidrio (Glassmorphism) para visualizar los productos favoritos del usuario al dar clic en "Favoritos" en el menú de perfil.
-- [ ] **15.6.5 Identificación de Comercio**: Cada producto favorito debe mostrar claramente a qué negocio pertenece (nombre/logo) dentro de la lista de favoritos de diferentes comercios.
+- [x] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
+- [x] **15.6.3 Flujo Gate de Login**: Si el usuario no está logueado, al dar clic en el corazón lo envía a loguearse.
+- [x] **15.6.4 Componente `<UserFavoritesSheet />`**: SideSheet/Bottom Sheet premium con estilo de vidrio (Glassmorphism) para visualizar los productos favoritos del usuario al dar clic en "Favoritos" en el menú de perfil.
+- [x] **15.6.5 Identificación de Comercio**: Cada producto favorito debe mostrar claramente a qué negocio pertenece (nombre/logo) dentro de la lista de favoritos de diferentes comercios.
 
 ---
 
@@ -259,7 +259,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ### ✅ 15.8 Calidad y Optimización
 - [x] **15.8.1 Modularización**: Separar cada sección en componentes pequeños.
 - [x] **15.8.2 `PremiumImage`**: Carga con esqueletos y manejo de errores.
-- [ ] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
+- [x] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
 
 ---
  

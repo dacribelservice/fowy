@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/hooks/useCart";
+import { UserFavoritesSheet } from "@/components/explorer/UserFavoritesSheet";
 
 export default function ExplorerLayout({
   children,
@@ -15,6 +17,8 @@ export default function ExplorerLayout({
 }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const { addToCart } = useCart();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -175,7 +179,13 @@ export default function ExplorerLayout({
                           return (
                             <button
                               key={idx}
-                              className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group"
+                              onClick={() => {
+                                if (item.label === "Favoritos") {
+                                  setIsFavoritesOpen(true);
+                                  setIsMenuOpen(false);
+                                }
+                              }}
+                              className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] text-slate-600 hover:bg-slate-50 transition-colors group cursor-pointer"
                             >
                               {content}
                             </button>
@@ -225,6 +235,21 @@ export default function ExplorerLayout({
             {children}
           </PageTransition>
         </main>
+
+        <UserFavoritesSheet
+          isOpen={isFavoritesOpen}
+          onClose={() => setIsFavoritesOpen(false)}
+          onAddToCart={(product) => {
+            addToCart({
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              image_url: product.image_url,
+              business_id: product.business_id,
+              business_name: product.business_name,
+            });
+          }}
+        />
       </div>
     </MobileFrame>
   );

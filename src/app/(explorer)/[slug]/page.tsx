@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useBusinessMenuData } from "@/hooks/useBusinessMenuData";
 import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
+import { useFavorites } from "@/hooks/useFavorites";
 
 import { BusinessMenuSkeleton } from "@/components/explorer/BusinessMenuSkeleton";
 import { BusinessMenuNotFound } from "@/components/explorer/BusinessMenuNotFound";
@@ -19,6 +20,7 @@ import { CraveProductCard } from "@/components/explorer/CraveProductCard";
 import { CraveProductDetailModal } from "@/components/explorer/CraveProductDetailModal";
 import { CraveMagicCart } from "@/components/explorer/CraveMagicCart";
 import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
+import { LazyWrapper } from "@/components/explorer/LazyWrapper";
 
 /**
  * BusinessMenuPage: El nuevo molde de producción premium de Crave Vision.
@@ -45,6 +47,9 @@ export default function BusinessMenuPage() {
   } = useBusinessMenuData(slug);
 
   useBusinessAnalytics(business?.id);
+
+  // Favorites Hook
+  const { isProductFavorite, toggleFavorite } = useFavorites();
 
   // Initialize global cart hook for this specific business
   const { businessItems, addToCart, removeFromCart } = useCart(business?.id);
@@ -195,13 +200,16 @@ export default function BusinessMenuPage() {
           ) : products.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {products.map((product) => (
-                <CraveProductCard
-                  key={product.id}
-                  product={product}
-                  onSelect={() => setSelectedDetailProduct(product)}
-                  onAddToCart={() => handleAddToCart(product)}
-                  accentColor={accentColor}
-                />
+                <LazyWrapper key={product.id}>
+                  <CraveProductCard
+                    product={product}
+                    onSelect={() => setSelectedDetailProduct(product)}
+                    onAddToCart={() => handleAddToCart(product)}
+                    accentColor={accentColor}
+                    isFavorite={isProductFavorite(product.id)}
+                    onToggleFavorite={() => toggleFavorite(product.id)}
+                  />
+                </LazyWrapper>
               ))}
             </div>
           ) : (
