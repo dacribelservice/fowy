@@ -279,18 +279,18 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ### ✂️ 15.10 Refactor de Calidad: Poda y Modularización de [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/[slug]/page.tsx)
 *Objetivo: Dividir el orquestador principal (actualmente de 433 líneas) para cumplir con el límite de <250 líneas establecido en los conceptos del proyecto, extrayendo lógica compleja y vistas secundarias de estado.*
 
-- [ ] **15.10.1 Extracción de Hooks Personalizados (Lógica de Datos)**:
-    - [ ] **Hook `useBusinessMenuData(slug)`**:
+- [x] **15.10.1 Extracción de Hooks Personalizados (Lógica de Datos)**:
+    - [x] **Hook `useBusinessMenuData(slug)`**:
         - **Qué hace**: Agrupa toda la obtención de datos de Supabase, estados de `business`, `categories`, `products`, `banners`, `loading`, estados reactivos de búsqueda debounzada, y el filtrado en el servidor.
         - **Impacto**: Elimina la complejidad de base de datos y búsqueda de la vista principal.
-    - [ ] **Hook `useBusinessAnalytics(businessId)`**:
+    - [x] **Hook `useBusinessAnalytics(businessId)`**:
         - **Qué hace**: Maneja el registro de visitas del cliente en `analytics_visits` de forma pasiva y segura.
         - **Impacto**: Elimina el callback `recordVisit` y su respectivo `useEffect`.
-- [ ] **15.10.2 Extracción de Componentes de UI Secundarios (Vistas de Estado)**:
-    - [ ] **Componente `<BusinessMenuSkeleton />`**:
+- [x] **15.10.2 Extracción de Componentes de UI Secundarios (Vistas de Estado)**:
+    - [x] **Componente `<BusinessMenuSkeleton />`**:
         - **Qué hace**: Contiene el enorme bloque de carga inicial con esqueletos animados de banner, barra de identidad, categorías y tarjetas de producto (líneas 168 a 228).
         - **Impacto**: Libera alrededor de 60 líneas de HTML esqueleto de la página principal.
-    - [ ] **Componente `<BusinessMenuNotFound />`**:
+    - [x] **Componente `<BusinessMenuNotFound />`**:
         - **Qué hace**: El diseño de pantalla de error visual y amigable cuando no se encuentra el negocio (líneas 119 a 165).
         - **Impacto**: Libera alrededor de 45 líneas de la página principal.
 

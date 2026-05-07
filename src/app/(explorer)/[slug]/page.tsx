@@ -1,10 +1,14 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
+import { useBusinessMenuData } from "@/hooks/useBusinessMenuData";
+import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
+
+import { BusinessMenuSkeleton } from "@/components/explorer/BusinessMenuSkeleton";
+import { BusinessMenuNotFound } from "@/components/explorer/BusinessMenuNotFound";
 
 import { CraveHeaderCompact } from "@/components/explorer/CraveHeaderCompact";
 import { MenuHeroSliderV2 } from "@/components/explorer/MenuHeroSliderV2";
@@ -22,145 +26,25 @@ import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
  */
 export default function BusinessMenuPage() {
   const { slug } = useParams();
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Database States
-  const [business, setBusiness] = useState<any | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [banners, setBanners] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [productsLoading, setProductsLoading] = useState(true);
+  // Custom Hooks (Data & Analytics)
+  const {
+    business,
+    categories,
+    products,
+    banners,
+    loading,
+    productsLoading,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+  } = useBusinessMenuData(slug);
 
-  const supabase = createClient();
-
-  // Debounce search query to optimize server requests
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (!slug) return;
-      try {
-        setLoading(true);
-
-        // Fetch Business
-        const { data: busData, error: busError } = await supabase
-          .from("businesses")
-          .select("*")
-          .eq("slug", slug)
-          .single();
-
-        if (busError || !busData) {
-          console.error("Business not found in Production Menu:", busError);
-          return;
-        }
-        setBusiness(busData);
-
-        // Fetch Categories
-        const { data: catData } = await supabase
-          .from("product_menu_categories")
-          .select("*")
-          .eq("business_id", busData.id)
-          .order("order_index", { ascending: true });
-
-        setCategories(catData || []);
-
-
-
-        // Fetch Banners
-        const { data: bannersData } = await supabase
-          .from("business_banners")
-          .select("*")
-          .eq("business_id", busData.id)
-          .order("order_index", { ascending: true });
-
-        setBanners(bannersData || []);
-      } catch (error) {
-        console.error("Error fetching data in Production Menu:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [slug, supabase]);
-
-  // Reactive Server-Side Products Filtering
-  useEffect(() => {
-    if (!business?.id) return;
-
-    async function fetchFilteredProducts() {
-      try {
-        setProductsLoading(true);
-        let query = supabase
-          .from("products")
-          .select("*")
-          .eq("business_id", business.id)
-          .eq("is_active", true);
-
-        // Category Filter
-        if (selectedCategory !== "all") {
-          const activeCat = categories.find((c) => c.id === selectedCategory);
-          if (activeCat) {
-            query = query.eq("category_name", activeCat.name);
-          }
-        }
-
-        // Search Query Filter
-        if (debouncedSearchQuery) {
-          query = query.or(
-            `name.ilike.%${debouncedSearchQuery}%,description.ilike.%${debouncedSearchQuery}%`
-          );
-        }
-
-        // Order by category name
-        query = query.order("category_name", { ascending: true });
-
-        const { data, error } = await query;
-        if (error) {
-          console.error("Error fetching filtered products:", error);
-        } else {
-          setProducts(data || []);
-        }
-      } catch (err) {
-        console.error("Error in fetchFilteredProducts:", err);
-      } finally {
-        setProductsLoading(false);
-      }
-    }
-
-    fetchFilteredProducts();
-  }, [business?.id, debouncedSearchQuery, selectedCategory, categories, supabase]);
-
-  // Analytics: Record Visit
-  const recordVisit = useCallback(async (businessId: string) => {
-    try {
-      await supabase.from("analytics_visits").insert({
-        business_id: businessId,
-        path: window.location.pathname,
-        user_agent: navigator.userAgent,
-        referrer: document.referrer || "direct"
-      });
-    } catch (e) {
-      console.error("Error recording visit:", e);
-    }
-  }, [supabase]);
-
-  useEffect(() => {
-    if (business?.id) {
-      recordVisit(business.id);
-    }
-  }, [business?.id, recordVisit]);
+  useBusinessAnalytics(business?.id);
 
   // Initialize global cart hook for this specific business
   const { businessItems, addToCart, removeFromCart } = useCart(business?.id);
@@ -215,80 +99,11 @@ export default function BusinessMenuPage() {
   }, [flatCartItems.length]);
 
   if (loading) {
-    return (
-      <div className="absolute inset-0 bg-[#ededed] overflow-y-auto flex flex-col scrollbar-hide pb-10">
-        {/* Banner Slider Skeleton */}
-        <div className="w-full h-[21rem] bg-gradient-to-br from-slate-200/50 to-slate-300/30 animate-pulse relative flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-slate-300 border-t-transparent rounded-full animate-spin absolute" />
-        </div>
-
-        {/* Business Header Skeleton */}
-        <div className="relative px-6 -mt-14 z-20 flex items-start gap-5 animate-pulse">
-          {/* Logo Circle Skeleton */}
-          <div className="w-28 h-28 rounded-full border-[5px] border-white bg-gradient-to-br from-slate-200 to-slate-300/80 shadow-sm shrink-0" />
-
-          {/* Details Skeleton */}
-          <div className="pt-16 flex-1 space-y-3">
-            <div className="h-6 bg-slate-300/60 rounded-full w-3/4" />
-            <div className="flex gap-4">
-              <div className="h-4 bg-slate-300/60 rounded-full w-1/4" />
-              <div className="h-4 bg-slate-300/60 rounded-full w-1/4" />
-            </div>
-          </div>
-        </div>
-
-        {/* Search & Categories Skeleton */}
-        <div className="px-6 mt-8 space-y-6 animate-pulse">
-          {/* Search Bar Skeleton */}
-          <div className="h-12 bg-white/60 backdrop-blur-md rounded-full w-full border border-white/40" />
-          
-          {/* Categories Bar Skeleton */}
-          <div className="flex gap-3 overflow-x-hidden">
-            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-16 shrink-0 border border-white/40" />
-            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-24 shrink-0 border border-white/40" />
-            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-20 shrink-0 border border-white/40" />
-            <div className="h-8 bg-white/60 backdrop-blur-md rounded-full w-28 shrink-0 border border-white/40" />
-          </div>
-        </div>
-
-        {/* Product Cards Grid Skeleton */}
-        <div className="px-4 mt-6 flex-1 animate-pulse">
-          <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/60 overflow-hidden flex flex-col p-3 space-y-3">
-                {/* Image placeholder */}
-                <div className="h-28 w-full bg-slate-200/50 rounded-2xl" />
-                {/* Title & Desc placeholder */}
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-slate-200/60 rounded-full w-5/6" />
-                  <div className="h-3 bg-slate-200/40 rounded-full w-2/3" />
-                </div>
-                {/* Footer placeholder */}
-                <div className="flex justify-between items-center pt-2">
-                  <div className="h-5 bg-slate-200/60 rounded-full w-1/3" />
-                  <div className="w-8 h-8 rounded-full bg-slate-200/60" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <BusinessMenuSkeleton />;
   }
 
   if (!business) {
-    return (
-      <div className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center gap-6">
-        <h1 className="text-xl font-black text-slate-800 uppercase tracking-wider">Menú No Disponible</h1>
-        <p className="text-sm text-slate-500">No pudimos encontrar este negocio o el enlace no es válido.</p>
-        <button 
-          onClick={() => router.push("/explorar")}
-          className="px-6 py-3 bg-slate-900 text-white rounded-full font-black uppercase text-[10px] tracking-widest cursor-pointer hover:bg-slate-800 transition-colors"
-        >
-          Volver a Explorar
-        </button>
-      </div>
-    );
+    return <BusinessMenuNotFound />;
   }
 
   const accentColor = business.color_identity || "#FF5A5F";
