@@ -221,7 +221,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ### 🔍 15.3 Buscador de Productos
 - [x] **15.3.1 Componente `<CraveSearchBar />`**: Input con ícono de lupa, estilo Glassmorphism.
-- [ ] **15.3.2 Filtrado Server-Side**: Implementar búsqueda reactiva consultando directamente a la DB (Supabase) para optimizar memoria en móvil (Concepto 3.2).
+- [x] **15.3.2 Filtrado Server-Side**: Implementar búsqueda reactiva consultando directamente a la DB (Supabase) para optimizar memoria en móvil (Concepto 3.2).
 
 ---
 
@@ -244,6 +244,8 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **15.6.1 DB — Tabla `user_favorites`**: Crear tabla con RLS por `user_id`.
 - [ ] **15.6.2 Hook `useFavorites.ts`**: Lógica de toggle y persistencia en Supabase.
 - [ ] **15.6.3 Flujo Gate de Login**: Si el usuario no está logueado, al dar clic en el corazón lo envía a loguearse.
+- [ ] **15.6.4 Componente `<UserFavoritesSheet />`**: SideSheet/Bottom Sheet premium con estilo de vidrio (Glassmorphism) para visualizar los productos favoritos del usuario al dar clic en "Favoritos" en el menú de perfil.
+- [ ] **15.6.5 Identificación de Comercio**: Cada producto favorito debe mostrar claramente a qué negocio pertenece (nombre/logo) dentro de la lista de favoritos de diferentes comercios.
 
 ---
 
@@ -271,6 +273,26 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [ ] **Habilitación Condicional**: El cliente podrá calificar el negocio con estrellas (1-5) únicamente cuando el negocio cambie el estado del pedido a `completado`.
     - [ ] **Seguridad**: Validar en Supabase que el usuario no duplique votos por negocio.
     - [ ] **Sincronización**: Actualización automática del promedio del negocio en `BusinessIdentityBar`.
+
+---
+
+### ✂️ 15.10 Refactor de Calidad: Poda y Modularización de [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/[slug]/page.tsx)
+*Objetivo: Dividir el orquestador principal (actualmente de 433 líneas) para cumplir con el límite de <250 líneas establecido en los conceptos del proyecto, extrayendo lógica compleja y vistas secundarias de estado.*
+
+- [ ] **15.10.1 Extracción de Hooks Personalizados (Lógica de Datos)**:
+    - [ ] **Hook `useBusinessMenuData(slug)`**:
+        - **Qué hace**: Agrupa toda la obtención de datos de Supabase, estados de `business`, `categories`, `products`, `banners`, `loading`, estados reactivos de búsqueda debounzada, y el filtrado en el servidor.
+        - **Impacto**: Elimina la complejidad de base de datos y búsqueda de la vista principal.
+    - [ ] **Hook `useBusinessAnalytics(businessId)`**:
+        - **Qué hace**: Maneja el registro de visitas del cliente en `analytics_visits` de forma pasiva y segura.
+        - **Impacto**: Elimina el callback `recordVisit` y su respectivo `useEffect`.
+- [ ] **15.10.2 Extracción de Componentes de UI Secundarios (Vistas de Estado)**:
+    - [ ] **Componente `<BusinessMenuSkeleton />`**:
+        - **Qué hace**: Contiene el enorme bloque de carga inicial con esqueletos animados de banner, barra de identidad, categorías y tarjetas de producto (líneas 168 a 228).
+        - **Impacto**: Libera alrededor de 60 líneas de HTML esqueleto de la página principal.
+    - [ ] **Componente `<BusinessMenuNotFound />`**:
+        - **Qué hace**: El diseño de pantalla de error visual y amigable cuando no se encuentra el negocio (líneas 119 a 165).
+        - **Impacto**: Libera alrededor de 45 líneas de la página principal.
 
 ---
 ---

@@ -35,8 +35,18 @@ export default function BusinessMenuPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [productsLoading, setProductsLoading] = useState(true);
 
   const supabase = createClient();
+
+  // Debounce search query to optimize server requests
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     async function fetchData() {
@@ -66,15 +76,7 @@ export default function BusinessMenuPage() {
 
         setCategories(catData || []);
 
-        // Fetch Products
-        const { data: prodData } = await supabase
-          .from("products")
-          .select("*")
-          .eq("business_id", busData.id)
-          .eq("is_active", true)
-          .order("category_name", { ascending: true });
 
-        setProducts(prodData || []);
 
         // Fetch Banners
         const { data: bannersData } = await supabase
@@ -92,6 +94,53 @@ export default function BusinessMenuPage() {
     }
     fetchData();
   }, [slug, supabase]);
+
+  // Reactive Server-Side Products Filtering
+  useEffect(() => {
+    if (!business?.id) return;
+
+    async function fetchFilteredProducts() {
+      try {
+        setProductsLoading(true);
+        let query = supabase
+          .from("products")
+          .select("*")
+          .eq("business_id", business.id)
+          .eq("is_active", true);
+
+        // Category Filter
+        if (selectedCategory !== "all") {
+          const activeCat = categories.find((c) => c.id === selectedCategory);
+          if (activeCat) {
+            query = query.eq("category_name", activeCat.name);
+          }
+        }
+
+        // Search Query Filter
+        if (debouncedSearchQuery) {
+          query = query.or(
+            `name.ilike.%${debouncedSearchQuery}%,description.ilike.%${debouncedSearchQuery}%`
+          );
+        }
+
+        // Order by category name
+        query = query.order("category_name", { ascending: true });
+
+        const { data, error } = await query;
+        if (error) {
+          console.error("Error fetching filtered products:", error);
+        } else {
+          setProducts(data || []);
+        }
+      } catch (err) {
+        console.error("Error in fetchFilteredProducts:", err);
+      } finally {
+        setProductsLoading(false);
+      }
+    }
+
+    fetchFilteredProducts();
+  }, [business?.id, debouncedSearchQuery, selectedCategory, categories, supabase]);
 
   // Analytics: Record Visit
   const recordVisit = useCallback(async (businessId: string) => {
@@ -249,23 +298,7 @@ export default function BusinessMenuPage() {
   const rating = business.rating || 4.8;
   const distance = business.distance || "1.2 km";
 
-  // Filtered Products List
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    let matchesCategory = true;
-    if (selectedCategory !== "all") {
-      const activeCat = categories.find((c) => c.id === selectedCategory);
-      if (activeCat) {
-        matchesCategory = product.category_name === activeCat.name;
-      } else {
-        matchesCategory = false;
-      }
-    }
-    
-    return matchesSearch && matchesCategory;
-  });
+
 
   return (
     <div 
@@ -328,9 +361,25 @@ export default function BusinessMenuPage() {
 
         {/* BLOQUE 4: LA JOYA DE LA CORONA - PRODUCT CARD V3 */}
         <div className="px-4 pb-24 mt-4">
-          {filteredProducts.length > 0 ? (
+          {productsLoading ? (
             <div className="grid grid-cols-2 gap-4">
-              {filteredProducts.map((product) => (
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white/80 backdrop-blur-md rounded-3xl border border-white/60 p-3 space-y-3 animate-pulse">
+                  <div className="h-28 w-full bg-slate-200/50 rounded-2xl animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-slate-200/60 rounded-full w-5/6 animate-pulse" />
+                    <div className="h-3 bg-slate-200/40 rounded-full w-2/3 animate-pulse" />
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <div className="h-5 bg-slate-200/60 rounded-full w-1/3 animate-pulse" />
+                    <div className="w-8 h-8 rounded-full bg-slate-200/60 animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {products.map((product) => (
                 <CraveProductCard
                   key={product.id}
                   product={product}
