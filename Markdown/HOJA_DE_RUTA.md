@@ -295,5 +295,16 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
         - **Impacto**: Libera alrededor de 45 líneas de la página principal.
 
 ---
+
+### 🌟 15.11 Ajustes de Calificaciones y Votos Reales (0 Estrellas)
+*Objetivo: Ajustar el sistema de ranking para mostrar 0 estrellas y (0) votos cuando el negocio no tenga calificaciones reales.*
+
+- [ ] **15.11.1 DB — Valor por Defecto**: Cambiar el valor por defecto de la columna `rating` de `5.0` a `0.0` en la tabla `businesses`.
+- [ ] **15.11.2 DB — Trigger de Promedio**: Actualizar la función del trigger para que, si no hay votos/calificaciones en `business_ratings`, el cálculo promedio devuelva `0.0` en lugar de `5.0`.
+- [ ] **15.11.3 Hook — Conteo de Votos**: En el hook de datos `useBusinessMenuData.ts`, realizar una consulta rápida para contar la cantidad exacta de calificaciones del negocio en la tabla `business_ratings` (`votesCount`).
+- [ ] **15.11.4 UI — Encabezados de Crave**: Actualizar `<CraveBusinessHeader />` y `<CraveHeaderCompact />` para recibir e integrar este conteo de votos. Si es 0, mostrar `(0)` votos y pintar las estrellas vacías (gris suave) en lugar de doradas.
+- [ ] **15.11.5 Panel Socio — Vista de Ranking**: Modificar `/business/orders/page.tsx` para que, si el conteo de votos del negocio es 0, muestre la calificación del socio en `0.0` y pinte las estrellas vacías, reflejando fielmente el estado real.
+
+---
 ---
  *Documento consolidado - FOWY 2026*

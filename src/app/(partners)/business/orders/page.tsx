@@ -8,7 +8,8 @@ import {
   CheckCircle2, 
   XCircle, 
   ExternalLink,
-  MessageCircle
+  MessageCircle,
+  Star
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,6 +19,8 @@ const supabase = createClient();
 
 export default function OrdersPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [businessRating, setBusinessRating] = useState<number | null>(null);
+  const [ratingCount, setRatingCount] = useState<number>(0);
   
   const { 
     orders, 
@@ -26,20 +29,33 @@ export default function OrdersPage() {
   } = useOrderManager(businessId);
 
   useEffect(() => {
-    const fetchBusinessId = async () => {
+    const fetchBusinessData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: business } = await supabase
         .from('businesses')
-        .select('id')
+        .select('id, rating')
         .eq('owner_id', user.id)
         .single();
 
-      if (business) setBusinessId(business.id);
+      if (business) {
+        setBusinessId(business.id);
+        setBusinessRating(business.rating || 0);
+
+        // Fetch rating count
+        const { count, error } = await supabase
+          .from('business_ratings')
+          .select('*', { count: 'exact', head: true })
+          .eq('business_id', business.id);
+
+        if (!error && count !== null) {
+          setRatingCount(count);
+        }
+      }
     };
 
-    fetchBusinessId();
+    fetchBusinessData();
   }, []);
 
   const loading = !businessId || loadingOrders;
@@ -55,6 +71,39 @@ export default function OrdersPage() {
           <p className="text-slate-500 mt-2">
             Gestiona tus pedidos entrantes y actualiza su estado al instante.
           </p>
+
+          {/* Calificación del Negocio */}
+          {businessRating !== null && (
+            <div className="flex items-center gap-3.5 mt-3 px-1">
+              <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 border border-amber-500/10 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-widest">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                <span className="text-[13px]">{businessRating > 0 ? businessRating.toFixed(1) : "N/A"}</span>
+              </div>
+              {businessRating > 0 && (
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((starVal) => {
+                    const isFull = starVal <= Math.round(businessRating);
+                    return (
+                      <Star
+                        key={starVal}
+                        className={`w-4 h-4 ${
+                          isFull 
+                            ? "fill-amber-400 text-amber-400" 
+                            : "text-slate-200 fill-slate-50"
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              <span className="text-xs font-semibold text-slate-400">
+                {ratingCount === 0 
+                  ? "Aún sin calificaciones de clientes" 
+                  : `(${ratingCount} ${ratingCount === 1 ? "opinión" : "opiniones"})`
+                }
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-bold border border-green-100">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />

@@ -59,25 +59,29 @@ export default function PartnerTopBar() {
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="flex flex-col"
-      >
-        <div className="flex items-center gap-2">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            {getTitle()}
-          </h2>
-          {pathname === "/business" && (
-            <span className="bg-fowy-secondary/10 text-fowy-secondary text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border border-fowy-secondary/20 flex items-center gap-1">
-              <Sparkles size={10} /> Live
-            </span>
-          )}
-        </div>
-        <p className="text-slate-500 text-sm font-medium mt-1">
-          {getSubtitle()}
-        </p>
-      </motion.div>
+      {pathname !== "/business/orders" ? (
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex flex-col"
+        >
+          <div className="flex items-center gap-2">
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+              {getTitle()}
+            </h2>
+            {pathname === "/business" && (
+              <span className="bg-fowy-secondary/10 text-fowy-secondary text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border border-fowy-secondary/20 flex items-center gap-1">
+                <Sparkles size={10} /> Live
+              </span>
+            )}
+          </div>
+          <p className="text-slate-500 text-sm font-medium mt-1">
+            {getSubtitle()}
+          </p>
+        </motion.div>
+      ) : (
+        <div />
+      )}
 
       <div className="flex items-center gap-4 self-end md:self-center">
         {/* Membership Alert Indicator */}
