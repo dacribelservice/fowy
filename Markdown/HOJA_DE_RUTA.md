@@ -306,5 +306,36 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **15.11.5 Panel Socio — Vista de Ranking**: Modificar `/business/orders/page.tsx` para que, si el conteo de votos del negocio es 0, muestre la calificación del socio en `0.0` y pinte las estrellas vacías, reflejando fielmente el estado real.
 
 ---
+
+## 📊 FASE 16: PANEL MÉTRICAS SUPER ADMIN (DISEÑO VERTICAL DE ALTA DENSIDAD)
+*Objetivo: Diseñar un panel de métricas ultra-minimalista, altamente responsivo para celulares y PC, ordenado en capas verticales independientes y con gráfica interactiva de ventas, respetando estrictamente las reglas de desacoplamiento y modularidad de `conceptos.md`.*
+
+- [ ] **16.1 Reorganización en Capas Verticales (Layout Mobile-First)**:
+    - [ ] **16.1.1 Capa 1 (Plan Píldora)**: Reemplazar la tarjeta de "Plan Contratado" actual por un elemento cilíndrico ultra-compacto (`rounded-full`) al inicio de la página con estilo premium oscuro o borde degradado, indicando de forma sutil: `Plan Standard • Próximo pago: 02/Junio/2026`.
+    - [ ] **16.1.2 Capa 2 (Lista de Métricas)**: Implementar la lista minimalista de las 4 métricas clave de rendimiento agrupadas verticalmente (sin tarjetas masivas).
+    - [ ] **16.1.3 Capa 2.5 (Tendencia de Ventas)**: Insertar la gráfica lineal interactiva justo debajo de la lista de métricas y antes de los datos generales del negocio.
+    - [ ] **16.1.4 Capa 3 (Tarjeta de Negocio Compacta)**: Rediseñar la tarjeta de información general (logo, badge `NEGOCIO ACTIVO`, datos) haciéndola más pequeña, compacta y alineada verticalmente.
+    - [ ] **16.1.5 Capa 4 (Módulos & Configuración)**: Rediseñar las tarjetas de módulos activos reduciendo su padding interior y tamaño de íconos, ordenándolas de forma vertical compacta sin elementos horizontales complejos.
+- [ ] **16.2 Lista de Métricas de Rendimiento**:
+    - [ ] **16.2.1 Métricas a Mostrar**: Incluir únicamente las 4 métricas principales: *Visitas Totales*, *Pedidos Recibidos*, *Tasa de Conversión* y *Ticket Promedio*.
+    - [ ] **16.2.2 Visualización de Alta Densidad**: Diseñar filas finas con iconos pequeños de color sutil, títulos delgados (`text-slate-400 text-xs`) y valores claros a la derecha separados por líneas divisorias casi invisibles (`border-b border-slate-50`).
+- [ ] **16.3 Gráfico de Ventas Interactivo ("FowySalesChart")**:
+    - [ ] **16.3.1 Estructura y Procesamiento de Datos (Backend Supabase)**:
+        - [ ] **16.3.1.1 Consulta**: Obtener órdenes válidas (`orders`) filtrando por el `business_id` del negocio actual.
+        - [ ] **16.3.1.2 Procesamiento Inteligente**: Agrupar los montos de venta (`total_amount`) acumulados por el filtro de tiempo.
+        - [ ] **16.3.1.3 Filtro de Tiempo**: Permitir selección dinámica por **Días** (últimos 7 días), **Semanas** (últimas 4 o 6 semanas) o **Meses** (últimos 6 o 12 meses).
+        - [ ] **16.3.1.4 Detalle de Calidad**: Rellenar vacíos con `$0` si un intervalo no tiene ventas para garantizar la continuidad del trazado.
+    - [ ] **16.3.2 Estructura de la Interfaz (UI/UX)**:
+        - [ ] **16.3.2.1 Cabecera & Controles**: Colocar el título del gráfico a la izquierda (`text-[10px] font-bold uppercase text-slate-400`) y un selector cilíndrico micro a la derecha para alternar filtros (`D`, `S`, `M`), con un indicador de fondo naranja Fowy (`bg-fowy-orange text-white`) con micro-animaciones de transición.
+        - [ ] **16.3.2.2 SVG Dinámico y Brillo Premium**: Trazar el gráfico con código `<svg viewBox="0 0 500 200">` ultra-responsive con una curva suave (`strokeLinecap="round"`), usando un degradado de naranja Fowy `#FF5A5F` a coral dorado.
+        - [ ] **16.3.2.3 Efecto Glow**: Añadir un trazado idéntico duplicado con efecto `blur` sutil debajo de la línea principal para simular brillo neumórfico.
+        - [ ] **16.3.2.4 Relleno del Área**: Agregar un área sombreada suave debajo de la curva que se desvanezca a transparente en la base.
+        - [ ] **16.3.2.5 Tooltips Interactivos (Mobile-First)**: Permitir que al tocar cualquier nodo de la gráfica aparezca un cuadro flotante sutil indicando el valor de venta (ej: `Vie: $120.000` o `Mes de Mayo: $1.480.000`).
+        - [ ] **16.3.2.6 Animación Elástica**: Configurar Framer Motion (`animate={{ pathLength: 1 }}`) para dibujar la línea elegantemente al cargar o cambiar el filtro.
+- [ ] **16.4 Acoplamiento Modular (Filosofía de Arquitectura - conceptos.md)**:
+    - [ ] **16.4.1 No Monolitos**: Prohibido agregar este código directamente dentro del orquestador `/app/admin/negocios/[id]/page.tsx` para evitar superar el límite de 200-250 líneas.
+    - [ ] **16.4.2 Componentes Especializados**: Crear componentes independientes en `src/components/admin/businesses/` (ej: `BusinessMetricsList.tsx`, `FowySalesChart.tsx`) para albergar toda la lógica visual de manera desacoplada.
+
+---
 ---
  *Documento consolidado - FOWY 2026*
