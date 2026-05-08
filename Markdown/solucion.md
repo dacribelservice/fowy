@@ -302,3 +302,72 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **4.1** Verificar que la gráfica modularizada se dibuje elegantemente con su animación elástica al cargar.
   - [x] **4.2** Confirmar que el filtro cilíndrico micro de tiempo (`D`, `S`, `M`) alterne de manera reactiva con transiciones fluidas.
   - [x] **4.3** Asegurar que al interactuar con los nodos en pantalla mobile/desktop aparezca el tooltip con el monto y etiqueta correctos.
+
+---
+
+## 🧩 Modularización de `CraveCheckoutSheet.tsx`
+
+> **Problema:** El archivo `src/components/explorer/CraveCheckoutSheet.tsx` tiene **656 líneas** combinando lógica de negocio, GPS, Supabase, UI del carrito y UI del formulario en un solo archivo. Viola el principio "Un Archivo, Una Responsabilidad" de `conceptos.md`.
+
+**Estructura objetivo tras la refactorización:**
+```
+src/components/explorer/
+├── CraveCheckoutSheet.tsx         → Orquestador (~150 líneas)
+├── CheckoutCartView.tsx           → UI del carrito (paso 1)
+├── CheckoutFormView.tsx           → UI del formulario (paso 2)
+└── hooks/
+    └── useCheckoutLogic.ts        → Toda la lógica (GPS, WhatsApp, Supabase)
+```
+
+---
+
+### Paso 1 — Crear el hook `useCheckoutLogic.ts`
+
+- [x] **1.1** Crear el archivo `src/components/explorer/hooks/useCheckoutLogic.ts`.
+- [x] **1.2** Mover todos los estados del componente al hook: `checkoutStep`, `customerName`, `customerPhone`, `customerAddress`, `gpsLocation`, `isLocating`, `orderNotes`, `paymentMethod`, `cashChange`, `customPaymentMethod`, `validationError`.
+- [x] **1.3** Mover la lógica de agrupación del carrito (`groupedCart`) al hook, recibiendo `cartItems` como parámetro.
+- [x] **1.4** Mover la función `handleShareLocation` completa al hook (geolocalización GPS).
+- [x] **1.5** Mover la función `handleSendWhatsApp` completa al hook (construcción del mensaje, insert en Supabase, dispatch del evento `fowy:order-created`, apertura de WhatsApp).
+- [x] **1.6** Mover el `useEffect` de reset (cuando `isOpen` cambia a `false`) al hook.
+- [x] **1.7** El hook recibe como parámetros: `{ cartItems, businessId, businessPhone, businessName, isOpen }`.
+- [x] **1.8** El hook retorna todos los estados y las dos funciones (`handleShareLocation`, `handleSendWhatsApp`).
+
+---
+
+### Paso 2 — Crear el componente `CheckoutCartView.tsx`
+
+- [x] **2.1** Crear el archivo `src/components/explorer/CheckoutCartView.tsx`.
+- [x] **2.2** Extraer todo el JSX correspondiente al **paso "cart"** (resumen de ítems, precios, botón "Continuar con el pedido").
+- [x] **2.3** Definir las props necesarias: `groupedCart`, `cartItems`, `accentColor`, `onAddOne`, `onRemoveOne`, `onContinue`.
+- [x] **2.4** Este componente es puramente visual, sin lógica de negocio ni llamadas a Supabase.
+- [x] **2.5** Mantener las animaciones de `framer-motion` existentes intactas.
+---
+
+### Paso 3 — Crear el componente `CheckoutFormView.tsx`
+
+- [x] **3.1** Crear el archivo `src/components/explorer/CheckoutFormView.tsx`.
+- [x] **3.2** Extraer todo el JSX correspondiente al **paso "checkout"** (formulario de nombre, celular, dirección, GPS, notas, método de pago, botón de WhatsApp).
+- [x] **3.3** Definir las props necesarias: `accentColor`, `businessName`, todos los estados del formulario y sus setters, `validationError`, `isLocating`, `gpsLocation`, `handleShareLocation`, `handleSendWhatsApp`, `onBack`.
+- [x] **3.4** Este componente es puramente visual y de interacción, sin lógica de negocio directa.
+- [x] **3.5** Mantener el SVG de WhatsApp, estilos glassmorphism y animaciones existentes.
+
+---
+
+### Paso 4 — Refactorizar el orquestador `CraveCheckoutSheet.tsx`
+
+- [x] **4.1** Limpiar `CraveCheckoutSheet.tsx` eliminando todos los estados, funciones y JSX detallado que fueron extraídos.
+- [x] **4.2** Importar y consumir `useCheckoutLogic`.
+- [x] **4.3** Importar y renderizar `<CheckoutCartView />` cuando `checkoutStep === "cart"`.
+- [x] **4.4** Importar y renderizar `<CheckoutFormView />` cuando `checkoutStep === "checkout"`.
+- [x] **4.5** Mantener únicamente el backdrop/overlay, el `<AnimatePresence>` principal y el `<motion.div>` contenedor del sheet.
+- [x] **4.6** Validar que el archivo orquestador quede por debajo de **150 líneas**.
+
+---
+
+### Paso 5 — Pruebas de integración
+
+- [ ] **5.1** Verificar que el flujo completo funciona: carrito → formulario → WhatsApp.
+- [ ] **5.2** Confirmar que el insert en Supabase sigue funcionando y se loguea correctamente el error si falla.
+- [ ] **5.3** Confirmar que el evento `fowy:order-created` se sigue disparando y `UserOrdersSheet` se actualiza.
+- [ ] **5.4** Verificar que la geolocalización GPS funciona en el nuevo componente.
+- [ ] **5.5** Confirmar que las animaciones de entrada/salida del sheet se mantienen igual.
