@@ -510,25 +510,3 @@ Para tener un desarrollo con el contexto adecuado y continuar con la construcci�
 - **Backup**: Respaldado con push exitoso a la rama `main` de GitHub.
 
 *Última actualización: 07 de Mayo de 2026 - 11:25 PM*
-
----
-
-## 🐛 ANÁLISIS DE BUG: PÉRDIDA DE SCROLL EN PANEL DE NEGOCIO EN VISTA PC — SESIÓN XVII (08 de Mayo de 2026)
-**Encargado**: Antigravity AI
-**Estado**: 🔍 ANALIZADO (Pendiente de aprobación de Cristian para solución)
-
-### 🎯 Diagnóstico del Problema
-Se reportó que en el panel del negocio se puede hacer scroll vertical en el menú lateral de forma correcta, pero el área de contenido principal no permite scroll en la vista de PC (en la vista de celular sí funciona de forma fluida).
-
-- **Comportamiento en PC (Escritorio)**: El layout divide la pantalla usando un sidebar lateral izquierdo fijo y una sección de contenido principal a la derecha. Al tener una altura fija de viewport (`h-screen`, `height: 100vh`) acompañada de un estilo de `overflow: hidden` en el contenedor de nivel superior, se bloquea por completo el scroll nativo con la rueda del ratón en la columna de contenido.
-- **Comportamiento en Celular**: Al adaptarse el layout responsive (donde el menú lateral se oculta o se convierte en un drawer móvil), el contenedor principal pierde las restricciones rígidas de altura y permite que el viewport nativo del móvil realice el scroll por defecto con la acción táctil de arrastre.
-
-### 🛠️ Propuesta de Solución (Pendiente de Aprobación)
-Para solucionar la pérdida de scroll en la vista de PC, se propone ajustar las clases de envoltura del contenedor de contenido principal (normalmente en [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/(partners)/business/page.tsx) o en su respectivo layout):
-1. Asegurar que el contenedor principal que aloja el contenido de la derecha tenga la clase `overflow-y-auto` en conjunto con `h-screen` o `max-h-screen`, para permitir el scroll local e independiente en la columna de contenido.
-2. Alternativamente, estructurar el contenedor general usando clases como `min-h-screen overflow-y-auto` a nivel responsive (`md:`) para que el scroll fluya con naturalidad sin verse truncado.
-
-*Nota de Seguridad*: En cumplimiento estricto de la **REGLA DE ORO**, no se ha realizado ninguna modificación o inserción de líneas de código en los archivos de la aplicación. Esta entrada actúa exclusivamente como registro y documentación técnica para su posterior ejecución tras la aprobación expresa de Cristian (CEO de FOWY).
-
----
-*Última actualización: 08 de Mayo de 2026 - 12:45 AM*

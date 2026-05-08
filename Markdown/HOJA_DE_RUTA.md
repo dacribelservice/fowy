@@ -330,5 +330,40 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] **16.4.2 Componentes Especializados**: Crear componentes independientes en `src/components/admin/businesses/` (ej: `BusinessMetricsList.tsx`, `FowySalesChart.tsx`) para albergar toda la lógica visual de manera desacoplada.
 
 ---
+
+## 💎 FASE 17: INTEGRACIÓN FINANCIERA DE MEMBRESÍAS (En Progreso ⏳)
+*Objetivo: Integrar el registro, cobro manual y aprobación de comprobantes de pago de negocios con el módulo de Finanzas global del Super Admin.*
+
+- [ ] **17.1 Modal de Confirmación y Ajuste Manual (BusinessPaymentViewer)**:
+    - [ ] **17.1.1** Crear modal de confirmación emergente (Popup/Dialog) con estilo premium glassmorphism.
+    - [ ] **17.1.2** Integrar campo numérico (Input) pre-llenado con el valor por defecto para permitir edición manual del monto verificado.
+    - [ ] **17.1.3** Actualizar base de datos (`payment_proofs`) modificando tanto el estado a `'approved'` como el `amount` con el valor exacto ingresado.
+- [ ] **17.2 Integración en Backend Financiero (useFinanceManager)**:
+    - [ ] **17.2.1** Extender el hook de finanzas para consultar en paralelo la tabla `payment_proofs` para todos los registros con estado `'approved'`.
+    - [ ] **17.2.2** Combinar las colecciones de `service_orders` y `payment_proofs` aprobados en un solo flujo ordenado temporalmente.
+- [ ] **17.3 Cálculos y Métricas Consolidadas (financeUtils)**:
+    - [ ] **17.3.1** Modificar `calculateFinanceStats` para sumar el 100% de los cobros de membresías de negocios a la métrica **"Ingresos FOWY"**.
+    - [ ] **17.3.2** Sumar los montos de membresía aprobados a la métrica de **"Volumen Total (GMV)"**.
+- [ ] **17.4 Interfaz del Panel de Finanzas (AdminFinancePage)**:
+    - [ ] **17.4.1** Actualizar la tabla de transacciones recientes para inyectar transacciones del tipo `Membresía` mostrando el nombre del negocio con un icono y estilo distintivos.
+    - [ ] **17.4.2** Asegurar la actualización del gráfico de tendencias para incluir el volumen de membresías confirmadas.
+
+---
+
+## 💰 FASE 18: AJUSTES DE MEMBRESÍA DINÁMICA (COP & FECHAS) (Pendiente ⏳)
+*Objetivo: Permitir al Súper Admin configurar el precio de membresía en COP y la fecha de próximo pago de cada negocio, y reflejar estos datos dinámicamente en el panel del socio.*
+
+- [ ] **18.1 Estructura de Base de Datos**:
+    - [ ] **18.1.1** Agregar la columna `membership_price` (NUMERIC) a la tabla `businesses` en Supabase para almacenar el valor personalizado en COP.
+- [ ] **18.2 Panel Súper Admin (Configuración del Negocio)**:
+    - [ ] **18.2.1** Integrar un campo numérico (Input) para el "Precio de Membresía (COP)" en la pestaña *Configuración General* (`BusinessBasicSettings`).
+    - [ ] **18.2.2** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
+- [ ] **18.3 Panel de Socio (Finanzas y Membresía)**:
+    - [ ] **18.3.1** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
+    - [ ] **18.3.2** Reemplazar los valores estáticos/hardcodeados (la fecha y los `$29.99` USD) por los valores dinámicos recuperados de la base de datos (con formato en COP).
+    - [ ] **18.3.3** Sincronizar el "Membership Alert" del `PartnerTopBar.tsx` para usar de forma consistente los datos dinámicos.
+    - [ ] **18.3.4** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar el valor de membresía dinámico asignado al negocio.
+
+---
 ---
  *Documento consolidado - FOWY 2026*
