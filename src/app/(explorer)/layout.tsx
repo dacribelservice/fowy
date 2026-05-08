@@ -149,7 +149,6 @@ export default function ExplorerLayout({
 
                         {/* Menu Options */}
                         {[
-                          { icon: User, label: "Perfil" },
                           ...(profile?.role === 'super_admin' ? [{ icon: ShieldCheck, label: "Admin Panel", href: "/admin/dashboard" }] : []),
                           ...(hasBusiness ? [{ icon: Store, label: "Mi Negocio", href: "/business" }] : []),
                           { icon: Heart, label: "Favoritos" },

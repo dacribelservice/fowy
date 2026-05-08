@@ -515,42 +515,53 @@ Para tener un desarrollo con el contexto adecuado y continuar con la construcci�
 
 ## 💎 INTEGRACIÓN FINANCIERA Y MEMBRESÍA DINÁMICA (FASES 17 Y 18) — SESIÓN XVII (08 de Mayo de 2026)
 **Encargado**: Antigravity AI
-**Estado**: 🔵 PLANIFICADO / CONTEXTO CONSOLIDADO PARA LA SIGUIENTE SESIÓN
+**Estado**: ✅ COMPLETADO
 
 ### 🎯 Contexto Maestro y Objetivos de la Checklist
 Se consolidó una planificación meticulosa para la integración de cobros y membresía dinámica de negocios, lista para ser codificada sin fricción. Este registro garantiza la continuidad perfecta del desarrollo.
 
 ### 📝 Desglose Técnico por Fases:
 
-#### 1. FASE 17: Integración Financiera de Membresías
-*   **17.1 Modal de Ajuste Manual (`BusinessPaymentViewer.tsx`)**:
-    *   **UI Premium Glassmorphism**: Crear un modal emergente estilizado (`backdrop-blur-md bg-white/80 border border-white/20`) que pre-llene un input con el precio de membresía actual del negocio (`business.membership_price` en lugar de valores fijos en dólares).
-    *   **Lógica de Aprobación**: Al hacer clic en "Confirmar", el modal guardará el valor manual verificado/ajustado en la columna `amount` de `payment_proofs` y el estado como `'approved'`.
-    *   **Sincronización en Tiempo Real**: Al confirmarse el pago, el panel superior del Super Admin debe ocultar de inmediato el bloque del comprobante verificado (limpiando el estado local del comprobante cargado en `page.tsx`).
-*   **17.2 Backend Financiero (`useFinanceManager.ts`)**:
-    *   Extender la consulta de finanzas para traer en paralelo todos los registros aprobados de `payment_proofs`.
-    *   Combinar las colecciones de pedidos de servicios (`service_orders`) y comprobantes de membresía (`payment_proofs`) en un único historial cronológico unificado.
-*   **17.3 Métricas Consolidadas (`financeUtils.ts`)**:
-    *   Sumar el 100% de los ingresos de membresías aprobadas a la métrica de **"Ingresos FOWY"**.
-    *   Sumar estos montos al volumen total de operaciones del ecosistema (**GMV**).
-*   **17.4 Dashboard de Finanzas (`AdminFinancePage`)**:
-    *   Mostrar transacciones de tipo "Membresía" con un icono distintivo (ej. `Sparkles` o `CreditCard`) y la tipografía de negocio adecuada en el listado de transacciones.
+#### 1. FASE 17: Integración Financiera de Membresías ✅
+*   **17.1 Modal de Ajuste Manual (`BusinessPaymentViewer.tsx`)**: ✅
+    *   Modal glassmorphism premium con input pre-llenado con `membership_price` del negocio.
+    *   Al aprobar, persiste `amount` (valor manual verificado) + `status: 'approved'` en `payment_proofs`.
+    *   Limpieza inmediata del estado del comprobante en la UI (sincronización en tiempo real).
+    *   **Auto-Progresión +30 días**: Al aprobar, calcula y persiste la nueva `payment_date` en `businesses`.
+*   **17.2 Backend Financiero (`useFinanceManager.ts`)**: ✅
+    *   Consulta en paralelo de `payment_proofs` con `status: 'approved'`.
+    *   Historial unificado y ordenado temporalmente: `service_orders` + `payment_proofs`.
+*   **17.3 Métricas Consolidadas (`financeUtils.ts`)**: ✅
+    *   100% de membresías aprobadas sumadas a **"Ingresos FOWY"** y al **GMV (Volumen Total)**.
+*   **17.4 Dashboard de Finanzas (`AdminFinancePage`)**: ✅
+    *   Transacciones tipo `Membresía` con icono `Sparkles` y tipografía distintiva.
+    *   Gráfico de tendencias actualizado para incluir volumen de membresías confirmadas.
 
-#### 2. FASE 18: Ajustes de Membresía Dinámica (COP & Fechas)
-*   **18.1 Estructura en Supabase**:
-    *   **✅ Completado**: Verificado y confirmado que las columnas `membership_price` (NUMERIC) y `payment_date` (TIMESTAMPTZ) ya están implementadas en la tabla `businesses`.
-*   **18.2 Panel de Súper Admin (`BusinessBasicSettings` & `page.tsx`)**:
-    *   **Campo "Precio COP"**: Añadir un input numérico para el "Precio de Membresía (COP)" en la configuración general del negocio.
-    *   **Blindaje contra JS Crashes**: Asegurar que la fecha se extraiga de forma segura con fallback para nulos: `business.payment_date?.split('T')[0] || ''`.
-    *   **Persistencia**: Sincronizar el envío del campo `membership_price` en el JSON que el orquestador `page.tsx` persiste en Supabase al guardar cambios generales.
-    *   **Auto-Progresión de Fecha (+30 días)**: Al aprobar un comprobante en `BusinessPaymentViewer`, el sistema calculará automáticamente la suma de la fecha de próximo pago del negocio +30 días, persistiendo el nuevo timestamp en la tabla `businesses`.
-*   **18.3 Panel de Socios (`/business/finanzas` & `PartnerTopBar.tsx`)**:
-    *   **Formateador COP**: Crear/utilizar una utilidad unificada `formatCOP(value)` para mostrar precios (ej. `$ 115.000` con espacio fino).
-    *   **Visualización Dinámica**: Eliminar el valor estático hardcodeado de mayo de 2026 y los $29.99 USD en `/business/finanzas`, consumiendo de forma reactiva `payment_date` y `membership_price` directamente del negocio cargado.
-    *   **Header Dinámico (`PartnerTopBar`)**: Modificar la consulta para traer también `name` y `plan` del negocio del socio logueado, inyectándolos dinámicamente en el perfil de usuario (reemplazando "Socio FOWY" y "Premium Plan" fijos).
-    *   **Carga Automatizada**: Al subir un comprobante de pago desde el panel del socio, el formulario debe enviar automáticamente el `membership_price` actual de ese negocio como el monto del comprobante.
+#### 2. FASE 18: Ajustes de Membresía Dinámica (COP & Fechas) ✅
+*   **18.1 Estructura en Supabase**: ✅ (Verificado — `membership_price` NUMERIC y `payment_date` TIMESTAMPTZ ya existían).
+*   **18.2 Panel de Súper Admin (`BusinessBasicSettings` & `page.tsx`)**: ✅
+    *   Input numérico "Precio de Membresía (COP)" integrado en *Configuración General*.
+    *   Blindaje de fecha contra JS crashes con `payment_date?.split('T')[0] || ''`.
+    *   Persistencia de `membership_price` en Supabase al guardar cambios generales.
+    *   Auto-progresión +30 días en `BusinessPaymentViewer` al aprobar comprobante.
+*   **18.3 Panel de Socios (`/business/finanzas` & `PartnerTopBar.tsx`)**: ✅
+    *   `formatCOP(value)` — Utilidad global unificada (`$ 115.000 COP`).
+    *   Valores dinámicos: `payment_date` y `membership_price` desde DB, eliminados todos los hardcodes (mayo estático, $29.99 USD).
+    *   `PartnerTopBar.tsx`: Consulta extendida con `name` y `plan`; perfil superior dinámico (nombre real, plan real, avatar con inicial del negocio).
+    *   Upload de comprobante: `membership_price` estricto del negocio. Si es `null`, muestra error y aborta en lugar de insertar valor incorrecto.
 
----
-*Fin de la sesión de preparación. Todo el contexto operativo de las Fases 17 y 18 está mapeado, estructurado y listo para el inicio del código.*
+### 📂 Archivos Modificados y Guardados:
+- `src/components/admin/businesses/BusinessPaymentViewer.tsx`
+- `src/hooks/useFinanceManager.ts`
+- `src/utils/financeUtils.ts`
+- `src/components/admin/businesses/BusinessBasicSettings.tsx`
+- `src/app/admin/negocios/[id]/page.tsx`
+- `src/app/(partners)/business/finanzas/page.tsx`
+- `src/components/partners/PartnerTopBar.tsx`
+- `Markdown/HOJA_DE_RUTA.md` (Fases 17 y 18 marcadas como completadas)
 
-*Última actualización: 08 de Mayo de 2026 - 10:00 AM*
+### 📈 Resultado de Calidad:
+- **Tipado y Compilación**: 0 errores TypeScript.
+- **Backup**: Commit `21c51c5` — push exitoso a la rama `main` de GitHub.
+
+*Última actualización: 08 de Mayo de 2026 - 06:10 PM*

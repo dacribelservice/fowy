@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, ChevronRight } from "lucide-react";
+import { Star, ChevronRight, Navigation } from "lucide-react";
 import Link from "next/link";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
 import { getDistance } from "@/utils/geo";
@@ -76,13 +76,26 @@ export default function BusinessDetailSheet({
         </div>
       </div>
 
-      <Link 
-        href={`/${business.slug}`}
-        className="w-full py-5 bg-slate-900 text-white rounded-[25px] font-black text-sm uppercase tracking-[2px] flex items-center justify-center gap-3 shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
-      >
-        Ver Menú Digital
-        <ChevronRight size={20} />
-      </Link>
+      <div className="flex gap-3">
+        {/* Navegar */}
+        <a
+          href={`https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 py-2 px-3 rounded-[20px] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 bg-gradient-to-b from-[#7B61FF] to-[#4D8BFF] text-white shadow-lg shadow-[#7B61FF]/30 hover:shadow-[#7B61FF]/50 active:scale-95 transition-all border border-white/20"
+        >
+          <Navigation size={16} />
+          Navegar
+        </a>
+        {/* Menú */}
+        <Link
+          href={`/${business.slug}`}
+          className="flex-1 py-2 px-3 rounded-[20px] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 bg-gradient-to-b from-[#FF5A5F] to-[#FF9A3D] text-white shadow-lg shadow-[#FF5A5F]/30 hover:shadow-[#FF5A5F]/50 active:scale-95 transition-all border border-white/20"
+        >
+          <ChevronRight size={16} />
+          Menú
+        </Link>
+      </div>
     </div>
   );
 }

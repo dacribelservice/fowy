@@ -123,13 +123,26 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness }: Ex
                     </div>
                   </div>
                   
-                  <Link 
-                    href={`/${biz.slug}`}
-                    className="w-full py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors"
-                  >
-                    Ver Menú
-                    <ChevronRight size={12} />
-                  </Link>
+                  <div className="flex gap-2">
+                    {/* Navegar */}
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${bizLat},${bizLng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 bg-gradient-to-b from-[#7B61FF] to-[#4D8BFF] !text-white shadow-md shadow-[#7B61FF]/30 hover:shadow-[#7B61FF]/50 active:scale-95 transition-all border border-white/20"
+                    >
+                      <Navigation size={11} />
+                      Navegar
+                    </a>
+                    {/* Menú */}
+                    <Link
+                      href={`/${biz.slug}`}
+                      className="flex-1 py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 bg-gradient-to-b from-[#FF5A5F] to-[#FF9A3D] !text-white shadow-md shadow-[#FF5A5F]/30 hover:shadow-[#FF5A5F]/50 active:scale-95 transition-all border border-white/20"
+                    >
+                      <ChevronRight size={11} />
+                      Menú
+                    </Link>
+                  </div>
                 </div>
               </Popup>
             </Marker>

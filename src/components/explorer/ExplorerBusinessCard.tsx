@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, Star, Clock, ChevronRight } from "lucide-react";
+import { MapPin, Star, Clock, ChevronRight, Navigation } from "lucide-react";
 import Link from "next/link";
 
 interface Business {
@@ -13,6 +13,8 @@ interface Business {
   city: string | null;
   category_name?: string;
   color_identity: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface ExplorerBusinessCardProps {
@@ -72,9 +74,9 @@ export default function ExplorerBusinessCard({ business, index }: ExplorerBusine
         </div>
       </div>
 
-      {/* Action Button */}
-      <div className="mt-4 pt-4 border-t border-slate-100/50 flex items-center justify-between">
-        <div className="flex -space-x-2">
+      {/* Action Buttons */}
+      <div className="mt-4 pt-4 border-t border-slate-100/50 flex items-center justify-between gap-3">
+        <div className="flex -space-x-2 flex-shrink-0">
            {[1,2,3].map(i => (
              <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
                <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" className="w-full h-full object-cover" />
@@ -85,13 +87,28 @@ export default function ExplorerBusinessCard({ business, index }: ExplorerBusine
            </div>
         </div>
 
-        <Link 
-          href={`/${business.slug}`}
-          className="flex items-center gap-2 px-6 py-2 rounded-full bg-fowy-energy text-white text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 group/btn shadow-md shadow-fowy-red/20"
-        >
-          Ver Menú
-          <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-        </Link>
+        <div className="flex gap-2">
+          {/* Navegar */}
+          {business.latitude && business.longitude && (
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 py-2 px-3 rounded-full bg-gradient-to-b from-[#7B61FF] to-[#4D8BFF] text-white text-xs font-black uppercase tracking-widest shadow-md shadow-[#7B61FF]/30 hover:shadow-[#7B61FF]/50 active:scale-95 transition-all border border-white/20"
+            >
+              <Navigation size={13} />
+              Navegar
+            </a>
+          )}
+          {/* Menú */}
+          <Link
+            href={`/${business.slug}`}
+            className="flex items-center gap-1.5 py-2 px-3 rounded-full bg-gradient-to-b from-[#FF5A5F] to-[#FF9A3D] text-white text-xs font-black uppercase tracking-widest shadow-md shadow-[#FF5A5F]/30 hover:shadow-[#FF5A5F]/50 active:scale-95 transition-all border border-white/20 group/btn"
+          >
+            <ChevronRight size={13} className="group-hover/btn:translate-x-0.5 transition-transform" />
+            Menú
+          </Link>
+        </div>
       </div>
     </motion.div>
   );
