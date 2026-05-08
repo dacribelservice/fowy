@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Image as ImageIcon, AlertCircle } from "lucide-react";
 
@@ -14,11 +14,18 @@ interface PremiumImageProps {
 export default function PremiumImage({ src, alt, className = "", fallbackType = "generic" }: PremiumImageProps) {
   const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
   const [displaySrc, setDisplaySrc] = useState(src);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setStatus("loading");
     setDisplaySrc(src);
   }, [src]);
+
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      setStatus("loaded");
+    }
+  }, [displaySrc]);
 
   return (
     <div className={`relative overflow-hidden bg-slate-50 flex items-center justify-center ${className}`}>
@@ -56,6 +63,7 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
 
       {/* Actual Image */}
       <img
+        ref={imgRef}
         src={displaySrc}
         alt={alt}
         className={`w-full h-full object-cover transition-all duration-500 ${
