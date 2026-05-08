@@ -103,3 +103,29 @@ export const groupFinanceByDate = (
     data: dailyVolume
   };
 };
+
+/**
+ * Formats a numeric value into Colombian Pesos (COP) with thousands separator as dot and a space.
+ * Example: formatCOP(115000) => "$ 115.000"
+ *          formatCOP(115000, true) => "$ 115.000 COP"
+ */
+export const formatCOP = (
+  value: number | string | null | undefined,
+  includeSuffix: boolean = false
+): string => {
+  const num = Number(value);
+  if (value === null || value === undefined || isNaN(num)) {
+    return "$ 0" + (includeSuffix ? " COP" : "");
+  }
+
+  // Format with es-CO (or es-ES) to guarantee dots as thousands separator
+  const formatted = new Intl.NumberFormat('es-CO', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(num);
+
+  // Return formatted string with spaces
+  return `$ ${formatted}${includeSuffix ? " COP" : ""}`;
+};
+

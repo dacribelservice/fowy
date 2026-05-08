@@ -367,12 +367,12 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] **18.2.3** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
     - [x] **18.2.4** **Progresión Automática de Fecha**: Al aprobar un pago en `BusinessPaymentViewer`, sumarle automáticamente **30 días** a la fecha de pago actual (o a la fecha actual si es nula) y guardarlo en la tabla `businesses`.
 - [ ] **18.3 Panel de Socio (Finanzas, Membresía y Formatos Premium)**:
-    - [ ] **18.3.1** **Formateador Unificado de COP**: Implementar utilidad global `formatCOP(value)` para desplegar montos con espacio y puntos como separadores de miles (ej. `$ 115.000 COP` o `$ 115.000`) de forma unificada.
-    - [ ] **18.3.2** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
-    - [ ] **18.3.3** Reemplazar los valores estáticos/hardcodeados (la fecha fija de mayo y los `$29.99` USD) por los valores dinámicos recuperados de la base de datos (con el nuevo formato COP premium).
-    - [ ] **18.3.4** Sincronizar el "Membership Alert" del `PartnerTopBar.tsx` para usar de forma consistente los datos dinámicos.
-    - [ ] **18.3.5** **Identidad Dinámica en PartnerTopBar**: Extender la consulta de `PartnerTopBar.tsx` para recuperar dinámicamente el `name` y `plan` del negocio del socio y mostrarlos en el perfil de la esquina superior, reemplazando las cadenas fijas por datos dinámicos y actualizados en tiempo real.
-    - [ ] **18.3.6** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar dinámicamente el valor del `membership_price` asignado al negocio del socio en lugar de un monto fijo.
+    - [x] **18.3.1** **Formateador Unificado de COP**: Implementar utilidad global `formatCOP(value)` para desplegar montos con espacio y puntos como separadores de miles (ej. `$ 115.000 COP` o `$ 115.000`) de forma unificada.
+    - [x] **18.3.2** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
+    - [x] **18.3.3** Reemplazar los valores estáticos/hardcodeados (la fecha fija de mayo y los `$29.99` USD) por los valores dinámicos recuperados de la base de datos (con el nuevo formato COP premium).
+    - [x] **18.3.4** Sincronizar el "Membership Alert" del `PartnerTopBar.tsx` para usar de forma consistente los datos dinámicos.
+    - [x] **18.3.5** **Identidad Dinámica en PartnerTopBar**: Extender la consulta de `PartnerTopBar.tsx` para recuperar dinámicamente el `name` y `plan` del negocio del socio y mostrarlos en el perfil de la esquina superior, reemplazando las cadenas fijas por datos dinámicos y actualizados en tiempo real.
+    - [x] **18.3.6** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar dinámicamente el valor del `membership_price` asignado al negocio del socio en lugar de un monto fijo.
 
 ---
 ---

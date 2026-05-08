@@ -10,6 +10,8 @@ import { createClient } from "@/utils/supabase/client";
 export default function PartnerTopBar() {
   const pathname = usePathname();
   const [membershipAlert, setMembershipAlert] = React.useState<{ days: number; active: boolean } | null>(null);
+  const [businessName, setBusinessName] = React.useState<string | null>(null);
+  const [businessPlan, setBusinessPlan] = React.useState<string | null>(null);
   const supabase = createClient();
 
   React.useEffect(() => {
@@ -19,12 +21,16 @@ export default function PartnerTopBar() {
 
       const { data: business } = await supabase
         .from('businesses')
-        .select('payment_date')
+        .select('payment_date, name, plan')
         .eq('owner_id', user.id)
         .single();
 
+      if (business?.name) setBusinessName(business.name);
+      if (business?.plan) setBusinessPlan(business.plan);
+
       if (business?.payment_date) {
-        const expiration = new Date(business.payment_date);
+        const cleanedDate = business.payment_date.replace(" ", "T");
+        const expiration = new Date(cleanedDate);
         const today = new Date();
         const diffTime = expiration.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -113,15 +119,19 @@ export default function PartnerTopBar() {
         {/* Profile Summary */}
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
           <div className="hidden sm:block text-right">
-            <p className="text-sm font-black text-slate-800 leading-none">Socio FOWY</p>
-            <p className="text-[10px] text-fowy-secondary font-black uppercase tracking-tighter mt-1">Premium Plan</p>
+            <p className="text-sm font-black text-slate-800 leading-none">
+              {businessName ?? 'Socio FOWY'}
+            </p>
+            <p className="text-[10px] text-fowy-secondary font-black uppercase tracking-tighter mt-1">
+              {businessPlan ? `Plan ${businessPlan}` : 'Plan FOWY'}
+            </p>
           </div>
           <motion.div 
             whileHover={{ scale: 1.05 }}
             className="w-12 h-12 rounded-2xl bg-gradient-to-br from-fowy-secondary to-fowy-purple p-[1px] shadow-premium"
           >
             <div className="w-full h-full rounded-[15px] bg-white flex items-center justify-center text-fowy-secondary font-black text-lg">
-              S
+              {businessName ? businessName.charAt(0).toUpperCase() : 'S'}
             </div>
           </motion.div>
         </div>

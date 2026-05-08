@@ -14,6 +14,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
+import { formatCOP } from "@/utils/financeUtils";
+
 interface PaymentProof {
   id: string;
   amount: number;
@@ -26,6 +28,10 @@ export default function FinancePage() {
   const [proofs, setProofs] = useState<PaymentProof[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [paymentDate, setPaymentDate] = useState<string | null>(null);
+  const [membershipPrice, setMembershipPrice] = useState<number | null>(null);
+  const [plan, setPlan] = useState<string | null>(null);
+  const [status, setStatus] = useState<boolean | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -35,11 +41,16 @@ export default function FinancePage() {
 
       const { data: business } = await supabase
         .from('businesses')
-        .select('id')
+        .select('id, payment_date, membership_price, plan, status')
         .eq('owner_id', user.id)
         .single();
 
       if (business) {
+        setPaymentDate(business.payment_date);
+        setMembershipPrice(business.membership_price);
+        setPlan(business.plan);
+        setStatus(business.status);
+
         const { data } = await supabase
           .from('payment_proofs')
           .select('*')
@@ -65,7 +76,7 @@ export default function FinancePage() {
 
       const { data: business } = await supabase
         .from('businesses')
-        .select('id')
+        .select('id, membership_price')
         .eq('owner_id', user.id)
         .single();
 
@@ -85,11 +96,16 @@ export default function FinancePage() {
         .from('payment-proofs')
         .getPublicUrl(filePath);
 
+      if (!business.membership_price) {
+        toast.error("El precio de membresía no está configurado. Contacta al administrador.");
+        return;
+      }
+
       const { error: insertError } = await supabase
         .from('payment_proofs')
         .insert({
           business_id: business.id,
-          amount: 29.99, // Standard plan cost
+          amount: business.membership_price,
           proof_url: publicUrl,
           status: 'pending'
         });
@@ -111,6 +127,25 @@ export default function FinancePage() {
       toast.error("Error al subir el comprobante");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const formatPaymentDate = (dateStr: string | null) => {
+    if (!dateStr) return "No configurada";
+    try {
+      const cleaned = dateStr.replace(" ", "T");
+      const date = new Date(cleaned);
+      if (isNaN(date.getTime())) return "No configurada";
+      const day = date.getDate();
+      const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day} ${month}, ${year}`;
+    } catch (e) {
+      return "No configurada";
     }
   };
 
@@ -139,22 +174,24 @@ export default function FinancePage() {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Plan Actual</p>
-              <h3 className="text-xl font-bold text-slate-800">FOWY PRO</h3>
+              <h3 className="text-xl font-bold text-slate-800">FOWY {plan?.toUpperCase() || "PRO"}</h3>
             </div>
           </div>
 
           <div className="space-y-4 mb-8">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Estado</span>
-              <span className="font-bold text-green-500">Activo</span>
+              <span className={`font-bold ${status !== false ? "text-green-500" : "text-red-500"}`}>
+                {status !== false ? "Activo" : "Inactivo"}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Próximo Pago</span>
-              <span className="font-bold text-slate-800">15 Mayo, 2026</span>
+              <span className="font-bold text-slate-800">{formatPaymentDate(paymentDate)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Costo Mensual</span>
-              <span className="font-bold text-slate-800">$29.99</span>
+              <span className="font-bold text-slate-800">{formatCOP(membershipPrice ?? 115000, true)}</span>
             </div>
           </div>
 
@@ -200,33 +237,33 @@ export default function FinancePage() {
                  {[1, 2].map(i => <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />)}
                </div>
             ) : (
-              <div className="space-y-4">
-                {proofs.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400">
-                    <FileText size={48} className="mx-auto mb-4 opacity-20" />
-                    <p>No tienes pagos registrados aún.</p>
-                  </div>
-                ) : (
-                  proofs.map((proof) => (
-                    <div key={proof.id} className="flex items-center justify-between p-4 bg-white/50 border border-slate-100 rounded-2xl">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          proof.status === 'approved' ? 'bg-green-100 text-green-600' :
-                          proof.status === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-red-100 text-red-600'
-                        }`}>
-                          {proof.status === 'approved' ? <CheckCircle2 size={20} /> :
-                           proof.status === 'pending' ? <Clock size={20} /> : <AlertCircle size={20} />}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-800">Pago de Membresía</p>
-                          <div className="flex items-center gap-2 text-xs text-slate-500">
-                            <Calendar size={12} />
-                            {new Date(proof.created_at).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-slate-800">${proof.amount}</p>
+               <div className="space-y-4">
+                 {proofs.length === 0 ? (
+                   <div className="text-center py-12 text-slate-400">
+                     <FileText size={48} className="mx-auto mb-4 opacity-20" />
+                     <p>No tienes pagos registrados aún.</p>
+                   </div>
+                 ) : (
+                   proofs.map((proof) => (
+                     <div key={proof.id} className="flex items-center justify-between p-4 bg-white/50 border border-slate-100 rounded-2xl">
+                       <div className="flex items-center gap-4">
+                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                           proof.status === 'approved' ? 'bg-green-100 text-green-600' :
+                           proof.status === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-red-100 text-red-600'
+                         }`}>
+                           {proof.status === 'approved' ? <CheckCircle2 size={20} /> :
+                            proof.status === 'pending' ? <Clock size={20} /> : <AlertCircle size={20} />}
+                         </div>
+                         <div>
+                           <p className="font-bold text-slate-800">Pago de Membresía</p>
+                           <div className="flex items-center gap-2 text-xs text-slate-500">
+                             <Calendar size={12} />
+                             {new Date(proof.created_at).toLocaleDateString()}
+                           </div>
+                         </div>
+                       </div>
+                       <div className="text-right">
+                         <p className="font-bold text-slate-800">{formatCOP(proof.amount)}</p>
                         <p className={`text-[10px] font-bold uppercase ${
                           proof.status === 'approved' ? 'text-green-500' :
                           proof.status === 'pending' ? 'text-orange-500' : 'text-red-500'
