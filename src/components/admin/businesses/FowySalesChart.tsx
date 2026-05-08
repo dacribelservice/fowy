@@ -34,19 +34,31 @@ export function FowySalesChart({ businessId }: { businessId: string }) {
           <div className="w-1.5 h-1.5 rounded-full bg-fowy-orange animate-pulse" />
           <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">Tendencia de Ventas</h4>
         </div>
-        <div className="bg-slate-100 rounded-full p-0.5 flex gap-0.5">
-          {(["D", "S", "M"] as TimeFilter[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => { setFilter(f); setActivePoint(null); }}
-              className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase transition-all duration-300 relative ${filter === f ? "text-white" : "text-slate-400 hover:text-slate-600"}`}
-            >
-              <span className="relative z-10">{f}</span>
-              {filter === f && (
-                <motion.div layoutId="activeFilterBg" className="absolute inset-0 bg-fowy-orange rounded-full" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
-              )}
-            </button>
-          ))}
+        <div className="bg-orange-50/60 border border-orange-100/50 rounded-full p-0.5 flex gap-0.5 shadow-sm">
+          {(["D", "S", "M"] as TimeFilter[]).map((f) => {
+            const labelMap = { D: "DÍA", S: "SEMANA", M: "MES" };
+            const isActive = filter === f;
+            return (
+              <button
+                key={f}
+                onClick={() => { setFilter(f); setActivePoint(null); }}
+                className={`text-[9px] font-black px-3 py-1 rounded-full uppercase transition-all duration-300 relative ${
+                  isActive 
+                    ? "text-[#FF5A5F]" 
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                <span className="relative z-10">{labelMap[f]}</span>
+                {isActive && (
+                  <motion.div 
+                    layoutId="activeFilterBg" 
+                    className="absolute inset-0 bg-orange-100/70 rounded-full" 
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }} 
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -129,8 +141,8 @@ export function FowySalesChart({ businessId }: { businessId: string }) {
           <Calendar className="w-3.5 h-3.5 text-slate-400" />
           Total del período
         </div>
-        <div className="text-slate-700 font-black text-xs flex items-center gap-0.5 bg-slate-100 rounded-lg px-2 py-0.5">
-          <TrendingUp className="w-3 h-3 text-fowy-orange" />
+        <div className="bg-gradient-to-r from-[#FF5A5F] to-[#FF9A3D] text-white font-black text-xs flex items-center gap-1 rounded-full px-3 py-1 shadow-md shadow-[#FF5A5F]/20 border border-white/10 transition-all duration-300 hover:scale-105 select-none">
+          <TrendingUp className="w-3.5 h-3.5 text-white" />
           {formatCurrency(totalPeriodSales)}
         </div>
       </div>

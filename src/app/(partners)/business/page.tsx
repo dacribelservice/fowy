@@ -9,14 +9,16 @@ import {
   DollarSign 
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { FowySalesChart } from "@/components/admin/businesses/FowySalesChart";
 
 export default function BusinessDashboard() {
   const [loading, setLoading] = useState(true);
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const [stats, setStats] = useState([
     { name: "Visitas Totales", value: "0", change: "0%", trend: "up", icon: Users, color: "bg-blue-500" },
     { name: "Pedidos Recibidos", value: "0", change: "0%", trend: "up", icon: ShoppingBag, color: "bg-fowy-secondary" },
     { name: "Tasa de Conversión", value: "0%", change: "0%", trend: "up", icon: TrendingUp, color: "bg-orange-500" },
-    { name: "Ticket Promedio", value: "$0.00", change: "0%", trend: "up", icon: DollarSign, color: "bg-green-500" },
+    { name: "Ticket Promedio", value: "$0", change: "0%", trend: "up", icon: DollarSign, color: "bg-green-500" },
   ]);
   const [recentVisits, setRecentVisits] = useState<any[]>([]);
   const supabase = createClient();
@@ -33,6 +35,7 @@ export default function BusinessDashboard() {
         .single();
 
       if (business) {
+        setBusinessId(business.id);
         // Fetch Visits
         const { count: visitCount } = await supabase
           .from('analytics_visits')
@@ -62,7 +65,7 @@ export default function BusinessDashboard() {
           { ...stats[0], value: (visitCount || 0).toLocaleString() },
           { ...stats[1], value: orderCount.toLocaleString() },
           { ...stats[2], value: `${conversionRate.toFixed(1)}%` },
-          { ...stats[3], value: `$${avgTicket.toFixed(2)}` },
+          { ...stats[3], value: `$${new Intl.NumberFormat("es-CO", { minimumFractionDigits: 0 }).format(avgTicket)}` },
         ]);
         
         if (latestVisits) setRecentVisits(latestVisits);
@@ -103,10 +106,16 @@ export default function BusinessDashboard() {
 
       {/* Charts / Activity Placeholder */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 glass-morphism p-8 rounded-fowy min-h-[400px] flex flex-col items-center justify-center text-slate-400">
-          <TrendingUp size={48} className="mb-4 opacity-20" />
-          <p className="font-medium text-lg">Gráfico de Ventas Semanales</p>
-          <p className="text-sm">Próximamente: Visualiza el crecimiento de tu negocio.</p>
+        <div className="lg:col-span-2 glass-morphism p-6 rounded-fowy min-h-[400px] flex flex-col justify-center">
+          {loading || !businessId ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+              <TrendingUp size={48} className="mb-4 opacity-20 animate-pulse" />
+              <p className="font-medium text-lg">Gráfico de Ventas</p>
+              <p className="text-sm">Cargando datos del negocio...</p>
+            </div>
+          ) : (
+            <FowySalesChart businessId={businessId} />
+          )}
         </div>
 
         <div className="glass-morphism p-8 rounded-fowy min-h-[400px] flex flex-col">
