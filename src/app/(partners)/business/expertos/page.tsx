@@ -7,6 +7,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ComingSoonOverlay from "@/components/partners/ComingSoonOverlay";
 
 // Components
 import { CategoryBar } from "@/components/partners/expertos/CategoryBar";
@@ -39,78 +40,83 @@ export default function ExpertosPage() {
   } = useExperts();
 
   return (
-    <div className="space-y-8 pb-10">
-      {/* Header Section */}
-      <HeaderSection />
+    <ComingSoonOverlay
+      title="Próximamente te sorprenderemos ✨"
+      description="El Marketplace de Expertos FOWY está en fase de preparación final. Conecta con el mejor talento calificado para potenciar y expandir tu negocio sin riesgos."
+    >
+      <div className="space-y-8 pb-10">
+        {/* Header Section */}
+        <HeaderSection />
 
-      {/* View Switcher */}
-      <div className="flex p-1 bg-white/50 backdrop-blur-sm rounded-3xl w-fit border border-slate-200/50">
-        <button 
-          onClick={() => setView('marketplace')}
-          className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'marketplace' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
-        >
-          Marketplace
-        </button>
-        <button 
-          onClick={() => setView('orders')}
-          className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'orders' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
-        >
-          Mis Contrataciones
-        </button>
-      </div>
+        {/* View Switcher */}
+        <div className="flex p-1 bg-white/50 backdrop-blur-sm rounded-3xl w-fit border border-slate-200/50">
+          <button 
+            onClick={() => setView('marketplace')}
+            className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'marketplace' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
+          >
+            Marketplace
+          </button>
+          <button 
+            onClick={() => setView('orders')}
+            className={`px-8 py-3 rounded-2xl text-sm font-black tracking-widest uppercase transition-all ${view === 'orders' ? 'bg-fowy-flow text-white shadow-lg shadow-fowy-blue/20' : 'text-slate-400 hover:text-fowy-blue'}`}
+          >
+            Mis Contrataciones
+          </button>
+        </div>
 
-      {view === 'marketplace' ? (
-        <>
-          <CategoryBar 
-            activeCategory={activeCategory} 
-            onCategoryChange={setActiveCategory} 
-          />
+        {view === 'marketplace' ? (
+          <>
+            <CategoryBar 
+              activeCategory={activeCategory} 
+              onCategoryChange={setActiveCategory} 
+            />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-            {filteredExpertos.map((expert, index) => (
-              <ExpertCard 
-                key={expert.id}
-                expert={expert}
-                index={index}
-                onClick={setSelectedExpert}
-              />
-            ))}
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+              {filteredExpertos.map((expert, index) => (
+                <ExpertCard 
+                  key={expert.id}
+                  expert={expert}
+                  index={index}
+                  onClick={setSelectedExpert}
+                />
+              ))}
+            </div>
 
-          <TrustBanner />
-        </>
-      ) : (
-        <ExpertOrdersList 
-          orders={myOrders}
-          loading={loading}
-          onReleaseFunds={(id) => setConfirmModal({ isOpen: true, orderId: id })}
-          onExplore={() => setView('marketplace')}
-        />
-      )}
-
-      {/* Modals */}
-      <AnimatePresence>
-        {selectedExpert && (
-          <ExpertDetailModal 
-            expert={selectedExpert}
-            onClose={() => setSelectedExpert(null)}
-            onHire={handleHire}
+            <TrustBanner />
+          </>
+        ) : (
+          <ExpertOrdersList 
+            orders={myOrders}
             loading={loading}
+            onReleaseFunds={(id) => setConfirmModal({ isOpen: true, orderId: id })}
+            onExplore={() => setView('marketplace')}
           />
         )}
-      </AnimatePresence>
 
-      <PremiumConfirmModal 
-        isOpen={confirmModal.isOpen}
-        onClose={() => setConfirmModal({ isOpen: false, orderId: null })}
-        onConfirm={() => confirmModal.orderId && handleReleaseFunds(confirmModal.orderId)}
-        title="¿Liberar pago al experto?"
-        description="Confirma que el trabajo ha sido entregado satisfactoriamente. Una vez liberado, el pago no podrá ser revertido."
-        confirmText="Sí, liberar pago"
-        cancelText="Aún no"
-        type="warning"
-      />
-    </div>
+        {/* Modals */}
+        <AnimatePresence>
+          {selectedExpert && (
+            <ExpertDetailModal 
+              expert={selectedExpert}
+              onClose={() => setSelectedExpert(null)}
+              onHire={handleHire}
+              loading={loading}
+            />
+          )}
+        </AnimatePresence>
+
+        <PremiumConfirmModal 
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal({ isOpen: false, orderId: null })}
+          onConfirm={() => confirmModal.orderId && handleReleaseFunds(confirmModal.orderId)}
+          title="¿Liberar pago al experto?"
+          description="Confirma que el trabajo ha sido entregado satisfactoriamente. Una vez liberado, el pago no podrá ser revertido."
+          confirmText="Sí, liberar pago"
+          cancelText="Aún no"
+          type="warning"
+        />
+      </div>
+    </ComingSoonOverlay>
   );
 }
 
