@@ -239,6 +239,7 @@ export default function BusinessMenuPage() {
         onRemoveOne={handleRemoveOne}
         accentColor={accentColor}
         businessName={businessName}
+        businessPhone={business?.phone}
       />
 
       {/* DETALLES DE PRODUCTO - POPUP ULTRA PREMIUM */}

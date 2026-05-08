@@ -25,6 +25,7 @@ export interface CraveCheckoutSheetProps {
   onRemoveOne: (productId: string) => void;
   accentColor: string;
   businessName: string;
+  businessPhone?: string;
 }
 
 export function CraveCheckoutSheet({
@@ -35,6 +36,7 @@ export function CraveCheckoutSheet({
   onRemoveOne,
   accentColor,
   businessName,
+  businessPhone,
 }: CraveCheckoutSheetProps) {
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout">("cart");
   const [customerName, setCustomerName] = useState("");
@@ -155,8 +157,16 @@ ${itemsText}
 
 *¡Gracias por tu compra!*`;
 
+    const rawPhone = businessPhone || "3000000000";
+    let normalizedPhone = rawPhone.replace(/\D/g, "");
+    if (normalizedPhone.length === 10) {
+      normalizedPhone = "57" + normalizedPhone;
+    } else if (!normalizedPhone.startsWith("57")) {
+      normalizedPhone = "57" + normalizedPhone;
+    }
+
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=573000000000&text=${encodedMessage}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${normalizedPhone}&text=${encodedMessage}`;
     window.open(whatsappUrl, "_blank");
   };
 
