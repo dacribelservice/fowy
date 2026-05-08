@@ -11,7 +11,8 @@ import {
   Loader2,
   MapPin,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -123,139 +124,227 @@ export default function BusinessProfilePage() {
       </div>
 
       {/* Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Basic Info */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 space-y-8 shadow-sm">
-            <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-              <Store size={24} className="text-slate-900" />
-              Datos del Establecimiento
-            </h3>
+        <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 space-y-8 shadow-sm">
+          <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
+            <Store size={24} className="text-slate-900" />
+            Datos del Establecimiento
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nombre Comercial</label>
+              <input 
+                type="text" 
+                value={business?.name || ""}
+                onChange={(e) => setBusiness({...business, name: e.target.value})}
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
+                placeholder="Ej. Burger Master"
+              />
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Nombre Comercial</label>
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">WhatsApp de Pedidos</label>
+              <div className="relative">
+                <Smartphone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                 <input 
                   type="text" 
-                  value={business?.name || ""}
-                  onChange={(e) => setBusiness({...business, name: e.target.value})}
-                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
-                  placeholder="Ej. Burger Master"
+                  value={business?.phone || ""}
+                  onChange={(e) => setBusiness({...business, phone: e.target.value})}
+                  className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
+                  placeholder="+57 300..."
                 />
               </div>
-              
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">WhatsApp de Pedidos</label>
-                <div className="relative">
-                  <Smartphone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                  <input 
-                    type="text" 
-                    value={business?.phone || ""}
-                    onChange={(e) => setBusiness({...business, phone: e.target.value})}
-                    className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
-                    placeholder="+57 300..."
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Ciudad</label>
-                <div className="relative">
-                  <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                  <input 
-                    type="text" 
-                    value={business?.city || ""}
-                    onChange={(e) => setBusiness({...business, city: e.target.value})}
-                    className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
-                    placeholder="Ej. Medellín"
-                  />
-                </div>
-              </div>
             </div>
-          </div>
 
-          {/* Schedules */}
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
-              <Clock size={24} className="text-slate-900" />
-              Horarios de Atención
-            </h3>
-            <div className="grid gap-3">
-              {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((dia) => (
-                <div key={dia} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all group hover:border-slate-200">
-                  <span className="text-sm font-black text-slate-700 w-24 group-hover:text-fowy-secondary transition-colors">{dia}</span>
-                  <div className="flex items-center gap-4">
-                    <input 
-                      type="time" 
-                      value={business?.schedules?.[dia]?.open || "09:00"}
-                      onChange={(e) => {
-                        const newSchedules = { ...business.schedules };
-                        if (!newSchedules[dia]) newSchedules[dia] = {};
-                        newSchedules[dia].open = e.target.value;
-                        setBusiness({...business, schedules: newSchedules});
-                      }}
-                      className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black focus:ring-2 focus:ring-fowy-secondary/20"
-                    />
-                    <span className="text-slate-300 font-black">—</span>
-                    <input 
-                      type="time" 
-                      value={business?.schedules?.[dia]?.close || "22:00"}
-                      onChange={(e) => {
-                        const newSchedules = { ...business.schedules };
-                        if (!newSchedules[dia]) newSchedules[dia] = {};
-                        newSchedules[dia].close = e.target.value;
-                        setBusiness({...business, schedules: newSchedules});
-                      }}
-                      className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black focus:ring-2 focus:ring-fowy-secondary/20"
-                    />
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={business?.schedules?.[dia]?.active ?? true}
-                      onChange={(e) => {
-                        const newSchedules = { ...business.schedules };
-                        if (!newSchedules[dia]) newSchedules[dia] = {};
-                        newSchedules[dia].active = e.target.checked;
-                        setBusiness({...business, schedules: newSchedules});
-                      }}
-                      className="sr-only peer" 
-                    />
-                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-fowy-secondary"></div>
-                  </label>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Ciudad</label>
+              <div className="relative">
+                <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                <input 
+                  type="text" 
+                  value={business?.city || ""}
+                  onChange={(e) => setBusiness({...business, city: e.target.value})}
+                  className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fowy-secondary/10 font-bold transition-all"
+                  placeholder="Ej. Medellín"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Sidebar Call to Action for Branding */}
-        <div className="space-y-8">
-          <Link href="/business/branding" className="block group">
-            <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center shadow-sm group-hover:border-fowy-secondary transition-all">
-              <div className="w-20 h-20 bg-fowy-secondary/10 rounded-3xl flex items-center justify-center text-fowy-secondary mb-6 group-hover:scale-110 transition-transform">
-                <Sparkles size={40} />
+        {/* Schedules */}
+        <div className="bg-white/70 backdrop-blur-xl p-6 sm:p-10 rounded-[2.5rem] border border-slate-100/80 shadow-lg relative overflow-hidden">
+          {/* Ambient lights for glassmorphism styling */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-fowy-secondary/5 rounded-full blur-3xl -z-10" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
+
+          <div className="relative z-10 space-y-6">
+            <div className="flex items-center gap-4 border-b border-slate-100/80 pb-6">
+              <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner">
+                <Clock size={24} />
               </div>
-              <h4 className="text-xl font-black text-slate-800 mb-2">Branding & Banners</h4>
-              <p className="text-sm text-slate-500 font-medium mb-8">
-                Configura tu logo, colores y el slider de banners para tu menú digital.
-              </p>
-              <div className="flex items-center gap-2 text-fowy-secondary font-black text-xs uppercase tracking-widest">
-                Configurar ahora <ChevronRight size={16} />
+              <div>
+                <h3 className="text-xl font-black text-slate-800">Horarios de Atención</h3>
+                <p className="text-xs text-slate-400 font-extrabold uppercase tracking-widest mt-1">Configura la disponibilidad semanal de tu local</p>
               </div>
             </div>
-          </Link>
 
-          <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white relative overflow-hidden group shadow-xl">
-             <div className="relative z-10">
-               <h4 className="text-lg font-black mb-2">Soporte Operativo</h4>
-               <p className="text-xs text-slate-400 font-medium leading-relaxed opacity-90">
-                 Si tienes problemas con tus horarios o ubicación, contacta a nuestro equipo de soporte.
-               </p>
-               <button className="mt-6 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-                 Contactar Soporte
-               </button>
-             </div>
+            <motion.div 
+              className="grid gap-4"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.05
+                  }
+                }
+              }}
+            >
+              {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((dia) => {
+                const isActive = business?.schedules?.[dia]?.active ?? true;
+                
+                return (
+                  <motion.div 
+                    key={dia} 
+                    variants={{
+                      hidden: { opacity: 0, y: 15 },
+                      visible: { opacity: 1, y: 0 }
+                    }}
+                    whileHover={{ scale: 1.01, translateY: -2 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className={`flex flex-col md:flex-row md:items-center justify-between p-5 sm:p-6 rounded-[2rem] border transition-all duration-300 gap-4 group relative ${
+                      isActive 
+                        ? 'bg-white/90 border-slate-100/80 hover:border-emerald-500/20 shadow-sm hover:shadow-[0_12px_30px_rgba(16,185,129,0.06)]' 
+                        : 'bg-slate-50/40 border-slate-100/20 opacity-60'
+                    }`}
+                  >
+                    {/* Left side: Day title & Icon */}
+                    <div className="flex items-center justify-between md:justify-start gap-4 w-full md:w-auto">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm ${
+                          isActive 
+                            ? 'bg-emerald-50 text-emerald-500 ring-4 ring-emerald-500/5' 
+                            : 'bg-slate-100 text-slate-400'
+                        }`}>
+                          <Calendar size={18} />
+                        </div>
+                        <div>
+                          <span className={`text-base font-black transition-colors duration-300 ${
+                            isActive ? 'text-slate-800 group-hover:text-emerald-600' : 'text-slate-400'
+                          }`}>
+                            {dia}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                              {isActive ? 'Abierto' : 'Cerrado'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Switch (Mobile only) */}
+                      <div className="md:hidden flex items-center">
+                        <div 
+                          onClick={() => {
+                            const newSchedules = { ...business.schedules };
+                            if (!newSchedules[dia]) newSchedules[dia] = {};
+                            newSchedules[dia].active = !isActive;
+                            setBusiness({...business, schedules: newSchedules});
+                          }}
+                          className={`relative w-14 h-8 rounded-full cursor-pointer p-1 transition-all duration-300 select-none ${
+                            isActive 
+                              ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]' 
+                              : 'bg-slate-200'
+                          }`}
+                        >
+                          <motion.div 
+                            layout
+                            className="w-6 h-6 bg-white rounded-full shadow-md"
+                            animate={{ x: isActive ? 24 : 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Middle side: Time Pickers */}
+                    <div className={`grid grid-cols-2 md:flex md:items-center gap-3 w-full md:w-auto ${
+                      isActive ? 'opacity-100' : 'opacity-40 pointer-events-none'
+                    } transition-all duration-300`}>
+                      {/* Open Time */}
+                      <div className="relative flex items-center">
+                        <Clock size={14} className={`absolute left-4 transition-colors z-10 ${isActive ? 'text-emerald-500' : 'text-slate-400'}`} />
+                        <div className="w-full relative">
+                          <input 
+                            type="time" 
+                            value={business?.schedules?.[dia]?.open || "09:00"}
+                            onChange={(e) => {
+                              const newSchedules = { ...business.schedules };
+                              if (!newSchedules[dia]) newSchedules[dia] = {};
+                              newSchedules[dia].open = e.target.value;
+                              setBusiness({...business, schedules: newSchedules});
+                            }}
+                            disabled={!isActive}
+                            className="w-full md:w-36 pl-10 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/30 transition-all shadow-sm"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="hidden md:flex text-slate-300 font-extrabold text-xs">—</div>
+
+                      {/* Close Time */}
+                      <div className="relative flex items-center">
+                        <Clock size={14} className={`absolute left-4 transition-colors z-10 ${isActive ? 'text-emerald-500' : 'text-slate-400'}`} />
+                        <div className="w-full relative">
+                          <input 
+                            type="time" 
+                            value={business?.schedules?.[dia]?.close || "22:00"}
+                            onChange={(e) => {
+                              const newSchedules = { ...business.schedules };
+                              if (!newSchedules[dia]) newSchedules[dia] = {};
+                              newSchedules[dia].close = e.target.value;
+                              setBusiness({...business, schedules: newSchedules});
+                            }}
+                            disabled={!isActive}
+                            className="w-full md:w-36 pl-10 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/30 transition-all shadow-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right side: Switch (Desktop only) */}
+                    <div className="hidden md:flex items-center">
+                      <div 
+                        onClick={() => {
+                          const newSchedules = { ...business.schedules };
+                          if (!newSchedules[dia]) newSchedules[dia] = {};
+                          newSchedules[dia].active = !isActive;
+                          setBusiness({...business, schedules: newSchedules});
+                        }}
+                        className={`relative w-14 h-8 rounded-full cursor-pointer p-1 transition-all duration-300 select-none ${
+                          isActive 
+                            ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]' 
+                            : 'bg-slate-200'
+                        }`}
+                      >
+                        <motion.div 
+                          layout
+                          className="w-6 h-6 bg-white rounded-full shadow-md"
+                          animate={{ x: isActive ? 24 : 0 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </div>
         </div>
       </div>

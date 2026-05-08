@@ -221,7 +221,7 @@ export default function MenuManagementPage() {
             className="flex items-center justify-center gap-2 px-6 py-3 glass-morphism text-slate-600 rounded-2xl font-bold border border-white/50 hover:bg-white transition-all"
           >
             <Layers size={20} className="text-fowy-secondary" />
-            Gestionar Secciones
+            Categorias
           </button>
           <button 
             onClick={handleAddNewProduct}
