@@ -77,7 +77,7 @@ export default function ComingSoonOverlay({ children, title, description }: Comi
   }
 
   return (
-    <div className="relative min-h-[400px] w-full">
+    <div className="relative min-h-[400px] w-full overflow-hidden">
       {/* Reset lock button for testing purposes - floating in a corner if unlocked */}
       {isUnlocked && (
         <button
@@ -94,8 +94,8 @@ export default function ComingSoonOverlay({ children, title, description }: Comi
       <div
         className={
           isUnlocked
-            ? "transition-all duration-700 ease-out"
-            : "filter blur-[8px] md:blur-[12px] opacity-40 pointer-events-none select-none transition-all duration-700"
+            ? "transition-all duration-700 ease-out w-full max-w-full"
+            : "filter blur-[8px] md:blur-[12px] opacity-40 pointer-events-none select-none transition-all duration-700 w-full max-w-full overflow-hidden"
         }
       >
         {children}

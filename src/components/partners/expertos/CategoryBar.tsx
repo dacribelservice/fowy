@@ -14,15 +14,15 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({
   onCategoryChange 
 }) => {
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+    <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full max-w-full">
       {CATEGORIES.map((cat) => (
         <button 
           key={cat}
           onClick={() => onCategoryChange(cat)}
-          className={`px-8 py-3 rounded-2xl text-sm font-bold transition-all whitespace-nowrap border-2 ${
+          className={`px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 whitespace-nowrap border ${
             activeCategory === cat 
-              ? 'bg-fowy-secondary border-fowy-secondary text-white shadow-premium' 
-              : 'bg-white border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-100'
+              ? 'bg-gradient-to-b from-[#7B61FF] to-[#5C40FF] border-[#7B61FF]/10 text-white shadow-[0_4px_12px_rgba(123,97,255,0.25)] border-t-white/10' 
+              : 'bg-white/70 backdrop-blur-sm border-slate-200/50 text-slate-500 hover:text-[#7B61FF] hover:bg-slate-50'
           }`}
         >
           {cat}

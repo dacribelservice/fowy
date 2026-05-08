@@ -10,6 +10,7 @@
     --radius-fowy: 20px;
     --radius-fowy-lg: 24px;
     --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
     --background: #FBFAFF;
     --foreground: #1E293B;
     --glass-bg: rgba(255, 255, 255, 0.7);
