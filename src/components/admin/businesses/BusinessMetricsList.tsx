@@ -98,12 +98,12 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
     return (
       <div className="space-y-4 py-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex justify-between items-center py-3 border-b border-slate-50/50">
+          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50">
             <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded bg-slate-100 animate-pulse" />
-              <div className="w-24 h-3 bg-slate-100 rounded animate-pulse" />
+              <div className="w-5 h-5 rounded bg-slate-50 animate-pulse" />
+              <div className="w-24 h-3 bg-slate-50 rounded animate-pulse" />
             </div>
-            <div className="w-12 h-4 bg-slate-100 rounded animate-pulse" />
+            <div className="w-12 h-4 bg-slate-50 rounded animate-pulse" />
           </div>
         ))}
       </div>
@@ -111,14 +111,14 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       {items.map((item, index) => (
         <motion.div
           key={item.label}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
-          className="group flex justify-between items-center py-3.5 border-b border-slate-50/70 hover:bg-slate-50/30 px-2 rounded-xl transition-colors"
+          className="group flex justify-between items-center py-2.5 border-b border-slate-50 hover:bg-slate-50/30 px-2 rounded-xl transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="p-1.5 bg-slate-50 rounded-lg group-hover:bg-white transition-colors border border-transparent group-hover:border-slate-100/50">

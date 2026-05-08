@@ -441,3 +441,40 @@ La misión es reconstruir la interfaz del usuario final desde cero en el Sandbox
 
 ---
 *Última actualización: 07 de Mayo de 2026 - 11:15 AM*
+
+---
+
+## 📊 PANEL DE MÉTRICAS SUPER ADMIN (FOWY VERTICAL) — SESIÓN XV (07 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: 🟢 COMPLETADO
+
+### 🎯 Objetivos Logrados (Sincronización con Hoja de Ruta)
+1. **Planificación y Reorganización en Capas Verticales (Fase 16.1)**:
+    - **16.1.1 (Capa 1 - Plan Píldora)**: Reemplazo de la antigua tarjeta de "Plan Contratado" por un elemento cilíndrico ultra-compacto (`rounded-full`) al inicio del panel de detalles de negocio, mostrando sutilmente el plan y próximo pago con estilo premium oscuro (`BusinessPlanPill`).
+    - **16.1.2 (Capa 2 - Lista de Métricas)**: Implementación de la lista minimalista de métricas de rendimiento en filas finas, maximizando la densidad de información y eliminando tarjetas masivas (`BusinessMetricsList`).
+    - **16.1.3 (Capa 2.5 - Tendencia de Ventas)**: Integración del gráfico lineal interactivo (`FowySalesChart`) inmediatamente debajo de la lista de métricas. El gráfico consume órdenes completadas reales desde Supabase y cuenta con filtros de agrupación dinámica (`D`, `S`, `M`), tooltip interactivo mobile-first y animaciones elásticas con `framer-motion`.
+    - **16.1.4 (Capa 3 - Tarjeta de Negocio Compacta)**: Rediseño completo de `BusinessProfileCard` en `BusinessProfileHeader.tsx` para cambiar de un layout horizontal a un apilamiento vertical sumamente limpio, con logo reducido y detalles de contacto como filas de clave-valor elegantes.
+    - **16.1.5 (Capa 4 - Módulos & Configuración)**: Rediseño completo de `BusinessModuleManager.tsx` transformando las antiguas tarjetas de módulos de su grid de dos columnas a una lista vertical de alta densidad. Se redujo el padding interior a `p-3.5`, el tamaño de iconos a `size={16}` y se diseñaron interruptores (toggles) compactos y simétricos, ofreciendo una visualización libre de elementos complejos.
+
+2. **Lista de Métricas de Rendimiento (Fase 16.2)**:
+    - **16.2.1 (Métricas a Mostrar)**: Verificación exhaustiva y confirmación de la visualización en tiempo real de únicamente las 4 métricas de rendimiento fundamentales en [BusinessMetricsList.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessMetricsList.tsx): *Visitas Totales*, *Pedidos Recibidos*, *Tasa de Conversión* y *Ticket Promedio*, consultando directamente las tablas de analíticas y órdenes del backend de Supabase.
+    - **16.2.2 (Visualización de Alta Densidad)**: Estilización fina y compacta de las filas de métricas con un espaciado reducido de `py-2.5`, subtítulos delgados en gris (`text-slate-400 text-xs font-semibold`) y líneas divisorias de casi nula opacidad (`border-b border-slate-50`), garantizando la máxima claridad y elegancia visual sin recargar la pantalla.
+
+### 📂 Archivos y Documentación de Contexto Clave:
+Para tener un desarrollo con el contexto adecuado y continuar con la construcción del sistema, el desarrollador o la IA debe leer:
+- **Hoja de Ruta Maestra**: [HOJA_DE_RUTA.md](file:///c:/Users/cange/Documents/fowy/Markdown/HOJA_DE_RUTA.md) — Registra de forma secuencial cada tarea, checklist e integraciones pendientes del panel de administración (Fase 16).
+- **Filosofía y Reglas de Diseño**: [conceptos.md](file:///c:/Users/cange/Documents/fowy/Markdown/conceptos.md) — Define los estándares estrictos de desacoplamiento, modularidad, rendimiento en tiempo real y reglas de "No Monolitos" para evitar que los archivos de páginas superen las 200-250 líneas.
+- **Componentes Creados/Editados en esta sesión**:
+  - Orquestador de la Página: [[id]/page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/negocios/%5Bid%5D/page.tsx)
+  - Gráfico Interactivo: [FowySalesChart.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/FowySalesChart.tsx)
+  - Lista de Métricas Compacta: [BusinessMetricsList.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessMetricsList.tsx)
+  - Píldora del Plan: [BusinessPlanPill.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessPlanPill.tsx)
+  - Rediseño de Tarjeta de Negocio: [BusinessProfileHeader.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessProfileHeader.tsx)
+  - Gestor de Módulos Activos: [BusinessModuleManager.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessModuleManager.tsx)
+
+### 📈 Resultado de Calidad:
+- **Verificación de Compilación**: Se ejecutó `tsc --noEmit` confirmando 0 errores de compilación TypeScript de manera exitosa.
+- **Seguridad**: Listo para ser respaldado en GitHub bajo la dirección del usuario.
+
+*Última actualización: 07 de Mayo de 2026 - 10:10 PM*
+

@@ -83,9 +83,9 @@ export function FowySalesChart({ businessId }: FowySalesChartProps) {
         d.setDate(now.getDate() - i);
         const dayStr = d.toISOString().split("T")[0];
 
-        // Sumar ventas de este día
+        // Sumar ventas de este día de manera segura
         const totalSales = orders
-          .filter((o) => o.created_at.startsWith(dayStr))
+          .filter((o) => o.created_at && o.created_at.startsWith(dayStr))
           .reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
         days.push({
@@ -108,6 +108,7 @@ export function FowySalesChart({ businessId }: FowySalesChartProps) {
 
         const totalSales = orders
           .filter((o) => {
+            if (!o.created_at) return false;
             const orderDate = new Date(o.created_at);
             return orderDate >= start && orderDate < end;
           })
@@ -157,12 +158,14 @@ export function FowySalesChart({ businessId }: FowySalesChartProps) {
 
       for (let i = 5; i >= 0; i--) {
         const d = new Date();
+        d.setDate(1); // Prevenir bug de fin de mes (e.g. 31 de mayo desbordando a marzo al restar 3 meses)
         d.setMonth(now.getMonth() - i);
         const year = d.getFullYear();
         const monthIndex = d.getMonth();
 
         const totalSales = orders
           .filter((o) => {
+            if (!o.created_at) return false;
             const orderDate = new Date(o.created_at);
             return (
               orderDate.getFullYear() === year &&

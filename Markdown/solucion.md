@@ -269,3 +269,36 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - Implementar un redirect ultraligero en la ruta sandbox `src/app/(explorer)/[slug]/crave-vision/` para limpiar automáticamente el caché HMR de Turbopack y guiar al usuario al menú premium.
 - [x] **6.3** **Backup Seguro**:
   - Generar commit del re-diseño modularizado y documentar la migración exitosa.
+
+---
+
+### 📊 Fase 9: Modularización del Gráfico de Ventas (`FowySalesChart.tsx`)
+
+> **Objetivo:** Dividir el componente monolítico de visualización de ventas `FowySalesChart.tsx` (que actualmente tiene ~433 líneas de código) en submódulos especializados e independientes para cumplir estrictamente con el límite de 200-250 líneas y seguir la filosofía de arquitectura de "Un Archivo, Una Responsabilidad".
+
+---
+
+#### 🛠️ Checklist de Modularización (Paso a Paso)
+
+- [x] **Paso 1: Creación del Hook Personalizado (`useFowySalesData.ts`)**
+  - [x] **1.1** Crear el archivo en `src/components/admin/businesses/useFowySalesData.ts`.
+  - [x] **1.2** Migrar la lógica de consulta de Supabase (`useEffect` que carga las órdenes del negocio).
+  - [x] **1.3** Mover toda la ingeniería de agrupación de datos por filtros dinámicos (`D` últimos 7 días, `S` últimas 6 semanas, `M` últimos 6 meses) y el rellenado con `$0` para los intervalos sin ventas.
+  - [x] **1.4** Retornar un objeto de datos limpios: `loading`, `chartData`, `points`, `totalPeriodSales`, `maxValue`, `pathD` (línea Bézier), y `areaD` (área sombreada).
+
+- [x] **Paso 2: Extracción del Tooltip Animado (`FowyChartTooltip.tsx`)**
+  - [x] **2.1** Crear el archivo en `src/components/admin/businesses/FowyChartTooltip.tsx`.
+  - [x] **2.2** Extraer el bloque interactivo con `AnimatePresence` y `<motion.div>` de Framer Motion.
+  - [x] **2.3** Recibir las props del tooltip (punto activo, posición X/Y, color de marca, formateador de moneda) de forma desacoplada.
+
+- [ ] **Paso 3: Rediseño del Orquestador de la Gráfica (`FowySalesChart.tsx`)**
+  - [ ] **3.1** Limpiar `src/components/admin/businesses/FowySalesChart.tsx` removiendo los hooks internos de cálculo matemático y lógica de Supabase.
+  - [ ] **3.2** Importar y consumir el hook `useFowySalesData`.
+  - [ ] **3.3** Importar y renderizar el componente `<FowyChartTooltip />`.
+  - [ ] **3.4** Mantener únicamente la estructura visual del componente: la cabecera (título, LED interactivo, selectores `D`/`S`/`M`) y el elemento responsive `<svg viewBox="0 0 500 180">` con su efecto Glow y grid de fondo.
+  - [ ] **3.5** Validar que el archivo orquestador principal quede por debajo de **160 líneas de código**, garantizando máxima legibilidad y cumplimiento de límites de código.
+
+- [ ] **Paso 4: Pruebas de Integración y Regresión**
+  - [ ] **4.1** Verificar que la gráfica modularizada se dibuje elegantemente con su animación elástica al cargar.
+  - [ ] **4.2** Confirmar que el filtro cilíndrico micro de tiempo (`D`, `S`, `M`) alterne de manera reactiva con transiciones fluidas.
+  - [ ] **4.3** Asegurar que al interactuar con los nodos en pantalla mobile/desktop aparezca el tooltip con el monto y etiqueta correctos.
