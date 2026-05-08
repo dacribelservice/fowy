@@ -1,5 +1,6 @@
 import React from "react";
 import PartnerSidebar from "@/components/partners/PartnerSidebar";
+import PartnerMobileMenu from "@/components/partners/PartnerMobileMenu";
 import PartnerTopBar from "@/components/partners/PartnerTopBar";
 import BusinessNotificationListener from "@/components/partners/BusinessNotificationListener";
 
@@ -15,6 +16,9 @@ export default function BusinessLayout({
 
       {/* Sidebar for Desktop */}
       <PartnerSidebar />
+
+      {/* Menu for Mobile */}
+      <PartnerMobileMenu />
 
       {/* Main Content */}
       <main className="flex-1 xl:ml-80 p-6 xl:p-10">

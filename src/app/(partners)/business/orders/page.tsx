@@ -7,15 +7,16 @@ import {
   Clock, 
   CheckCircle2, 
   XCircle, 
-  ExternalLink,
   MessageCircle,
-  Star
+  Star,
+  TrendingUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useOrderManager } from "@/hooks/useOrderManager";
 
 const supabase = createClient();
+const formatCurrency = (val: number) => `$${new Intl.NumberFormat("es-CO", { minimumFractionDigits: 0 }).format(val)}`;
 
 export default function OrdersPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
@@ -59,6 +60,13 @@ export default function OrdersPage() {
   }, []);
 
   const loading = !businessId || loadingOrders;
+
+  // Cálculos dinámicos de los KPIs basados en tiempo real
+  const totalCompletedSales = orders
+    .filter(o => o.status === 'completed')
+    .reduce((sum, o) => sum + (o.total_amount || 0), 0);
+
+  const pendingOrdersCount = orders.filter(o => o.status === 'pending').length;
 
   return (
     <div className="space-y-8">
@@ -116,83 +124,116 @@ export default function OrdersPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-fowy-secondary"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
-          <AnimatePresence mode="popLayout">
-            {orders.length === 0 ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="glass-morphism p-12 rounded-fowy text-center"
-              >
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ShoppingBag size={32} className="text-slate-400" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-700">Sin pedidos aún</h3>
-                <p className="text-slate-500">Los pedidos que recibas aparecerán aquí con un sonido de caja registradora.</p>
-              </motion.div>
-            ) : (
-              orders.map((order) => (
-                <motion.div
-                  key={order.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="glass-morphism p-6 rounded-fowy shadow-glass border-l-4 border-l-fowy-secondary flex flex-col md:flex-row items-start md:items-center gap-6"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        #{order.id.slice(0, 8)}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                        order.status === 'pending' ? 'bg-orange-100 text-orange-600' : 
-                        order.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                      }`}>
-                        {order.status === 'pending' ? 'Pendiente' : 
-                         order.status === 'completed' ? 'Completado' : 'Cancelado'}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800">{order.customer_name}</h3>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-                      <div className="flex items-center gap-1">
-                        <Clock size={14} />
-                        {new Date(order.created_at).toLocaleTimeString()}
-                      </div>
-                      <div className="flex items-center gap-1 text-fowy-secondary font-medium">
-                        <MessageCircle size={14} />
-                        {order.customer_phone}
-                      </div>
-                    </div>
-                  </div>
+        <div className="space-y-6">
+          {/* Tarjetas de Resumen KPI */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Card Total Ventas Completadas */}
+            <div className="glass-morphism p-5 rounded-fowy border border-slate-100/80 shadow-sm flex items-center justify-between bg-gradient-to-br from-white/95 to-slate-50/30">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Total Ventas Completadas</p>
+                <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+                  {formatCurrency(totalCompletedSales)}
+                </h3>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-tr from-[#FF5A5F] to-[#FF9A3D] text-white rounded-2xl flex items-center justify-center shadow-md shadow-[#FF5A5F]/20">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+            </div>
 
-                  <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    {order.status === 'pending' && (
-                      <>
-                        <button 
-                          onClick={() => updateOrderStatus(order.id, 'completed')}
-                          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-fowy-secondary text-white rounded-xl font-bold shadow-premium hover:opacity-90 transition-all"
-                        >
-                          <CheckCircle2 size={18} />
-                          Completar
-                        </button>
-                        <button 
-                          onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-red-500 border border-red-100 rounded-xl font-bold hover:bg-red-50 transition-all"
-                        >
-                          <XCircle size={18} />
-                          Cancelar
-                        </button>
-                      </>
-                    )}
-                    <button className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
-                      <ExternalLink size={20} />
-                    </button>
+            {/* Card Pedidos Pendientes */}
+            <div className="glass-morphism p-5 rounded-fowy border border-slate-100/80 shadow-sm flex items-center justify-between bg-gradient-to-br from-white/95 to-slate-50/30">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Pedidos Pendientes</p>
+                <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+                  {pendingOrdersCount}
+                </h3>
+              </div>
+              <div className="w-12 h-12 bg-orange-50 text-[#FF5A5F] border border-orange-100/50 rounded-2xl flex items-center justify-center shadow-sm">
+                <Clock className="w-6 h-6 text-[#FF5A5F]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Grilla de Pedidos */}
+          <div className="grid grid-cols-1 gap-6">
+            <AnimatePresence mode="popLayout">
+              {orders.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="glass-morphism p-12 rounded-fowy text-center"
+                >
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ShoppingBag size={32} className="text-slate-400" />
                   </div>
+                  <h3 className="text-xl font-bold text-slate-700">Sin pedidos aún</h3>
+                  <p className="text-slate-500">Los pedidos que recibas aparecerán aquí con un sonido de caja registradora.</p>
                 </motion.div>
-              ))
-            )}
-          </AnimatePresence>
+              ) : (
+                orders.map((order) => (
+                  <motion.div
+                    key={order.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="glass-morphism p-6 rounded-fowy shadow-glass border-l-4 border-l-fowy-secondary flex flex-col md:flex-row items-start md:items-center gap-6"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                          #{order.id.slice(0, 8)}
+                        </span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                          order.status === 'pending' ? 'bg-orange-100 text-orange-600' : 
+                          order.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                        }`}>
+                          {order.status === 'pending' ? 'Pendiente' : 
+                           order.status === 'completed' ? 'Completado' : 'Cancelado'}
+                        </span>
+                        {/* Valor de la venta (pedido) */}
+                        <span className="text-[11px] font-black px-2.5 py-0.5 bg-orange-50/80 border border-orange-100/50 text-[#FF5A5F] rounded-full shadow-sm">
+                          {formatCurrency(order.total_amount)}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-800">{order.customer_name}</h3>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <Clock size={14} />
+                          {new Date(order.created_at).toLocaleTimeString()}
+                        </div>
+                        <div className="flex items-center gap-1 text-fowy-secondary font-medium">
+                          <MessageCircle size={14} />
+                          {order.customer_phone}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                      {order.status === 'pending' && (
+                        <>
+                          <button 
+                            onClick={() => updateOrderStatus(order.id, 'completed')}
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-fowy-secondary text-white rounded-xl font-bold shadow-premium hover:opacity-90 transition-all"
+                          >
+                            <CheckCircle2 size={18} />
+                            Completar
+                          </button>
+                          <button 
+                            onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-red-500 border border-red-100 rounded-xl font-bold hover:bg-red-50 transition-all"
+                          >
+                            <XCircle size={18} />
+                            Cancelar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       )}
     </div>
