@@ -63,7 +63,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
 
-## 🎭 FASE 6: OPTIMIZACIÓN Y ESCALABILIDAD (Completada ✅)
+## 🧠 FASE 6: OPTIMIZACIÓN Y ESCALABILIDAD (Completada ✅)
 - [x] **6.1 Paginación en Tiempo Real**: Carga por bloques (offset/limit).
 - [x] **6.2 Búsqueda Server-side**: Filtros directos en Supabase.
 - [x] **6.3 Gestión Maestra de Imágenes**: Compresión con API Canvas y limpieza de Storage.
@@ -122,7 +122,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] 10.3.2 Sistema de estados: `pending_payment` -> `in_escrow` -> `completed` -> `funds_released`.
     - [x] 10.3.3 Algoritmo de comisión: Cálculo automático del 20% de FOWY y 80% para el experto.
 - [x] **10.4 Gestión de Entregas y Garantía**:
-    - [x] 10.4.1 Panel de Experto (`/business/expert`) para que el profesional gestione pedidos y suba entregas.
+    - [x] 10.4.1 Panel de Experto (`/business/expert`) para que el profesional ggestione pedidos y suba entregas.
     - [x] 10.4.2 Flujo de aprobación del Socio: Al dar "Liberar Pago", el dinero se marca para acreditación.
     - [x] 10.4.3 Auditoría de seguridad y protección de fondos en custodia por FOWY.
 
@@ -262,9 +262,9 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **15.8.3 Performance**: Carga perezosa del grid para optimizar memoria en móvil.
 
 ---
- 
+
 ### 📊 15.9 Historial de Pedidos & Sistema de Rating (Explorer)
-*Objetivo: Permitir que el cliente gestione sus compras y califique negocios una vez completado el pedido.*
+*Objetivo: Permitir que el cliente funcione sus compras y califique negocios una vez completado el pedido.*
 - [x] **15.9.1 UI — Acceso en Menú de Perfil**: Inyectar la opción "Mis Pedidos" (Icono: `ShoppingBag`) en el layout del explorador.
 - [x] **15.9.2 Componente `<UserOrdersSheet />`**: SideSheet premium para visualizar el historial (con estilo de vidrio/Glassmorphism idéntico al carrito).
 - [x] **15.9.3 Lógica de Estados**: Visualizar y filtrar pedidos por estados: `completado`, `pendiente` y `cancelado`.
@@ -302,8 +302,13 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **15.11.1 DB — Valor por Defecto**: Cambiar el valor por defecto de la columna `rating` de `5.0` a `0.0` en la tabla `businesses`.
 - [x] **15.11.2 DB — Trigger de Promedio**: Actualizar la función del trigger para que, si no hay votos/calificaciones en `business_ratings`, el cálculo promedio devuelva `0.0` en lugar de `5.0`.
 - [x] **15.11.3 Hook — Conteo de Votos**: En el hook de datos `useBusinessMenuData.ts`, realizar una consulta rápida para contar la cantidad exacta de calificaciones del negocio en la tabla `business_ratings` (`votesCount`).
-- [x] **15.11.4 UI — Encabezados de Crave**: Actualizar `<CraveBusinessHeader />` y `<CraveHeaderCompact />` para recibir e integrar este conteo de votos. Si es 0, mostrar `(0)` votos y pintar las estrellas vacías (gris suave) en lugar de doradas.
-- [x] **15.11.5 Panel Socio — Vista de Ranking**: Modificar `/business/orders/page.tsx` para que, si el conteo de votos del negocio es 0, muestre la calificación del socio en `0.0` y pinte las estrellas vacías, reflejando fielm- [x] **16.1 Reorganización en Capas Verticales (Layout Mobile-First)**:
+- [x] **15.11.4 UI — Encabezados de Crave**: Actualizar `<CraveBusinessHeader />` and `<CraveHeaderCompact />` para recibir e integrar este conteo de votos. Si es 0, mostrar `(0)` votos y pintar las estrellas vacías (gris suave) en lugar de doradas.
+- [x] **15.11.5 Panel Socio — Vista de Ranking**: Modificar `/business/orders/page.tsx` para que, si el conteo de votos del negocio es 0, muestre la calificación del socio en `0.0` y pinte las estrellas vacías, reflejando fielmente el promedio.
+
+---
+
+## 📱 FASE 16: REDISEÑO DE PORTAL SOCIO (DASHBOARD) ✅
+- [x] **16.1 Reorganización en Capas Verticales (Layout Mobile-First)**:
     - [x] **16.1.1 Capa 1 (Plan Píldora)**: Reemplazar la tarjeta de "Plan Contratado" actual por un elemento cilíndrico ultra-compacto (`rounded-full`) al inicio de la página con estilo premium oscuro o borde degradado, indicando de forma sutil: `Plan Standard • Próximo pago: 02/Junio/2026`.
     - [x] **16.1.2 Capa 2 (Lista de Métricas)**: Implementar la lista minimalista de las 4 métricas clave de rendimiento agrupadas verticalmente (sin tarjetas masivas).
     - [x] **16.1.3 Capa 2.5 (Tendencia de Ventas)**: Insertar la gráfica lineal interactiva justo debajo de la lista de métricas y antes de los datos generales del negocio.
@@ -335,9 +340,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 *Objetivo: Integrar el registro, cobro manual y aprobación de comprobantes de pago de negocios con el módulo de Finanzas global del Super Admin.*
 
 - [ ] **17.1 Modal de Confirmación y Ajuste Manual (BusinessPaymentViewer)**:
-    - [ ] **17.1.1** Crear modal de confirmación emergente (Popup/Dialog) con estilo premium glassmorphism.
-    - [ ] **17.1.2** Integrar campo numérico (Input) pre-llenado con el valor por defecto para permitir edición manual del monto verificado.
-    - [ ] **17.1.3** Actualizar base de datos (`payment_proofs`) modificando tanto el estado a `'approved'` como el `amount` con el valor exacto ingresado.
+    - [ ] **17.1.1** Crear modal de confirmación emergente (Popup/Dialog) con estilo premium glassmorphism (`backdrop-blur-md bg-white/80`).
+    - [ ] **17.1.2** Integrar campo numérico (Input) pre-llenado con el valor personalizado `membership_price` del negocio (o fallback estándar si es nulo) para permitir edición manual del monto verificado.
+    - [ ] **17.1.3** Limpieza de Interfaz: Al aprobar el pago, el modulo de imagen de comprobante pendiente debe limpiarse inmediatamente esperando el próximo comprobante (Sincronización en tiempo real).
+    - [ ] **17.1.4** Actualizar base de datos (`payment_proofs`) modificando tanto el estado a `'approved'` como el `amount` con el valor exacto verificado/ingresado.
 - [ ] **17.2 Integración en Backend Financiero (useFinanceManager)**:
     - [ ] **17.2.1** Extender el hook de finanzas para consultar en paralelo la tabla `payment_proofs` para todos los registros con estado `'approved'`.
     - [ ] **17.2.2** Combinar las colecciones de `service_orders` y `payment_proofs` aprobados en un solo flujo ordenado temporalmente.
@@ -353,16 +359,20 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ## 💰 FASE 18: AJUSTES DE MEMBRESÍA DINÁMICA (COP & FECHAS) (Pendiente ⏳)
 *Objetivo: Permitir al Súper Admin configurar el precio de membresía en COP y la fecha de próximo pago de cada negocio, y reflejar estos datos dinámicamente en el panel del socio.*
 
-- [ ] **18.1 Estructura de Base de Datos**:
-    - [ ] **18.1.1** Agregar la columna `membership_price` (NUMERIC) a la tabla `businesses` en Supabase para almacenar el valor personalizado en COP.
+- [x] **18.1 Estructura de Base de Datos (Completada ✅)**:
+    - [x] **18.1.1** Verificar existencia de la columna `membership_price` (NUMERIC) en la tabla `businesses` de Supabase (Confirmada su existencia vía query SQL).
 - [ ] **18.2 Panel Súper Admin (Configuración del Negocio)**:
     - [ ] **18.2.1** Integrar un campo numérico (Input) para el "Precio de Membresía (COP)" en la pestaña *Configuración General* (`BusinessBasicSettings`).
-    - [ ] **18.2.2** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
-- [ ] **18.3 Panel de Socio (Finanzas y Membresía)**:
-    - [ ] **18.3.1** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
-    - [ ] **18.3.2** Reemplazar los valores estáticos/hardcodeados (la fecha y los `$29.99` USD) por los valores dinámicos recuperados de la base de datos (con formato en COP).
-    - [ ] **18.3.3** Sincronizar el "Membership Alert" del `PartnerTopBar.tsx` para usar de forma consistente los datos dinámicos.
-    - [ ] **18.3.4** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar el valor de membresía dinámico asignado al negocio.
+    - [ ] **18.2.2** **Blindaje de Fecha**: Agregar control de errores (Optional Chaining / Fallback) al formatear `payment_date` en el panel del Admin (`payment_date?.split('T')[0] || ''`) para evitar JS crashes si la fecha es nula en DB.
+    - [ ] **18.2.3** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
+    - [ ] **18.2.4** **Progresión Automática de Fecha**: Al aprobar un pago en `BusinessPaymentViewer`, sumarle automáticamente **30 días** a la fecha de pago actual (o a la fecha actual si es nula) y guardarlo en la tabla `businesses`.
+- [ ] **18.3 Panel de Socio (Finanzas, Membresía y Formatos Premium)**:
+    - [ ] **18.3.1** **Formateador Unificado de COP**: Implementar utilidad global `formatCOP(value)` para desplegar montos con espacio y puntos como separadores de miles (ej. `$ 115.000 COP` o `$ 115.000`) de forma unificada.
+    - [ ] **18.3.2** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
+    - [ ] **18.3.3** Reemplazar los valores estáticos/hardcodeados (la fecha fija de mayo y los `$29.99` USD) por los valores dinámicos recuperados de la base de datos (con el nuevo formato COP premium).
+    - [ ] **18.3.4** Sincronizar el "Membership Alert" del `PartnerTopBar.tsx` para usar de forma consistente los datos dinámicos.
+    - [ ] **18.3.5** **Identidad Dinámica en PartnerTopBar**: Extender la consulta de `PartnerTopBar.tsx` para recuperar dinámicamente el `name` y `plan` del negocio del socio y mostrarlos en el perfil de la esquina superior, reemplazando las cadenas fijas por datos dinámicos y actualizados en tiempo real.
+    - [ ] **18.3.6** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar dinámicamente el valor del `membership_price` asignado al negocio del socio en lugar de un monto fijo.
 
 ---
 ---
