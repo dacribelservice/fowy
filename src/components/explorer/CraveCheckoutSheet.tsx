@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   MapPin, 
@@ -26,6 +27,7 @@ export interface CraveCheckoutSheetProps {
   accentColor: string;
   businessName: string;
   businessPhone?: string;
+  businessId?: string;
 }
 
 export function CraveCheckoutSheet({
@@ -37,7 +39,9 @@ export function CraveCheckoutSheet({
   accentColor,
   businessName,
   businessPhone,
+  businessId,
 }: CraveCheckoutSheetProps) {
+  const supabase = createClient();
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout">("cart");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -92,7 +96,7 @@ export function CraveCheckoutSheet({
     );
   };
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     if (!customerName.trim() || !customerPhone.trim()) {
       setValidationError("Por favor, ingresa tu nombre y celular para enviar el pedido.");
       return;
@@ -156,6 +160,41 @@ ${itemsText}
 💰 *Total a Pagar:* $${totalText}
 
 *¡Gracias por tu compra!*`;
+
+    // Guardar el pedido en Supabase
+    if (businessId) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const totalAmount = cartItems.reduce((acc, curr) => acc + curr.price, 0);
+        const itemsPayload = groupedCart.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image_url: item.image_url ?? null,
+        }));
+
+        const { error: insertError } = await supabase.from("orders").insert({
+          business_id: businessId,
+          customer_id: user?.id ?? null,
+          customer_name: customerName.trim(),
+          customer_phone: customerPhone.trim(),
+          items: itemsPayload,
+          total_amount: totalAmount,
+          status: "pending",
+        });
+
+        if (insertError) {
+          console.error("[FOWY] Error al guardar pedido en Supabase:", insertError.message, insertError.details, insertError.hint);
+        } else {
+          // Notificar a UserOrdersSheet para que recargue los pedidos del usuario
+          window.dispatchEvent(new CustomEvent("fowy:order-created"));
+        }
+      } catch (err) {
+        console.error("[FOWY] Error inesperado guardando el pedido:", err);
+        // No bloqueamos el flujo: igual se envía por WhatsApp
+      }
+    }
 
     const rawPhone = businessPhone || "3000000000";
     let normalizedPhone = rawPhone.replace(/\D/g, "");

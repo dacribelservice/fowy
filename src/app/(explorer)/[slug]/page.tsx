@@ -240,6 +240,7 @@ export default function BusinessMenuPage() {
         accentColor={accentColor}
         businessName={businessName}
         businessPhone={business?.phone}
+        businessId={business?.id}
       />
 
       {/* DETALLES DE PRODUCTO - POPUP ULTRA PREMIUM */}

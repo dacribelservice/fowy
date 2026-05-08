@@ -197,6 +197,20 @@ export function UserOrdersSheet({
     }
   }, [user, isOpen, activeTab]);
 
+  // Escuchar evento global cuando se crea un pedido nuevo desde el checkout
+  useEffect(() => {
+    const handleOrderCreated = () => {
+      if (user) {
+        setPage(1);
+        fetchOrders(user.id, 1, false);
+      }
+    };
+    window.addEventListener("fowy:order-created", handleOrderCreated);
+    return () => {
+      window.removeEventListener("fowy:order-created", handleOrderCreated);
+    };
+  }, [user]);
+
   const handleLoadMore = () => {
     if (user && !loadingMore && hasMore) {
       const nextPage = page + 1;
