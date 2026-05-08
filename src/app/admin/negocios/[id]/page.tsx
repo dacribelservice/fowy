@@ -28,6 +28,7 @@ export interface BusinessData {
   phone: string;
   payment_date: string;
   payment_proof_url?: string | null;
+  payment_proof_id?: string | null;
   modules: {
     standard: boolean;
     pro: boolean;
@@ -58,6 +59,24 @@ export default function BusinessDetailsPage() {
         .single();
       
       if (error) throw error;
+
+      // Obtener el comprobante de pago PENDIENTE más reciente desde 'payment_proofs'
+      const { data: proofData, error: proofError } = await supabase
+        .from('payment_proofs')
+        .select('id, proof_url')
+        .eq('business_id', id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (!proofError && proofData && proofData.length > 0) {
+        data.payment_proof_url = proofData[0].proof_url;
+        data.payment_proof_id = proofData[0].id;
+      } else {
+        data.payment_proof_url = null;
+        data.payment_proof_id = null;
+      }
+
       setBusiness(data);
     } catch (error) {
       console.error("Error fetching business:", error);
@@ -84,8 +103,7 @@ export default function BusinessDetailsPage() {
           latitude: business.latitude,
           longitude: business.longitude,
           phone: business.phone,
-          payment_date: business.payment_date,
-          payment_proof_url: business.payment_proof_url
+          payment_date: business.payment_date
         })
         .eq('id', id);
 
@@ -167,7 +185,7 @@ export default function BusinessDetailsPage() {
                     onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
                   />
 
-                  <BusinessPaymentViewer business={business} />
+                  <BusinessPaymentViewer business={business} onRefresh={fetchBusiness} />
 
                   <div className="md:col-span-2">
                     <BusinessLocationManager 

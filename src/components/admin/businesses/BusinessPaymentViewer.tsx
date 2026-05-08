@@ -1,14 +1,40 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Check } from "lucide-react";
 import { BusinessData } from "@/app/admin/negocios/[id]/page";
+import { createClient } from "@/utils/supabase/client";
 
 interface BusinessPaymentViewerProps {
   business: BusinessData;
+  onRefresh?: () => void;
 }
 
-export function BusinessPaymentViewer({ business }: BusinessPaymentViewerProps) {
+export function BusinessPaymentViewer({ business, onRefresh }: BusinessPaymentViewerProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+
+  const handleConfirmPayment = async () => {
+    if (!business.payment_proof_id) return;
+    try {
+      setConfirming(true);
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("payment_proofs")
+        .update({ status: "approved" })
+        .eq("id", business.payment_proof_id);
+
+      if (error) throw error;
+
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+      alert("Error al confirmar el pago");
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   return (
     <div className="space-y-2 md:col-span-2">
@@ -26,11 +52,27 @@ export function BusinessPaymentViewer({ business }: BusinessPaymentViewerProps) 
                 <span className="text-white text-xs font-bold px-3 py-1 bg-white/20 rounded-full backdrop-blur-md">Ampliar</span>
               </div>
             </div>
-            <div className="flex-1">
-              <h5 className="text-sm font-bold text-slate-800 mb-1">Comprobante Recibido</h5>
-              <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                El dueño del negocio ha enviado este comprobante. Haz clic en la imagen para verla en tamaño completo.
-              </p>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h5 className="text-sm font-bold text-slate-800 mb-1">Comprobante Recibido</h5>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  El dueño del negocio ha enviado este comprobante. Haz clic en la imagen para ampliar o verifícalo presionando "Confirmado".
+                </p>
+              </div>
+              <button
+                onClick={handleConfirmPayment}
+                disabled={confirming}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm hover:shadow active:scale-[0.98] cursor-pointer disabled:pointer-events-none"
+              >
+                {confirming ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Check size={14} />
+                    Confirmado
+                  </>
+                )}
+              </button>
             </div>
           </>
         ) : (
@@ -80,6 +122,23 @@ export function BusinessPaymentViewer({ business }: BusinessPaymentViewerProps) 
               />
             </div>
             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={async () => {
+                  setIsImageModalOpen(false);
+                  await handleConfirmPayment();
+                }}
+                disabled={confirming}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-colors shadow-lg cursor-pointer"
+              >
+                {confirming ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Check size={14} />
+                    Confirmar Pago
+                  </>
+                )}
+              </button>
               <a 
                 href={business.payment_proof_url}
                 target="_blank"
