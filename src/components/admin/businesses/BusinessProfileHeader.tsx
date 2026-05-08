@@ -39,80 +39,64 @@ interface ProfileCardProps {
 }
 
 export function BusinessProfileCard({ business }: ProfileCardProps) {
-  const formatPaymentDate = (date: string | Date | null | undefined) => {
-    if (!date) return "No definido";
-    try {
-      const dateString = typeof date === 'string' ? date : date.toISOString();
-      const [year, month, day] = dateString.split('T')[0].split('-');
-      const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      const monthName = months[parseInt(month, 10) - 1];
-      if (!day || !monthName || !year) return dateString.split('T')[0];
-      return `${day}/${monthName}/${year}`;
-    } catch (e) {
-      return String(date);
-    }
-  };
-
   return (
-    <div className="lg:col-span-1 space-y-8">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-[40px] p-10 shadow-xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden"
-      >
-        {/* Background Decor */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-fowy-orange/5 rounded-full -mr-16 -mt-16 blur-3xl" />
-        
-        <div className="relative flex flex-col items-center text-center">
-          <div className="w-32 h-32 rounded-[40px] p-1 bg-gradient-to-tr from-fowy-red to-fowy-orange mb-6 shadow-2xl">
-            <div className="w-full h-full rounded-[38px] overflow-hidden border-4 border-white bg-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={business.logo_url} className="w-full h-full object-cover" alt={business.name} />
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight mb-1">{business.name}</h2>
-          <p className="text-[10px] font-mono text-slate-400 font-bold uppercase mb-6 tracking-tighter opacity-60">ID: {business.id.slice(0,8)}</p>
-          
-          <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8 border ${
-            business.status ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'
-          }`}>
-            {business.status ? "● Negocio Activo" : "○ Inactivo"}
-          </div>
-
-          <div className="w-full space-y-4 text-left border-t border-slate-50 pt-8">
-            <div className="flex items-center gap-3 text-slate-500">
-              <div className="p-2 bg-slate-50 rounded-lg"><MapPin size={14} /></div>
-              <span className="text-xs font-bold">{business.city}, {business.country}</span>
-            </div>
-            <div className="flex items-center gap-3 text-slate-500">
-              <div className="p-2 bg-slate-50 rounded-lg"><Phone size={14} /></div>
-              <span className="text-xs font-bold">+{business.phone}</span>
-            </div>
-            <div className="flex items-center gap-3 text-slate-500">
-              <div className="p-2 bg-slate-50 rounded-lg"><Globe size={14} /></div>
-              <span className="text-xs font-bold lowercase">/{business.slug}</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Quick Info: Plan actual */}
-      <div className="bg-slate-900 rounded-[30px] p-8 text-white relative overflow-hidden group">
-        <div className="absolute bottom-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-          <Zap size={100} />
-        </div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Plan Contratado</p>
-        <div className="flex items-center gap-3">
-          <Star className="text-fowy-orange" fill="currentColor" />
-          <h4 className="text-2xl font-black italic tracking-tighter uppercase">{business.plan}</h4>
-        </div>
-        <div className="mt-6 flex justify-between items-center">
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Próximo Pago</p>
-          <span className="text-xs font-black">{formatPaymentDate(business.payment_date)}</span>
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-3xl p-5 shadow-md shadow-slate-100/50 border border-slate-100 relative overflow-hidden flex flex-col items-center text-center"
+    >
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-24 h-24 bg-fowy-orange/5 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none" />
+      
+      {/* Logo */}
+      <div className="w-14 h-14 rounded-2xl p-0.5 bg-gradient-to-tr from-fowy-red to-fowy-orange shadow-md flex-shrink-0 mb-2">
+        <div className="w-full h-full rounded-[14px] overflow-hidden border-2 border-white bg-white">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={business.logo_url} className="w-full h-full object-cover" alt={business.name} />
         </div>
       </div>
-    </div>
+
+      {/* Text Info */}
+      <div className="flex flex-col items-center gap-1 mb-3">
+        <h2 className="text-base font-black text-slate-800 tracking-tight leading-tight">{business.name}</h2>
+        <span className="text-[8px] font-mono text-slate-400 font-bold uppercase tracking-widest opacity-70">ID: {business.id.slice(0,8)}</span>
+        
+        <div className={`mt-1.5 inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+          business.status 
+            ? 'bg-green-50/70 text-green-600 border-green-100/50' 
+            : 'bg-red-50/70 text-red-600 border-red-100/50'
+        }`}>
+          {business.status ? "● Negocio Activo" : "○ Negocio Inactivo"}
+        </div>
+      </div>
+
+      {/* Info Rows */}
+      <div className="w-full border-t border-slate-50 pt-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-xs px-1">
+          <div className="flex items-center gap-2 text-slate-400">
+            <MapPin size={12} />
+            <span className="text-[9px] font-bold uppercase tracking-wider">Ubicación</span>
+          </div>
+          <span className="font-semibold text-slate-600 text-right">{business.city}, {business.country}</span>
+        </div>
+
+        <div className="flex items-center justify-between text-xs px-1">
+          <div className="flex items-center gap-2 text-slate-400">
+            <Phone size={12} />
+            <span className="text-[9px] font-bold uppercase tracking-wider">Teléfono</span>
+          </div>
+          <span className="font-semibold text-slate-600 text-right">+{business.phone}</span>
+        </div>
+
+        <div className="flex items-center justify-between text-xs px-1">
+          <div className="flex items-center gap-2 text-slate-400">
+            <Globe size={12} />
+            <span className="text-[9px] font-bold uppercase tracking-wider">Enlace</span>
+          </div>
+          <span className="font-semibold text-fowy-orange lowercase text-right">/{business.slug}</span>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

@@ -311,10 +311,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 *Objetivo: Diseñar un panel de métricas ultra-minimalista, altamente responsivo para celulares y PC, ordenado en capas verticales independientes y con gráfica interactiva de ventas, respetando estrictamente las reglas de desacoplamiento y modularidad de `conceptos.md`.*
 
 - [ ] **16.1 Reorganización en Capas Verticales (Layout Mobile-First)**:
-    - [ ] **16.1.1 Capa 1 (Plan Píldora)**: Reemplazar la tarjeta de "Plan Contratado" actual por un elemento cilíndrico ultra-compacto (`rounded-full`) al inicio de la página con estilo premium oscuro o borde degradado, indicando de forma sutil: `Plan Standard • Próximo pago: 02/Junio/2026`.
-    - [ ] **16.1.2 Capa 2 (Lista de Métricas)**: Implementar la lista minimalista de las 4 métricas clave de rendimiento agrupadas verticalmente (sin tarjetas masivas).
-    - [ ] **16.1.3 Capa 2.5 (Tendencia de Ventas)**: Insertar la gráfica lineal interactiva justo debajo de la lista de métricas y antes de los datos generales del negocio.
-    - [ ] **16.1.4 Capa 3 (Tarjeta de Negocio Compacta)**: Rediseñar la tarjeta de información general (logo, badge `NEGOCIO ACTIVO`, datos) haciéndola más pequeña, compacta y alineada verticalmente.
+    - [x] **16.1.1 Capa 1 (Plan Píldora)**: Reemplazar la tarjeta de "Plan Contratado" actual por un elemento cilíndrico ultra-compacto (`rounded-full`) al inicio de la página con estilo premium oscuro o borde degradado, indicando de forma sutil: `Plan Standard • Próximo pago: 02/Junio/2026`.
+    - [x] **16.1.2 Capa 2 (Lista de Métricas)**: Implementar la lista minimalista de las 4 métricas clave de rendimiento agrupadas verticalmente (sin tarjetas masivas).
+    - [x] **16.1.3 Capa 2.5 (Tendencia de Ventas)**: Insertar la gráfica lineal interactiva justo debajo de la lista de métricas y antes de los datos generales del negocio.
+    - [x] **16.1.4 Capa 3 (Tarjeta de Negocio Compacta)**: Rediseñar la tarjeta de información general (logo, badge `NEGOCIO ACTIVO`, datos) haciéndola más pequeña, compacta y alineada verticalmente.
     - [ ] **16.1.5 Capa 4 (Módulos & Configuración)**: Rediseñar las tarjetas de módulos activos reduciendo su padding interior y tamaño de íconos, ordenándolas de forma vertical compacta sin elementos horizontales complejos.
 - [ ] **16.2 Lista de Métricas de Rendimiento**:
     - [ ] **16.2.1 Métricas a Mostrar**: Incluir únicamente las 4 métricas principales: *Visitas Totales*, *Pedidos Recibidos*, *Tasa de Conversión* y *Ticket Promedio*.

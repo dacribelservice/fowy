@@ -9,6 +9,10 @@ import { BusinessTopBar, BusinessProfileCard, BusinessBasicSettings } from "@/co
 import { BusinessLocationManager } from "@/components/admin/businesses/BusinessLocationManager";
 import { BusinessModuleManager } from "@/components/admin/businesses/BusinessModuleManager";
 import { BusinessPaymentViewer } from "@/components/admin/businesses/BusinessPaymentViewer";
+import { BusinessPlanPill } from "@/components/admin/businesses/BusinessPlanPill";
+import { BusinessMetricsList } from "@/components/admin/businesses/BusinessMetricsList";
+import { FowySalesChart } from "@/components/admin/businesses/FowySalesChart";
+
 
 export interface BusinessData {
   id: string;
@@ -105,59 +109,75 @@ export default function BusinessDetailsPage() {
   if (!business) return <div>No se encontró el negocio.</div>;
 
   return (
-    <div className="max-w-6xl mx-auto pb-20">
+    <div className="max-w-2xl mx-auto pb-20 px-4">
       {/* Header Navegación */}
       <BusinessTopBar onBack={() => router.back()} onSave={handleUpdate} saving={saving} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Columna Izquierda: Perfil Card */}
+      <div className="flex flex-col gap-6 mt-4">
+        {/* Capa 1: Plan Píldora (Cilíndrico Ultra-Compacto) */}
+        <div className="flex justify-center w-full">
+          <BusinessPlanPill plan={business.plan} paymentDate={business.payment_date} />
+        </div>
+
+        {/* Capa 2: Lista de Métricas Minimalistas de Rendimiento */}
+        <div className="bg-white rounded-3xl p-6 shadow-md shadow-slate-100/50 border border-slate-100">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Métricas de Rendimiento</h3>
+          <BusinessMetricsList businessId={business.id} />
+        </div>
+
+        {/* Capa 2.5: Tendencia de Ventas (Gráfica Interactiva) */}
+        <div className="bg-white rounded-3xl p-6 shadow-md shadow-slate-100/50 border border-slate-100">
+          <FowySalesChart businessId={business.id} />
+        </div>
+
+        {/* Capa 3: Tarjeta de Negocio Compacta */}
         <BusinessProfileCard business={business} />
 
-        {/* Columna Derecha: Configuración & Módulos */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-[40px] shadow-xl shadow-slate-200/50 border border-slate-50 overflow-hidden">
-            {/* Tabs */}
-            <div className="flex border-b border-slate-50 bg-slate-50/50">
-              {['modules', 'settings'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all relative ${
-                    activeTab === tab ? 'text-fowy-orange' : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  {tab === 'modules' ? 'Módulos Activos' : 'Configuración General'}
-                  {activeTab === tab && (
-                    <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-1 bg-fowy-orange" />
-                  )}
-                </button>
-              ))}
-            </div>
+        {/* Capa 4: Módulos & Configuración */}
+        <div className="bg-white rounded-3xl shadow-md shadow-slate-100/50 border border-slate-100 overflow-hidden">
+          {/* Tabs */}
+          <div className="flex border-b border-slate-100 bg-slate-50/50">
+            {['modules', 'settings'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.15em] transition-all relative ${
+                  activeTab === tab ? 'text-fowy-orange' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {tab === 'modules' ? 'Módulos Activos' : 'Configuración General'}
+                {activeTab === tab && (
+                  <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-[3px] bg-fowy-orange" />
+                )}
+              </button>
+            ))}
+          </div>
 
-            <div className="p-10">
-              {activeTab === 'modules' ? (
-                <BusinessModuleManager 
-                  business={business} 
-                  onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
-                />
-              ) : (
-                <div className="space-y-8">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <BusinessBasicSettings 
-                        business={business} 
-                        onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
-                      />
+          <div className="p-6">
+            {activeTab === 'modules' ? (
+              <BusinessModuleManager 
+                business={business} 
+                onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <BusinessBasicSettings 
+                    business={business} 
+                    onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
+                  />
 
-                      <BusinessPaymentViewer business={business} />
+                  <BusinessPaymentViewer business={business} />
 
-                      <BusinessLocationManager 
-                        business={business} 
-                        onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
-                      />
-                   </div>
+                  <div className="md:col-span-2">
+                    <BusinessLocationManager 
+                      business={business} 
+                      onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
+                    />
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
