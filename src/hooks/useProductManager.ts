@@ -109,6 +109,10 @@ export function useProductManager(businessId: string | null) {
     return await updateProduct(id, { in_stock: !currentStock });
   };
 
+  const toggleOffer = async (id: string, currentOffer: boolean) => {
+    return await updateProduct(id, { is_offer: !currentOffer });
+  };
+
   useEffect(() => {
     if (businessId) {
       fetchProducts();
@@ -123,6 +127,7 @@ export function useProductManager(businessId: string | null) {
     updateProduct,
     deleteProduct,
     toggleStock,
+    toggleOffer,
     refreshProducts: fetchProducts
   };
 }

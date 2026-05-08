@@ -126,7 +126,12 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
         if (error) {
           console.error("Error fetching filtered products:", error);
         } else {
-          setProducts(data || []);
+          // Mapeamos is_offer a is_promo para que el frontend visualice la etiqueta de promoción correctamente
+          const mappedProducts = (data || []).map((p: any) => ({
+            ...p,
+            is_promo: p.is_offer
+          }));
+          setProducts(mappedProducts);
         }
       } catch (err) {
         console.error("Error in fetchFilteredProducts:", err);

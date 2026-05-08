@@ -54,6 +54,7 @@ export default function MenuManagementPage() {
     products, 
     loading: loadingProds, 
     toggleStock,
+    toggleOffer,
     deleteProduct,
     refreshProducts 
   } = useProductManager(businessId);
@@ -139,6 +140,10 @@ export default function MenuManagementPage() {
 
   const handleToggleStock = async (id: string, currentStock: boolean) => {
     await toggleStock(id, currentStock);
+  };
+
+  const handleToggleOffer = async (id: string, currentOffer: boolean) => {
+    await toggleOffer(id, currentOffer);
   };
 
   const handleEditProduct = (product: Product) => {
@@ -362,26 +367,52 @@ export default function MenuManagementPage() {
                     {product.description || 'Sin descripción disponible.'}
                   </p>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${product.in_stock ? 'bg-green-500' : 'bg-red-500'}`} />
-                      <span className="text-xs font-bold text-slate-600">
-                        {product.in_stock ? 'En Stock' : 'Agotado'}
-                      </span>
-                    </div>
-                    
-                    <button 
-                      onClick={() => handleToggleStock(product.id, product.in_stock)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                        product.in_stock ? 'bg-[#7B61FF]' : 'bg-slate-200'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
-                          product.in_stock ? 'translate-x-6' : 'translate-x-1'
+                  <div className="mt-6 pt-4 border-t border-slate-100 space-y-3">
+                    {/* Fila de Promoción/Oferta */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${product.is_offer ? 'bg-[#FF5A5F]' : 'bg-slate-300'}`} />
+                        <span className="text-xs font-bold text-slate-600">
+                          {product.is_offer ? 'En Promoción' : 'Sin Promo'}
+                        </span>
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleToggleOffer(product.id, product.is_offer)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                          product.is_offer ? 'bg-[#FF5A5F]' : 'bg-slate-200'
                         }`}
-                      />
-                    </button>
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+                            product.is_offer ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Fila de Stock */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${product.in_stock ? 'bg-green-500' : 'bg-red-500'}`} />
+                        <span className="text-xs font-bold text-slate-600">
+                          {product.in_stock ? 'En Stock' : 'Agotado'}
+                        </span>
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleToggleStock(product.id, product.in_stock)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                          product.in_stock ? 'bg-[#7B61FF]' : 'bg-slate-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+                            product.in_stock ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
