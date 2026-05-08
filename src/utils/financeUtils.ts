@@ -15,7 +15,11 @@ export interface FinanceStats {
  * Calculates financial metrics from a list of service orders.
  * This ensures precision by centralizing the math logic.
  */
-export const calculateFinanceStats = (orders: ServiceOrder[], role: 'admin' | 'professional' = 'admin'): FinanceStats => {
+export const calculateFinanceStats = (
+  orders: ServiceOrder[],
+  role: 'admin' | 'professional' = 'admin',
+  approvedProofs: any[] = []
+): FinanceStats => {
   const stats: FinanceStats = {
     totalVolume: 0,
     totalCommissions: 0,
@@ -41,6 +45,15 @@ export const calculateFinanceStats = (orders: ServiceOrder[], role: 'admin' | 'p
     }
   });
 
+  // Process approved payment proofs (memberships) for admin stats
+  if (role === 'admin') {
+    approvedProofs.forEach(proof => {
+      const amount = Number(proof.amount) || 0;
+      stats.totalVolume += amount;         // Paso 17.3.2: Sumar al Volumen Total (GMV)
+      stats.totalCommissions += amount;    // Paso 17.3.1: Sumar el 100% a Ingresos FOWY
+    });
+  }
+
   if (role === 'professional') {
     stats.availableBalance = stats.releasedFunds;
     stats.pendingBalance = stats.pendingEscrow;
@@ -50,9 +63,13 @@ export const calculateFinanceStats = (orders: ServiceOrder[], role: 'admin' | 'p
 };
 
 /**
- * Groups earnings by date for charts
+ * Groups earnings by date for charts, including both service orders and approved memberships.
  */
-export const groupFinanceByDate = (orders: ServiceOrder[], days: number = 7) => {
+export const groupFinanceByDate = (
+  orders: ServiceOrder[],
+  days: number = 7,
+  approvedProofs: any[] = []
+) => {
   const lastDays = Array.from({ length: days }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (days - 1 - i));
@@ -64,12 +81,21 @@ export const groupFinanceByDate = (orders: ServiceOrder[], days: number = 7) => 
     const nextDay = new Date(day);
     nextDay.setDate(nextDay.getDate() + 1);
     
-    return orders
+    const ordersVolume = orders
       .filter(o => {
         const d = new Date(o.created_at);
         return d >= day && d < nextDay;
       })
       .reduce((acc, o) => acc + (Number(o.amount) || 0), 0);
+
+    const proofsVolume = approvedProofs
+      .filter(p => {
+        const d = new Date(p.created_at);
+        return d >= day && d < nextDay;
+      })
+      .reduce((acc, p) => acc + (Number(p.amount) || 0), 0);
+
+    return ordersVolume + proofsVolume;
   });
 
   return {

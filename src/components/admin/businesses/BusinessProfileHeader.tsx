@@ -137,8 +137,19 @@ export function BusinessBasicSettings({ business, onChange }: BasicSettingsProps
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Próximo Pago (Fecha)</label>
         <input 
           type="date"
-          value={typeof business.payment_date === 'string' ? business.payment_date.split('T')[0] : ''}
+          value={business.payment_date?.split('T')[0] || ''}
           onChange={(e) => onChange({ payment_date: e.target.value })}
+          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Precio de Membresía (COP)</label>
+        <input 
+          type="number"
+          value={business.membership_price !== undefined && business.membership_price !== null ? business.membership_price : ''}
+          onChange={(e) => onChange({ membership_price: e.target.value === '' ? null : Number(e.target.value) })}
+          placeholder="Ej: 115000"
           className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-700 outline-none"
         />
       </div>

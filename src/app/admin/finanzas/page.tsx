@@ -9,7 +9,8 @@ import {
   Calendar,
   Clock,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Gem
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useFinanceManager } from "@/hooks/useFinanceManager";
@@ -17,7 +18,7 @@ import StatCard from "@/components/admin/shared/StatCard";
 import { DashboardGrowthChart } from "@/components/admin/dashboard/DashboardGrowthChart";
 
 export default function AdminFinancePage() {
-  const { stats, chartData, orders, loading } = useFinanceManager('admin');
+  const { stats, chartData, transactions, loading } = useFinanceManager('admin');
 
   if (loading) {
     return (
@@ -97,26 +98,57 @@ export default function AdminFinancePage() {
             Últimas Transacciones
           </h3>
           <div className="space-y-4">
-            {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 bg-white/50 border border-slate-100 rounded-2xl">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    order.status === 'funds_released' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-                  }`}>
-                    {order.status === 'funds_released' ? <ArrowUpRight size={16} /> : <Clock size={16} />}
+            {transactions.slice(0, 5).map((tx) => {
+              const isMembership = tx.type === 'membership';
+              return (
+                <div 
+                  key={tx.id} 
+                  className={`flex items-center justify-between p-4 bg-white/50 border rounded-2xl transition-all duration-300 hover:scale-[1.01] hover:shadow-sm ${
+                    isMembership 
+                      ? 'border-purple-200/60 bg-gradient-to-r from-purple-50/40 via-white/50 to-white/50' 
+                      : 'border-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      isMembership 
+                        ? 'bg-purple-100 text-purple-600 shadow-sm'
+                        : tx.status === 'funds_released' 
+                          ? 'bg-green-100 text-green-600' 
+                          : 'bg-amber-100 text-amber-600'
+                    }`}>
+                      {isMembership ? (
+                        <Gem size={18} className="animate-pulse" />
+                      ) : tx.status === 'funds_released' ? (
+                        <ArrowUpRight size={18} />
+                      ) : (
+                        <Clock size={18} />
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-slate-800">{tx.businessName}</p>
+                        {isMembership && (
+                          <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-600 rounded-full">
+                            Membresía
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider mt-0.5">
+                        {isMembership ? 'Pago de Membresía' : tx.status}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-800">{order.businesses?.name}</p>
-                    <p className="text-[10px] text-slate-400 uppercase font-black">{order.status}</p>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-slate-800">${tx.amount.toFixed(2)}</p>
+                    <p className="text-[10px] text-fowy-purple font-bold">
+                      {isMembership ? '100% FOWY' : `Com: $${tx.fowyCommission.toFixed(2)}`}
+                    </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-black text-slate-800">${order.amount.toFixed(2)}</p>
-                  <p className="text-[10px] text-fowy-purple font-bold">Com: ${order.fowy_commission.toFixed(2)}</p>
-                </div>
-              </div>
-            ))}
-            {orders.length === 0 && (
+              );
+            })}
+            {transactions.length === 0 && (
               <p className="text-center text-slate-400 py-8 italic">No hay transacciones recientes</p>
             )}
           </div>

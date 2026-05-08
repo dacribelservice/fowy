@@ -29,6 +29,7 @@ export interface BusinessData {
   payment_date: string;
   payment_proof_url?: string | null;
   payment_proof_id?: string | null;
+  membership_price?: number | null;
   modules: {
     standard: boolean;
     pro: boolean;
@@ -103,7 +104,8 @@ export default function BusinessDetailsPage() {
           latitude: business.latitude,
           longitude: business.longitude,
           phone: business.phone,
-          payment_date: business.payment_date
+          payment_date: business.payment_date,
+          membership_price: business.membership_price
         })
         .eq('id', id);
 
@@ -185,7 +187,11 @@ export default function BusinessDetailsPage() {
                     onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
                   />
 
-                  <BusinessPaymentViewer business={business} onRefresh={fetchBusiness} />
+                  <BusinessPaymentViewer 
+                    business={business} 
+                    onRefresh={fetchBusiness} 
+                    onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)}
+                  />
 
                   <div className="md:col-span-2">
                     <BusinessLocationManager 

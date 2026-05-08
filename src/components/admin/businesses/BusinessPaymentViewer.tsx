@@ -1,29 +1,78 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { ImageIcon, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ImageIcon, Check, DollarSign } from "lucide-react";
 import { BusinessData } from "@/app/admin/negocios/[id]/page";
 import { createClient } from "@/utils/supabase/client";
 
 interface BusinessPaymentViewerProps {
   business: BusinessData;
   onRefresh?: () => void;
+  onChange?: (updates: Partial<BusinessData>) => void;
 }
 
-export function BusinessPaymentViewer({ business, onRefresh }: BusinessPaymentViewerProps) {
+export function BusinessPaymentViewer({ business, onRefresh, onChange }: BusinessPaymentViewerProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [verifiedAmount, setVerifiedAmount] = useState<string>("");
   const [confirming, setConfirming] = useState(false);
+
+  const triggerConfirmModal = () => {
+    setVerifiedAmount((business.membership_price ?? 29.99).toString());
+    setIsConfirmModalOpen(true);
+  };
 
   const handleConfirmPayment = async () => {
     if (!business.payment_proof_id) return;
+    const parsedAmount = parseFloat(verifiedAmount);
+    if (isNaN(parsedAmount) || parsedAmount < 0) {
+      alert("Por favor ingrese un monto válido");
+      return;
+    }
+
     try {
       setConfirming(true);
       const supabase = createClient();
+
+      // 1. Aprobar comprobante de pago
       const { error } = await supabase
         .from("payment_proofs")
-        .update({ status: "approved" })
+        .update({ 
+          status: "approved",
+          amount: parsedAmount
+        })
         .eq("id", business.payment_proof_id);
 
       if (error) throw error;
+
+      // 2. Progresión Automática de Fecha: Sumar 30 días
+      let nextDate = new Date();
+      if (business.payment_date) {
+        const dateStr = business.payment_date.replace(" ", "T");
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed.getTime())) {
+          nextDate = parsed;
+        }
+      }
+      nextDate.setDate(nextDate.getDate() + 30);
+      const newPaymentDateStr = nextDate.toISOString();
+
+      // 3. Guardar nueva fecha de próximo pago en 'businesses'
+      const { error: businessError } = await supabase
+        .from("businesses")
+        .update({ payment_date: newPaymentDateStr })
+        .eq("id", business.id);
+
+      if (businessError) throw businessError;
+
+      setIsConfirmModalOpen(false);
+
+      if (onChange) {
+        onChange({
+          payment_proof_url: null,
+          payment_proof_id: null,
+          payment_date: newPaymentDateStr
+        });
+      }
 
       if (onRefresh) {
         onRefresh();
@@ -60,7 +109,7 @@ export function BusinessPaymentViewer({ business, onRefresh }: BusinessPaymentVi
                 </p>
               </div>
               <button
-                onClick={handleConfirmPayment}
+                onClick={triggerConfirmModal}
                 disabled={confirming}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm hover:shadow active:scale-[0.98] cursor-pointer disabled:pointer-events-none"
               >
@@ -123,9 +172,9 @@ export function BusinessPaymentViewer({ business, onRefresh }: BusinessPaymentVi
             </div>
             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
               <button
-                onClick={async () => {
+                onClick={() => {
                   setIsImageModalOpen(false);
-                  await handleConfirmPayment();
+                  triggerConfirmModal();
                 }}
                 disabled={confirming}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-colors shadow-lg cursor-pointer"
@@ -157,6 +206,81 @@ export function BusinessPaymentViewer({ business, onRefresh }: BusinessPaymentVi
           </motion.div>
         </div>
       )}
+
+      {/* Glassmorphic Confirmation & Price Verification Modal */}
+      <AnimatePresence>
+        {isConfirmModalOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-fade-in">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="relative max-w-md w-full bg-white/80 border border-white/40 backdrop-blur-md rounded-[32px] p-8 shadow-2xl flex flex-col gap-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center shadow-inner">
+                  <DollarSign size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-800 tracking-tight">Confirmar Aprobación 💳</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                    Verifica o edita el monto que quedará registrado en el historial financiero para este pago.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Monto Verificado (COP / USD)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">$</span>
+                  <input
+                    type="number"
+                    step="any"
+                    value={verifiedAmount}
+                    onChange={(e) => setVerifiedAmount(e.target.value)}
+                    className="w-full pl-8 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fowy-orange/20 focus:border-fowy-orange transition-all"
+                    placeholder="Monto"
+                  />
+                </div>
+                {business.membership_price !== undefined && business.membership_price !== null ? (
+                  <p className="text-[10px] text-slate-400 font-medium ml-1">
+                    Precio asignado del negocio: <span className="font-bold text-slate-600">${business.membership_price}</span>
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-slate-400 font-medium ml-1">
+                    Usando tarifa estándar de FOWY: <span className="font-bold text-slate-600">$29.99</span>
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={() => setIsConfirmModalOpen(false)}
+                  className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmPayment}
+                  disabled={confirming}
+                  className="flex-1 py-3.5 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {confirming ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Check size={14} />
+                      Aprobar Pago
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

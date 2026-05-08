@@ -340,19 +340,19 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 *Objetivo: Integrar el registro, cobro manual y aprobación de comprobantes de pago de negocios con el módulo de Finanzas global del Super Admin.*
 
 - [ ] **17.1 Modal de Confirmación y Ajuste Manual (BusinessPaymentViewer)**:
-    - [ ] **17.1.1** Crear modal de confirmación emergente (Popup/Dialog) con estilo premium glassmorphism (`backdrop-blur-md bg-white/80`).
-    - [ ] **17.1.2** Integrar campo numérico (Input) pre-llenado con el valor personalizado `membership_price` del negocio (o fallback estándar si es nulo) para permitir edición manual del monto verificado.
-    - [ ] **17.1.3** Limpieza de Interfaz: Al aprobar el pago, el modulo de imagen de comprobante pendiente debe limpiarse inmediatamente esperando el próximo comprobante (Sincronización en tiempo real).
-    - [ ] **17.1.4** Actualizar base de datos (`payment_proofs`) modificando tanto el estado a `'approved'` como el `amount` con el valor exacto verificado/ingresado.
+    - [x] **17.1.1** Crear modal de confirmación emergente (Popup/Dialog) con estilo premium glassmorphism (`backdrop-blur-md bg-white/80`).
+    - [x] **17.1.2** Integrar campo numérico (Input) pre-llenado con el valor personalizado `membership_price` del negocio (o fallback estándar si es nulo) para permitir edición manual del monto verificado.
+    - [x] **17.1.3** Limpieza de Interfaz: Al aprobar el pago, el modulo de imagen de comprobante pendiente debe limpiarse inmediatamente esperando el próximo comprobante (Sincronización en tiempo real).
+    - [x] **17.1.4** Actualizar base de datos (`payment_proofs`) modificando tanto el estado a `'approved'` como el `amount` con el valor exacto verificado/ingresado.
 - [ ] **17.2 Integración en Backend Financiero (useFinanceManager)**:
-    - [ ] **17.2.1** Extender el hook de finanzas para consultar en paralelo la tabla `payment_proofs` para todos los registros con estado `'approved'`.
-    - [ ] **17.2.2** Combinar las colecciones de `service_orders` y `payment_proofs` aprobados en un solo flujo ordenado temporalmente.
+    - [x] **17.2.1** Extender el hook de finanzas para consultar en paralelo la tabla `payment_proofs` para todos los registros con estado `'approved'`.
+    - [x] **17.2.2** Combinar las colecciones de `service_orders` y `payment_proofs` aprobados en un solo flujo ordenado temporalmente.
 - [ ] **17.3 Cálculos y Métricas Consolidadas (financeUtils)**:
-    - [ ] **17.3.1** Modificar `calculateFinanceStats` para sumar el 100% de los cobros de membresías de negocios a la métrica **"Ingresos FOWY"**.
-    - [ ] **17.3.2** Sumar los montos de membresía aprobados a la métrica de **"Volumen Total (GMV)"**.
+    - [x] **17.3.1** Modificar `calculateFinanceStats` para sumar el 100% de los cobros de membresías de negocios a la métrica **"Ingresos FOWY"**.
+    - [x] **17.3.2** Sumar los montos de membresía aprobados a la métrica de **"Volumen Total (GMV)"**.
 - [ ] **17.4 Interfaz del Panel de Finanzas (AdminFinancePage)**:
-    - [ ] **17.4.1** Actualizar la tabla de transacciones recientes para inyectar transacciones del tipo `Membresía` mostrando el nombre del negocio con un icono y estilo distintivos.
-    - [ ] **17.4.2** Asegurar la actualización del gráfico de tendencias para incluir el volumen de membresías confirmadas.
+    - [x] **17.4.1** Actualizar la tabla de transacciones recientes para inyectar transacciones del tipo `Membresía` mostrando el nombre del negocio con un icono y estilo distintivos.
+    - [x] **17.4.2** Asegurar la actualización del gráfico de tendencias para incluir el volumen de membresías confirmadas.
 
 ---
 
@@ -362,10 +362,10 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **18.1 Estructura de Base de Datos (Completada ✅)**:
     - [x] **18.1.1** Verificar existencia de la columna `membership_price` (NUMERIC) en la tabla `businesses` de Supabase (Confirmada su existencia vía query SQL).
 - [ ] **18.2 Panel Súper Admin (Configuración del Negocio)**:
-    - [ ] **18.2.1** Integrar un campo numérico (Input) para el "Precio de Membresía (COP)" en la pestaña *Configuración General* (`BusinessBasicSettings`).
-    - [ ] **18.2.2** **Blindaje de Fecha**: Agregar control de errores (Optional Chaining / Fallback) al formatear `payment_date` en el panel del Admin (`payment_date?.split('T')[0] || ''`) para evitar JS crashes si la fecha es nula en DB.
-    - [ ] **18.2.3** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
-    - [ ] **18.2.4** **Progresión Automática de Fecha**: Al aprobar un pago en `BusinessPaymentViewer`, sumarle automáticamente **30 días** a la fecha de pago actual (o a la fecha actual si es nula) y guardarlo en la tabla `businesses`.
+    - [x] **18.2.1** Integrar un campo numérico (Input) para el "Precio de Membresía (COP)" en la pestaña *Configuración General* (`BusinessBasicSettings`).
+    - [x] **18.2.2** **Blindaje de Fecha**: Agregar control de errores (Optional Chaining / Fallback) al formatear `payment_date` en el panel del Admin (`payment_date?.split('T')[0] || ''`) para evitar JS crashes si la fecha es nula en DB.
+    - [x] **18.2.3** Asegurar la persistencia de `membership_price` al guardar los cambios del negocio en `src/app/admin/negocios/[id]/page.tsx`.
+    - [x] **18.2.4** **Progresión Automática de Fecha**: Al aprobar un pago en `BusinessPaymentViewer`, sumarle automáticamente **30 días** a la fecha de pago actual (o a la fecha actual si es nula) y guardarlo en la tabla `businesses`.
 - [ ] **18.3 Panel de Socio (Finanzas, Membresía y Formatos Premium)**:
     - [ ] **18.3.1** **Formateador Unificado de COP**: Implementar utilidad global `formatCOP(value)` para desplegar montos con espacio y puntos como separadores de miles (ej. `$ 115.000 COP` o `$ 115.000`) de forma unificada.
     - [ ] **18.3.2** Modificar la consulta en `/business/finanzas` para seleccionar `payment_date` y `membership_price` de la tabla `businesses`.
