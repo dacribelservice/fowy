@@ -32,11 +32,17 @@ export interface UseFowySalesDataReturn {
   areaD: string;
 }
 
+interface DBOrder {
+  total_amount: number | null;
+  created_at: string | null;
+  status: string | null;
+}
+
 export function useFowySalesData({
   businessId,
   filter,
 }: UseFowySalesDataProps): UseFowySalesDataReturn {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<DBOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
@@ -87,13 +93,24 @@ export function useFowySalesData({
       ];
 
       for (let i = 6; i >= 0; i--) {
-        const d = new Date();
+        const d = new Date(now);
         d.setDate(now.getDate() - i);
-        const dayStr = d.toISOString().split("T")[0];
+        
+        const year = d.getFullYear();
+        const month = d.getMonth();
+        const date = d.getDate();
 
-        // Sumar ventas de este día de manera segura
+        // Sumar ventas de este día de manera segura comparando año, mes y día en la zona horaria local
         const totalSales = orders
-          .filter((o) => o.created_at && o.created_at.startsWith(dayStr))
+          .filter((o) => {
+            if (!o.created_at) return false;
+            const orderDate = new Date(o.created_at);
+            return (
+              orderDate.getFullYear() === year &&
+              orderDate.getMonth() === month &&
+              orderDate.getDate() === date
+            );
+          })
           .reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
         days.push({

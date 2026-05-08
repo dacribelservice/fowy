@@ -291,14 +291,14 @@ Siguiendo el estándar implementado en `businesses`, se debe aplicar el mismo ri
   - [x] **2.2** Extraer el bloque interactivo con `AnimatePresence` y `<motion.div>` de Framer Motion.
   - [x] **2.3** Recibir las props del tooltip (punto activo, posición X/Y, color de marca, formateador de moneda) de forma desacoplada.
 
-- [ ] **Paso 3: Rediseño del Orquestador de la Gráfica (`FowySalesChart.tsx`)**
-  - [ ] **3.1** Limpiar `src/components/admin/businesses/FowySalesChart.tsx` removiendo los hooks internos de cálculo matemático y lógica de Supabase.
-  - [ ] **3.2** Importar y consumir el hook `useFowySalesData`.
-  - [ ] **3.3** Importar y renderizar el componente `<FowyChartTooltip />`.
-  - [ ] **3.4** Mantener únicamente la estructura visual del componente: la cabecera (título, LED interactivo, selectores `D`/`S`/`M`) y el elemento responsive `<svg viewBox="0 0 500 180">` con su efecto Glow y grid de fondo.
-  - [ ] **3.5** Validar que el archivo orquestador principal quede por debajo de **160 líneas de código**, garantizando máxima legibilidad y cumplimiento de límites de código.
+- [x] **Paso 3: Rediseño del Orquestador de la Gráfica (`FowySalesChart.tsx`)**
+  - [x] **3.1** Limpiar `src/components/admin/businesses/FowySalesChart.tsx` removiendo los hooks internos de cálculo matemático y lógica de Supabase.
+  - [x] **3.2** Importar y consumir el hook `useFowySalesData`.
+  - [x] **3.3** Importar y renderizar el componente `<FowyChartTooltip />`.
+  - [x] **3.4** Mantener únicamente la estructura visual del componente: la cabecera (título, LED interactivo, selectores `D`/`S`/`M`) y el elemento responsive `<svg viewBox="0 0 500 180">` con su efecto Glow y grid de fondo.
+  - [x] **3.5** Validar que el archivo orquestador principal quede por debajo de **160 líneas de código**, garantizando máxima legibilidad y cumplimiento de límites de código.
 
-- [ ] **Paso 4: Pruebas de Integración y Regresión**
-  - [ ] **4.1** Verificar que la gráfica modularizada se dibuje elegantemente con su animación elástica al cargar.
-  - [ ] **4.2** Confirmar que el filtro cilíndrico micro de tiempo (`D`, `S`, `M`) alterne de manera reactiva con transiciones fluidas.
-  - [ ] **4.3** Asegurar que al interactuar con los nodos en pantalla mobile/desktop aparezca el tooltip con el monto y etiqueta correctos.
+- [x] **Paso 4: Pruebas de Integración y Regresión**
+  - [x] **4.1** Verificar que la gráfica modularizada se dibuje elegantemente con su animación elástica al cargar.
+  - [x] **4.2** Confirmar que el filtro cilíndrico micro de tiempo (`D`, `S`, `M`) alterne de manera reactiva con transiciones fluidas.
+  - [x] **4.3** Asegurar que al interactuar con los nodos en pantalla mobile/desktop aparezca el tooltip con el monto y etiqueta correctos.
