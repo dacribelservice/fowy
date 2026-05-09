@@ -21,6 +21,7 @@ import { CraveProductDetailModal } from "@/components/explorer/CraveProductDetai
 import { CraveMagicCart } from "@/components/explorer/CraveMagicCart";
 import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
 import { LazyWrapper } from "@/components/explorer/LazyWrapper";
+import { AutoScrollBanners } from "@/components/explorer/AutoScrollBanners";
 
 /**
  * BusinessMenuPage: El nuevo molde de producción premium de Crave Vision.
@@ -183,7 +184,7 @@ export default function BusinessMenuPage() {
         </div>
 
         {/* BLOQUE 4: LA JOYA DE LA CORONA - PRODUCT CARD V3 */}
-        <div className="px-4 pb-24 mt-4">
+        <div className="px-4 pb-8 mt-4">
           {productsLoading ? (
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
@@ -221,6 +222,9 @@ export default function BusinessMenuPage() {
             </div>
           )}
         </div>
+
+        {/* BLOQUE 4.5: MARKETING BANNERS (Fase 19.3.6) */}
+        <AutoScrollBanners />
       </div>
 
       {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL & BOTTOM SHEET) */}

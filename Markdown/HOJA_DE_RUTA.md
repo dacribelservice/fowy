@@ -408,16 +408,16 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **19.3.4 Detención al Tocar (Pausa)**: Añadir detector de eventos en el carrusel para que la animación se pause de forma inmediata en `onHover` (pantallas desktop) y `onTouchStart` (pantallas móviles) permitiendo hacer clic en un banner pausado fácilmente.
 - [x] **19.3.5 Elemento del Mensaje (CTA Unificado)**: Inyectar el mensaje motivacional encima del carrusel con tipografía premium:
     > *"¿Te quedaste con hambre de más? Explora otros locales en el mapa 🗺️"*
-- [ ] **19.3.6 Integración del Pie de Página**: Colocar el componente `<AutoScrollBanners />` en la parte inferior de la vista del menú digital del explorador (`src/app/(explorer)/[slug]/page.tsx`), integrándose de forma fluida al final de la página cuando el usuario navegue toda la oferta de productos.
+- [x] **19.3.6 Integración del Pie de Página**: Colocar el componente `<AutoScrollBanners />` en la parte inferior de la vista del menú digital del explorador (`src/app/(explorer)/[slug]/page.tsx`), integrándose de forma fluida al final de la página cuando el usuario navegue toda la oferta de productos.
 
 ---
 
 ### ✨ 19.4 Efectos Visuales y Animaciones Premium (Ethereal High-Tech)
-- [ ] **19.4.1 Efecto Shimmer (Brillo)**: Programar un reflejo brillante metálico diagonal que se deslice sobre los banners automáticamente cada 4 segundos usando animaciones CSS nativas para llamar la atención del usuario sin interferir con su lectura.
-- [ ] **19.4.2 Micro-Animaciones de Tap / Hover (Concepto 4.2)**: Usar Framer Motion (`framer-motion`) o transiciones CSS suaves para dar una respuesta táctil instantánea al interactuar con el banner:
+- [x] **19.4.1 Efecto Shimmer (Brillo)**: Programar un reflejo brillante metálico diagonal que se deslice sobre los banners automáticamente cada 4 segundos usando animaciones CSS nativas para llamar la atención del usuario sin interferir con su lectura.
+- [x] **19.4.2 Micro-Animaciones de Tap / Hover (Concepto 4.2)**: Usar Framer Motion (`framer-motion`) o transiciones CSS suaves para dar una respuesta táctil instantánea al interactuar con el banner:
     - Escala elástica al hacer clic/tap (`scale-[0.98]`).
     - Incremento sutil de tamaño e intensidad de sombra al posar el cursor en pantallas táctiles o desktop.
-- [ ] **19.4.3 Transición de Redirección**: Configurar un loader suave de transición hacia la página principal del mapa explorador (`/explorar` o `/`) cuando se haga clic en cualquiera de los banners.
+- [x] **19.4.3 Transición de Redirección**: Configurar un loader suave de transición hacia la página principal del mapa explorador (`/explorar` o `/`) cuando se haga clic en cualquiera de los banners.
 
 ---
 ---
