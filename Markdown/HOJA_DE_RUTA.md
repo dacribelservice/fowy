@@ -375,5 +375,50 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - [x] **18.3.6** Modificar la inserción de nuevos comprobantes de pago (`payment_proofs`) para inyectar dinámicamente el valor del `membership_price` asignado al negocio del socio en lugar de un monto fijo.
 
 ---
+
+## 📣 FASE 19: SISTEMA DE MARKETING Y BANNERS AUTO-SCROLL (Pendiente ⏳)
+*Objetivo: Implementar un sistema de marketing administrable por el Super Admin para mostrar banners publicitarios horizontales en el pie de página de los menús de todos los negocios, con scroll automático infinito y redirección fluida al mapa explorador.*
+
+---
+
+### 🗄️ 19.1 Base de Datos & Storage (Supabase)
+- [x] **19.1.1 DB — Tabla `marketing_banners`**: Crear tabla con los campos: `id` (UUID, PK), `image_url` (TEXT), `title` (TEXT, opcional), `link_url` (TEXT, fallback a `/explorar`), `is_active` (BOOLEAN, default true), `sort_order` (INTEGER, default 0) y `created_at` (TIMESTAMPTZ).
+- [ ] **19.1.2 DB — Seguridad RLS**: Configurar políticas de Row Level Security (RLS) en `marketing_banners` que permitan lectura pública a todos (`explorer`, etc.) y escritura/edición/borrado exclusivo al rol `super_admin`.
+- [ ] **19.1.3 Storage — Bucket de Marketing**: Configurar un bucket público en Supabase (`marketing` o similar) con políticas RLS que permitan subir/borrar imágenes únicamente a los usuarios con rol `super_admin`.
+
+---
+
+### 💻 19.2 Panel Súper Admin (Módulo Marketing)
+- [ ] **19.2.1 Sidebar — Acceso Unificado**: Agregar el ítem **"Marketing"** en la barra lateral del panel admin (`Sidebar.tsx`), utilizando un ícono elegante como `Sparkles` o `Megaphone` de Lucide.
+- [ ] **19.2.2 Orquestador — Hook `useMarketingManager`**: Implementar un hook para encapsular toda la lógica de obtención de banners, subida con compresión de imágenes, reordenamiento, activación con switch y borrado.
+- [ ] **19.2.3 UI — `/admin/marketing/page.tsx` (Desacoplado)**: Crear la página principal de marketing cumpliendo la regla de <250 líneas (Conceptos 1.1) separándola en componentes atómicos:
+    - [ ] `<MarketingBannerHeader />` (Título, botón para agregar banner).
+    - [ ] `<BannerUploadModal />` (Modal premium con estilo glassmorphism para subir fotos).
+    - [ ] `<BannerGridList />` (Listado en cuadrícula con miniaturas de los banners).
+- [ ] **19.2.4 Calidad de Subida (Concepto 3.3)**: Forzar el uso obligatorio de la utilidad de compresión de imágenes `compressImage` antes de subir cualquier archivo al bucket de Supabase, optimizando el rendimiento móvil de la app.
+- [ ] **19.2.5 Acciones Instantáneas**: Integrar switches (`is_active`) con feedback visual rápido y borrado de banners. El borrado debe incluir limpieza automática del archivo correspondiente en el Storage de Supabase (Concepto 3.4) para evitar basura huérfana.
+- [ ] **19.2.6 Diálogos y Alertas (Concepto 4.1)**: Prohibir el uso de `alert()` nativos. Utilizar el sistema de modales interactivos de confirmación (`DeleteConfirmModal.tsx`) y notificaciones mediante `SuccessToast` para respuestas táctiles rápidas.
+
+---
+
+### 🎨 19.3 Visualización del Cliente (Menú de Negocio - Explorador)
+- [ ] **19.3.1 Hook de Datos — `useActiveBanners`**: Desarrollar hook reutilizable para consultar los banners activos ordenados por `sort_order` de manera eficiente.
+- [ ] **19.3.2 Componente `<AutoScrollBanners />` (DNA Modular - Concepto 1.2)**: Diseñar el pie de página móvil horizontal con espaciados (`gap-4`) que muestre los banners de forma secuencial.
+- [ ] **19.3.3 Scroll Automático Suave (Marquee CSS)**: Implementar animación CSS nativa (`translateX`) de velocidad constante y ultrasuave que realice un bucle infinito de imágenes (Concepto 3).
+- [ ] **19.3.4 Detención al Tocar (Pausa)**: Añadir detector de eventos en el carrusel para que la animación se pause de forma inmediata en `onHover` (pantallas desktop) y `onTouchStart` (pantallas móviles) permitiendo hacer clic en un banner pausado fácilmente.
+- [ ] **19.3.5 Elemento del Mensaje (CTA Unificado)**: Inyectar el mensaje motivacional encima del carrusel con tipografía premium:
+    > *"¿Te quedaste con hambre de más? Explora otros locales en el mapa 🗺️"*
+- [ ] **19.3.6 Integración del Pie de Página**: Colocar el componente `<AutoScrollBanners />` en la parte inferior de la vista del menú digital del explorador (`src/app/(explorer)/[slug]/page.tsx`), integrándose de forma fluida al final de la página cuando el usuario navegue toda la oferta de productos.
+
+---
+
+### ✨ 19.4 Efectos Visuales y Animaciones Premium (Ethereal High-Tech)
+- [ ] **19.4.1 Efecto Shimmer (Brillo)**: Programar un reflejo brillante metálico diagonal que se deslice sobre los banners automáticamente cada 4 segundos usando animaciones CSS nativas para llamar la atención del usuario sin interferir con su lectura.
+- [ ] **19.4.2 Micro-Animaciones de Tap / Hover (Concepto 4.2)**: Usar Framer Motion (`framer-motion`) o transiciones CSS suaves para dar una respuesta táctil instantánea al interactuar con el banner:
+    - Escala elástica al hacer clic/tap (`scale-[0.98]`).
+    - Incremento sutil de tamaño e intensidad de sombra al posar el cursor en pantallas táctiles o desktop.
+- [ ] **19.4.3 Transición de Redirección**: Configurar un loader suave de transición hacia la página principal del mapa explorador (`/explorar` o `/`) cuando se haga clic en cualquiera de los banners.
+
+---
 ---
  *Documento consolidado - FOWY 2026*
