@@ -464,13 +464,13 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - Asegurar el correcto desmantelamiento del intervalo (`clearInterval`) al desmontar el componente para evitar fugas de memoria (*memory leaks*) y colisiones en React 19.
 
 ### 🎨 21.4 Experiencia de Usuario Premium & Realtime en el Mapa
-- [ ] **21.4.1 Switch Inteligente con Feedback Visual**:
+- [x] **21.4.1 Switch Inteligente con Feedback Visual**:
     - Rediseñar el control del switch de "Abierto/Cerrado" en el panel del socio. Al activarse el cierre/apertura automática, mostrar un badge parpadeante suave: `Sincronizado • Auto-cierre activo`.
     - Agregar micro-animaciones elásticas usando `framer-motion` para que el switch físico cambie de posición automáticamente en vivo cuando el reloj traspase el límite.
-- [ ] **21.4.2 Sincronización en Tiempo Real con el Explorador**:
+- [x] **21.4.2 Sincronización en Tiempo Real con el Explorador**:
     - Validar que al cambiar el switch de forma automática (`is_open` pasa a `false` o `true`), los clientes en el mapa explorador (`/explorar`) reciban el cambio al instante.
     - Utilizar la suscripción persistente Realtime (Singleton) configurada en la Fase 13 para detectar la actualización del campo `is_open`.
-- [ ] **21.4.3 Ocultamiento del Mapa con Transición Suave**:
+- [x] **21.4.3 Ocultamiento del Mapa con Transición Suave**:
     - Cuando el negocio cambie a estado Cerrado, **ocultarlo completamente de la vista del mapa explorador y de los listados** (requisito del negocio).
     - Para evitar una desaparición brusca del pin en el mapa y de la tarjeta, aplicar una animación de salida premium (`fade-out` y escala elástica) usando Framer Motion en el listado reactivo.
 

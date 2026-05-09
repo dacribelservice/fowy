@@ -114,17 +114,25 @@ export function useExplorerManager() {
 
   // Realtime
   useEffect(() => {
+    const channelId = `explorer-businesses-rt-${Math.random().toString(36).substring(7)}`;
     const channel = supabase
-      .channel('explorer-businesses-rt')
+      .channel(channelId)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'businesses' },
         (payload) => {
           fetchRef.current();
           if (payload.new && (payload.new as { id?: string }).id) {
+            const newBiz = payload.new as any;
+            const isOpen = newBiz.status === true && isBusinessOpen(newBiz.schedules);
+            
             setSelectedBusiness((prev: any) => {
-              if (prev && prev.id === (payload.new as { id: string }).id) {
-                return { ...prev, ...(payload.new as any) };
+              if (prev && prev.id === newBiz.id) {
+                if (!isOpen) {
+                  setIsSheetOpen(false);
+                  return null;
+                }
+                return { ...prev, ...newBiz };
               }
               return prev;
             });

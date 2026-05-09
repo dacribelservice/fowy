@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
 import { getDistance } from "@/utils/geo";
@@ -38,32 +38,42 @@ export default function BusinessListSheet({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {businesses.map((biz) => (
-            <motion.div 
-              key={biz.id} 
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onSelectBusiness(biz)}
-              className="bg-zinc-100/50 rounded-[20px] p-3 border border-white/40 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-            >
-              <div className="w-full aspect-square rounded-2xl bg-slate-50 overflow-hidden mb-3 relative">
-                <PremiumImage 
-                  src={biz.logo_url || "/placeholder-business.png"} 
-                  alt={biz.name} 
-                  className="w-full h-full transition-transform group-hover:scale-110"
-                  fallbackType="logo"
-                />
-                {userLocation && (
-                  <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[8px] font-black shadow-sm">
-                    {getDistance(userLocation[0], userLocation[1], Number(biz.latitude), Number(biz.longitude)).toFixed(1)} km
-                  </div>
-                )}
-              </div>
-              <h3 className="text-xs font-black text-slate-800 leading-tight mb-1 truncate">{biz.name}</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate">
-                {biz.tags && biz.tags.length > 0 ? biz.tags.join(" • ") : (biz.categories?.name || "Comercio")}
-              </p>
-            </motion.div>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {businesses.map((biz) => (
+              <motion.div 
+                key={biz.id} 
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ 
+                  opacity: 0, 
+                  scale: 0.3, 
+                  transition: { type: "spring", damping: 15, stiffness: 100 } 
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onSelectBusiness(biz)}
+                className="bg-zinc-100/50 rounded-[20px] p-3 border border-white/40 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              >
+                <div className="w-full aspect-square rounded-2xl bg-slate-50 overflow-hidden mb-3 relative">
+                  <PremiumImage 
+                    src={biz.logo_url || "/placeholder-business.png"} 
+                    alt={biz.name} 
+                    className="w-full h-full transition-transform group-hover:scale-110"
+                    fallbackType="logo"
+                  />
+                  {userLocation && (
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[8px] font-black shadow-sm">
+                      {getDistance(userLocation[0], userLocation[1], Number(biz.latitude), Number(biz.longitude)).toFixed(1)} km
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-xs font-black text-slate-800 leading-tight mb-1 truncate">{biz.name}</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate">
+                  {biz.tags && biz.tags.length > 0 ? biz.tags.join(" • ") : (biz.categories?.name || "Comercio")}
+                </p>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </>
