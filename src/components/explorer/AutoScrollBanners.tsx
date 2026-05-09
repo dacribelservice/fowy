@@ -1,17 +1,55 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useActiveBanners } from "@/hooks/useActiveBanners";
+import { useActiveCTAs } from "@/hooks/useActiveCTAs";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
 import { useRouter } from "next/navigation";
 import { Map } from "lucide-react";
 
 export function AutoScrollBanners() {
   const { banners, loading, error } = useActiveBanners();
+  const { ctas: activeCtas } = useActiveCTAs();
   const [isPaused, setIsPaused] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [currentCtaIndex, setCurrentCtaIndex] = useState(0);
   const router = useRouter();
+
+  // Fallback phrases if DB is empty, loading or error
+  const fallbackCtas = [
+    "¿Te quedaste con hambre de más? Explora otros locales en el mapa 🗺️",
+    "¿Buscas promociones exclusivas? Descubre los mejores combos hoy ⚡",
+    "¿Quieres probar algo nuevo? Explora más delicias en tu zona 🍕"
+  ];
+
+  // Resolve the list of CTAs to use
+  const ctaList = activeCtas && activeCtas.length > 0 
+    ? activeCtas.map(cta => cta.text)
+    : fallbackCtas;
+
+  // Bound check the index when the list changes
+  useEffect(() => {
+    if (currentCtaIndex >= ctaList.length) {
+      setCurrentCtaIndex(0);
+    }
+  }, [ctaList.length, currentCtaIndex]);
+
+  // Rotate index every 5.5 seconds (5500ms)
+  useEffect(() => {
+    if (ctaList.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentCtaIndex((prev) => (prev + 1) % ctaList.length);
+    }, 5500);
+
+    return () => clearInterval(interval);
+  }, [ctaList.length]);
+
+  const handleCtaClick = () => {
+    setIsRedirecting(true);
+    router.push("/explorar");
+  };
 
   // If loading or error, we render a beautiful skeleton loading state or gracefully return null
   if (loading) {
@@ -162,18 +200,21 @@ export function AutoScrollBanners() {
             <Map size={12} className="animate-bounce" />
             Descubre Más Experiencias
           </div>
-          <h4 className="text-sm font-black text-slate-800 tracking-tight leading-tight max-w-sm mx-auto">
-            ¿Te quedaste con hambre de más? <br />
-            <span 
-              className="text-fowy-red hover:underline cursor-pointer transition-all active:scale-98" 
-              onClick={() => {
-                setIsRedirecting(true);
-                router.push("/explorar");
-              }}
-            >
-              Explora otros locales en el mapa 🗺️
-            </span>
-          </h4>
+          <div className="h-12 flex items-center justify-center relative overflow-hidden max-w-md mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.h4
+                key={currentCtaIndex}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                onClick={handleCtaClick}
+                className="text-sm font-black text-slate-800 hover:text-fowy-red hover:underline cursor-pointer transition-all duration-200 select-none text-center tracking-tight leading-tight max-w-sm mx-auto active:scale-98"
+              >
+                {ctaList[currentCtaIndex]}
+              </motion.h4>
+            </AnimatePresence>
+          </div>
         </motion.div>
 
         {/* Horizontal Scroll Track Wrapper */}

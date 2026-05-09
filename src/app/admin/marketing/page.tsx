@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import MarketingBannerHeader from "@/components/admin/marketing/MarketingBannerHeader";
 import BannerUploadModal from "@/components/admin/marketing/BannerUploadModal";
 import BannerGridList from "@/components/admin/marketing/BannerGridList";
+import MarketingCTAManager from "@/components/admin/marketing/MarketingCTAManager";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
 import { useMarketingManager } from "@/hooks/useMarketingManager";
 
@@ -15,7 +16,16 @@ export default function MarketingPage() {
     addBanner, 
     updateBanner, 
     deleteBanner, 
-    reorderBanners 
+    reorderBanners,
+
+    // Frases dinámicas
+    ctas,
+    ctasLoading,
+    ctasError,
+    addCTA,
+    updateCTA,
+    deleteCTA,
+    reorderCTAs
   } = useMarketingManager();
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -47,12 +57,17 @@ export default function MarketingPage() {
     }
   };
 
+  const handleShowToast = (message: string) => {
+    setToast({ show: true, message });
+  };
+
   return (
     <div className="pb-32 px-4 sm:px-8 max-w-full lg:max-w-[1600px] mx-auto">
+      {/* Sección 1: Banners de Marketing */}
       <MarketingBannerHeader onAddClick={() => setIsUploadOpen(true)} />
       
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-semibold">
+        <div className="mb-6 p-4 bg-red-950/40 border border-red-500/30 text-red-400 rounded-2xl text-sm font-semibold">
           {error}
         </div>
       )}
@@ -65,12 +80,26 @@ export default function MarketingPage() {
         onReorder={reorderBanners}
       />
 
+      {/* Sección 2: Gestión de Frases Rotativas (CTAs) */}
+      <MarketingCTAManager 
+        ctas={ctas}
+        loading={ctasLoading}
+        error={ctasError}
+        onAdd={addCTA}
+        onUpdate={updateCTA}
+        onDelete={deleteCTA}
+        onReorder={reorderCTAs}
+        onToast={handleShowToast}
+      />
+
+      {/* Modal para subir banners */}
       <BannerUploadModal 
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
         onSave={handleSave}
       />
 
+      {/* Alertas Toast de Éxito */}
       <SuccessToast 
         show={toast.show}
         message={toast.message}

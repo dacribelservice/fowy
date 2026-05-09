@@ -624,3 +624,52 @@ Se consolidó una planificación meticulosa para la integración de cobros y mem
 - **Alineación de Diseño**: UX ultra-premium responsiva que incentiva de manera sutil y elegante la navegación del explorador.
 
 *Última actualización: 09 de Mayo de 2026 - 02:00 AM*
+
+---
+
+## 📣 FASE 20: MARKETING CTA SYSTEM — SESIÓN XIX (08 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: 🟢 COMPLETADO ✅
+
+### 🎯 Objetivos Logrados (Sincronización con Hoja de Ruta)
+1. **DB — Tabla `marketing_ctas` (20.1.1)**: ✅
+   - Creada la tabla física `marketing_ctas` en la base de datos Supabase con los campos: `id` (UUID, PK), `text` (TEXT), `is_active` (BOOLEAN, default true), `sort_order` (INTEGER, default 0), y `created_at` (TIMESTAMPTZ, default timezone('utc', now())).
+2. **DB — Políticas RLS & Seguridad (20.1.2)**: ✅
+   - Activada la seguridad de fila (RLS) en `marketing_ctas`.
+   - Creada la política de lectura pública `Allow public read access to marketing CTAs` (SELECT) para permitir lectura a todos los usuarios sin restricciones de autenticación.
+   - Creada la política de acceso total `Allow all for admin on marketing CTAs` (ALL) exclusiva para usuarios autenticados cuyo rol en la tabla `profiles` sea `'super_admin'::user_role`.
+3. **UI — Interfaz de Gestión de Frases `<MarketingCTAManager />` (20.2.1)**: ✅
+   - Diseñado e implementado el componente modular `MarketingCTAManager.tsx` bajo un estilo visual ultra-premium y glassmorphic, con efectos decorativos glow en verde esmeralda y rojo Fowy.
+   - Cuenta con soporte completo para:
+     - Formulario de alta rápido y estilizado con validaciones.
+     - Listado numerado con badges estilizados.
+     - Edición interactiva *en línea* (*inline editing*) con botones de confirmación rápidos.
+     - Switch de alternancia de estado activo/desactivo que aplica opacidad sutil sobre ítems apagados.
+     - Flechas direccionales arriba/abajo para reordenamiento instantáneo.
+     - Botón de borrado conectado al modal de confirmación táctil premium `DeleteConfirmModal.tsx`.
+4. **Hook — Orquestación en `useMarketingManager` (20.2.2)**: ✅
+   - Extendido el hook `useMarketingManager.ts` con tipado estricto `MarketingCTA`.
+   - Implementada toda la lógica CRUD optimista para CTAs: `ctas`, `ctasLoading`, `ctasError`, `addCTA`, `updateCTA`, `deleteCTA` y `reorderCTAs`.
+   - Las interacciones de switch, orden y borrado impactan la interfaz inmediatamente de forma visual y ejecutan el guardado asíncrono en segundo plano de manera transparente.
+5. **Integración en Panel Super Admin (MarketingPage)**: ✅
+   - Modificado el archivo `/admin/marketing/page.tsx` para integrar el componente `<MarketingCTAManager />`, permitiendo administrar simultáneamente los banners horizontales de marketing y las frases publicitarias rotativas en una misma vista organizada.
+6. **Hook de Datos `useActiveCTAs` (20.3.1)**: ✅
+   - Diseñado e implementado el hook de lectura pública `useActiveCTAs.ts` para obtener de manera eficiente únicamente las frases de marketing que están activas (`is_active: true`) y ordenadas de acuerdo a su orden de prioridad (`sort_order` ascendente).
+7. **Transiciones de Entrada/Salida con Framer Motion (20.3.2)**: ✅
+   - Reemplazado el bloque de texto de CTA estático sobre los banners publicitarios en el componente `AutoScrollBanners.tsx` con un contenedor rotativo de texto animado de velocidad controlada (rotación cada 5.5 segundos).
+   - Aplicadas transiciones súper fluidas y elásticas mediante Framer Motion utilizando `AnimatePresence` con animaciones de desvanecimiento hacia arriba y deslizamiento flotante desde abajo (`initial={{ opacity: 0, y: 15 }}`, `animate={{ opacity: 1, y: 0 }}`, `exit={{ opacity: 0, y: -15 }}`).
+   - La caja de texto se configuró con un alto de precisión (`h-12`) alineada verticalmente y centrada en el eje flex, asegurando compatibilidad con frases de hasta dos líneas sin recortar ni empujar el carrusel inferior. El cursor ahora presenta interactividad hover, cambiando a rojo Fowy con subrayado y respuesta táctil sutil de clic elástico (`active:scale-98`).
+8. **Fallback de Resiliencia (20.3.3)**: ✅
+   - Diseñado e integrado un robusto sistema de respaldo (`fallbackCtas`) con frases motivacionales de marketing y exploración pre-configuradas si la base de datos se encuentra vacía, en estado de carga o ante problemas de red. Esto garantiza que la visualización del cliente nunca falle ni muestre un bloque vacío.
+
+### 📂 Archivos Modificados:
+- `src/hooks/useActiveCTAs.ts` *(Creado)* (Hook para el cliente móvil)
+- `src/components/explorer/AutoScrollBanners.tsx` (Animación con AnimatePresence de frases dinámicas y fallbacks)
+- `Markdown/HOJA_DE_RUTA.md` (Paso 20.3 completamente verificado y cerrado)
+- `Markdown/BITACORA.md` (Este archivo de bitácora)
+
+### 📈 Resultado de Calidad:
+- **Tipado y Compilación**: 0 errores de TypeScript (`powershell -ExecutionPolicy Bypass -Command "npx tsc --noEmit"` verificado exitosamente).
+
+*Última actualización: 09 de Mayo de 2026 - 02:15 AM*
+

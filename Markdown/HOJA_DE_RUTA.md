@@ -420,5 +420,22 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **19.4.3 Transición de Redirección**: Configurar un loader suave de transición hacia la página principal del mapa explorador (`/explorar` o `/`) cuando se haga clic en cualquiera de los banners.
 
 ---
+
+## 📣 FASE 20: SISTEMA DE TEXTOS ROTATIVOS Y LLAMADOS A LA ACCIÓN DINÁMICOS (MARKETING CTA SYSTEM)
+
+### 📊 20.1 Estructura en Base de Datos (Supabase)
+- [x] **20.1.1 Creación de la Tabla `marketing_ctas`**: Crear la tabla para almacenar los textos dinámicos personalizables (campos: `id`, `text`, `is_active`, `sort_order`, `created_at`).
+- [x] **20.1.2 Políticas RLS & Seguridad**: Configurar políticas de seguridad RLS para permitir lectura pública para el explorador móvil y permisos de escritura/modificación exclusivos para el Super Administrador.
+
+### ⚙️ 20.2 Panel de Administración (Super Admin)
+- [x] **20.2.1 Interfaz de Gestión de Frases**: Diseñar la sección de administración de CTAs dentro de `/admin/marketing/page.tsx` para agregar, editar, ordenar (sort_order) y activar/desactivar las frases rotativas de manera amigable.
+- [x] **20.2.2 Orquestación en Hook useMarketingManager**: Integrar las peticiones y actualizaciones optimistas del CRUD de frases dinámicas en nuestro hook para una respuesta inmediata.
+
+### ✨ 20.3 Componente Rotador con Transiciones Ultra-Premium
+- [x] **20.3.1 Hook de Datos useActiveCTAs**: Crear el hook personalizado de lectura optimizada para obtener del cliente únicamente las frases activas y ordenadas por prioridad.
+- [x] **20.3.2 Transiciones de Entrada/Salida con Framer Motion**: Reemplazar el CTA estático sobre los banners en `AutoScrollBanners.tsx` con un contenedor animado. Al cambiar el texto cada 5-6 segundos, el texto anterior se desvanecerá hacia arriba y el nuevo entrará flotando desde abajo (`AnimatePresence` fade + slide up).
+- [x] **20.3.3 Fallback de Resiliencia**: Configurar un texto por defecto elegante si el negocio no tiene frases configuradas o hay problemas de red, garantizando que el diseño nunca se rompa.
+
+---
 ---
  *Documento consolidado - FOWY 2026*

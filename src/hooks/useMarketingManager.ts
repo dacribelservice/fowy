@@ -14,10 +14,23 @@ export interface MarketingBanner {
   created_at?: string;
 }
 
+export interface MarketingCTA {
+  id: string;
+  text: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+}
+
 export function useMarketingManager() {
   const [banners, setBanners] = useState<MarketingBanner[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [ctas, setCtas] = useState<MarketingCTA[]>([]);
+  const [ctasLoading, setCtasLoading] = useState(false);
+  const [ctasError, setCtasError] = useState<string | null>(null);
+
   const supabase = createClient();
 
   const fetchBanners = useCallback(async () => {
@@ -178,9 +191,144 @@ export function useMarketingManager() {
     }
   };
 
+  // ==========================================
+  // LÓGICA DE FRASES DINÁMICAS (MARKETING CTAs)
+  // ==========================================
+
+  const fetchCTAs = useCallback(async () => {
+    setCtasLoading(true);
+    setCtasError(null);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from("marketing_ctas")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+      if (fetchError) throw fetchError;
+      setCtas(data || []);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido al obtener frases publicitarias";
+      setCtasError(errorMsg);
+      console.error("Error fetching marketing CTAs:", err);
+    } finally {
+      setCtasLoading(false);
+    }
+  }, [supabase]);
+
+  const addCTA = async (text: string) => {
+    setCtasLoading(true);
+    setCtasError(null);
+    try {
+      const nextOrder = ctas.length > 0 
+        ? Math.max(...ctas.map(c => c.sort_order)) + 1 
+        : 0;
+
+      const { data, error: insertError } = await supabase
+        .from("marketing_ctas")
+        .insert([{
+          text: text,
+          is_active: true,
+          sort_order: nextOrder
+        }])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      setCtas(prev => [...prev, data]);
+      return data;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error al agregar frase publicitaria";
+      setCtasError(errorMsg);
+      console.error("Error adding marketing CTA:", err);
+      return null;
+    } finally {
+      setCtasLoading(false);
+    }
+  };
+
+  const updateCTA = async (id: string, updates: Partial<MarketingCTA>) => {
+    setCtasError(null);
+    const previousCtas = [...ctas];
+
+    // Actualización optimista local
+    setCtas(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from("marketing_ctas")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+
+      setCtas(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+      return data;
+    } catch (err) {
+      setCtas(previousCtas);
+      const errorMsg = err instanceof Error ? err.message : "Error al actualizar frase publicitaria";
+      setCtasError(errorMsg);
+      console.error("Error updating marketing CTA:", err);
+      return null;
+    }
+  };
+
+  const deleteCTA = async (id: string) => {
+    setCtasError(null);
+    const previousCtas = [...ctas];
+
+    // Actualización optimista local (eliminación inmediata)
+    setCtas(prev => prev.filter(c => c.id !== id));
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("marketing_ctas")
+        .delete()
+        .eq("id", id);
+
+      if (deleteError) throw deleteError;
+      return true;
+    } catch (err) {
+      setCtas(previousCtas);
+      const errorMsg = err instanceof Error ? err.message : "Error al eliminar frase publicitaria";
+      setCtasError(errorMsg);
+      console.error("Error deleting marketing CTA:", err);
+      return false;
+    }
+  };
+
+  const reorderCTAs = async (newCtas: MarketingCTA[]) => {
+    setCtas(newCtas);
+    setCtasError(null);
+
+    try {
+      const updates = newCtas.map((cta, index) => ({
+        id: cta.id,
+        text: cta.text,
+        is_active: cta.is_active,
+        sort_order: index,
+        created_at: cta.created_at
+      }));
+
+      const { error: upsertError } = await supabase
+        .from("marketing_ctas")
+        .upsert(updates);
+
+      if (upsertError) throw upsertError;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Error al guardar el reordenamiento de frases";
+      setCtasError(errorMsg);
+      console.error("Error reordering CTAs:", err);
+      fetchCTAs(); // Rollback en caso de error
+    }
+  };
+
   useEffect(() => {
     fetchBanners();
-  }, [fetchBanners]);
+    fetchCTAs();
+  }, [fetchBanners, fetchCTAs]);
 
   return {
     banners,
@@ -190,6 +338,16 @@ export function useMarketingManager() {
     updateBanner,
     deleteBanner,
     reorderBanners,
-    refreshBanners: fetchBanners
+    refreshBanners: fetchBanners,
+
+    // Exponer lógica de frases dinámicas
+    ctas,
+    ctasLoading,
+    ctasError,
+    addCTA,
+    updateCTA,
+    deleteCTA,
+    reorderCTAs,
+    refreshCTAs: fetchCTAs
   };
 }
