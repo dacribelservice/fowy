@@ -12,26 +12,50 @@ export function isBusinessOpen(schedules: any): boolean {
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const now = getBogotaDate();
   
-  // Obtener el día de la semana actual en español
-  const currentDay = daysOfWeek[now.getDay()];
-  const daySchedule = schedules[currentDay];
+  const currentDayIndex = now.getDay();
+  const currentDay = daysOfWeek[currentDayIndex];
+  
+  // Obtener el día de ayer para verificar si su horario nocturno sigue activo hoy
+  const yesterdayDayIndex = (currentDayIndex - 1 + 7) % 7;
+  const yesterdayDay = daysOfWeek[yesterdayDayIndex];
 
-  // Si el día no está activo o no tiene información de horario, está cerrado
-  if (!daySchedule || daySchedule.active === false) {
-    return false;
-  }
-
-  const { open, close } = daySchedule;
-  if (!open || !close) return true;
+  const currentDaySchedule = schedules[currentDay];
+  const yesterdaySchedule = schedules[yesterdayDay];
 
   // Formato de hora actual: "HH:MM" (en base 24h)
   const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-  if (close > open) {
-    // Horario regular del mismo día (ej. 09:00 a 22:00)
-    return currentTime >= open && currentTime <= close;
-  } else {
-    // Horario nocturno que cruza la medianoche (ej. 18:00 a 02:00)
-    return currentTime >= open || currentTime <= close;
+  // 1. Evaluar si está abierto por el horario de HOY
+  let openToday = false;
+  if (currentDaySchedule && currentDaySchedule.active !== false) {
+    const open = currentDaySchedule.open || "09:00";
+    const close = currentDaySchedule.close || "22:00";
+
+    if (close > open) {
+      // Horario regular del mismo día (ej. 09:00 a 22:00)
+      openToday = currentTime >= open && currentTime <= close;
+    } else if (close < open) {
+      // Horario nocturno que cruza la medianoche (ej. 18:00 a 02:00)
+      openToday = currentTime >= open || currentTime <= close;
+    } else {
+      // Si apertura y cierre coinciden (ej. "00:00" a "00:00"), se considera abierto 24h
+      openToday = true;
+    }
   }
+
+  // 2. Evaluar si está abierto por el horario nocturno de AYER (Midnight Crossover)
+  let openFromYesterday = false;
+  if (yesterdaySchedule && yesterdaySchedule.active !== false) {
+    const yestOpen = yesterdaySchedule.open || "09:00";
+    const yestClose = yesterdaySchedule.close || "22:00";
+
+    // Si el horario de ayer cruzó la medianoche (ej. Abrió a las 18:00 de ayer y cierra a las 02:00 de hoy)
+    if (yestClose < yestOpen) {
+      // Estamos dentro de las primeras horas de hoy (antes del cierre de ayer)
+      openFromYesterday = currentTime <= yestClose;
+    }
+  }
+
+  // El negocio está abierto si se cumple el horario de hoy O el que se extendió desde ayer
+  return openToday || openFromYesterday;
 }

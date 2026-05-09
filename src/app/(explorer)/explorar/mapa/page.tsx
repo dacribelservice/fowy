@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
 import { Loader2, ArrowLeft, Filter } from "lucide-react";
 import Link from "next/link";
+import { isBusinessOpen } from "@/utils/businessTime";
 
 const ExplorerMap = dynamic(() => import("@/components/explorer/ExplorerMap"), {
   ssr: false,
@@ -34,7 +35,10 @@ export default function MapaPage() {
         .not('longitude', 'is', null);
 
       if (error) throw error;
-      setBusinesses(data || []);
+      
+      // Filtrar dinámicamente los negocios abiertos según horario de Bogotá (GMT-5)
+      const openBusinesses = (data || []).filter((b: any) => isBusinessOpen(b.schedules));
+      setBusinesses(openBusinesses);
 
       // Fetch categories for the filter
       const { data: catData } = await supabase

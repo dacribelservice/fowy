@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { getBogotaDate, getBogotaTimeString, formatTimeWithSeconds } from "@/utils/bogotaTimeUtils";
+import { getBogotaDate, getBogotaTimeString } from "@/utils/bogotaTimeUtils";
+import { isBusinessOpen } from "@/utils/businessTime";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
@@ -49,39 +50,22 @@ export function useBusinessSchedule(props?: UseBusinessScheduleProps) {
 
       // Si tenemos un ID de negocio y un status actual, evaluamos la transición automática (Fase 21.3.3)
       if (businessId && currentStatus !== undefined && !isUpdatingRef.current) {
-        // Determinamos si debe estar abierto o cerrado en base a la hora de Bogotá y horarios
-        let openTime = "09:00:00";
-        let closeTime = "22:00:00";
-        let isDayActive = true;
-
-        if (schedules && Object.keys(schedules).length > 0) {
+        // Determinamos si debe estar abierto o cerrado llamando a la función centralizada isBusinessOpen
+        let evalSchedules = schedules;
+        if ((!schedules || Object.keys(schedules).length === 0) && (openingTime || closingTime)) {
+          // Si no hay calendario detallado, pero sí horarios simples heredados, construimos un objeto virtual para mantener compatibilidad
           const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-          const currentDay = daysOfWeek[bDate.getDay()];
-          const daySchedule = schedules[currentDay];
-
-          if (daySchedule) {
-            isDayActive = daySchedule.active !== false;
-            openTime = formatTimeWithSeconds(daySchedule.open || "09:00");
-            closeTime = formatTimeWithSeconds(daySchedule.close || "22:00");
-          } else {
-            isDayActive = false; // Sin horario activo hoy
-          }
-        } else if (openingTime || closingTime) {
-          openTime = formatTimeWithSeconds(openingTime);
-          closeTime = formatTimeWithSeconds(closingTime);
+          evalSchedules = {};
+          daysOfWeek.forEach(day => {
+            evalSchedules[day] = {
+              active: true,
+              open: openingTime || "09:00",
+              close: closingTime || "22:00"
+            };
+          });
         }
 
-        // Si el día está inactivo en el calendario de horarios, debe estar cerrado
-        let shouldBeOpen = false;
-        if (isDayActive) {
-          if (closeTime > openTime) {
-            // Horario regular del mismo día (ej. 09:00:00 a 22:00:00)
-            shouldBeOpen = timeStr >= openTime && timeStr <= closeTime;
-          } else {
-            // Horario nocturno que cruza la medianoche (ej. 18:00:00 a 02:00:00)
-            shouldBeOpen = timeStr >= openTime || timeStr <= closeTime;
-          }
-        }
+        const shouldBeOpen = isBusinessOpen(evalSchedules);
 
         // Si el estado evaluado difiere del estado actual, ejecutamos la transición instantánea
         if (shouldBeOpen !== currentStatus) {

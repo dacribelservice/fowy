@@ -463,24 +463,18 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **21.3.4 Resiliencia y Control de Fugas (Concepto 6)**:
     - Asegurar el correcto desmantelamiento del intervalo (`clearInterval`) al desmontar el componente para evitar fugas de memoria (*memory leaks*) y colisiones en React 19.
 
-### 🎨 21.4 Experiencia de Usuario Premium & Realtime en el Mapa
-- [x] **21.4.1 Switch Inteligente con Feedback Visual**:
-    - Rediseñar el control del switch de "Abierto/Cerrado" en el panel del socio. Al activarse el cierre/apertura automática, mostrar un badge parpadeante suave: `Sincronizado • Auto-cierre activo`.
-    - Agregar micro-animaciones elásticas usando `framer-motion` para que el switch físico cambie de posición automáticamente en vivo cuando el reloj traspase el límite.
-- [x] **21.4.2 Sincronización en Tiempo Real con el Explorador**:
-    - Validar que al cambiar el switch de forma automática (`is_open` pasa a `false` o `true`), los clientes en el mapa explorador (`/explorar`) reciban el cambio al instante.
-    - Utilizar la suscripción persistente Realtime (Singleton) configurada en la Fase 13 para detectar la actualización del campo `is_open`.
-- [x] **21.4.3 Ocultamiento del Mapa con Transición Suave**:
-    - Cuando el negocio cambie a estado Cerrado, **ocultarlo completamente de la vista del mapa explorador y de los listados** (requisito del negocio).
-    - Para evitar una desaparición brusca del pin en el mapa y de la tarjeta, aplicar una animación de salida premium (`fade-out` y escala elástica) usando Framer Motion en el listado reactivo.
+### 🎨 21.4 Unificación del Motor de Doble Capa (Dual-Layer Control) y Realtime
+- [x] **21.4.1 Indicador de Estado Automático No-Interactivo**: Rediseñar el control del switch de "Abierto/Cerrado" en el panel del socio (`PartnerTopBar.tsx`). Convertir el switch en un indicador visual 100% automático de lectura gobernado por el reloj de Bogotá y sus calendarios. Mostrar el badge parpadeante suave: `Sincronizado • Auto-cierre activo` y aplicar transiciones suaves de `framer-motion` (Concepto 4.2).
+- [x] **21.4.2 Sincronización Realtime con Filtro Dinámico del Mapa**: Modificar el mapa interactivo de descubrimiento en `src/app/(explorer)/explorar/mapa/page.tsx` para integrar el filtro dinámico `isBusinessOpen(b.schedules)` sincronizado con la hora oficial de Bogotá (`getBogotaDate()`). De esta manera, el mapa ocultará instantáneamente cualquier negocio cerrado al segundo exacto, garantizando consistencia absoluta con la lista de exploración.
+- [x] **21.4.3 Coherencia Absoluta en el Menú Directo**: Asegurar que al entrar a un enlace directo del menú en `src/app/(explorer)/[slug]/page.tsx`, el estado `isOpen` evalúe ambas capas del motor de control unificado (`isOpen = business.status === true && isBusinessOpen(business.schedules)`). Esto garantiza que el negocio se muestre cerrado y bloquee las compras si está fuera de horario (Capa Automática), O si tiene un estado deshabilitado en base de datos (Capa de Control Maestro).
 
 ---
 
 ### 🔧 21.5 Corrección de Desfases, Fallbacks y Cruce de Medianoche (Crossover)
 - [x] **21.5.1 Sincronización Horaria Absoluta en Cliente (`isBusinessOpen`)**: Modificar `src/utils/businessTime.ts` para que use la hora oficial de Bogotá calculada por `getBogotaDate()`, eliminando por completo la dependencia del reloj local del dispositivo del cliente (Arquitectura: Concepto 2 - Un Archivo, Una Responsabilidad).
-- [ ] **21.5.2 Implementación del Algoritmo de Cruce de Medianoche (Crossover)**: Integrar soporte en `isBusinessOpen` para validar tanto el horario del día actual como el horario nocturno extendido del día anterior (ej. si ayer abrió de 18:00 a 02:00, hoy a la 01:00 AM debe seguir apareciendo como Abierto).
-- [ ] **21.5.3 Unificación de Fallbacks de Apertura/Cierre**: Configurar valores por defecto robustos (`09:00` para apertura y `22:00` para cierre) en la función `isBusinessOpen`, asegurando resiliencia absoluta en caso de datos faltantes (`undefined`) en la base de datos de Supabase.
-- [ ] **21.5.4 Unificación de Lógica en el Hook (`useBusinessSchedule`)**: Refactorizar el hook en `src/components/admin/businesses/hooks/useBusinessSchedule.ts` para que llame directamente a la función centralizada `isBusinessOpen(schedules)`. Esto garantiza el patrón DRY (Don't Repeat Yourself) y elimina discrepancias entre el panel de socios y la vista pública.
+- [x] **21.5.2 Implementación del Algoritmo de Cruce de Medianoche (Crossover)**: Integrar soporte en `isBusinessOpen` para validar tanto el horario del día actual como el horario nocturno extendido del día anterior.
+- [x] **21.5.3 Unificación de Fallbacks de Apertura/Cierre**: Configurar valores por defecto robustos (`09:00` para apertura y `22:00` para cierre) en la función `isBusinessOpen`, asegurando resiliencia absoluta en caso de datos faltantes (`undefined`) en la base de datos de Supabase.
+- [x] **21.5.4 Unificación de Lógica en el Hook (`useBusinessSchedule`)**: Refactorizar el hook en `src/components/admin/businesses/hooks/useBusinessSchedule.ts` para que llame directamente a la función centralizada `isBusinessOpen(schedules)`. Esto garantiza el patrón DRY (Don't Repeat Yourself) y elimina discrepancias entre el panel de socios y la vista pública.
 - [ ] **21.5.5 Pruebas y Validación de Estados Cruzados**: Realizar pruebas locales simulando diferentes horas del día en Bogotá y horarios nocturnos para verificar que las transiciones de estado ocurran perfectamente al segundo exacto y sin loops de actualización en la base de datos.
 
 ---

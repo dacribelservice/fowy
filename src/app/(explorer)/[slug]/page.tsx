@@ -119,7 +119,7 @@ export default function BusinessMenuPage() {
   const businessName = business.name || "";
   const rating = business.rating ?? 0.0;
   const distance = business.distance || "1.2 km";
-  const isOpen = isBusinessOpen(business.schedules);
+  const isOpen = business.status === true && isBusinessOpen(business.schedules);
 
 
 
