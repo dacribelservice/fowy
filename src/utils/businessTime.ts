@@ -1,3 +1,5 @@
+import { getBogotaDate } from "./bogotaTimeUtils";
+
 /**
  * Calcula si un negocio está abierto en este preciso instante según sus horarios configurados.
  * Soporta horarios regulares y nocturnos que cruzan la medianoche (ej: 18:00 a 02:00).
@@ -8,7 +10,7 @@ export function isBusinessOpen(schedules: any): boolean {
   }
 
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  const now = new Date();
+  const now = getBogotaDate();
   
   // Obtener el día de la semana actual en español
   const currentDay = daysOfWeek[now.getDay()];

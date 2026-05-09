@@ -475,5 +475,13 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
     - Para evitar una desaparición brusca del pin en el mapa y de la tarjeta, aplicar una animación de salida premium (`fade-out` y escala elástica) usando Framer Motion en el listado reactivo.
 
 ---
+
+### 🔧 21.5 Corrección de Desfases, Fallbacks y Cruce de Medianoche (Crossover)
+- [x] **21.5.1 Sincronización Horaria Absoluta en Cliente (`isBusinessOpen`)**: Modificar `src/utils/businessTime.ts` para que use la hora oficial de Bogotá calculada por `getBogotaDate()`, eliminando por completo la dependencia del reloj local del dispositivo del cliente (Arquitectura: Concepto 2 - Un Archivo, Una Responsabilidad).
+- [ ] **21.5.2 Implementación del Algoritmo de Cruce de Medianoche (Crossover)**: Integrar soporte en `isBusinessOpen` para validar tanto el horario del día actual como el horario nocturno extendido del día anterior (ej. si ayer abrió de 18:00 a 02:00, hoy a la 01:00 AM debe seguir apareciendo como Abierto).
+- [ ] **21.5.3 Unificación de Fallbacks de Apertura/Cierre**: Configurar valores por defecto robustos (`09:00` para apertura y `22:00` para cierre) en la función `isBusinessOpen`, asegurando resiliencia absoluta en caso de datos faltantes (`undefined`) en la base de datos de Supabase.
+- [ ] **21.5.4 Unificación de Lógica en el Hook (`useBusinessSchedule`)**: Refactorizar el hook en `src/components/admin/businesses/hooks/useBusinessSchedule.ts` para que llame directamente a la función centralizada `isBusinessOpen(schedules)`. Esto garantiza el patrón DRY (Don't Repeat Yourself) y elimina discrepancias entre el panel de socios y la vista pública.
+- [ ] **21.5.5 Pruebas y Validación de Estados Cruzados**: Realizar pruebas locales simulando diferentes horas del día en Bogotá y horarios nocturnos para verificar que las transiciones de estado ocurran perfectamente al segundo exacto y sin loops de actualización en la base de datos.
+
 ---
  *Documento consolidado - FOWY 2026*
