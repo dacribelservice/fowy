@@ -41,7 +41,7 @@ export default function ExplorerBusinessCard({ business, index }: ExplorerBusine
             className="w-full h-full object-cover"
           />
           {/* Active Status Dot */}
-          <div className="absolute top-1 right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm" />
+          <div className="absolute top-1 right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm animate-pulse" />
         </div>
 
         {/* Business Info */}

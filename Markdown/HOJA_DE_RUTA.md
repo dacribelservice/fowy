@@ -437,5 +437,43 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **20.3.3 Fallback de Resiliencia**: Configurar un texto por defecto elegante si el negocio no tiene frases configuradas o hay problemas de red, garantizando que el diseño nunca se rompa.
 
 ---
+
+## ⏰ FASE 21: SISTEMA DE CONTROL AUTOMÁTICO DE HORARIOS (BOGOTÁ GMT-5) CON SENSADO EN SEGUNDOS
+*Objetivo: Automatizar el flujo de apertura y cierre de los negocios garantizando que cambien de estado en tiempo real (al segundo exacto) según su horario configurado, sincronizándose con la hora oficial de Bogotá (GMT-5) y ocultándose automáticamente del mapa explorador al cerrar.*
+
+### 🗄️ 21.1 Estructura e Infraestructura de Datos (Supabase)
+- [ ] **21.1.1 Precisión de Segundos en DB**: Validar que las columnas `opening_time` y `closing_time` de la tabla `businesses` utilicen el tipo de dato `TIME` sin zona horaria, permitiendo almacenar horas con precisión de segundos (`HH:MM:SS`).
+- [ ] **21.1.2 Políticas RLS & Seguridad (Concepto 6.4)**: Garantizar que las políticas RLS de la tabla `businesses` solo permitan la edición de los horarios al `owner_id` del negocio y al `super_admin`.
+
+### 🌐 21.2 Motor de Tiempo Real de Bogotá (GMT-5) y Helpers
+- [ ] **21.2.1 Utilidad de Sincronización de Reloj (`bogotaTimeUtils.ts`)**:
+    - Crear una utilidad global de tiempo en `src/utils/bogotaTimeUtils.ts` para obtener la fecha y hora actual de Bogotá (GMT-5), evitando depender de la hora local del dispositivo del cliente (que puede estar desajustada).
+    - Utilizar el formateador nativo `Intl.DateTimeFormat` con la zona horaria `'America/Bogota'` para calcular la diferencia de desfase con precisión de milisegundos.
+- [ ] **21.2.2 Helper de Formateo con Segundos**: Desarrollar una función `formatTimeWithSeconds(timeStr)` que valide e inyecte los segundos (ej. de `09:00` a `09:00:00`) garantizando consistencia absoluta en las comparaciones de tiempo.
+
+### 🔌 21.3 Lógica del Hook Reactivo Desacoplado (`useBusinessSchedule`)
+- [ ] **21.3.1 Hook de Control de Horarios (`useBusinessSchedule.ts`)**:
+    - Crear el hook personalizado en `src/components/admin/businesses/hooks/useBusinessSchedule.ts` para encapsular toda la lógica de validación horaria, siguiendo la regla de "Un Archivo, Una Responsabilidad" (Concepto 2).
+- [ ] **21.3.2 Intervalo de Sensado en Segundos (Sensado Activo)**:
+    - Implementar un `setInterval` de alta precisión que se ejecute cada segundo (1000ms) para consultar el reloj sincronizado de Bogotá.
+    - Mostrar en el Panel del Socio un reloj digital dinámico con segundos interactivos (`HH:MM:SS`) y un indicador de zona horaria: `Bogotá (GMT-5)`.
+- [ ] **21.3.3 Algoritmo de Transición Instantánea (Al Segundo Exacto)**:
+    - Programar el evaluador de tiempo para que, al identificar **un segundo después** del margen establecido por el dueño (ej. si el cierre es `11:00:00` y la hora es `11:00:01`), cambie automáticamente el estado del negocio.
+    - Invocar la mutación de Supabase para actualizar `is_open` de forma silenciosa en segundo plano, notificando al usuario mediante un Toast Premium interactivo de FOWY.
+- [ ] **21.3.4 Resiliencia y Control de Fugas (Concepto 6)**:
+    - Asegurar el correcto desmantelamiento del intervalo (`clearInterval`) al desmontar el componente para evitar fugas de memoria (*memory leaks*) y colisiones en React 19.
+
+### 🎨 21.4 Experiencia de Usuario Premium & Realtime en el Mapa
+- [ ] **21.4.1 Switch Inteligente con Feedback Visual**:
+    - Rediseñar el control del switch de "Abierto/Cerrado" en el panel del socio. Al activarse el cierre/apertura automática, mostrar un badge parpadeante suave: `Sincronizado • Auto-cierre activo`.
+    - Agregar micro-animaciones elásticas usando `framer-motion` para que el switch físico cambie de posición automáticamente en vivo cuando el reloj traspase el límite.
+- [ ] **21.4.2 Sincronización en Tiempo Real con el Explorador**:
+    - Validar que al cambiar el switch de forma automática (`is_open` pasa a `false` o `true`), los clientes en el mapa explorador (`/explorar`) reciban el cambio al instante.
+    - Utilizar la suscripción persistente Realtime (Singleton) configurada en la Fase 13 para detectar la actualización del campo `is_open`.
+- [ ] **21.4.3 Ocultamiento del Mapa con Transición Suave**:
+    - Cuando el negocio cambie a estado Cerrado, **ocultarlo completamente de la vista del mapa explorador y de los listados** (requisito del negocio).
+    - Para evitar una desaparición brusca del pin en el mapa y de la tarjeta, aplicar una animación de salida premium (`fade-out` y escala elástica) usando Framer Motion en el listado reactivo.
+
+---
 ---
  *Documento consolidado - FOWY 2026*

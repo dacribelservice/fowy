@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { getDistance } from "@/utils/geo";
+import { isBusinessOpen } from "@/utils/businessTime";
 
 // Singleton supabase client
 const supabase = createClient();
@@ -93,7 +94,9 @@ export function useExplorerManager() {
         sortedBus = sortedBus.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       }
 
-      setBusinesses(sortedBus);
+      // Filtrar los negocios para mostrar solo los que actualmente están abiertos
+      const openBusinesses = sortedBus.filter((biz: any) => isBusinessOpen(biz.schedules));
+      setBusinesses(openBusinesses);
     } catch (error) {
       console.error("Error fetching explorer data:", error);
     } finally {

@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { useBusinessMenuData } from "@/hooks/useBusinessMenuData";
 import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
 import { useFavorites } from "@/hooks/useFavorites";
+import { isBusinessOpen } from "@/utils/businessTime";
 
 import { BusinessMenuSkeleton } from "@/components/explorer/BusinessMenuSkeleton";
 import { BusinessMenuNotFound } from "@/components/explorer/BusinessMenuNotFound";
@@ -116,9 +117,9 @@ export default function BusinessMenuPage() {
   const accentColor = business.color_identity || "#FF5A5F";
   const logoUrl = business.logo_url || "";
   const businessName = business.name || "";
-  const isOpen = business.is_open ?? true;
   const rating = business.rating ?? 0.0;
   const distance = business.distance || "1.2 km";
+  const isOpen = isBusinessOpen(business.schedules);
 
 
 

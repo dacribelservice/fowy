@@ -77,7 +77,7 @@ export function CraveHeaderCompact({
                     style={{ color: isOpen ? "#34C759" : "#EF4444" }}
                   >
                     <span
-                      className="w-1.5 h-1.5 rounded-full animate-pulse"
+                      className={`w-1.5 h-1.5 rounded-full ${isOpen ? "animate-pulse" : ""}`}
                       style={{ backgroundColor: isOpen ? "#34C759" : "#EF4444" }}
                     />
                     {isOpen ? "Abierto" : "Cerrado"}

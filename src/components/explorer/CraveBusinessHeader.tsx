@@ -42,7 +42,7 @@ export function CraveBusinessHeader({
           {/* Estado: Abierto / Cerrado */}
           <div className="flex items-center gap-1.5">
             <span 
-              className="w-3 h-3 rounded-full" 
+              className={`w-3 h-3 rounded-full ${isOpen ? "animate-pulse" : ""}`} 
               style={{ backgroundColor: isOpen ? "#34C759" : "#EF4444" }}
             />
             <span 
