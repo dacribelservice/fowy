@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, LayoutDashboard, Store, Users, 
-  Briefcase, UserCircle, Wallet, ShieldCheck 
+  Briefcase, UserCircle, Wallet, ShieldCheck,
+  Sparkles
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -13,12 +14,13 @@ export default function FloatingActionMenu() {
   const router = useRouter();
 
   const menuItems = [
-    { icon: <LayoutDashboard size={22} />, href: "/admin/dashboard", delay: 0.3 },
-    { icon: <Store size={22} />, href: "/admin/negocios", delay: 0.25 },
-    { icon: <Users size={22} />, href: "/admin/vendedores", delay: 0.2 },
-    { icon: <Briefcase size={22} />, href: "/admin/profesionales", delay: 0.15 },
-    { icon: <UserCircle size={22} />, href: "/admin/usuarios", delay: 0.1 },
-    { icon: <Wallet size={22} />, href: "/admin/finanzas", delay: 0.05 },
+    { icon: <LayoutDashboard size={22} />, href: "/admin/dashboard", delay: 0.35 },
+    { icon: <Store size={22} />, href: "/admin/negocios", delay: 0.3 },
+    { icon: <Users size={22} />, href: "/admin/vendedores", delay: 0.25 },
+    { icon: <Briefcase size={22} />, href: "/admin/profesionales", delay: 0.2 },
+    { icon: <UserCircle size={22} />, href: "/admin/usuarios", delay: 0.15 },
+    { icon: <Wallet size={22} />, href: "/admin/finanzas", delay: 0.1 },
+    { icon: <Sparkles size={22} />, href: "/admin/marketing", delay: 0.05 },
     { icon: <ShieldCheck size={22} />, href: "/admin/seguridad", delay: 0 },
   ];
 

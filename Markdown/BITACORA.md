@@ -565,3 +565,46 @@ Se consolidó una planificación meticulosa para la integración de cobros y mem
 - **Backup**: Commit `21c51c5` — push exitoso a la rama `main` de GitHub.
 
 *Última actualización: 08 de Mayo de 2026 - 06:10 PM*
+
+---
+
+## 📣 FASE 19: SISTEMA DE MARKETING Y BANNERS AUTO-SCROLL — SESIÓN XVIII (08 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: 🟢 EN PROGRESO (PARTE SUPER ADMIN COMPLETADA ✅)
+
+### 🎯 Objetivos Logrados (Sincronización con Hoja de Ruta)
+1. **Acceso Unificado & Sidebar (19.2.1)**: ✅
+   - Agregado el acceso unificado **"Marketing"** en la barra lateral del panel administrativo (`Sidebar.tsx`), usando el ícono premium `Sparkles` de Lucide.
+2. **Orquestador de Datos `useMarketingManager` (19.2.2)**: ✅
+   - Hook personalizado para encapsular la lógica de banners, optimista, ligera y segura.
+3. **Página y Componentes Desacoplados (19.2.3)**: ✅
+   - Página súper limpia y atómica en `/admin/marketing/page.tsx` (< 60 líneas).
+   - Componentes modulares: `<MarketingBannerHeader />`, `<BannerUploadModal />` y `<BannerGridList />`.
+4. **Calidad de Subida & Compresión (19.2.4)**: ✅
+   - Integrado de forma obligatoria `compressImage` en el cliente antes de enviar al bucket de Supabase, optimizando la carga.
+5. **Acciones Instantáneas con Optimistic Updates (19.2.5)**: ✅
+   - Los switches y eliminaciones modifican la interfaz de inmediato. La eliminación limpia físicamente el archivo del Storage de Supabase para evitar basura huérfana.
+6. **Diálogos y Alertas Premium (19.2.6)**: ✅
+   - Prohibido el uso de `alert()` nativo en favor de `<DeleteConfirmModal />` para confirmaciones seguras y del componente `<SuccessToast />` para dar un feedback táctil instantáneo y placentero al administrador.
+7. **Hook de Datos useActiveBanners (19.3.1)**: ✅
+   - Diseñado e implementado el hook reutilizable `useActiveBanners.ts` para obtener eficientemente solo los banners de marketing activos (`is_active: true`) y ordenados por `sort_order` ascendente.
+8. **Componente `<AutoScrollBanners />` (19.3.2)**: ✅
+   - Diseñado e implementado el componente `AutoScrollBanners.tsx` como el pie de página móvil horizontal con espaciados (`gap-4`) que consulta los banners activos de forma secuencial, incorporando estados de carga con skeletons pulidos, degradados premium y redirecciones dinámicas de un toque.
+9. **Scroll Automático Suave (Marquee CSS) (19.3.3)**: ✅
+    - Desarrollada la animación infinita ultrasuave de velocidad constante (p. ej. 40px/s) mediante cálculos matemáticos de repetición y duplicación de banners, anulando por completo el molesto salto de salto ("jitter") al finalizar la traslación mediante envolturas de relleno de píxeles perfectas (`pr-4` en lugar de `gap`).
+10. **Detención al Tocar y Hover (Pausa) (19.3.4)**: ✅
+    - Integrado el control de estado reactivo `isPaused` conectado a listeners de eventos nativos de alta precisión: `onMouseEnter`/`onMouseLeave` (para pausar al posar el cursor en desktops) y
+    `onTouchStart`/`onTouchEnd` (para suspender de inmediato el scroll infinito al colocar el dedo en móviles). Esto garantiza clics limpios y predecibles sobre los banners en cualquier dispositivo sin que la marquesina se mueva.
+11. **Elemento del Mensaje (CTA Unificado) (19.3.5)**: ✅
+    - Implementación e inyección del mensaje motivacional premium *"¿Te quedaste con hambre de más? Explora otros locales en el mapa 🗺️"* justo encima del carrusel, con animaciones fluidas (`framer-motion`), diseño responsivo y redirección dinámica con micro-interacción al hacer tap sobre el enlace del mapa.
+
+### 📂 Archivos Modificados:
+- `src/components/explorer/AutoScrollBanners.tsx` (Mensaje de CTA Unificado verificado e integrado).
+- `Markdown/HOJA_DE_RUTA.md` (Paso 19.3.5 marcado como completado).
+- `Markdown/BITACORA.md` (Este archivo de bitácora).
+
+### 📈 Resultado de Calidad:
+- **Tipado y Compilación**: 0 errores de TypeScript (`powershell -ExecutionPolicy Bypass -Command "npx tsc --noEmit"` verificado con éxito).
+- **Alineación de Diseño**: UX ultra-premium responsiva que incentiva de manera sutil y elegante la navegación del explorador.
+
+*Última actualización: 09 de Mayo de 2026 - 00:35 AM*

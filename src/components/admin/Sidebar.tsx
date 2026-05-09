@@ -11,7 +11,8 @@ import {
   UserCircle, 
   Wallet, 
   ShieldCheck, 
-  LogOut 
+  LogOut,
+  Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
@@ -30,6 +31,7 @@ const menuItems = [
   { name: "Profesionales", href: "/admin/profesionales", icon: Briefcase },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserCircle },
   { name: "Finanzas", href: "/admin/finanzas", icon: Wallet },
+  { name: "Marketing", href: "/admin/marketing", icon: Sparkles },
   { name: "Seguridad", href: "/admin/seguridad", icon: ShieldCheck },
 ];
 
