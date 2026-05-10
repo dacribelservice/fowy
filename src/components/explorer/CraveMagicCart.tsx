@@ -54,7 +54,7 @@ export function CraveMagicCart({
             damping: 14,
             mass: 1.1,
           }}
-          className="absolute bottom-10 left-1/2 z-50 overflow-hidden cursor-pointer flex items-center justify-between"
+          className="absolute bottom-[50px] left-1/2 z-50 overflow-hidden cursor-pointer flex items-center justify-between"
           style={{
             // Glassmorphism ultra-premium super marcado
             background:

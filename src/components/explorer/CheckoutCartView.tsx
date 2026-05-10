@@ -10,6 +10,7 @@ export interface CheckoutCartViewProps {
   onAddOne: (product: any) => void;
   onRemoveOne: (productId: string) => void;
   onContinue: () => void;
+  isBusinessOpen?: boolean;
 }
 
 export function CheckoutCartView({
@@ -19,6 +20,7 @@ export function CheckoutCartView({
   onAddOne,
   onRemoveOne,
   onContinue,
+  isBusinessOpen,
 }: CheckoutCartViewProps) {
   const totalPrice = cartItems.reduce((acc, curr) => acc + curr.price, 0);
 
@@ -124,20 +126,27 @@ export function CheckoutCartView({
           </span>
         </div>
 
-        {/* Botón Finalizar */}
-        <button
-          onClick={onContinue}
-          className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
-          style={{
-            background: `linear-gradient(135deg, ${accentColor}e6 0%, ${accentColor} 100%)`,
-            boxShadow: `0 10px 25px ${accentColor}66, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`,
-          }}
-        >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            Finalizar Pedido
-          </span>
-          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </button>
+        {isBusinessOpen !== false ? (
+          <button
+            onClick={onContinue}
+            className="w-full py-4 rounded-full text-white font-bold text-[16px] tracking-wide transition-all duration-300 active:scale-95 shadow-lg relative overflow-hidden group border border-white/10"
+            style={{
+              background: `linear-gradient(135deg, ${accentColor}e6 0%, ${accentColor} 100%)`,
+              boxShadow: `0 10px 25px ${accentColor}66, inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)`,
+            }}
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Finalizar Pedido
+            </span>
+            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
+        ) : (
+          <div 
+            className="w-full py-4 rounded-full flex items-center justify-center gap-2 border border-red-500/10 text-[16px] select-none text-red-500 bg-red-50/80 backdrop-blur-sm shadow-sm font-normal tracking-wide"
+          >
+            <span>El negocio se encuentra cerrado</span>
+          </div>
+        )}
       </div>
     </>
   );

@@ -251,6 +251,7 @@ export default function BusinessMenuPage() {
         businessName={businessName}
         businessPhone={business?.phone}
         businessId={business?.id}
+        isBusinessOpen={isOpen}
       />
 
       {/* DETALLES DE PRODUCTO - POPUP ULTRA PREMIUM */}

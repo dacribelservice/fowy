@@ -16,6 +16,7 @@ export interface CraveCheckoutSheetProps {
   businessName: string;
   businessPhone?: string;
   businessId?: string;
+  isBusinessOpen?: boolean;
 }
 
 export function CraveCheckoutSheet({
@@ -28,6 +29,7 @@ export function CraveCheckoutSheet({
   businessName,
   businessPhone,
   businessId,
+  isBusinessOpen,
 }: CraveCheckoutSheetProps) {
   const logic = useCheckoutLogic({
     cartItems,
@@ -117,6 +119,7 @@ export function CraveCheckoutSheet({
                   onAddOne={onAddOne}
                   onRemoveOne={onRemoveOne}
                   onContinue={() => setCheckoutStep("checkout")}
+                  isBusinessOpen={isBusinessOpen}
                 />
               ) : (
                 <CheckoutFormView
