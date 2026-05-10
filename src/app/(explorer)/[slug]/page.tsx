@@ -150,7 +150,7 @@ export default function BusinessMenuPage() {
           const scrollTop = e.currentTarget.scrollTop;
           setIsScrolled(scrollTop > 120);
         }}
-        className="flex-1 overflow-y-auto pb-20 relative"
+        className="flex-1 overflow-y-auto relative"
       >
         {/* BLOQUE 2: HEADER Y BRANDING V3 */}
         
