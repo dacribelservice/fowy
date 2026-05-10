@@ -114,7 +114,7 @@ export function CheckoutCartView({
       </div>
 
       {/* Footer con Total y Botón de Acción */}
-      <div className="p-6 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+      <div className="pt-6 px-6 pb-16 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
         <div className="flex items-center justify-between px-1">
           <span className="text-slate-500 font-bold text-[14px] uppercase tracking-wider">
             Total del Pedido

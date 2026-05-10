@@ -374,7 +374,7 @@ export function CheckoutFormView({
       </div>
 
       {/* Footer del Formulario */}
-      <div className="p-6 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+      <div className="pt-6 px-6 pb-16 bg-white/20 backdrop-blur-md border-t border-white/20 shrink-0 space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
         {validationError && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
