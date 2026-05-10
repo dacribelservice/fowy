@@ -153,7 +153,6 @@ export default function ExplorerLayout({
                           ...(hasBusiness ? [{ icon: Store, label: "Mi Negocio", href: "/business" }] : []),
                           { icon: Heart, label: "Favoritos" },
                           { icon: ShoppingBag, label: "Mis Pedidos" },
-                          { icon: FileText, label: "Términos y condiciones" },
                         ].map((item, idx) => {
                           const isLink = 'href' in item;
                           const content = (
