@@ -478,4 +478,76 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [ ] **21.5.5 Pruebas y Validación de Estados Cruzados**: Realizar pruebas locales simulando diferentes horas del día en Bogotá y horarios nocturnos para verificar que las transiciones de estado ocurran perfectamente al segundo exacto y sin loops de actualización en la base de datos.
 
 ---
+
+## ⚖️ FASE 22: PIE DE PÁGINA (FOOTER) INSTITUCIONAL PREMIUM Y POPUPS LEGALES MODULARES (VERSIÓN 2.7.7)
+*Objetivo: Diseñar e implementar un pie de página institucional premium con dos franjas cromáticas (Gris Oscuro #5a5a5a y Negro #000000), enlaces interactivos en azul oscuro de alto contraste, e integrar un sistema de popups modulares con scroll interno para los Términos y Condiciones, Políticas de Privacidad/Cookies y la Visión Expandida de FOWY. Se debe garantizar que el pie de página nunca sea obstruido por el carrito de compras flotante (Anti-Overlap System).*
+
+---
+
+### 🎨 22.1 Estructura Visual y Diseño Cromático Dual (Fowy Footer Layout)
+- [ ] **22.1.1 Contenedor Principal de Dos Franjas**:
+    - **Franja Superior (Gris Oscuro `#5a5a5a`)**: Espaciado generoso (*padding-top: 48px, padding-bottom: 32px*) para contener el propósito, enlaces legales en azul oscuro y accesos de contacto.
+    - **Franja Inferior (Negro `#000000` / `#121212`)**: Altura compacta para albergar la propiedad intelectual (Copyright) en color gris medio `#757575` y un eslogan en el tono dorado `#a58100`.
+- [ ] **22.1.2 Columna de Propósito y Marca (Izquierda)**:
+    - Integrar el logotipo de Fowy en versión blanca/monocromática con animación sutil al posar el cursor.
+    - Colocar un resumen de 3 líneas del valor de Fowy extraído directamente de `VISION-DE-FOWY.md`:
+      > *"FOWY democratiza la tecnología entregando herramientas de software de nivel enterprise a comercios locales mediante suscripciones planas y justas, impulsando el descubrimiento orgánico y conectando negocios con repartidores y profesionales locales sin comisiones de intermediación abusivas."*
+    - Mostrar la etiqueta de versión de la aplicación de forma sutil e integrada al final de esta columna: `Versión 2.7.7`.
+- [ ] **22.1.3 Columna de Enlaces Legales y Visión (Centro)**:
+    - Agrupar de forma vertical los enlaces clicables: **Términos y Condiciones**, **Políticas de Privacidad**, **Políticas de Cookies**, y **Nuestra Visión**.
+    - Forzar el color de texto en un **azul oscuro zafiro o cobalto de alto contraste (ej. `#2563eb` o `#1d4ed8`)** para asegurar legibilidad sobre el fondo gris y cumplir estrictamente con los requerimientos visuales.
+    - Aplicar micro-interacciones de hover que cambien sutilmente la opacidad e incorporen un subrayado elegante con efecto de barra expansiva.
+
+---
+
+### 📝 22.2 Popups Legales con Scroll Interno y Redacción Exhaustiva (Fowy Legal System)
+- [ ] **22.2.1 Popup de Términos y Condiciones (Completo e Inalterable)**:
+    - Crear un modal interactivo con scroll interno vertical independiente (`overflow-y-auto max-h-[70vh] pr-4`) para albergar los siguientes puntos detallados sin excepción:
+        - **1. Naturaleza Jurídica y Rol de FOWY**: Explicar que FOWY es exclusivamente un facilitador tecnológico y proveedor de software (SaaS) que conecta comercios locales, repartidores independientes (Moto-Fowy) y consumidores. FOWY no es un restaurante, tienda, ni agencia de transporte/mensajería.
+        - **2. Modelo de Suscripción Plana**: Dejar constancia de que FOWY no cobra comisiones (0%) sobre el valor de las ventas de los negocios. Los comercios operan bajo una tarifa plana mensual que les garantiza control absoluto de sus márgenes.
+        - **3. Autonomía de los Repartidores (Moto-Fowy)**: Explicar que la logística y el transporte son operados por terceros independientes de forma autónoma. FOWY no tiene relación laboral directa ni se responsabiliza de tiempos de entrega, pérdidas o estado de los productos.
+        - **4. Integración y Despacho vía WhatsApp**: Declarar que el flujo de checkout recopila los datos del carrito de compras y los transfiere al WhatsApp del comercio para su coordinación directa. FOWY no procesa pagos en esta instancia de checkout y las disputas comerciales se resuelven de forma exclusiva entre el comercio y el cliente.
+        - **5. Propiedad Intelectual**: FOWY retiene el 100% de los derechos sobre el software, marcas, algoritmos, y diseño de la plataforma.
+- [ ] **22.2.2 Popup de Políticas de Privacidad (Exhaustivo)**:
+    - Crear un modal con scroll interno que detalle con precisión quirúrgica:
+        - **1. Recopilación de Datos de Ubicación**: Detallar que se requiere acceso a la geolocalización del cliente única y exclusivamente para posicionar el mapa interactivo y listar comercios cercanos en tiempo real. Estos datos se procesan localmente y no se almacenan de forma histórica sin consentimiento.
+        - **2. Recopilación de Datos de Contacto**: Captura del número de WhatsApp y nombre del usuario para el checkout automatizado hacia el negocio.
+        - **3. Blindaje de Datos y Seguridad**: Declarar el uso obligatorio de políticas Row Level Security (RLS) en Supabase para asegurar aislamiento absoluto de bases de datos por rol (`explorer`, `partner`, `rider`, `admin`). FOWY garantiza la confidencialidad y prohíbe terminantemente vender, alquilar o transferir información a terceros con fines publicitarios.
+- [ ] **22.2.3 Popup de Políticas de Cookies**:
+    - Detallar con scroll interno el uso exclusivo de cookies esenciales:
+        - **1. Propósito Operativo**: Cookies de persistencia del carrito de compras temporal, mantenimiento de sesiones de usuario activas y optimización de cargas del mapa explorador de Leaflet.
+        - **2. Privacidad de Cookies**: Declarar la prohibición absoluta de cookies de rastreo de terceros (*third-party tracking cookies*) para marketing invasivo o publicidad cruzada fuera de la plataforma.
+
+---
+
+### 🌟 22.3 Popup "Nuestra Visión" de Alto Impacto (Crave Vision Modal)
+- [ ] **22.3.1 Modal de la Visión Expandida**:
+    - Crear un popup inmersivo con scroll interno que renderice de forma hermosa y con diseño premium los pilares fundamentales extraídos de `VISION-DE-FOWY.md`:
+        - **Pilar 1: Democracia Tecnológica**: Entrega de software enterprise a pequeños negocios de proximidad, rompiendo los monopolios de comisiones abusivas del 30% que asfixian el comercio de barrio.
+        - **Pilar 2: Descubrimiento Orgánico**: Tráfico cruzado y colaborativo donde el éxito de un comercio impulsa las visitas de todos sus vecinos cercanos en el mapa dinámico.
+        - **Pilar 3: Economía Circular Local**: El dinero de la comunidad fluye internamente de vecino a vecino: el comerciante vende directo, contrata profesionales de su misma zona para marketing/contabilidad, y los repartidores del vecindario (Moto-Fowy) obtienen ingresos 100% directos y dignos.
+
+---
+
+### 📞 22.4 Canales de Contacto Directo y Redes Sociales (Contact & Social Hub)
+- [ ] **22.4.1 Enlace Directo a WhatsApp**:
+    - Incorporar el texto **"WhatsApp +57 302 460 1348"** acompañado del icono oficial de WhatsApp en color verde de su marca.
+    - Configurar el enlace de apertura directo `https://wa.me/573024601348?text=Hola%20Fowy` abriendo en una pestaña nueva con seguridad `rel="noopener noreferrer"`.
+- [ ] **22.4.2 Enlace Directo a Correo**:
+    - Incorporar el texto **"info@fowy.pro"** acompañado de un icono minimalista de sobre de correo.
+    - Configurar el enlace activo de tipo `mailto:info@fowy.pro`.
+- [ ] **22.4.3 Fila de Iconos de Redes Sociales (Alineado con Mockup)**:
+    - Colocar los iconos oficiales de **Instagram**, **Facebook**, **TikTok** y **YouTube** con bordes circulares blancos sobre fondo negro/gris oscuro, tal como se especifica en la imagen.
+    - Aplicar transiciones fluidas de color y escala elástica (`hover:scale-110`) al interactuar con ellos.
+
+---
+
+### 🛡️ 22.5 Espaciado de Seguridad y Sistema de Prevención de Colisiones (Anti-Overlap System)
+- [ ] **22.5.1 Algoritmo de Altura Adaptativa (Cart Safety Spacer)**:
+    - **Problema de Colisión**: El carrito de compras flotante (`VER PEDIDO` que aparece en la parte inferior de la pantalla) puede tapar los textos de términos, contacto o la versión en el footer al scrollar al fondo absoluto.
+    - **Solución**: Diseñar una zona de seguridad inteligente en la parte inferior del footer. Si el carrito está activo en la sesión del cliente, inyectar dinámicamente un padding inferior generoso al footer (por ejemplo, `padding-bottom: 140px` o la clase `pb-[140px]`). Esto levantará todo el contenido útil del footer por encima de la barra del carrito flotante, permitiendo leer la versión, derechos reservados y enlaces legales sin ninguna obstrucción.
+- [ ] **22.5.2 Pruebas de Usabilidad y Responsividad**:
+    - Comprobar visualmente que en pantallas móviles de todos los tamaños (Mobile-First Shell) el footer se lee correctamente, los popups mantengan su scroll táctil suave y el carrito flotante quede asentado de forma impecable sin tapar el contenido legal ni el número de versión.
+
+---
  *Documento consolidado - FOWY 2026*

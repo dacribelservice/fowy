@@ -80,7 +80,7 @@ export default function BusinessDashboard() {
 
         const orderCount = ordersData?.length || 0;
         const totalSales = ordersData?.reduce((acc, curr) => acc + Number(curr.total_amount), 0) || 0;
-        const avgTicket = orderCount > 0 ? totalSales / orderCount : 0;
+        const avgTicket = orderCount > 0 ? Math.round(totalSales / orderCount) : 0;
         const conversionRate = visitCount && visitCount > 0 ? (orderCount / visitCount) * 100 : 0;
 
         // Fetch Recent Visits
@@ -131,7 +131,7 @@ export default function BusinessDashboard() {
           { ...stats[0], value: (visitCount || 0).toLocaleString() },
           { ...stats[1], value: orderCount.toLocaleString() },
           { ...stats[2], value: `${conversionRate.toFixed(1)}%` },
-          { ...stats[3], value: `$${new Intl.NumberFormat("es-CO", { minimumFractionDigits: 0 }).format(avgTicket)}` },
+          { ...stats[3], value: `$${new Intl.NumberFormat("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(avgTicket)}` },
         ]);
         
         if (latestVisits) setRecentVisits(latestVisits);
