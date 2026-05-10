@@ -513,7 +513,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
         - **1. Recopilación de Datos de Ubicación**: Detallar que se requiere acceso a la geolocalización del cliente única y exclusivamente para posicionar el mapa interactivo y listar comercios cercanos en tiempo real. Estos datos se procesan localmente y no se almacenan de forma histórica sin consentimiento.
         - **2. Recopilación de Datos de Contacto**: Captura del número de WhatsApp y nombre del usuario para el checkout automatizado hacia el negocio.
         - **3. Blindaje de Datos y Seguridad**: Declarar el uso obligatorio de políticas Row Level Security (RLS) en Supabase para asegurar aislamiento absoluto de bases de datos por rol (`explorer`, `partner`, `rider`, `admin`). FOWY garantiza la confidencialidad y prohíbe terminantemente vender, alquilar o transferir información a terceros con fines publicitarios.
-- [ ] **22.2.3 Popup de Políticas de Cookies**:
+- [x] **22.2.3 Popup de Políticas de Cookies**:
     - Detallar con scroll interno el uso exclusivo de cookies esenciales:
         - **1. Propósito Operativo**: Cookies de persistencia del carrito de compras temporal, mantenimiento de sesiones de usuario activas y optimización de cargas del mapa explorador de Leaflet.
         - **2. Privacidad de Cookies**: Declarar la prohibición absoluta de cookies de rastreo de terceros (*third-party tracking cookies*) para marketing invasivo o publicidad cruzada fuera de la plataforma.
@@ -521,7 +521,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 🌟 22.3 Popup "Nuestra Visión" de Alto Impacto (Crave Vision Modal)
-- [ ] **22.3.1 Modal de la Visión Expandida**:
+- [x] **22.3.1 Modal de la Visión Expandida**:
     - Crear un popup inmersivo con scroll interno que renderice de forma hermosa y con diseño premium los pilares fundamentales extraídos de `VISION-DE-FOWY.md`:
         - **Pilar 1: Democracia Tecnológica**: Entrega de software enterprise a pequeños negocios de proximidad, rompiendo los monopolios de comisiones abusivas del 30% que asfixian el comercio de barrio.
         - **Pilar 2: Descubrimiento Orgánico**: Tráfico cruzado y colaborativo donde el éxito de un comercio impulsa las visitas de todos sus vecinos cercanos en el mapa dinámico.
