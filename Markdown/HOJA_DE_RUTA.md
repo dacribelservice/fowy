@@ -527,27 +527,6 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
         - **Pilar 2: Descubrimiento Orgánico**: Tráfico cruzado y colaborativo donde el éxito de un comercio impulsa las visitas de todos sus vecinos cercanos en el mapa dinámico.
         - **Pilar 3: Economía Circular Local**: El dinero de la comunidad fluye internamente de vecino a vecino: el comerciante vende directo, contrata profesionales de su misma zona para marketing/contabilidad, y los repartidores del vecindario (Moto-Fowy) obtienen ingresos 100% directos y dignos.
 
----
-
-### 📞 22.4 Canales de Contacto Directo y Redes Sociales (Contact & Social Hub)
-- [ ] **22.4.1 Enlace Directo a WhatsApp**:
-    - Incorporar el texto **"WhatsApp +57 302 460 1348"** acompañado del icono oficial de WhatsApp en color verde de su marca.
-    - Configurar el enlace de apertura directo `https://wa.me/573024601348?text=Hola%20Fowy` abriendo en una pestaña nueva con seguridad `rel="noopener noreferrer"`.
-- [ ] **22.4.2 Enlace Directo a Correo**:
-    - Incorporar el texto **"info@fowy.pro"** acompañado de un icono minimalista de sobre de correo.
-    - Configurar el enlace activo de tipo `mailto:info@fowy.pro`.
-- [ ] **22.4.3 Fila de Iconos de Redes Sociales (Alineado con Mockup)**:
-    - Colocar los iconos oficiales de **Instagram**, **Facebook**, **TikTok** y **YouTube** con bordes circulares blancos sobre fondo negro/gris oscuro, tal como se especifica en la imagen.
-    - Aplicar transiciones fluidas de color y escala elástica (`hover:scale-110`) al interactuar con ellos.
-
----
-
-### 🛡️ 22.5 Espaciado de Seguridad y Sistema de Prevención de Colisiones (Anti-Overlap System)
-- [ ] **22.5.1 Algoritmo de Altura Adaptativa (Cart Safety Spacer)**:
-    - **Problema de Colisión**: El carrito de compras flotante (`VER PEDIDO` que aparece en la parte inferior de la pantalla) puede tapar los textos de términos, contacto o la versión en el footer al scrollar al fondo absoluto.
-    - **Solución**: Diseñar una zona de seguridad inteligente en la parte inferior del footer. Si el carrito está activo en la sesión del cliente, inyectar dinámicamente un padding inferior generoso al footer (por ejemplo, `padding-bottom: 140px` o la clase `pb-[140px]`). Esto levantará todo el contenido útil del footer por encima de la barra del carrito flotante, permitiendo leer la versión, derechos reservados y enlaces legales sin ninguna obstrucción.
-- [ ] **22.5.2 Pruebas de Usabilidad y Responsividad**:
-    - Comprobar visualmente que en pantallas móviles de todos los tamaños (Mobile-First Shell) el footer se lee correctamente, los popups mantengan su scroll táctil suave y el carrito flotante quede asentado de forma impecable sin tapar el contenido legal ni el número de versión.
 
 ---
  *Documento consolidado - FOWY 2026*

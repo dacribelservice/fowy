@@ -96,8 +96,11 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
           {/* 22.1.2 Columna de Propósito y Marca (Izquierda) */}
           <div className="flex flex-col space-y-4">
             {/* Propósito de Fowy (3 líneas) */}
-            <p className="text-xs text-black leading-relaxed max-w-sm">
-              FOWY democratiza la tecnología entregando herramientas de software de nivel enterprise a comercios locales mediante suscripciones planas y justas, impulsando el descubrimiento orgánico y conectando negocios con repartidores y profesionales locales sin comisiones de intermediación abusivas.
+            <p className="text-xs text-[#000000] leading-relaxed max-w-sm">
+              Recupera el control de tu negocio. FOWY te libera de las comisiones abusivas y te conecta con tu ciudad, con un menú profesional.
+            </p>
+            <p className="text-xs text-[#000000] leading-relaxed max-w-sm">
+              FOWY no es solo una herramienta digital, es tu aliado para que dejes de trabajar para las aplicaciones y empieces a hacer crecer tu propio negocio con tranquilidad.
             </p>
           </div>
 
