@@ -23,6 +23,8 @@ import { CraveMagicCart } from "@/components/explorer/CraveMagicCart";
 import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
 import { LazyWrapper } from "@/components/explorer/LazyWrapper";
 import { AutoScrollBanners } from "@/components/explorer/AutoScrollBanners";
+import Footer from "@/components/explorer/Footer";
+
 
 /**
  * BusinessMenuPage: El nuevo molde de producción premium de Crave Vision.
@@ -226,6 +228,9 @@ export default function BusinessMenuPage() {
 
         {/* BLOQUE 4.5: MARKETING BANNERS (Fase 19.3.6) */}
         <AutoScrollBanners />
+
+        {/* BLOQUE 4.6: PIE DE PÁGINA (Fase 22.1.1 & 22.1.2) */}
+        <Footer extraPaddingBottom={flatCartItems.length > 0 && !isCartOpen} />
       </div>
 
       {/* BLOQUE 5: LA EXPERIENCIA DEL CARRITO (MAGIC PILL & BOTTOM SHEET) */}

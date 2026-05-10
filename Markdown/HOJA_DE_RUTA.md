@@ -485,15 +485,15 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 🎨 22.1 Estructura Visual y Diseño Cromático Dual (Fowy Footer Layout)
-- [ ] **22.1.1 Contenedor Principal de Dos Franjas**:
+- [x] **22.1.1 Contenedor Principal de Dos Franjas**:
     - **Franja Superior (Gris Oscuro `#5a5a5a`)**: Espaciado generoso (*padding-top: 48px, padding-bottom: 32px*) para contener el propósito, enlaces legales en azul oscuro y accesos de contacto.
     - **Franja Inferior (Negro `#000000` / `#121212`)**: Altura compacta para albergar la propiedad intelectual (Copyright) en color gris medio `#757575` y un eslogan en el tono dorado `#a58100`.
-- [ ] **22.1.2 Columna de Propósito y Marca (Izquierda)**:
+- [x] **22.1.2 Columna de Propósito y Marca (Izquierda)**:
     - Integrar el logotipo de Fowy en versión blanca/monocromática con animación sutil al posar el cursor.
     - Colocar un resumen de 3 líneas del valor de Fowy extraído directamente de `VISION-DE-FOWY.md`:
       > *"FOWY democratiza la tecnología entregando herramientas de software de nivel enterprise a comercios locales mediante suscripciones planas y justas, impulsando el descubrimiento orgánico y conectando negocios con repartidores y profesionales locales sin comisiones de intermediación abusivas."*
     - Mostrar la etiqueta de versión de la aplicación de forma sutil e integrada al final de esta columna: `Versión 2.7.7`.
-- [ ] **22.1.3 Columna de Enlaces Legales y Visión (Centro)**:
+- [x] **22.1.3 Columna de Enlaces Legales y Visión (Centro)**:
     - Agrupar de forma vertical los enlaces clicables: **Términos y Condiciones**, **Políticas de Privacidad**, **Políticas de Cookies**, y **Nuestra Visión**.
     - Forzar el color de texto en un **azul oscuro zafiro o cobalto de alto contraste (ej. `#2563eb` o `#1d4ed8`)** para asegurar legibilidad sobre el fondo gris y cumplir estrictamente con los requerimientos visuales.
     - Aplicar micro-interacciones de hover que cambien sutilmente la opacidad e incorporen un subrayado elegante con efecto de barra expansiva.
@@ -501,14 +501,14 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 📝 22.2 Popups Legales con Scroll Interno y Redacción Exhaustiva (Fowy Legal System)
-- [ ] **22.2.1 Popup de Términos y Condiciones (Completo e Inalterable)**:
+- [x] **22.2.1 Popup de Términos y Condiciones (Completo e Inalterable)**:
     - Crear un modal interactivo con scroll interno vertical independiente (`overflow-y-auto max-h-[70vh] pr-4`) para albergar los siguientes puntos detallados sin excepción:
         - **1. Naturaleza Jurídica y Rol de FOWY**: Explicar que FOWY es exclusivamente un facilitador tecnológico y proveedor de software (SaaS) que conecta comercios locales, repartidores independientes (Moto-Fowy) y consumidores. FOWY no es un restaurante, tienda, ni agencia de transporte/mensajería.
         - **2. Modelo de Suscripción Plana**: Dejar constancia de que FOWY no cobra comisiones (0%) sobre el valor de las ventas de los negocios. Los comercios operan bajo una tarifa plana mensual que les garantiza control absoluto de sus márgenes.
         - **3. Autonomía de los Repartidores (Moto-Fowy)**: Explicar que la logística y el transporte son operados por terceros independientes de forma autónoma. FOWY no tiene relación laboral directa ni se responsabiliza de tiempos de entrega, pérdidas o estado de los productos.
         - **4. Integración y Despacho vía WhatsApp**: Declarar que el flujo de checkout recopila los datos del carrito de compras y los transfiere al WhatsApp del comercio para su coordinación directa. FOWY no procesa pagos en esta instancia de checkout y las disputas comerciales se resuelven de forma exclusiva entre el comercio y el cliente.
         - **5. Propiedad Intelectual**: FOWY retiene el 100% de los derechos sobre el software, marcas, algoritmos, y diseño de la plataforma.
-- [ ] **22.2.2 Popup de Políticas de Privacidad (Exhaustivo)**:
+- [x] **22.2.2 Popup de Políticas de Privacidad (Exhaustivo)**:
     - Crear un modal con scroll interno que detalle con precisión quirúrgica:
         - **1. Recopilación de Datos de Ubicación**: Detallar que se requiere acceso a la geolocalización del cliente única y exclusivamente para posicionar el mapa interactivo y listar comercios cercanos en tiempo real. Estos datos se procesan localmente y no se almacenan de forma histórica sin consentimiento.
         - **2. Recopilación de Datos de Contacto**: Captura del número de WhatsApp y nombre del usuario para el checkout automatizado hacia el negocio.
