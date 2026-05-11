@@ -710,4 +710,28 @@ Se consolidó una planificación meticulosa para la integración de cobros y mem
 
 *Última actualización: 11 de Mayo de 2026 - 03:45 AM*
 
+---
+
+## 📱 COMPATIBILIDAD WEBKIT: CORRECCIÓN DE ORDENAMIENTO POR FECHAS EN EXPLORADOR — SESIÓN XXI (11 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: ✅ COMPLETADO
+
+### 🎯 Objetivos Logrados
+1. **Resolución de Error Crítico en Safari (iOS)**:
+   - Se diagnosticó y corrigió el fallo de ordenamiento por fechas de creación de negocios en iOS / Safari.
+   - El motor WebKit de iOS interpreta cadenas de fecha con formato de espacio `"YYYY-MM-DD HH:MM:SS"` como `Invalid Date` al pasarlas directamente a `new Date()`, provocando un retorno de `NaN.getTime()`, lo que anulaba el ordenamiento correcto y provocaba congelamientos de pantalla o fallos de renderizado en iPhones.
+   - Se importó y aplicó el utilitario seguro `parseSafeDate` de `@/utils/bogotaTimeUtils` en la rutina de ordenamiento por fallback de [useExplorerManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useExplorerManager.ts) (línea 116).
+   - Para evitar mutación directa del arreglo (que puede causar advertencias en React 19 o re-renders innecesarios), se usó la propagación de arrays `[...sortedBus].sort()`.
+
+### 📂 Archivos Modificados:
+- **Hook del Explorador**: [useExplorerManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useExplorerManager.ts)
+- **Historial**: [BITACORA.md](file:///c:/Users/cange/Documents/fowy/Markdown/BITACORA.md) (Este archivo de bitácora)
+
+### 📈 Resultado de Calidad:
+- **Compilación TypeScript**: Validada con `tsc --noEmit` de manera exitosa resultando en 0 errores.
+- **Alineación de Seguridad (Regla de Oro)**: Modificación del código y actualización de la bitácora expresamente bajo la autorización y directriz del CEO.
+
+*Última actualización: 11 de Mayo de 2026 - 01:50 PM*
+
+
 

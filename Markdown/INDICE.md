@@ -12,13 +12,19 @@
 |---------|-------------|-------------|
 | **BITACORA.md** | Registro cronológico de TODOS los cambios del proyecto: fases completadas, hitos, bugs resueltos y decisiones técnicas. Incluye stack, arquitectura y progreso por fases. | Al retomar sesión o verificar qué se ha hecho antes. |
 | **HOJA_DE_RUTA.md** | Checklist maestra consolidada de TODAS las fases (1-11). Cada fase tiene subtareas con `[x]` o `[ ]`. Es la fuente de verdad del progreso global. | Al planificar qué fase seguir o verificar estado de completitud. |
+| **VISION-DE-FOWY.md** | Visión de negocio e ingeniería a largo plazo: Fowy como Super-App de Economía Circular Local, modelo de monetización modular y mapa de flujos de valor. | Al buscar alineación comercial, presentar el proyecto o diseñar nuevas verticales. |
+| **MOTO-FOWY.md** | Plan de ingeniería del sistema de repartidores: modelado DB, geolocalización GPS activa y flujos de eventos realtime. | Al comenzar la integración de logística o envíos de última milla. |
+| **iPhone.md** | Diagnóstico y plan de blindaje de compatibilidad para dispositivos móviles iOS (Safari/WebKit), cubriendo problemas de fechas, audio en segundo plano y local storage seguro. | Al optimizar UX móvil o depurar problemas exclusivos de iPhones. |
+| **SEO.md** | Plan y checklists para posicionamiento SEO tradicional y GEO (buscadores basados en IA como Perplexity, ChatGPT Search, Gemini y Claude) con JSON-LD estructurado. | Al optimizar la indexación pública de menús y el tablero de tráfico en el panel. |
+| **Marketing.md** | Estrategia de monetización y publicidad local cruzada no competitiva y de promoción mediante banners para maximizar ingresos por de membresías. | Al integrar módulos de marketing, estadísticas avanzadas o monetización. |
 | **proyecto.md** | Blueprint arquitectónico: pilares de diseño, stack estándar, mapa de carpetas, estrategia de seguridad (RLS, Middleware) y guía para replicar la app. **Contiene alerta de RLS temporal.** | Al crear nuevos módulos, entender la arquitectura base o revisar alertas de seguridad. |
 | **conceptos.md** | Reglas de código obligatorias: límite de 250 líneas por archivo, desacoplamiento, imports dinámicos, paginación obligatoria, compresión de imágenes, prohibición de `alert()` nativos. | Al escribir o refactorizar cualquier código. SIEMPRE relevante. |
 | **diseño.md** | Tokens de diseño visual: paleta de colores (gradientes Energy/Flow), tipografía (Inter/Poppins), componentes (cards, sidebar, buttons), micro-animaciones y responsividad. | Al modificar UI, estilos o crear componentes visuales nuevos. |
-| **nucleo.md** | Checklist de construcción del núcleo (Fases 1-4): infraestructura, cerebro DB, cascarón UI. Todas completadas. | Solo como referencia histórica. Rara vez necesario. |
 | **login.md** | Hoja de ruta del módulo de autenticación: backend Supabase (Google Auth, email templates), UI (login, registro, recuperación) y lógica (callbacks, middleware). **COMPLETADO ✅** | Al implementar o ajustar el sistema de login/registro. |
 | **notificaciones.md** | Arquitectura completa de notificaciones: FCM + Supabase Realtime, tabla de eventos por rol, UI (campana, toasts, historial), Edge Function `send-push`. Todo completado. | Al modificar o debuggear notificaciones push/realtime. |
 | **solucion.md** | Documentación del bug de sincronización Explorador↔Panel de negocio: 5 pasos de diagnóstico, causa raíz (RLS + `.sort()` mutation + stale closures), arquitectura final con `useRef` + singleton. | Solo si hay bugs en el explorador o en la sincronización realtime. |
+| **errores-github.md** | Historial de errores críticos de tipado TypeScript, dependencias y renderizado durante despliegues de Vercel/GitHub con sus resoluciones. | Al depurar fallos en la canalización CI/CD o errores en la construcción del sitio. |
+| **nucleo.md** | Checklist de construcción del núcleo (Fases 1-4): infraestructura, cerebro DB, cascarón UI. Todas completadas. | Solo como referencia histórica. Rara vez necesario. |
 
 ---
 
@@ -45,7 +51,12 @@
 
 | Si la tarea es sobre... | Lee estos archivos |
 |------------------------|-------------------|
-| 🐛 Bug o error | `solucion.md` + archivo del módulo afectado |
+| 🐛 Bug o error | `solucion.md` + `errores-github.md` + archivo del módulo afectado |
+| 📱 Compatibilidad Móvil / iOS | `iPhone.md` |
+| 🔍 SEO / GEO e IA Search | `SEO.md` |
+| 🏍️ Repartidores (Moto-Fowy) | `MOTO-FOWY.md` |
+| 📣 Monetización o Banners | `Marketing.md` |
+| 🌟 Visión Maestra | `VISION-DE-FOWY.md` |
 | 🎨 Cambio de UI/estilos | `diseño.md` + `conceptos.md` |
 | 🏗️ Nuevo módulo o ruta | `proyecto.md` + `menu admin/app.md` |
 | 📊 Panel Admin | `menu admin/negocios.md` |
@@ -65,4 +76,5 @@
 2. **Registro Simplificado**: El flujo de registro ha sido optimizado para ser directo (Auth -> Perfil -> Éxito), asignando el rol `explorer` por defecto.
 
 ---
-*Última actualización de la biblioteca: 05 de Mayo de 2026 — Reflejando Alineación Crave Vision*
+*Última actualización de la biblioteca: 11 de Mayo de 2026 — Reflejando Integración de Blindaje iOS y Multi-Docs*
+

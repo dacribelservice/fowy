@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { getDistance } from "@/utils/geo";
 import { isBusinessOpen } from "@/utils/businessTime";
+import { parseSafeDate } from "@/utils/bogotaTimeUtils";
 
 // Singleton supabase client
 const supabase = createClient();
@@ -113,7 +114,11 @@ export function useExplorerManager() {
           return distA - distB;
         });
       } else {
-        sortedBus = sortedBus.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        sortedBus = [...sortedBus].sort((a, b) => {
+          const dateB = parseSafeDate(b.created_at).getTime();
+          const dateA = parseSafeDate(a.created_at).getTime();
+          return dateB - dateA;
+        });
       }
 
       // Filtrar los negocios para mostrar solo los que actualmente están abiertos
