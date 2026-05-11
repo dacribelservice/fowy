@@ -86,3 +86,47 @@ export function getBogotaTimeString(): string {
   const seconds = String(bogotaDate.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}:${seconds}`;
 }
+
+/**
+ * Sanitiza una cadena de fecha para que sea 100% compatible con el motor WebKit de iOS (Safari).
+ * Reemplaza los espacios por "T" para asegurar el cumplimiento del estándar ISO 8601.
+ * 
+ * @param dateStr Cadena de fecha a sanitizar.
+ * @returns Cadena de fecha sanitizada lista para usar con `new Date()`.
+ */
+export function sanitizeDateString(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  
+  // Limpiar espacios en los extremos y reemplazar el espacio separador entre fecha y hora por "T"
+  return dateStr.trim().replace(/\s+/, "T");
+}
+
+/**
+ * Crea un objeto Date de forma segura e independiente del motor del navegador (compatible con iOS Safari).
+ * 
+ * @param dateInput Cadena de fecha, número de timestamp, u objeto Date.
+ * @returns Objeto Date válido, o un Date con la hora actual si la entrada es inválida.
+ */
+export function parseSafeDate(dateInput: any): Date {
+  if (!dateInput) return new Date();
+  
+  if (dateInput instanceof Date) {
+    return isNaN(dateInput.getTime()) ? new Date() : dateInput;
+  }
+  
+  if (typeof dateInput === 'number') {
+    return new Date(dateInput);
+  }
+  
+  if (typeof dateInput === 'string') {
+    const sanitized = sanitizeDateString(dateInput);
+    const date = new Date(sanitized);
+    if (isNaN(date.getTime())) {
+      console.warn("parseSafeDate: Entrada de fecha inválida después de sanitizar:", dateInput);
+      return new Date();
+    }
+    return date;
+  }
+  
+  return new Date();
+}

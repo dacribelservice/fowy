@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
-import { Loader2, Navigation, Plus } from "lucide-react";
+import { Loader2, Navigation, Plus, AlertCircle, X } from "lucide-react";
 import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
 import BusinessListSheet from "@/components/explorer/BusinessListSheet";
 import BusinessDetailSheet from "@/components/explorer/BusinessDetailSheet";
@@ -32,10 +32,20 @@ export default function ExplorarPage() {
     setSelectedBusiness,
     isLocationModalOpen,
     setIsLocationModalOpen,
+    locationError,
+    setLocationError,
     handleSelectCategory,
     handleCenterUser,
     handleSelectBusiness
   } = useExplorerManager();
+
+  const [showWarningBanner, setShowWarningBanner] = useState(true);
+
+  useEffect(() => {
+    if (locationError) {
+      setShowWarningBanner(true);
+    }
+  }, [locationError]);
 
   return (
     <div className="h-full w-full relative overflow-hidden bg-transparent">
@@ -48,6 +58,51 @@ export default function ExplorarPage() {
           onSelectBusiness={handleSelectBusiness}
         />
       </div>
+
+      {/* Geolocation Explanation / Warning Banner */}
+      <AnimatePresence>
+        {locationError && showWarningBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="absolute top-4 left-4 right-4 z-30 max-w-[420px] mx-auto"
+          >
+            <div className="bg-white/95 backdrop-blur-xl border border-amber-200/60 rounded-[24px] shadow-[0_15px_30px_rgba(0,0,0,0.08)] p-4 pr-10 flex gap-3 relative overflow-hidden">
+              <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-amber-400 to-orange-500" />
+              
+              <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 flex-shrink-0">
+                <AlertCircle size={20} />
+              </div>
+              
+              <div className="flex-1">
+                <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-[1.5px] mb-1 flex items-center gap-1.5">
+                  Ubicación de Respaldo Activa
+                </h4>
+                <p className="text-[11px] font-semibold text-slate-500 leading-normal">
+                  {locationError === "permission_denied" ? (
+                    <span>
+                      📍 <strong>Permisos desactivados:</strong> FOWY te muestra el centro de Bogotá por defecto. Para ver tiendas cerca de ti, haz clic en el candado junto a la URL en tu iPhone y activa los permisos de ubicación.
+                    </span>
+                  ) : (
+                    <span>
+                      🔒 <strong>Servicio GPS o conexión inactiva:</strong> Mostrando centro de Bogotá. Asegúrate de navegar mediante <strong>HTTPS seguro</strong>, de activar el GPS de tu iPhone y de estar fuera de WebViews restrictivos (como en Instagram o WhatsApp).
+                    </span>
+                  )}
+                </p>
+              </div>
+              
+              <button
+                onClick={() => setShowWarningBanner(false)}
+                className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100/50 transition-colors"
+                title="Cerrar aviso"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Categories Layer (Floating Bottom) */}
       <div className="absolute bottom-4 left-0 right-0 z-20">

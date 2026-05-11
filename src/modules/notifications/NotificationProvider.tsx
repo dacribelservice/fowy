@@ -28,12 +28,16 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
   const supabase = createClient();
 
   // Audio helper
-  const playNotificationSound = (type: 'order' | 'alert' = 'alert') => {
+  const playNotificationSound = async (type: 'order' | 'alert' = 'alert') => {
     try {
       const audio = new Audio(type === 'order' ? '/sounds/cash-register.mp3' : '/sounds/alert.mp3');
-      audio.play();
-    } catch (err) {
-      console.warn('Audio playback failed:', err);
+      await audio.play();
+    } catch (err: any) {
+      if (err?.name === 'NotAllowedError' || err?.name === 'AbortError') {
+        console.warn('Audio play blocked or aborted by iOS browser:', err.name);
+      } else {
+        console.warn('Audio playback failed:', err);
+      }
     }
   };
 

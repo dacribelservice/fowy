@@ -258,7 +258,7 @@ export default function FinancePage() {
                            <p className="font-bold text-slate-800">Pago de Membresía</p>
                            <div className="flex items-center gap-2 text-xs text-slate-500">
                              <Calendar size={12} />
-                             {new Date(proof.created_at).toLocaleDateString()}
+                             <span suppressHydrationWarning>{new Date(proof.created_at).toLocaleDateString()}</span>
                            </div>
                          </div>
                        </div>

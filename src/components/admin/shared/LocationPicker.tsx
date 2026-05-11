@@ -69,7 +69,7 @@ export default function LocationPicker({
     initialLat && initialLng ? [initialLat, initialLng] : null
   );
 
-  const defaultCenter: [number, number] = [4.5709, -74.2973]; // Default Colombia
+  const defaultCenter: [number, number] = [4.624335, -74.063644]; // Centro de Bogotá, Colombia (Fallback)
   const center = position || defaultCenter;
 
   return (

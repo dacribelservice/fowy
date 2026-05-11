@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { safeLocalStorage } from '@/utils/storage';
 
 export interface CartItem {
   id: string;
@@ -16,7 +17,7 @@ export function useCart(businessId?: string) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('fowy_cart');
+    const savedCart = safeLocalStorage.getItem('fowy_cart');
     if (savedCart) {
       try {
         setItems(JSON.parse(savedCart));
@@ -30,7 +31,7 @@ export function useCart(businessId?: string) {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem('fowy_cart', JSON.stringify(items));
+      safeLocalStorage.setItem('fowy_cart', JSON.stringify(items));
     }
   }, [items, isInitialized]);
 

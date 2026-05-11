@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { FowySalesChart } from "@/components/admin/businesses/FowySalesChart";
+import { parseSafeDate } from "@/utils/bogotaTimeUtils";
+import { useMounted } from "@/hooks/useMounted";
+
+
 
 // Custom Instagram icon compatible with Lucide v1
 const Instagram = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
@@ -38,6 +42,8 @@ const Instagram = ({ size = 24, className = "" }: { size?: number; className?: s
 
 export default function BusinessDashboard() {
   const [loading, setLoading] = useState(true);
+  const mounted = useMounted();
+
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [stats, setStats] = useState([
     { name: "Visitas Totales", value: "0", change: "0%", trend: "up", icon: Users, color: "bg-blue-500" },
@@ -284,8 +290,8 @@ export default function BusinessDashboard() {
                     <div className="w-2 h-2 rounded-full bg-fowy-blue" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-slate-700">Usuario anónimo</p>
-                      <p className="text-xs text-slate-400">
-                        {new Date(visit.created_at).toLocaleTimeString()}
+                      <p className="text-xs text-slate-400" suppressHydrationWarning>
+                        {mounted ? parseSafeDate(visit.created_at).toLocaleTimeString() : ""}
                       </p>
                     </div>
                     {renderTrafficBadge(visit.referrer)}

@@ -30,7 +30,7 @@ interface ExplorerMapProps {
 }
 
 export default function ExplorerMap({ businesses, center, onSelectBusiness }: ExplorerMapProps) {
-  const defaultCenter: [number, number] = [4.5709, -74.2973]; // Colombia
+  const defaultCenter: [number, number] = [4.624335, -74.063644]; // Centro de Bogotá, Colombia (Fallback)
   let mapCenter: [number, number] = defaultCenter;
   
   if (center) {

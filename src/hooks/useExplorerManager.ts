@@ -15,6 +15,7 @@ export function useExplorerManager() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [locationError, setLocationError] = useState<"permission_denied" | "position_unavailable" | "unsupported" | "timeout" | null>(null);
 
   // Refs to hold latest state values (avoids stale closures in callbacks)
   const categoriesRef = useRef<any[]>([]);
@@ -28,17 +29,38 @@ export function useExplorerManager() {
 
   // Initial Geolocation
   useEffect(() => {
-    if ("geolocation" in navigator) {
+    const isGeolocationAvailable = typeof window !== "undefined" && navigator && "geolocation" in navigator && !!navigator.geolocation;
+    if (isGeolocationAvailable) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
+          setLocationError(null);
         },
         (error) => {
-          console.error("Geolocation error:", error);
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.warn("User denied geolocation permission.");
+              setLocationError("permission_denied");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.warn("Location information is unavailable (iOS/Safari might block non-HTTPS connections or GPS is disabled).");
+              setLocationError("position_unavailable");
+              break;
+            case error.TIMEOUT:
+              console.warn("Geolocation request timed out.");
+              setLocationError("timeout");
+              break;
+            default:
+              console.warn("An unknown geolocation error occurred:", error.message);
+              setLocationError("position_unavailable");
+          }
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
+    } else {
+      console.warn("Geolocation is not supported or blocked by this browser.");
+      setLocationError("unsupported");
     }
   }, []);
 
@@ -153,18 +175,38 @@ export function useExplorerManager() {
   };
 
   const handleCenterUser = () => {
-    if ("geolocation" in navigator) {
+    const isGeolocationAvailable = typeof window !== "undefined" && navigator && "geolocation" in navigator && !!navigator.geolocation;
+    if (isGeolocationAvailable) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
+          setLocationError(null);
         },
         (error) => {
-          if (error.code === 1) setIsLocationModalOpen(true);
-          else console.warn("Error de ubicación:", error.message);
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              setIsLocationModalOpen(true);
+              setLocationError("permission_denied");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.warn("Ubicación no disponible en este dispositivo/red (iOS/Safari podría requerir HTTPS).");
+              setLocationError("position_unavailable");
+              break;
+            case error.TIMEOUT:
+              console.warn("La solicitud de geolocalización expiró.");
+              setLocationError("timeout");
+              break;
+            default:
+              console.warn("Error de ubicación:", error.message);
+              setLocationError("position_unavailable");
+          }
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
+    } else {
+      console.warn("Geolocation no está disponible en este navegador.");
+      setLocationError("unsupported");
     }
   };
 
@@ -185,6 +227,8 @@ export function useExplorerManager() {
     setSelectedBusiness,
     isLocationModalOpen,
     setIsLocationModalOpen,
+    locationError,
+    setLocationError,
     handleSelectCategory,
     handleCenterUser,
     handleSelectBusiness

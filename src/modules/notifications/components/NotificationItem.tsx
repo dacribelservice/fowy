@@ -4,6 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNotifications } from '../NotificationProvider';
 import { Circle, MessageSquare, AlertCircle, ShoppingBag, Clock } from 'lucide-react';
+import { useMounted } from '@/hooks/useMounted';
+
 
 interface NotificationItemProps {
   notification: {
@@ -30,6 +32,8 @@ const getIcon = (type: string) => {
 
 export const NotificationItem = ({ notification, onClick }: NotificationItemProps) => {
   const { markAsRead } = useNotifications();
+  const mounted = useMounted();
+
 
   const handleClick = async () => {
     if (!notification.is_read) {
@@ -75,9 +79,9 @@ export const NotificationItem = ({ notification, onClick }: NotificationItemProp
           <h4 className={`text-sm font-semibold truncate ${!notification.is_read ? 'text-gray-900' : 'text-gray-600'}`}>
             {notification.title}
           </h4>
-          <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap flex items-center gap-1">
+          <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap flex items-center gap-1" suppressHydrationWarning>
             <Clock className="w-3 h-3" />
-            {timeAgo(notification.created_at)}
+            {mounted ? timeAgo(notification.created_at) : ""}
           </span>
         </div>
         <p className={`text-xs mt-1 line-clamp-2 leading-relaxed ${!notification.is_read ? 'text-gray-700' : 'text-gray-500'}`}>

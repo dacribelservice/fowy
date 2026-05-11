@@ -1,3 +1,5 @@
+import { parseSafeDate } from "./bogotaTimeUtils";
+
 export interface BusinessStats {
   total: number;
   activos: number;
@@ -31,7 +33,7 @@ export function calculateBusinessStats(businesses: any[]): BusinessStats {
   // Vencimientos en los próximos 7 días
   const vencimientos = businesses.filter((b: any) => {
     if (!b.payment_date) return false;
-    const fechaPago = new Date(b.payment_date);
+    const fechaPago = parseSafeDate(b.payment_date);
     return fechaPago >= hoy && fechaPago <= en7Dias;
   }).length;
 
@@ -39,9 +41,9 @@ export function calculateBusinessStats(businesses: any[]): BusinessStats {
   const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
   
-  const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
+  const nuevosEsteMes = businesses.filter((b: any) => parseSafeDate(b.created_at) >= inicioMesActual).length;
   const nuevosMesPasado = businesses.filter((b: any) => {
-    const d = new Date(b.created_at);
+    const d = parseSafeDate(b.created_at);
     return d >= inicioMesPasado && d < inicioMesActual;
   }).length;
 

@@ -102,28 +102,28 @@ Muchos usuarios de iPhone intentan resolver los problemas abriendo la web desde 
 Sigue esta lista paso a paso para auditar e implementar cada corrección en la base de código de FOWY. Puedes marcar cada tarea como completada `[x]` a medida que se resuelvan.
 
 ### 📅 1. Compatibilidad de Fechas (`Invalid Date` en WebKit)
-- [ ] **1.1. Auditoría de constructores de fechas:** Buscar de manera global todas las ocurrencias de `new Date(` y `Date.parse(` en la base de código.
-- [ ] **1.2. Sanitización en Utilidades de Bogotá:** Modificar [bogotaTimeUtils.ts](file:///c:/Users/cange/Documents/fowy/src/utils/bogotaTimeUtils.ts) para asegurar que cualquier cadena de fecha recibida reemplace espacios en blanco por el carácter `"T"` (ej. `rawDate.replace(" ", "T")`).
-- [ ] **1.3. Sanitización de Estadísticas:** Revisar archivos de procesamiento de analíticas del negocio (ej. `src/utils/businessStats.ts`) y normalizar la entrada de fechas antes de realizar comparaciones de tiempo.
-- [ ] **1.4. Validaciones en Pedidos:** Asegurar que la lógica de tiempo transcurrido en el gestor de pedidos (ej. `src/hooks/useOrderManager.ts` u homólogos) maneje de manera segura las diferencias de timestamp sin arrojar `NaN`.
+- [x] **1.1. Auditoría de constructores de fechas:** Buscar de manera global todas las ocurrencias de `new Date(` y `Date.parse(` en la base de código.
+- [x] **1.2. Sanitización en Utilidades de Bogotá:** Modificar [bogotaTimeUtils.ts](file:///c:/Users/cange/Documents/fowy/src/utils/bogotaTimeUtils.ts) para asegurar que cualquier cadena de fecha recibida reemplace espacios en blanco por el carácter `"T"` (ej. `rawDate.replace(" ", "T")`).
+- [x] **1.3. Sanitización de Estadísticas:** Revisar archivos de procesamiento de analíticas del negocio (ej. `src/utils/businessStats.ts`) y normalizar la entrada de fechas antes de realizar comparaciones de tiempo.
+- [x] **1.4. Validaciones en Pedidos:** Asegurar que la lógica de tiempo transcurrido en el gestor de pedidos (ej. `src/hooks/useOrderManager.ts` u homólogos) maneje de manera segura las diferencias de timestamp sin arrojar `NaN`.
 
 ### 💧 2. Prevención de Errores de Hidratación (`Hydration Mismatch`)
-- [ ] **2.1. Retraso de Renderizado en Fechas Clientes:** Envolver los componentes de visualización de horas o fechas dinámicas (por ejemplo, el reloj, horas de entrega estimadas, etc.) en un hook que espere a que el componente esté montado (`useEffect` -> `mounted = true`).
-- [ ] **2.2. Importación Dinámica (Dynamic Imports):** Cargar componentes pesados del lado del cliente o que accedan al objeto `window` (como el mapa de Leaflet de `/explorar`) usando `next/dynamic` con la opción `{ ssr: false }` desactivada.
-- [ ] **2.3. Supresión Selectiva de Advertencias:** Agregar el atributo `suppressHydrationWarning` únicamente en los elementos HTML específicos que muestren marcas de tiempo relativas (como "hace 5 minutos") para evitar advertencias molestas en la consola del iPhone.
+- [x] **2.1. Retraso de Renderizado en Fechas Clientes:** Envolver los componentes de visualización de horas o fechas dinámicas (por ejemplo, el reloj, horas de entrega estimadas, etc.) en un hook que espere a que el componente esté montado (`useEffect` -> `mounted = true`).
+- [x] **2.2. Importación Dinámica (Dynamic Imports):** Cargar componentes pesados del lado del cliente o que accedan al objeto `window` (como el mapa de Leaflet de `/explorar`) usando `next/dynamic` con la opción `{ ssr: false }` desactivada.
+- [x] **2.3. Supresión Selectiva de Advertencias:** Agregar el atributo `suppressHydrationWarning` únicamente en los elementos HTML específicos que muestren marcas de tiempo relativas (como "hace 5 minutos") para evitar advertencias molestas en la consola del iPhone.
 
 ### 🔊 3. Control de Bloqueos de Audio (`Autoplay / AudioContext`)
-- [ ] **3.1. Protección de Promesas de Reproducción:** Modificar todas las invocaciones de `.play()` en archivos de alerta de audio para asegurar que manejen la promesa de forma asíncrona dentro de un bloque `try-catch` (capturando `NotAllowedError` o `AbortError`).
-- [ ] **3.2. Botón de Activación de Sonido:** Diseñar e incorporar un botón o switch discreto de "Sonido Activo" en el panel del negocio que requiera una interacción física del usuario, inicializando el objeto `AudioContext` en el tap para desbloquear Safari.
-- [ ] **3.3. Estado de Audio en UI:** Reflejar visualmente al usuario o socio de negocio si el sonido está bloqueado o desbloqueado mediante iconos (ej. 🔊 / 🔇) para una excelente experiencia de usuario.
+- [x] **3.1. Protección de Promesas de Reproducción:** Modificar todas las invocaciones de `.play()` en archivos de alerta de audio para asegurar que manejen la promesa de forma asíncrona dentro de un bloque `try-catch` (capturando `NotAllowedError` o `AbortError`).
+- [x] **3.2. Botón de Activación de Sonido:** Diseñar e incorporar un botón o switch discreto de "Sonido Activo" en el panel del negocio que requiera una interacción física del usuario, inicializando el objeto `AudioContext` en el tap para desbloquear Safari.
+- [x] **3.3. Estado de Audio en UI:** Reflejar visualmente al usuario o socio de negocio si el sonido está bloqueado o desbloqueado mediante iconos (ej. 🔊 / 🔇) para una excelente experiencia de usuario.
 
 ### 📍 4. Geolocalización y Mapas Robustos
-- [ ] **4.1. Verificación previa de API:** Asegurar que antes de llamar a `navigator.geolocation.getCurrentPosition` se valide la existencia del API y se capturen todos los códigos de error (permiso denegado, posición no disponible, timeout).
-- [ ] **4.2. Coordenadas de Respaldo (Fallback Coords):** Configurar coordenadas estáticas predeterminadas (ej. coordenadas del centro de Bogotá) si falla la localización automática, garantizando que el mapa se cargue de todos modos.
-- [ ] **4.3. Banner explicativo de HTTPS / GPS:** Implementar un aviso en la interfaz del mapa que guíe amigablemente al usuario en iPhone sobre cómo otorgar permisos de ubicación o le indique que se requiere una conexión HTTPS segura.
+- [x] **4.1. Verificación previa de API:** Asegurar que antes de llamar a `navigator.geolocation.getCurrentPosition` se valide la existencia del API y se capturen todos los códigos de error (permiso denegado, posición no disponible, timeout).
+- [x] **4.2. Coordenadas de Respaldo (Fallback Coords):** Configurar coordenadas estáticas predeterminadas (ej. coordenadas del centro de Bogotá) si falla la localización automática, garantizando que el mapa se cargue de todos modos.
+- [x] **4.3. Banner explicativo de HTTPS / GPS:** Implementar un aviso en la interfaz del mapa que guíe amigablemente al usuario en iPhone sobre cómo otorgar permisos de ubicación o le indique que se requiere una conexión HTTPS segura.
 
 ### 💾 5. Blindaje del `localStorage` en Modo Privado
-- [ ] **5.1. Encapsulamiento del Storage:** Crear o utilizar una función envolvente para `localStorage` (`getItem`, `setItem`, `removeItem`) protegida con `try-catch` para evitar fallos catastróficos en modo incógnito de Safari.
-- [ ] **5.2. Memoria en Caché Temporal (Memory Fallback):** Implementar un almacenamiento de respaldo en memoria volátil (objeto plano de JavaScript) dentro de la utilidad de almacenamiento, para que si `localStorage` falla, la app siga operando con datos temporales durante la sesión.
-- [ ] **5.3. Cliente Supabase en Privado:** Asegurar que la configuración del cliente de autenticación de Supabase utilice un adaptador resistente o ignore de manera elegante la imposibilidad de persistir sesión si localStorage está deshabilitado por completo.
+- [x] **5.1. Encapsulamiento del Storage:** Crear o utilizar una función envolvente para `localStorage` (`getItem`, `setItem`, `removeItem`) protegida con `try-catch` para evitar fallos catastróficos en modo incógnito de Safari.
+- [x] **5.2. Memoria en Caché Temporal (Memory Fallback):** Implementar un almacenamiento de respaldo en memoria volátil (objeto plano de JavaScript) dentro de la utilidad de almacenamiento, para que si `localStorage` falla, la app siga operando con datos temporales durante la sesión.
+- [x] **5.3. Cliente Supabase en Privado:** Asegurar que la configuración del cliente de autenticación de Supabase utilice un adaptador resistente o ignore de manera elegante la imposibilidad de persistir sesión si localStorage está deshabilitado por completo.
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Lock, ShieldCheck, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
+import { safeLocalStorage } from "@/utils/storage";
 
 interface ComingSoonOverlayProps {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export default function ComingSoonOverlay({ children, title, description }: Comi
 
   useEffect(() => {
     // Check local storage on mount (prevents hydration mismatch)
-    const unlocked = localStorage.getItem("fowy_unlocked_preview") === "true";
+    const unlocked = safeLocalStorage.getItem("fowy_unlocked_preview") === "true";
     setIsUnlocked(unlocked);
   }, []);
 
@@ -47,7 +48,7 @@ export default function ComingSoonOverlay({ children, title, description }: Comi
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "8462Ee%829Vv") {
-      localStorage.setItem("fowy_unlocked_preview", "true");
+      safeLocalStorage.setItem("fowy_unlocked_preview", "true");
       setIsUnlocked(true);
       setShowSecretModal(false);
       toast.success("¡Desbloqueado con éxito! 🎉", {
@@ -62,7 +63,7 @@ export default function ComingSoonOverlay({ children, title, description }: Comi
   };
 
   const handleResetLock = () => {
-    localStorage.removeItem("fowy_unlocked_preview");
+    safeLocalStorage.removeItem("fowy_unlocked_preview");
     setIsUnlocked(false);
     toast.success("Módulo bloqueado nuevamente");
   };

@@ -153,7 +153,7 @@ export default function BusinessList({
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500" suppressHydrationWarning>
                       <Calendar size={16} className="text-slate-300" />
                       {new Date(b.payment_date).toLocaleDateString()}
                     </div>
@@ -230,7 +230,7 @@ export default function BusinessList({
                 </div>
                 <div className="bg-white/40 p-3 rounded-2xl border border-white/50">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Próximo Pago</span>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-600" suppressHydrationWarning>
                     <Calendar size={12} className="text-slate-400" />
                     {new Date(b.payment_date).toLocaleDateString()}
                   </div>

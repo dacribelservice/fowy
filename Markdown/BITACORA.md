@@ -673,3 +673,41 @@ Se consolidó una planificación meticulosa para la integración de cobros y mem
 
 *Última actualización: 09 de Mayo de 2026 - 02:15 AM*
 
+
+---
+
+## 💾 BLINDAJE DE STORAGE EN MODO PRIVADO — SESIÓN XX (11 de Mayo de 2026)
+**Encargado**: Antigravity AI
+**Estado**: ✅ COMPLETADO
+
+### 🎯 Objetivos Logrados (Sincronización con Hoja de Ruta)
+1. **Creación del Storage Wrapper Seguro (Fase 5.1)**: ✅
+   - Creación del archivo utilitario [storage.ts](file:///c:/Users/cange/Documents/fowy/src/utils/storage.ts) para encapsular las llamadas a `localStorage` (`getItem`, `setItem`, `removeItem`, `clear`) de forma segura.
+   - Protegido completamente con bloques `try-catch` y validaciones previas de `typeof window` para evitar fallos catastróficos durante el renderizado del lado del servidor (SSR) y en modos de navegación privada (incógnito) de Safari en iOS.
+
+2. **Memoria en Caché Temporal (Memory Fallback) (Fase 5.2)**: ✅
+   - Implementación de un respaldo volátil en memoria (`memoryStorage: Record<string, string>`) dentro del utilitario.
+   - Si `localStorage` está bloqueado o deshabilitado, la aplicación de manera automática conmuta a usar la memoria temporal de forma transparente.
+   - Refactorización de todos los hooks y componentes clave de la aplicación para hacer uso de este almacenamiento seguro:
+     - [useCart.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useCart.ts): Gestión y persistencia del carrito de compras (`fowy_cart`).
+     - [useOrderManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useOrderManager.ts): Estado del audio desbloqueado para alertas en tiempo real en iOS/Safari (`business_audio_unlocked`).
+     - [ComingSoonOverlay.tsx](file:///c:/Users/cange/Documents/fowy/src/components/partners/ComingSoonOverlay.tsx): Estado de la clave de previsualización del panel de socios (`fowy_unlocked_preview`).
+
+3. **Cliente Supabase en Modo Privado (Fase 5.3)**: ✅
+   - Modificación de [client.ts](file:///c:/Users/cange/Documents/fowy/src/utils/supabase/client.ts) para inyectar nuestro adaptador seguro en la inicialización del cliente de autenticación de Supabase (`createBrowserClient`), a través de la opción `auth: { storage: safeLocalStorage }`.
+   - Con esto se garantiza que si `localStorage` nativo está bloqueado por el navegador en modo incógnito, el flujo de autenticación, almacenamiento del JWT y la lógica de validación de sesión de Supabase continúen funcionando perfectamente en memoria sin generar excepciones en iOS Safari.
+
+### 📂 Archivos Modificados:
+- **Utilitario de Almacenamiento**: [storage.ts](file:///c:/Users/cange/Documents/fowy/src/utils/storage.ts) *(Creado)*
+- **Hook del Carrito**: [useCart.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useCart.ts)
+- **Gestor de Órdenes**: [useOrderManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useOrderManager.ts)
+- **Componente ComingSoon Overlay**: [ComingSoonOverlay.tsx](file:///c:/Users/cange/Documents/fowy/src/components/partners/ComingSoonOverlay.tsx)
+- **Cliente Supabase**: [client.ts](file:///c:/Users/cange/Documents/fowy/src/utils/supabase/client.ts)
+- **Hoja de Ruta**: [iPhone.md](file:///c:/Users/cange/Documents/fowy/Markdown/iPhone.md)
+
+### 📈 Resultado de Calidad:
+- **Tipado y Compilación**: 0 errores de TypeScript (`powershell -ExecutionPolicy Bypass -Command "npx tsc --noEmit"` verificado exitosamente).
+
+*Última actualización: 11 de Mayo de 2026 - 03:45 AM*
+
+

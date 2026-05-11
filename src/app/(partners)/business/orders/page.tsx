@@ -9,11 +9,17 @@ import {
   XCircle, 
   MessageCircle,
   Star,
-  TrendingUp
+  TrendingUp,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useOrderManager } from "@/hooks/useOrderManager";
+import { parseSafeDate } from "@/utils/bogotaTimeUtils";
+import { useMounted } from "@/hooks/useMounted";
+
+
 
 const supabase = createClient();
 const formatCurrency = (val: number) => `$${new Intl.NumberFormat("es-CO", { minimumFractionDigits: 0 }).format(val)}`;
@@ -22,10 +28,14 @@ export default function OrdersPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [businessRating, setBusinessRating] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
+  const mounted = useMounted();
+
   
   const { 
     orders, 
     loading: loadingOrders, 
+    isSoundActive,
+    toggleSound,
     updateOrderStatus 
   } = useOrderManager(businessId);
 
@@ -113,9 +123,32 @@ export default function OrdersPage() {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-bold border border-green-100">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          Conectado en vivo
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-bold border border-green-100">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Conectado en vivo
+          </div>
+
+          <button
+            onClick={toggleSound}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
+              isSoundActive
+                ? "bg-emerald-500 text-white border-emerald-400 hover:bg-emerald-600"
+                : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"
+            }`}
+          >
+            {isSoundActive ? (
+              <>
+                <Volume2 size={16} className="animate-pulse" />
+                <span>Sonido Activo 🔊</span>
+              </>
+            ) : (
+              <>
+                <VolumeX size={16} />
+                <span>Sonido Inactivo 🔇</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
@@ -198,9 +231,9 @@ export default function OrdersPage() {
                       </div>
                       <h3 className="text-xl font-bold text-slate-800">{order.customer_name}</h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" suppressHydrationWarning>
                           <Clock size={14} />
-                          {new Date(order.created_at).toLocaleTimeString()}
+                          {mounted ? parseSafeDate(order.created_at).toLocaleTimeString() : ""}
                         </div>
                         <div className="flex items-center gap-1 text-fowy-secondary font-medium">
                           <MessageCircle size={14} />

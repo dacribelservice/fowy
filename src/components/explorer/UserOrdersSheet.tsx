@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, X, Store, Calendar, ChevronDown, ChevronUp, RefreshCw, Star } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { parseSafeDate } from "@/utils/bogotaTimeUtils";
+import { useMounted } from "@/hooks/useMounted";
+
+
 
 export interface UserOrdersSheetProps {
   isOpen: boolean;
@@ -17,6 +21,8 @@ export function UserOrdersSheet({
   onReorder,
 }: UserOrdersSheetProps) {
   const [orders, setOrders] = useState<any[]>([]);
+  const mounted = useMounted();
+
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "completed" | "cancelled">("all");
@@ -249,8 +255,9 @@ export function UserOrdersSheet({
   };
 
   const formatDate = (dateString: string) => {
+    if (!mounted) return "";
     try {
-      const date = new Date(dateString);
+      const date = parseSafeDate(dateString);
       return date.toLocaleDateString("es-CO", {
         day: "numeric",
         month: "short",
@@ -388,7 +395,7 @@ export function UserOrdersSheet({
                               </h4>
                               <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
                                 <Calendar className="w-3 h-3 shrink-0" />
-                                <span>{formatDate(order.created_at)}</span>
+                                <span suppressHydrationWarning>{formatDate(order.created_at)}</span>
                               </div>
                             </div>
                           </div>

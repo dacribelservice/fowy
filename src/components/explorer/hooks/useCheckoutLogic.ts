@@ -53,8 +53,9 @@ export function useCheckoutLogic({
 
   // ── GPS: Geolocalización ──────────────────────────────────────────
   const handleShareLocation = () => {
-    if (typeof window === "undefined" || !navigator.geolocation) {
-      setValidationError("La geolocalización no está soportada por tu navegador o dispositivo.");
+    const isGeolocationAvailable = typeof window !== "undefined" && navigator && "geolocation" in navigator && !!navigator.geolocation;
+    if (!isGeolocationAvailable) {
+      setValidationError("La geolocalización no está soportada o está bloqueada por tu navegador/dispositivo.");
       return;
     }
     setIsLocating(true);
@@ -68,10 +69,22 @@ export function useCheckoutLogic({
       },
       (error) => {
         setIsLocating(false);
-        console.error("Error getting location", error);
-        setValidationError("No se pudo obtener tu ubicación. Por favor, escríbela manualmente.");
+        console.error("Error getting location:", error);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setValidationError("Permiso denegado. Por favor, autoriza el acceso al GPS en la configuración de tu iPhone/navegador o escribe tu dirección.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setValidationError("Ubicación no disponible. Asegúrate de tener buena señal GPS/Internet y que la conexión sea HTTPS segura.");
+            break;
+          case error.TIMEOUT:
+            setValidationError("La solicitud de GPS expiró. Por favor, vuelve a intentarlo o escribe tu dirección.");
+            break;
+          default:
+            setValidationError("No se pudo obtener tu ubicación. Por favor, escríbela manualmente.");
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
 

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { safeLocalStorage } from "@/utils/storage";
 
 export interface Order {
   id: string;
@@ -21,13 +22,27 @@ export function useOrderManager(businessId: string | null) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSoundActive, setIsSoundActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ordersRef = useRef<Order[]>([]);
+  const isSoundActiveRef = useRef(false);
 
-  // Sincronizar ref con estado para evitar stale closures en el callback
+  // Sincronizar refs con estado para evitar stale closures en el callback
   useEffect(() => {
     ordersRef.current = orders;
   }, [orders]);
+
+  useEffect(() => {
+    isSoundActiveRef.current = isSoundActive;
+  }, [isSoundActive]);
+
+  // Cargar estado guardado de audio al montar
+  useEffect(() => {
+    const saved = safeLocalStorage.getItem("business_audio_unlocked");
+    if (saved === "true") {
+      setIsSoundActive(true);
+    }
+  }, []);
 
   // Inicializar sonido
   useEffect(() => {
@@ -35,6 +50,29 @@ export function useOrderManager(businessId: string | null) {
       audioRef.current = new Audio("/sounds/cash-register.mp3");
     }
   }, []);
+
+  // Método interactivo para alternar el sonido y desbloquear Safari/iOS
+  const toggleSound = async () => {
+    if (!audioRef.current) return;
+    if (!isSoundActive) {
+      try {
+        // Reproducción silenciosa e instantánea para inicializar el contexto de WebKit
+        audioRef.current.muted = true;
+        await audioRef.current.play();
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.muted = false;
+        
+        setIsSoundActive(true);
+        safeLocalStorage.setItem("business_audio_unlocked", "true");
+      } catch (err) {
+        console.error("Failed to unlock audio context in Safari:", err);
+      }
+    } else {
+      setIsSoundActive(false);
+      safeLocalStorage.setItem("business_audio_unlocked", "false");
+    }
+  };
 
   const fetchOrders = useCallback(async () => {
     if (!businessId) return;
@@ -106,9 +144,15 @@ export function useOrderManager(businessId: string | null) {
             return [newOrder, ...prev];
           });
           
-          // Reproducir sonido de notificación
-          if (audioRef.current) {
-            audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+          // Reproducir sonido de notificación si el sonido está activo
+          if (isSoundActiveRef.current && audioRef.current) {
+            audioRef.current.play().catch((err) => {
+              if (err?.name === 'NotAllowedError' || err?.name === 'AbortError') {
+                console.warn('Audio play blocked or aborted by iOS browser:', err.name);
+              } else {
+                console.log("Audio play failed:", err);
+              }
+            });
           }
         }
       )
@@ -133,6 +177,8 @@ export function useOrderManager(businessId: string | null) {
     orders,
     loading,
     error,
+    isSoundActive,
+    toggleSound,
     updateOrderStatus,
     refreshOrders: fetchOrders
   };

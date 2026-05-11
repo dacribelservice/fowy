@@ -146,7 +146,7 @@ export default function DisputesPage() {
                   }`}>
                     {dispute.status === 'open' ? 'Abierta' : 'Resuelta'}
                   </span>
-                  <span className="text-[10px] opacity-50 font-bold">
+                  <span className="text-[10px] opacity-50 font-bold" suppressHydrationWarning>
                     {new Date(dispute.created_at).toLocaleDateString()}
                   </span>
                 </div>

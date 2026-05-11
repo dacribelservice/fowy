@@ -43,8 +43,12 @@ export default function BusinessNotificationListener() {
           (payload) => {
             console.log("¡Nuevo pedido recibido!", payload);
             if (audioRef.current) {
-              audioRef.current.play().catch(err => {
-                console.warn("No se pudo reproducir el sonido (posible bloqueo del navegador):", err);
+              audioRef.current.play().catch((err) => {
+                if (err?.name === 'NotAllowedError' || err?.name === 'AbortError') {
+                  console.warn('Audio play blocked or aborted by iOS browser:', err.name);
+                } else {
+                  console.warn("No se pudo reproducir el sonido (posible bloqueo del navegador):", err);
+                }
               });
             }
           }
