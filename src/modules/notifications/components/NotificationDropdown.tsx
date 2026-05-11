@@ -6,6 +6,7 @@ import { useNotifications } from '../NotificationProvider';
 import { NotificationItem } from './NotificationItem';
 import { Bell, Settings } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface NotificationDropdownProps {
   onClose: () => void;
@@ -14,10 +15,14 @@ interface NotificationDropdownProps {
 export const NotificationDropdown = ({ onClose }: NotificationDropdownProps) => {
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const pathname = usePathname();
 
   const filteredNotifications = filter === 'unread' 
     ? notifications.filter(n => !n.is_read)
     : notifications;
+
+  const isBusiness = pathname?.startsWith('/business');
+  const historyLink = isBusiness ? '/business/notifications' : '/admin/notifications';
 
   return (
     <motion.div
@@ -109,7 +114,7 @@ export const NotificationDropdown = ({ onClose }: NotificationDropdownProps) => 
       {/* Footer */}
       <div className="p-4 bg-gray-50/50 border-t border-gray-100/50 flex justify-between items-center">
         <Link 
-          href="/admin/notifications" 
+          href={historyLink} 
           onClick={onClose}
           className="text-xs font-bold text-gray-900 hover:text-indigo-600 transition-colors flex items-center gap-2"
         >
