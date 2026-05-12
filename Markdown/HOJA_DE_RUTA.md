@@ -535,7 +535,7 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 ---
 
 ### 🎨 23.1 Creación del Componente de Bloqueo Modular e Inteligente (`BusinessMembershipGuard`)
-- [ ] **23.1.1 Arquitectura del Componente**:
+- [x] **23.1.1 Arquitectura del Componente**:
     - Crear el componente `BusinessMembershipGuard.tsx` en `src/components/partners/` de forma aislada y limpia.
     - Utilizar el cliente singleton de Supabase y las utilidades `getBogotaDate` y `parseSafeDate` de `bogotaTimeUtils.ts` para asegurar sincronización de tiempo inquebrantable e invulnerabilidad en motores WebKit (iOS/Safari).
 - [ ] **23.1.2 Algoritmo de Sensado de Días de Retraso**:
