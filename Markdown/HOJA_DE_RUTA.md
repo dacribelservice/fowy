@@ -538,47 +538,47 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 - [x] **23.1.1 Arquitectura del Componente**:
     - Crear el componente `BusinessMembershipGuard.tsx` en `src/components/partners/` de forma aislada y limpia.
     - Utilizar el cliente singleton de Supabase y las utilidades `getBogotaDate` y `parseSafeDate` de `bogotaTimeUtils.ts` para asegurar sincronización de tiempo inquebrantable e invulnerabilidad en motores WebKit (iOS/Safari).
-- [ ] **23.1.2 Algoritmo de Sensado de Días de Retraso**:
+- [x] **23.1.2 Algoritmo de Sensado de Días de Retraso**:
     - Consultar el campo `payment_date` de la tabla `businesses` para el usuario logueado en tiempo real.
     - Calcular la diferencia exacta de días transcurridos (`diffDays`) entre la fecha oficial de Bogotá y la fecha de vencimiento (`diffDays = hoy - payment_date`).
     - Clasificar el estado del comercio en tres fases de membresía:
         - **Membresía al Día** (`diffDays < 0`): No mostrar alertas.
         - **Etapa 1: Alerta Flexible** (`0 <= diffDays <= 7`): Mostrar alerta temporal con opción de postergar + mini-cápsula persistente titilante.
         - **Etapa 2: Bloqueo Total** (`diffDays > 7` o día 8 en adelante): Bloqueo absoluto del panel con botón de acción única.
-- [ ] **23.1.3 Persistencia de Postergación de Alerta (Session Control)**:
+- [x] **23.1.3 Persistencia de Postergación de Alerta (Session Control)**:
     - Implementar almacenamiento en `sessionStorage` (ej. `fowy_membership_dismissed_date`) para recordar que el usuario ya cerró la alerta flexible de pantalla completa en la sesión actual, evitando interrumpir repetidamente su navegación mientras opera.
 
 ---
 
 ### 🧊 23.2 Diseño Visual de Interfaz por Etapas (Ethereal High-Tech Styling)
-- [ ] **23.2.1 Etapa 1: Diseño del Intersticial Flexible (Días 0 a 7)**:
+- [x] **23.2.1 Etapa 1: Diseño del Intersticial Flexible (Días 0 a 7)**:
     - **Vidrio de Fondo**: Pantalla completa translúcida con desenfoque de fondo premium (`backdrop-blur-md bg-slate-950/60`).
     - **Cápsula de Alerta**: Tarjeta central cilíndrica con bordes muy redondeados (`rounded-[40px]` o `rounded-[50px]`) usando vidrio blanco premium (`bg-white/90 backdrop-blur-2xl border border-white`).
     - **Contorno de Halo Vibrante**: Sombra externa difusa en color rojo/naranja suave (`shadow-[0_20px_50px_rgba(255,90,95,0.15)]`).
     - **Botonera de Doble Acción**:
         - **Botón "Pagar Ahora"**: Botón cilíndrico tipo píldora con degradado *Primary Energy* (`from-[#FF5A5F] to-[#FF9A3D]`), relieve táctil y micro-interacción al presionar (`whileTap={{ scale: 0.95 }}`) que redirige suavemente a `/business/finanzas`.
         - **Botón "Hacerlo más tarde"**: Enlace o píldora secundaria estilizada, discreta y elegante que guarda el flag en `sessionStorage` y descarta el modal de pantalla completa temporalmente.
-- [ ] **23.2.2 Etapa 1: Diseño de la Mini-Cápsula Persistente y Titilante**:
+- [x] **23.2.2 Etapa 1: Diseño de la Mini-Cápsula Persistente y Titilante**:
     - Desarrollar un mini-badge o píldora ultra-discreta cilíndrica (`rounded-full bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] px-4 py-1.5`) integrada en el layout global o barra de navegación.
     - Integrar un indicador LED titilante en rojo vibrante al lado del texto *"Membresía por Vencer 💳"* o *"Pago Pendiente ⏳"*.
     - Aplicar una animación dinámica `pulse` en bucle continuo utilizando `framer-motion` para captar la atención del dueño sin obstruir sus operaciones de despacho o menú.
-- [ ] **23.2.3 Etapa 2: Diseño del Bloqueo Infranqueable (Día 8 en Adelante)**:
+- [x] **23.2.3 Etapa 2: Diseño del Bloqueo Infranqueable (Día 8 en Adelante)**:
     - **Fondo de Bloqueo Absoluto**: Capa protectora a pantalla completa sobre las pestañas operativas (`backdrop-blur-xl bg-slate-950/80` o similar).
     - **Tarjeta de Bloqueo Cilíndrica Inmóvil**: Píldora gigante central (`rounded-[40px] bg-white border-2 border-[#FF5A5F]`) con título imperativo *"Panel Bloqueado 💳"* y descripción: *"Su membresía tiene más de 7 días de vencimiento. Para continuar usando las herramientas del panel de negocios, por favor cargue su comprobante de pago."*
     - **Botón Único**: Píldora con degradado vibrante *"Pagar Membresía / Ir a Finanzas"*. No existe botón de posponer ni de escape. El panel queda 100% inhabilitado en rutas de negocio.
-- [ ] **23.2.4 Excepción del Panel de Finanzas (`/business/finanzas`)**:
+- [x] **23.2.4 Excepción del Panel de Finanzas (`/business/finanzas`)**:
     - Garantizar que al navegar a `/business/finanzas`, el bloqueo de pantalla completa (tanto de Etapa 1 como de Etapa 2) se desvanezca por completo para liberar el cargador de archivos (`input[type="file"]`).
     - En su lugar, mostrar en la parte superior o inferior de la pantalla de Finanzas un banner cilíndrico horizontal estilizado (`rounded-[20px] bg-amber-500/10 border border-amber-500/20 text-amber-700 px-6 py-3 flex items-center justify-between`) que advierta el vencimiento de forma discreta pero firme.
 
 ---
 
 ### 🔌 23.3 Integración, Rutas Inteligentes y Despliegue en el Layout
-- [ ] **23.3.1 Inyección en el Layout de Socios**:
+- [x] **23.3.1 Inyección en el Layout de Socios**:
     - Importar y montar el componente `<BusinessMembershipGuard />` en el archivo principal del layout: `src/app/(partners)/business/layout.tsx`.
     - Detectar cambios de ruta en tiempo real utilizando `usePathname()`.
-- [ ] **23.3.2 Exclusión de Planes Especiales**:
+- [x] **23.3.2 Exclusión de Planes Especiales**:
     - Asegurar que la lógica de cobro no afecte a negocios con planes que no estén sujetos a restricción inmediata, tales como cuentas bajo el plan `trial` (de prueba activo), `gratis` o cuentas de desarrollo/admin.
-- [ ] **23.3.3 Verificación y Pruebas del Flujo Completo**:
+- [x] **23.3.3 Verificación y Pruebas del Flujo Completo**:
     - Probar localmente modificando el valor de `payment_date` en la base de datos simulando:
         - Escenario A (Día de pago no vencido): Sin avisos.
         - Escenario B (Días de mora de 0 a 7): Aparición del modal con 2 botones, guardado correcto de la evasión en la sesión, y renderizado hermoso de la mini-cápsula titilante.
@@ -586,3 +586,4 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
 
 ---
  *Documento consolidado - FOWY 2026*
+
