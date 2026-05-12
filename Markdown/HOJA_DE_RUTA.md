@@ -527,6 +527,50 @@ Este es el registro único de verdad. Combina todos los checklists de `nucleo.md
         - **Pilar 2: Descubrimiento Orgánico**: Tráfico cruzado y colaborativo donde el éxito de un comercio impulsa las visitas de todos sus vecinos cercanos en el mapa dinámico.
         - **Pilar 3: Economía Circular Local**: El dinero de la comunidad fluye internamente de vecino a vecino: el comerciante vende directo, contrata profesionales de su misma zona para marketing/contabilidad, y los repartidores del vecindario (Moto-Fowy) obtienen ingresos 100% directos y dignos.
 
+---
+
+## 🛡️ FASE 23: SISTEMA DE ALERTA Y BLOQUEO DE MEMBRESÍA VENCIDA (VERSIÓN 2.8.0)
+*Objetivo: Implementar un sistema de bloqueo visual cilíndrico de alta estética en todas las pestañas de administración del negocio cuando el mes de pago esté vencido, protegiendo las vistas clave, pero habilitando dinámicamente el acceso completo al panel de finanzas (/business/finanzas) para que el comerciante pueda cargar su comprobante de pago.*
+
+---
+
+### 🎨 23.1 Creación del Componente Modular de Bloqueo (BusinessMembershipGuard)
+- [ ] **23.1.1 Arquitectura del Componente**:
+    - Crear el componente `BusinessMembershipGuard.tsx` en `src/components/partners/` de forma completamente aislada de la página.
+    - Utilizar el cliente singleton de Supabase y `getBogotaDate` / `parseSafeDate` de `bogotaTimeUtils.ts` para asegurar sincronización de tiempo y compatibilidad del motor iOS (WebKit).
+- [ ] **23.1.2 Lógica de Estado de Vencimiento**:
+    - Consultar el campo `payment_date` de la tabla `businesses` para el usuario logueado.
+    - Comparar la fecha de expiración contra la fecha oficial actual de Bogotá.
+    - Determinar el estado `isExpired = bogotaToday > expirationDate`.
+- [ ] **23.1.3 Comportamiento Inteligente por Ruta**:
+    - Obtener la ruta activa con `usePathname()` de Next.js.
+    - Si el negocio está vencido (`isExpired === true`):
+        - En rutas operativas (ej. `/business`, `/business/orders`, `/business/menu`, `/business/perfil`): Activar el bloqueo en pantalla completa.
+        - En la ruta `/business/finanzas`: Desactivar el bloqueo de pantalla completa y, en su lugar, mostrar un banner de aviso cilíndrico en la parte inferior de la pantalla para permitir la carga del comprobante de pago.
+
+---
+
+### 🧊 23.2 Diseño Visual del Bloqueo Cilíndrico (Ethereal High-Tech Styling)
+- [ ] **23.2.1 Contenedor de Cristal y Desenfoque**:
+    - Diseñar un fondo de pantalla completa con desenfoque de fondo premium (`backdrop-blur-md bg-slate-950/60`).
+    - Renderizar una tarjeta flotante de forma cilíndrica/cápsula con bordes curvos muy amplios (`rounded-[40px]` o `rounded-[50px]`) utilizando un vidrio blanco traslúcido (`bg-white/85 backdrop-blur-2xl border border-white`).
+- [ ] **23.2.2 Indicadores Visuales de Alerta**:
+    - Añadir una sombra difusa externa (glow) de color rojo/naranja en el contorno del cilindro (`shadow-[0_20px_50px_rgba(255,90,95,0.2)]`).
+    - Integrar un icono animado vectorizado (ej. `Lock` o `CreditCard`) en rojo vibrante que pulse o rebote en bucle continuo con `framer-motion`.
+- [ ] **23.2.3 Micro-interacciones y Botón de Acción**:
+    - Colocar textos premium: Título *"Membresía Vencida 💳"* y descripción indicando que se debe cargar el comprobante para reactivar el panel.
+    - Diseñar el botón de acción como una píldora cilíndrica perfecta con degradado *Primary Energy* (`from-[#FF5A5F] to-[#FF9A3D]`).
+    - Añadir efecto de relieve táctil y micro-interacción al presionar (`whileTap={{ scale: 0.95 }}`) que redirija al usuario a `/business/finanzas`.
+
+---
+
+### 🔌 23.3 Integración y Despliegue en el Layout de Socios
+- [ ] **23.3.1 Inyección en el Layout Principal**:
+    - Importar y montar el `<BusinessMembershipGuard />` en el archivo `src/app/(partners)/business/layout.tsx`.
+    - Garantizar que el componente no interrumpa la carga de la aplicación para planes no restringidos (`trial`, `gratis`, etc.).
+- [ ] **23.3.2 Verificación de Flujo Completo**:
+    - Validar que al expirar la fecha, las pestañas operativas queden inaccesibles mostrando la cápsula flotante.
+    - Confirmar que al dar clic en el botón de acción se realice la navegación suave y se libere la pantalla de finanzas de forma limpia para permitir la subida del archivo.
 
 ---
  *Documento consolidado - FOWY 2026*
