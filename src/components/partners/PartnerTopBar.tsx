@@ -221,7 +221,7 @@ export default function PartnerTopBar() {
         </div>
         
         {/* Profile Summary */}
-        <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+        <div className="hidden sm:flex items-center gap-3 pl-4 border-l border-slate-200">
           <div className="hidden sm:block text-right">
             <p className="text-sm font-black text-slate-800 leading-none">
               {businessName ?? 'Socio FOWY'}

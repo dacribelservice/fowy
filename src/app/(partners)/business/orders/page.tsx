@@ -81,7 +81,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
         <div>
           <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
             Pedidos en Tiempo Real 🛒
@@ -122,33 +122,35 @@ export default function OrdersPage() {
               </span>
             </div>
           )}
-        </div>
-        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-bold border border-green-100">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Conectado en vivo
-          </div>
 
-          <button
-            onClick={toggleSound}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
-              isSoundActive
-                ? "bg-emerald-500 text-white border-emerald-400 hover:bg-emerald-600"
-                : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"
-            }`}
-          >
-            {isSoundActive ? (
-              <>
-                <Volume2 size={16} className="animate-pulse" />
-                <span>Sonido Activo 🔊</span>
-              </>
-            ) : (
-              <>
-                <VolumeX size={16} />
-                <span>Sonido Inactivo 🔇</span>
-              </>
-            )}
-          </button>
+          {/* Conexión y Control de Sonido (Cilíndricos y apilados verticalmente debajo del ranking) */}
+          <div className="flex flex-col items-start gap-2.5 mt-4 px-1">
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-bold border border-green-100 w-fit">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              Conectado en vivo
+            </div>
+
+            <button
+              onClick={toggleSound}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98] w-fit ${
+                isSoundActive
+                  ? "bg-emerald-500 text-white border-emerald-400 hover:bg-emerald-600"
+                  : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"
+              }`}
+            >
+              {isSoundActive ? (
+                <>
+                  <Volume2 size={16} className="animate-pulse" />
+                  <span>Sonido Activo 🔊</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX size={16} />
+                  <span>Sonido Inactivo 🔇</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
