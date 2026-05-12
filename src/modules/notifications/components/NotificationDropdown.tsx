@@ -30,7 +30,7 @@ export const NotificationDropdown = ({ onClose }: NotificationDropdownProps) => 
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="absolute right-0 mt-3 w-[380px] origin-top-right rounded-[24px] border border-white/20 bg-white/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden z-50 flex flex-col"
+      className="fixed md:absolute left-4 right-4 md:left-auto md:right-0 mx-auto md:mx-0 top-24 md:top-auto md:mt-3 max-w-[380px] md:w-[380px] origin-top md:origin-top-right rounded-[24px] border border-white/20 bg-white/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden z-50 flex flex-col"
     >
       {/* Header */}
       <div className="p-5 border-b border-gray-100/50 bg-white/40">

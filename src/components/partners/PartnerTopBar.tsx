@@ -115,7 +115,7 @@ export default function PartnerTopBar() {
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-      {pathname !== "/business/orders" ? (
+      {pathname !== "/business/orders" && pathname !== "/business/perfil" ? (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
