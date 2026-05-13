@@ -71,16 +71,16 @@ export default function BusinessTagsManager({
             return (
               <motion.button
                 key={catName}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.05, y: -1 }}
+                whileTap={{ scale: 0.94 }}
                 onClick={() => toggleCategory(catName)}
-                className={`px-4 py-2.5 rounded-2xl border text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-4 py-2.5 rounded-2xl text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer border ${
                   isSelected
-                    ? 'bg-[#7B61FF]/10 border-[#7B61FF]/25 text-[#7B61FF]'
-                    : 'bg-white/40 border-slate-100 text-slate-500 hover:border-slate-200 hover:bg-white'
+                    ? "bg-gradient-to-r from-[#7B61FF] to-[#4D8BFF] text-white border-white/20 shadow-md shadow-indigo-500/15"
+                    : "bg-white/45 border-slate-200/70 text-slate-600 hover:border-[#4D8BFF]/40 hover:bg-white hover:text-[#4D8BFF]"
                 }`}
               >
-                {isSelected && <Check size={14} />}
+                {isSelected && <Check size={14} className="stroke-[3px]" />}
                 {catName}
               </motion.button>
             );
