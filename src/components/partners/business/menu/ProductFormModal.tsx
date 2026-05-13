@@ -297,13 +297,26 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                    <Layers size={16} className="text-fowy-secondary" />
-                    Categoría
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                      <Layers size={16} className="text-fowy-secondary" />
+                      Categoría
+                    </label>
+                    {isGlobal && (
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-slate-200 uppercase tracking-wider">
+                        <Lock size={10} /> Oficial
+                      </span>
+                    )}
+                  </div>
                   <select 
                     required
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 focus:bg-white transition-all text-slate-700 font-medium appearance-none"
+                    disabled={isGlobal}
+                    className={cn(
+                      "w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 transition-all font-medium appearance-none",
+                      isGlobal 
+                        ? "bg-slate-100/60 border-slate-200 text-slate-400 cursor-not-allowed" 
+                        : "bg-slate-50 border-slate-100 focus:bg-white text-slate-700"
+                    )}
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
                   >

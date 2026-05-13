@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Image as ImageIcon, Upload, Check, AlertCircle, RefreshCw, Layers } from "lucide-react";
+import { X, Image as ImageIcon, Upload, Check, AlertCircle, RefreshCw, Layers, Lock } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { storageService } from "@/services/storageService";
 import { GlobalCategory, GlobalProduct } from "@/types/catalogo";
@@ -38,8 +38,13 @@ export default function ProductFormModal({
       setError(null);
       setName(product?.name || "");
       setDescription(product?.description || "");
-      setCategoryId(product?.global_category_id || categories[0]?.id || "");
-      setCategoryDefault(product?.category_default || "");
+      
+      const initialCatId = product?.global_category_id || categories[0]?.id || "";
+      setCategoryId(initialCatId);
+      
+      const selectedCat = categories.find((c) => c.id === initialCatId);
+      setCategoryDefault(product?.category_default || selectedCat?.name || "");
+      
       setImagePreview(product?.image_url || null);
       setImageFile(null);
       setIsActive(product ? product.is_active : true);
@@ -236,18 +241,20 @@ export default function ProductFormModal({
                   <label className="block text-xs font-black uppercase tracking-wider text-slate-500">
                     Categoría por Defecto en Comercio Local
                   </label>
-                  <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">Autocompletado</span>
+                  <span className="text-[10px] bg-slate-100 text-slate-400 px-2.5 py-1 rounded-lg font-bold border border-slate-200 flex items-center gap-1 uppercase tracking-wider">
+                    <Lock size={10} /> Sincronizado
+                  </span>
                 </div>
                 <input
                   type="text"
-                  disabled={saving}
+                  disabled={true}
                   value={categoryDefault}
                   onChange={(e) => setCategoryDefault(e.target.value)}
-                  placeholder="Ej. Gaseosas, Cervezas Importadas, Licores..."
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fowy-red/10 focus:border-fowy-red transition-all"
+                  placeholder="Se autocompleta con la categoría circular global"
+                  className="w-full px-4 py-3 bg-slate-100/60 border border-slate-200 rounded-xl text-slate-400 cursor-not-allowed font-medium focus:outline-none transition-all"
                 />
-                <p className="text-[10px] text-slate-400 font-medium">
-                  Es la categoría del menú local donde se colocará este producto cuando un comercio lo agregue. Si se deja en blanco, usará el nombre de la categoría circular global.
+                <p className="text-[10px] text-slate-400 font-semibold flex items-center gap-1 mt-1">
+                  💡 Se creará automáticamente esta categoría en el menú de los negocios con el mismo nombre de la Categoría Circular Global.
                 </p>
               </div>
 
