@@ -87,7 +87,7 @@ Esta fase integra la capacidad de crear categorías globales representadas por i
   - Renderizar las categorías globales como círculos perfectos (`w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 shadow-sm backdrop-blur-md`) usando `PremiumImage`.
 - [x] **5.8 Pestaña/Subpantalla de Selección de Productos**:
   - Al dar clic en una categoría circular (ej. "Coca-Cola"), transicionar mediante Framer Motion hacia una subvista que muestre todos los productos del catálogo asociados a ella.
-- [ ] **5.9 Switch Táctil de Activación y Automatización de Categoría Local**:
+- [x] **5.9 Switch Táctil de Activación y Automatización de Categoría Local**:
   - **Lógica Inteligente de Creación Automática de Categoría**: Al activar el Switch del producto global (ej. "Coca-Cola Original 350ml"):
     - Fowy buscará si el negocio ya posee una categoría local con el nombre exacto de la categoría global ("Coca-Cola").
     - Si **no existe**, Fowy creará la categoría local automáticamente.
@@ -95,8 +95,8 @@ Esta fase integra la capacidad de crear categorías globales representadas por i
   - **Edición Inline de Precios**: Habilitar campos inmediatos para fijar el **Precio Local** y una **Descripción Local** opcional en caliente sin cerrar la pestaña.
 
 #### 📱 Bloque 4: Menú Digital del Cliente (Explorer Edition)
-- [ ] **5.10 Renderizado Dinámico en la Barra de Categorías**:
+- [x] **5.10 Renderizado Dinámico en la Barra de Categorías**:
   - Asegurar que la categoría creada automáticamente por el sistema (ej. "Coca-Cola") se renderice como una píldora seleccionable en la barra horizontal de categorías del cliente.
-- [ ] **5.11 Carga Elegante de Productos Activos**:
+- [x] **5.11 Carga Elegante de Productos Activos**:
   - Mostrar los productos globales activados bajo la categoría correspondiente, consumiendo dinámicamente la imagen oficial de catálogo mediante `PremiumImage` y el precio local fijado por el comercio.
 

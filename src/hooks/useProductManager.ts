@@ -17,6 +17,7 @@ export interface Product {
   is_offer: boolean;
   is_recommended: boolean;
   category_name: string;
+  category_id?: string | null;
   created_at?: string;
   global_products?: any;
 }

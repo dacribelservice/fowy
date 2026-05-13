@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { 
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProductManager, type Product } from "@/hooks/useProductManager";
+import { useCategoryManager, type MenuCategory } from "@/hooks/useCategoryManager";
 import MenuCategoryManager from "@/components/partners/business/menu/MenuCategoryManager";
 import ProductFormModal from "@/components/partners/business/menu/ProductFormModal";
 import DeleteConfirmationModal from "@/components/partners/business/menu/DeleteConfirmationModal";
@@ -36,7 +37,273 @@ interface Business {
   tags: string[];
 }
 
+interface GlobalProductCardProps {
+  gp: GlobalProduct;
+  isActive: boolean;
+  activeProduct: Product | undefined;
+  selectedGlobalCat: GlobalCategory;
+  localCategories: MenuCategory[];
+  addLocalCategory: (name: string) => Promise<any>;
+  addProduct: (product: any) => Promise<any>;
+  deleteProduct: (id: string) => Promise<boolean>;
+  updateProduct: (id: string, updates: any) => Promise<any>;
+}
 
+function GlobalProductCard({
+  gp,
+  isActive,
+  activeProduct,
+  selectedGlobalCat,
+  localCategories,
+  addLocalCategory,
+  addProduct,
+  deleteProduct,
+  updateProduct
+}: GlobalProductCardProps) {
+  const [priceInput, setPriceInput] = useState(activeProduct ? activeProduct.price.toString() : "");
+  const [descInput, setDescInput] = useState(activeProduct ? activeProduct.description : "");
+  const [isSaving, setIsSaving] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const priceInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (activeProduct) {
+      setPriceInput(activeProduct.price.toString());
+      setDescInput(activeProduct.description || "");
+    } else {
+      setPriceInput("");
+      setDescInput("");
+    }
+  }, [activeProduct]);
+
+  useEffect(() => {
+    if (isActive) {
+      setTimeout(() => {
+        priceInputRef.current?.focus();
+        priceInputRef.current?.select();
+      }, 150);
+    }
+  }, [isActive]);
+
+  const handleSaveInline = async () => {
+    if (!activeProduct) return;
+    const priceValue = parseFloat(priceInput);
+    const finalPrice = isNaN(priceValue) ? 0 : priceValue;
+    const finalDesc = descInput.trim();
+
+    if (finalPrice === activeProduct.price && finalDesc === (activeProduct.description || "")) {
+      return;
+    }
+
+    setIsSaving(true);
+    setJustSaved(false);
+
+    const updated = await updateProduct(activeProduct.id, {
+      price: finalPrice,
+      description: finalDesc
+    });
+
+    setIsSaving(false);
+    if (updated) {
+      setJustSaved(true);
+      toast.success(`"${gp.name}" actualizado.`);
+      setTimeout(() => setJustSaved(false), 2000);
+    } else {
+      toast.error("Error al guardar los cambios.");
+    }
+  };
+
+  const handleToggleSwitch = async () => {
+    if (isActive && activeProduct) {
+      const confirm = window.confirm(`¿Estás seguro de que deseas eliminar "${gp.name}" de tu menú?`);
+      if (confirm) {
+        setIsSaving(true);
+        const ok = await deleteProduct(activeProduct.id);
+        setIsSaving(false);
+        if (ok) {
+          toast.success(`"${gp.name}" eliminado de tu menú.`);
+        } else {
+          toast.error(`Error al eliminar "${gp.name}".`);
+        }
+      }
+    } else {
+      setIsSaving(true);
+      try {
+        let localCat = localCategories.find(
+          c => c.name.trim().toLowerCase() === selectedGlobalCat.name.trim().toLowerCase()
+        );
+
+        if (!localCat) {
+          localCat = await addLocalCategory(selectedGlobalCat.name);
+          if (!localCat) {
+            toast.error("Error al crear la categoría automáticamente.");
+            return;
+          }
+          toast.success(`Categoría "${selectedGlobalCat.name}" creada automáticamente.`);
+        }
+
+        const newProduct = await addProduct({
+          global_product_id: gp.id,
+          name: gp.name,
+          description: gp.description || "",
+          price: 0,
+          image_url: gp.image_url || "",
+          category_name: localCat.name,
+          category_id: localCat.id,
+          in_stock: true,
+          is_active: true,
+          is_new: false,
+          is_offer: false,
+          is_recommended: false
+        });
+
+        if (newProduct) {
+          toast.success(`"${gp.name}" agregado a tu menú.`);
+        } else {
+          toast.error("Error al agregar el producto.");
+        }
+      } catch (err) {
+        console.error("Error toggling global product:", err);
+        toast.error("Ocurrió un error.");
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  return (
+    <motion.div
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      className="bg-white border border-slate-100 rounded-3xl p-4 flex flex-col justify-between hover:shadow-premium hover:border-fowy-secondary/20 transition-all shadow-sm"
+    >
+      <div>
+        {/* Imagen de Producto Global */}
+        <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
+          <PremiumImage
+            src={gp.image_url || ""}
+            alt={gp.name}
+            className="w-full h-full object-cover"
+            fallbackType="generic"
+          />
+          {gp.category_default && (
+            <span className="absolute top-3 left-3 bg-slate-900/65 backdrop-blur-md text-white text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              {gp.category_default}
+            </span>
+          )}
+        </div>
+
+        {/* Detalles */}
+        <h4 className="font-extrabold text-slate-800 text-base line-clamp-1">
+          {gp.name}
+        </h4>
+        <p className="text-xs text-slate-400 mt-1 line-clamp-2 min-h-[32px] leading-relaxed">
+          {gp.description || "Sin descripción predeterminada."}
+        </p>
+      </div>
+
+      <div>
+        {/* Interactive Switch Container */}
+        <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              Estado Menú
+            </span>
+            <span className={`text-xs font-extrabold ${isActive ? "text-fowy-secondary" : "text-slate-400"}`}>
+              {isActive ? "Activo" : "Inactivo"}
+            </span>
+          </div>
+          
+          {/* Switch component with Framer Motion */}
+          <button
+            onClick={handleToggleSwitch}
+            disabled={isSaving}
+            className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 focus:outline-none flex items-center cursor-pointer ${
+              isActive ? "bg-[#7B61FF]" : "bg-slate-200"
+            } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <motion.div
+              layout
+              className="w-5 h-5 bg-white rounded-full shadow-md"
+              animate={{ x: isActive ? 20 : 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+          </button>
+        </div>
+
+        {/* Expandable pricing form */}
+        <AnimatePresence>
+          {isActive && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden mt-4 pt-4 border-t border-slate-100 space-y-3"
+            >
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Precio Local ($)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">$</span>
+                  <input
+                    ref={priceInputRef}
+                    type="number"
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    onBlur={handleSaveInline}
+                    placeholder="0"
+                    className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 focus:bg-white transition-all text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Descripción Local (Opcional)
+                </label>
+                <textarea
+                  value={descInput}
+                  onChange={(e) => setDescInput(e.target.value)}
+                  onBlur={handleSaveInline}
+                  placeholder="Ej: Servido bien frío..."
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 focus:bg-white transition-all text-slate-700 resize-none"
+                />
+              </div>
+
+              {/* Save Button & Feedback Status */}
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-[10px] text-slate-400 font-medium">
+                  {isSaving ? "Guardando..." : justSaved ? "¡Guardado!" : "Cambios se guardan al salir"}
+                </span>
+                <button
+                  onClick={handleSaveInline}
+                  disabled={isSaving}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+                    justSaved 
+                      ? "bg-green-500/10 text-green-600" 
+                      : "bg-fowy-secondary text-white hover:opacity-90"
+                  }`}
+                >
+                  {isSaving ? (
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : justSaved ? (
+                    <>
+                      <CheckCircle2 size={12} />
+                      Listo
+                    </>
+                  ) : (
+                    "Guardar"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function MenuManagementPage() {
   const supabase = createClient();
@@ -116,12 +383,19 @@ export default function MenuManagementPage() {
     fetchGlobalProducts();
   }, [selectedGlobalCat, supabase]);
   
+  const {
+    categories: localCategories,
+    addCategory: addLocalCategory
+  } = useCategoryManager(businessId);
+
   const { 
     products, 
     loading: loadingProds, 
     toggleStock,
     toggleOffer,
     deleteProduct,
+    addProduct,
+    updateProduct,
     refreshProducts 
   } = useProductManager(businessId);
 
@@ -349,80 +623,18 @@ export default function MenuManagementPage() {
                   const isActive = activeGlobalProductIds.has(gp.id);
                   const activeProduct = products.find(p => p.global_product_id === gp.id);
                   return (
-                    <motion.div
+                    <GlobalProductCard
                       key={gp.id}
-                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                      className="bg-white border border-slate-100 rounded-3xl p-4 flex flex-col justify-between hover:shadow-premium hover:border-fowy-secondary/20 transition-all shadow-sm"
-                    >
-                      <div>
-                        {/* Imagen de Producto Global */}
-                        <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
-                          <PremiumImage
-                            src={gp.image_url || ""}
-                            alt={gp.name}
-                            className="w-full h-full object-cover"
-                            fallbackType="generic"
-                          />
-                          {gp.category_default && (
-                            <span className="absolute top-3 left-3 bg-slate-900/65 backdrop-blur-md text-white text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                              {gp.category_default}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Detalles */}
-                        <h4 className="font-extrabold text-slate-800 text-base line-clamp-1">
-                          {gp.name}
-                        </h4>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2 min-h-[32px] leading-relaxed">
-                          {gp.description || "Sin descripción predeterminada."}
-                        </p>
-                      </div>
-
-                      {/* Interactive Switch Container */}
-                      <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                            Estado Menú
-                          </span>
-                          <span className={`text-xs font-extrabold ${isActive ? "text-fowy-secondary" : "text-slate-400"}`}>
-                            {isActive ? "Activo" : "Inactivo"}
-                          </span>
-                        </div>
-                        
-                        {/* Switch component with Framer Motion */}
-                        <button
-                          onClick={async () => {
-                            if (isActive && activeProduct) {
-                              // Si ya está activo, lo eliminamos con toast
-                              const confirm = window.confirm(`¿Estás seguro de que deseas eliminar "${gp.name}" de tu menú?`);
-                              if (confirm) {
-                                const ok = await deleteProduct(activeProduct.id);
-                                if (ok) {
-                                  toast.success(`"${gp.name}" eliminado de tu menú.`);
-                                } else {
-                                  toast.error(`Error al eliminar "${gp.name}".`);
-                                }
-                              }
-                            } else {
-                              // Si está inactivo, abrimos el modal para que asigne precio y categoría local
-                              setSelectedGlobalProduct(gp);
-                              setIsGlobalSaveModalOpen(true);
-                            }
-                          }}
-                          className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 focus:outline-none flex items-center cursor-pointer ${
-                            isActive ? "bg-[#7B61FF]" : "bg-slate-200"
-                          }`}
-                        >
-                          <motion.div
-                            layout
-                            className="w-5 h-5 bg-white rounded-full shadow-md"
-                            animate={{ x: isActive ? 20 : 0 }}
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                          />
-                        </button>
-                      </div>
-                    </motion.div>
+                      gp={gp}
+                      isActive={isActive}
+                      activeProduct={activeProduct}
+                      selectedGlobalCat={selectedGlobalCat}
+                      localCategories={localCategories}
+                      addLocalCategory={addLocalCategory}
+                      addProduct={addProduct}
+                      deleteProduct={deleteProduct}
+                      updateProduct={updateProduct}
+                    />
                   );
                 })}
               </div>
