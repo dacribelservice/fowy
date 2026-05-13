@@ -4,34 +4,120 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Plus, RefreshCw, Layers, Edit2, Trash2, AlertCircle } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { storageService } from "@/services/storageService";
 import { GlobalCategory } from "@/types/catalogo";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
+import SuccessToast from "@/components/admin/shared/SuccessToast";
 
 interface CategoryTabProps {
   onOpenModal: (category?: GlobalCategory | null) => void;
-  categories: GlobalCategory[];
-  loading: boolean;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  handleToggleActive: (category: GlobalCategory) => void;
-  handleDeleteCategory: (category: GlobalCategory) => void;
 }
 
-export default function CategoryTab({
-  onOpenModal,
-  categories,
-  loading,
-  searchTerm,
-  setSearchTerm,
-  handleToggleActive,
-  handleDeleteCategory
-}: CategoryTabProps) {
+export default function CategoryTab({ onOpenModal }: CategoryTabProps) {
+  const supabase = createClient();
+  const [categories, setCategories] = useState<GlobalCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState({ show: false, message: "" });
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: fetchError } = await supabase
+        .from("global_categories")
+        .select("*")
+        .order("name", { ascending: true });
+
+      if (fetchError) throw fetchError;
+      setCategories(data || []);
+    } catch (err: any) {
+      console.error("Error fetching global categories:", err);
+      setError("No se pudieron cargar las categorías globales.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleToggleActive = async (category: GlobalCategory) => {
+    try {
+      const nextActive = !category.is_active;
+      const { error: updateError } = await supabase
+        .from("global_categories")
+        .update({ is_active: nextActive })
+        .eq("id", category.id);
+
+      if (updateError) throw updateError;
+
+      setCategories((prev) =>
+        prev.map((c) => (c.id === category.id ? { ...c, is_active: nextActive } : c))
+      );
+
+      setToast({
+        show: true,
+        message: nextActive
+          ? `Categoría "${category.name}" activada`
+          : `Categoría "${category.name}" desactivada`,
+      });
+    } catch (err: any) {
+      console.error("Error toggling active state:", err);
+      setToast({ show: true, message: "Error al actualizar estado" });
+    }
+  };
+
+  const handleDeleteCategory = async (category: GlobalCategory) => {
+    if (!window.confirm(`¿Estás seguro de eliminar la categoría "${category.name}"? Se impedirá si hay productos asociados.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const { error: deleteError } = await supabase
+        .from("global_categories")
+        .delete()
+        .eq("id", category.id);
+
+      if (deleteError) {
+        if (deleteError.code === "23503") {
+          throw new Error("No se puede eliminar porque tiene productos globales asociados.");
+        }
+        throw deleteError;
+      }
+
+      if (category.image_url) {
+        await storageService.deleteFileByUrl(category.image_url, "categories");
+      }
+
+      setToast({ show: true, message: "Categoría eliminada con éxito" });
+      fetchCategories();
+    } catch (err: any) {
+      console.error("Error deleting category:", err);
+      alert(err.message || "Ocurrió un error al intentar eliminar la categoría.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredCategories = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-3">
+          <AlertCircle size={20} />
+          {error}
+        </div>
+      )}
+
       {/* Search Bar & Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-8">
         <div className="relative w-full sm:max-w-md">
@@ -126,6 +212,13 @@ export default function CategoryTab({
           ))}
         </div>
       )}
+
+      {/* Success Toast Notification */}
+      <SuccessToast
+        show={toast.show}
+        message={toast.message}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
     </div>
   );
 }

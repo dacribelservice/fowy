@@ -375,16 +375,16 @@ src/components/explorer/
 
 ### Paso 2 — Modularización de Categorías Globales (CategoryTab)
 - [x] **2.1** Crear el archivo `src/components/admin/catalogo/CategoryTab.tsx`.
-- [ ] **2.2** Trasladar toda la lógica de fetching (`fetchCategories`), estados locales (`categories`, `loading`, `searchTerm`) y acciones directas (`handleDeleteCategory`, `handleToggleActive`) a este componente.
-- [ ] **2.3** Mover el renderizado JSX de la pestaña "categories" (buscador, botón "Nueva Categoría", grid `filteredCategories`).
-- [ ] **2.4** Asegurar que el tamaño de este archivo quede en torno a las **150-200 líneas**.
+- [x] **2.2** Trasladar toda la lógica de fetching (`fetchCategories`), estados locales (`categories`, `loading`, `searchTerm`) y acciones directas (`handleDeleteCategory`, `handleToggleActive`) a este componente.
+- [x] **2.3** Mover el renderizado JSX de la pestaña "categories" (buscador, botón "Nueva Categoría", grid `filteredCategories`).
+- [x] **2.4** Asegurar que el tamaño de este archivo quede en torno a las **150-200 líneas**.
 
 ### Paso 3 — Extracción del Modal de Categorías (CategoryFormModal)
-- [ ] **3.1** Crear el archivo `src/components/admin/catalogo/CategoryFormModal.tsx`.
-- [ ] **3.2** Mover toda la lógica del formulario: estados de inputs, previsualización de imágenes, y la función `handleSaveCategory`.
-- [ ] **3.3** Mover el bloque JSX completo (`<AnimatePresence>`) que renderiza el modal.
-- [ ] **3.4** Configurar `props` para recibir: `isOpen`, `category` (para edición), `onClose`, y `onSuccess` (para refrescar el grid padre).
-- [ ] **3.5** Limitar el tamaño de este componente a un máximo de **200-250 líneas**.
+- [x] **3.1** Crear el archivo `src/components/admin/catalogo/CategoryFormModal.tsx`.
+- [x] **3.2** Mover toda la lógica del formulario: estados de inputs, previsualización de imágenes, y la función `handleSaveCategory`.
+- [x] **3.3** Mover el bloque JSX completo (`<AnimatePresence>`) que renderiza el modal.
+- [x] **3.4** Configurar `props` para recibir: `isOpen`, `category` (para edición), `onClose`, y `onSuccess` (para refrescar el grid padre).
+- [x] **3.5** Limitar el tamaño de este componente a un máximo de **200-250 líneas**.
 
 ### Paso 4 — Modularización de Productos Globales (ProductTab)
 - [ ] **4.1** Crear el archivo `src/components/admin/catalogo/ProductTab.tsx`.
