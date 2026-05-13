@@ -387,13 +387,13 @@ src/components/explorer/
 - [x] **3.5** Limitar el tamaño de este componente a un máximo de **200-250 líneas**.
 
 ### Paso 4 — Modularización de Productos Globales (ProductTab)
-- [ ] **4.1** Crear el archivo `src/components/admin/catalogo/ProductTab.tsx`.
-- [ ] **4.2** Trasladar la lógica de fetching (`fetchProducts`), filtros (`productSearchTerm`, `selectedCategoryFilter`) y acciones rápidas del grid. *(Nota: este componente necesitará importar o hacer fetch de las `categories` para rellenar el dropdown de filtros).*
-- [ ] **4.3** Mover el JSX correspondiente a la pestaña "products" (barra de búsqueda, filtros y tarjetas de productos).
-- [ ] **4.4** Validar que su tamaño sea de aproximadamente **150-200 líneas**.
+- [x] **4.1** Crear el archivo `src/components/admin/catalogo/ProductTab.tsx`.
+- [x] **4.2** Trasladar la lógica de fetching (`fetchProducts`), filtros (`productSearchTerm`, `selectedCategoryFilter`) y acciones rápidas del grid. *(Nota: este componente necesitará importar o hacer fetch de las `categories` para rellenar el dropdown de filtros).*
+- [x] **4.3** Mover el JSX correspondiente a la pestaña "products" (barra de búsqueda, filtros y tarjetas de productos).
+- [x] **4.4** Validar que su tamaño sea de aproximadamente **150-200 líneas**.
 
 ### Paso 5 — Extracción del Modal de Productos (ProductFormModal)
-- [ ] **5.1** Crear el archivo `src/components/admin/catalogo/ProductFormModal.tsx`.
+- [x] **5.1** Crear el archivo `src/components/admin/catalogo/ProductFormModal.tsx`.
 - [ ] **5.2** Trasladar la compleja gestión del formulario: inputs, `category_default` dinámico, subida de imagen y `handleSaveProduct`.
 - [ ] **5.3** Extraer el JSX completo del modal de productos.
 - [ ] **5.4** Configurar las `props` necesarias: `isOpen`, `product`, `categories` (para el menú desplegable), `onClose`, y `onSuccess`.
