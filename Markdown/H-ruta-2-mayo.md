@@ -81,7 +81,8 @@ Esta fase integra la capacidad de crear categorías globales representadas por i
   - Formulario de creación de productos con un selector visual que cargue dinámicamente las categorías circulares desde `global_categories`.
 
 #### 🤝 Bloque 3: Panel del Comercio (`/business/menu`) — Activación Inteligente
-- [ ] **5.7 Carrusel de Categorías Circulares**:
+- [x] **5.7 Carrusel de Categorías Circulares**:
+  - Eliminar el botón antiguo y redundante "Catálogo Fowy" en la esquina superior derecha para limpiar la interfaz.
   - Implementar un carrusel horizontal con scroll táctil súper fluido justo debajo de "Etiquetas de tu Negocio".
   - Renderizar las categorías globales como círculos perfectos (`w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 shadow-sm backdrop-blur-md`) usando `PremiumImage`.
 - [ ] **5.8 Pestaña/Subpantalla de Selección de Productos**:

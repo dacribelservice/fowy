@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { 
+  ArrowLeft,
   X, 
   Search, 
   ChevronLeft, 
@@ -37,6 +38,7 @@ interface GlobalProductSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectProduct: (product: GlobalProduct) => void;
+  initialCategory?: string;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -51,13 +53,20 @@ const CATEGORIES_PRESETS = [
   { id: "Energizantes", label: "Energizantes" }
 ];
 
-export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct }: GlobalProductSelectorProps) {
+export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct, initialCategory }: GlobalProductSelectorProps) {
   const [products, setProducts] = useState<GlobalProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "All");
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCategory(initialCategory || "All");
+      setPage(1);
+    }
+  }, [isOpen, initialCategory]);
 
   const supabase = createClient();
 
@@ -127,18 +136,16 @@ export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct
   };
 
   const modalVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: 15 },
+    hidden: { x: "100%", opacity: 0.95 },
     visible: { 
-      opacity: 1, 
-      scale: 1, 
-      y: 0,
-      transition: { type: "spring" as const, damping: 25, stiffness: 220 } 
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring" as const, damping: 30, stiffness: 260 } 
     },
     exit: { 
-      opacity: 0, 
-      scale: 0.95, 
-      y: 10,
-      transition: { ease: "easeInOut", duration: 0.2 } 
+      x: "100%",
+      opacity: 0.95,
+      transition: { ease: "easeInOut", duration: 0.25 } 
     }
   };
 
@@ -161,7 +168,7 @@ export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 md:p-10">
+      <div className="fixed inset-0 z-[120] flex justify-end overflow-hidden">
         {/* Fondo con Blur */}
         <motion.div
           initial="hidden"
@@ -169,33 +176,41 @@ export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct
           exit="exit"
           variants={overlayVariants as any}
           onClick={onClose}
-          className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+          className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
         />
 
-        {/* Modal de Catálogo Global */}
+        {/* Subpantalla Lateral de Catálogo Global */}
         <motion.div
           initial="hidden"
           animate="visible"
           exit="exit"
           variants={modalVariants as any}
-          className="relative w-full max-w-4xl bg-white rounded-3xl shadow-premium border border-slate-100 flex flex-col h-[85vh] max-h-[850px] overflow-hidden"
+          className="relative w-full max-w-2xl bg-white shadow-premium border-l border-slate-100 flex flex-col h-full overflow-hidden"
         >
           {/* Header del Modal */}
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-fowy-secondary/10 rounded-xl flex items-center justify-center text-fowy-secondary">
-                <Sparkles size={20} className="animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-800">Catálogo Global Fowy</h3>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
-                  Productos pre-cargados de alta calidad
-                </p>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={onClose}
+                className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-500 hover:text-slate-800 flex items-center justify-center border border-slate-100 bg-white shadow-sm"
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-fowy-secondary/10 rounded-xl flex items-center justify-center text-fowy-secondary">
+                  <Sparkles size={20} className="animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-800">Catálogo Global Fowy</h3>
+                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+                    Productos pre-cargados de alta calidad
+                  </p>
+                </div>
               </div>
             </div>
             <button 
               onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600"
+              className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600 hidden sm:block"
             >
               <X size={24} />
             </button>
@@ -247,7 +262,7 @@ export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/50">
             {loading ? (
               // Loading State (Premium Skeleton Cards)
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="bg-white border border-slate-100 rounded-2xl p-3 space-y-3 animate-pulse shadow-sm">
                     <div className="aspect-square w-full bg-slate-100 rounded-xl" />
@@ -262,7 +277,7 @@ export default function GlobalProductSelector({ isOpen, onClose, onSelectProduct
                 variants={containerVariants as any}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+                className="grid grid-cols-2 sm:grid-cols-3 gap-4"
               >
                 {products.map((product) => (
                   <motion.div
