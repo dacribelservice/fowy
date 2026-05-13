@@ -21,7 +21,8 @@ export default function DashboardPage() {
     growthPercentages: [0,0,0,0,0,0,0],
     growthNames: [[],[],[],[],[],[],[]] as string[][],
     conversionRate: 0,
-    upcomingExpirations: 0
+    upcomingExpirations: 0,
+    businesses: [] as any[]
   });
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -111,7 +112,8 @@ export default function DashboardPage() {
           standardPercentage,
           growthData,
           growthPercentages,
-          growthNames
+          growthNames,
+          businesses
         }));
       }
     } catch (error) {
@@ -141,11 +143,7 @@ export default function DashboardPage() {
 
       {/* Main Content Area (Gráficas) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <DashboardGrowthChart 
-          growthData={stats.growthData}
-          growthPercentages={stats.growthPercentages}
-          growthNames={stats.growthNames}
-        />
+        <DashboardGrowthChart businesses={stats.businesses} />
 
         <DashboardDistributionChart 
           totalBusinesses={stats.totalBusinesses}
