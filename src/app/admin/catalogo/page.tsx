@@ -10,29 +10,8 @@ import { createClient } from "@/utils/supabase/client";
 import { storageService } from "@/services/storageService";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
 import SuccessToast from "@/components/admin/shared/SuccessToast";
+import { GlobalCategory, GlobalProduct } from "@/types/catalogo";
 
-interface GlobalCategory {
-  id: string;
-  name: string;
-  image_url: string | null;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface GlobalProduct {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  global_category_id: string | null;
-  category_default: string | null;
-  is_active: boolean;
-  created_at: string;
-  global_categories?: {
-    id: string;
-    name: string;
-  } | null;
-}
 
 export default function CatalogoFowyPage() {
   const supabase = createClient();

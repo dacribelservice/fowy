@@ -369,12 +369,12 @@ src/components/explorer/
 **Objetivo:** Dividir el monolito de 1,243 líneas (`src/app/admin/catalogo/page.tsx`) en componentes modulares, cumpliendo estrictamente con la regla de un máximo de 200-250 líneas por archivo establecida en `conceptos.md`.
 
 ### Paso 1 — Extracción de Interfaces y Tipos (Shared Types)
-- [ ] **1.1** Crear un archivo `src/types/catalogo.ts` (o ubicar en carpeta pertinente de tipos).
-- [ ] **1.2** Extraer las interfaces `GlobalCategory` y `GlobalProduct` desde `page.tsx` y exportarlas.
-- [ ] **1.3** Importar estas interfaces en todos los nuevos componentes que se crearán.
+- [x] **1.1** Crear un archivo `src/types/catalogo.ts` (o ubicar en carpeta pertinente de tipos).
+- [x] **1.2** Extraer las interfaces `GlobalCategory` y `GlobalProduct` desde `page.tsx` y exportarlas.
+- [x] **1.3** Importar estas interfaces en todos los nuevos componentes que se crearán.
 
 ### Paso 2 — Modularización de Categorías Globales (CategoryTab)
-- [ ] **2.1** Crear el archivo `src/components/admin/catalogo/CategoryTab.tsx`.
+- [x] **2.1** Crear el archivo `src/components/admin/catalogo/CategoryTab.tsx`.
 - [ ] **2.2** Trasladar toda la lógica de fetching (`fetchCategories`), estados locales (`categories`, `loading`, `searchTerm`) y acciones directas (`handleDeleteCategory`, `handleToggleActive`) a este componente.
 - [ ] **2.3** Mover el renderizado JSX de la pestaña "categories" (buscador, botón "Nueva Categoría", grid `filteredCategories`).
 - [ ] **2.4** Asegurar que el tamaño de este archivo quede en torno a las **150-200 líneas**.
