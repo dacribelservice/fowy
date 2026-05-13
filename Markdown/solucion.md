@@ -394,14 +394,14 @@ src/components/explorer/
 
 ### Paso 5 — Extracción del Modal de Productos (ProductFormModal)
 - [x] **5.1** Crear el archivo `src/components/admin/catalogo/ProductFormModal.tsx`.
-- [ ] **5.2** Trasladar la compleja gestión del formulario: inputs, `category_default` dinámico, subida de imagen y `handleSaveProduct`.
-- [ ] **5.3** Extraer el JSX completo del modal de productos.
-- [ ] **5.4** Configurar las `props` necesarias: `isOpen`, `product`, `categories` (para el menú desplegable), `onClose`, y `onSuccess`.
-- [ ] **5.5** Asegurar que el código no supere las **250 líneas**.
+- [x] **5.2** Trasladar la compleja gestión del formulario: inputs, `category_default` dinámico, subida de imagen y `handleSaveProduct`.
+- [x] **5.3** Extraer el JSX completo del modal de productos.
+- [x] **5.4** Configurar las `props` necesarias: `isOpen`, `product`, `categories` (para el menú desplegable), `onClose`, y `onSuccess`.
+- [x] **5.5** Asegurar que el código no supere las **250 líneas**.
 
 ### Paso 6 — Limpieza del Orquestador Padre (`page.tsx`)
-- [ ] **6.1** Eliminar de `src/app/admin/catalogo/page.tsx` todos los estados, modales y lógica que fueron extraídos.
-- [ ] **6.2** Mantener el estado de la pestaña activa (`activeTab`).
-- [ ] **6.3** Preservar el JSX del Header principal ("Catálogo Fowy") y los botones selectores.
-- [ ] **6.4** Importar e inyectar condicionalmente `<CategoryTab />` y `<ProductTab />` según la pestaña seleccionada.
-- [ ] **6.5** Validar que el orquestador final quede sumamente limpio, preferiblemente con **menos de 100-150 líneas** de código.
+- [x] **6.1** Eliminar de `src/app/admin/catalogo/page.tsx` todos los estados, modales y lógica que fueron extraídos.
+- [x] **6.2** Mantener el estado de la pestaña activa (`activeTab`).
+- [x] **6.3** Preservar el JSX del Header principal ("Catálogo Fowy") y los botones selectores.
+- [x] **6.4** Importar e inyectar condicionalmente `<CategoryTab />` y `<ProductTab />` según la pestaña seleccionada.
+- [x] **6.5** Validar que el orquestador final quede sumamente limpio, preferiblemente con **menos de 100-150 líneas** de código.
