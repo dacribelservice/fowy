@@ -100,7 +100,7 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
         setProductsLoading(true);
         let query = supabase
           .from("products")
-          .select("*")
+          .select("*, global_products(*)")
           .eq("business_id", business.id)
           .eq("is_active", true);
 
@@ -115,7 +115,7 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
         // Filtro por búsqueda de texto
         if (debouncedSearchQuery) {
           query = query.or(
-            `name.ilike.%${debouncedSearchQuery}%,description.ilike.%${debouncedSearchQuery}%`
+            `name.ilike.%${debouncedSearchQuery}%,description.ilike.%${debouncedSearchQuery}%,global_products.name.ilike.%${debouncedSearchQuery}%,global_products.description.ilike.%${debouncedSearchQuery}%`
           );
         }
 
@@ -126,11 +126,17 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
         if (error) {
           console.error("Error fetching filtered products:", error);
         } else {
-          // Mapeamos is_offer a is_promo para que el frontend visualice la etiqueta de promoción correctamente
-          const mappedProducts = (data || []).map((p: any) => ({
-            ...p,
-            is_promo: p.is_offer
-          }));
+          // Mapeamos is_offer a is_promo para que el frontend visualice la etiqueta de promoción correctamente y aplicamos fallback del catálogo global
+          const mappedProducts = (data || []).map((p: any) => {
+            const gp = p.global_products;
+            return {
+              ...p,
+              name: p.name || gp?.name || "",
+              description: p.description ?? gp?.description ?? null,
+              image_url: p.image_url || gp?.image_url || "",
+              is_promo: p.is_offer
+            };
+          });
           setProducts(mappedProducts);
         }
       } catch (err) {

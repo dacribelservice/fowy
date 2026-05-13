@@ -15,7 +15,8 @@ import {
   Zap,
   TrendingUp,
   Package,
-  Layers
+  Layers,
+  Lock
 } from "lucide-react";
 import { toast } from "sonner";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
@@ -43,9 +44,19 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  const isGlobal = !!productToEdit?.global_product_id;
+  const globalProduct = productToEdit?.global_products;
+
   // Form State
   const [name, setName] = useState(productToEdit?.name || "");
-  const [description, setDescription] = useState(productToEdit?.description || "");
+  const [description, setDescription] = useState(() => {
+    if (isGlobal && productToEdit && globalProduct) {
+      if (productToEdit.description === globalProduct.description) {
+        return "";
+      }
+    }
+    return productToEdit?.description || "";
+  });
   const [price, setPrice] = useState(productToEdit?.price?.toString() || "");
   const [categoryName, setCategoryName] = useState(productToEdit?.category_name || "");
   const [imageUrl, setImageUrl] = useState(productToEdit?.image_url || "");
@@ -74,8 +85,8 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
     try {
       let finalImageUrl = imageUrl;
       
-      // Upload image if selected
-      const file = fileInputRef.current?.files?.[0];
+      // Upload image if selected (only if not a global product)
+      const file = isGlobal ? null : fileInputRef.current?.files?.[0];
       if (file) {
         finalImageUrl = await storageService.uploadFile(file, 'products', {
           path: `${businessId}/products`,
@@ -86,11 +97,11 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
       }
 
       const productData = {
-        name,
-        description,
+        name: isGlobal ? null : name,
+        description: (isGlobal && description.trim() === "") ? null : description,
         price: parseFloat(price),
         category_name: categoryName,
-        image_url: finalImageUrl,
+        image_url: isGlobal ? null : finalImageUrl,
         in_stock: inStock,
         is_active: true,
         is_new: isNew,
@@ -173,17 +184,25 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
             
             {/* Image Upload Area */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <ImageIcon size={16} className="text-fowy-secondary" />
-                Imagen del Producto
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <ImageIcon size={16} className="text-fowy-secondary" />
+                  Imagen del Producto
+                </label>
+                {isGlobal && (
+                  <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-slate-200">
+                    <Lock size={12} /> Bloqueado
+                  </span>
+                )}
+              </div>
               <div 
-                onClick={() => fileInputRef.current?.click()}
+                onClick={isGlobal ? undefined : () => fileInputRef.current?.click()}
                 className={cn(
-                  "relative aspect-video rounded-3xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center group",
+                  "relative aspect-video rounded-3xl border-2 border-dashed transition-all overflow-hidden flex flex-col items-center justify-center group",
                   previewUrl 
                     ? "border-transparent bg-slate-100" 
-                    : "border-slate-200 bg-slate-50 hover:border-fowy-secondary/40 hover:bg-white"
+                    : "border-slate-200 bg-slate-50 hover:border-fowy-secondary/40 hover:bg-white",
+                  isGlobal ? "cursor-default border-slate-100" : "cursor-pointer"
                 )}
               >
                 {previewUrl ? (
@@ -193,11 +212,18 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
                       alt="Preview" 
                       className="w-full h-full" 
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-white font-bold flex items-center gap-2">
-                        <Upload size={16} /> Cambiar Imagen
+                    {!isGlobal && (
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-white font-bold flex items-center gap-2">
+                          <Upload size={16} /> Cambiar Imagen
+                        </div>
                       </div>
-                    </div>
+                    )}
+                    {isGlobal && (
+                      <div className="absolute top-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/10 shadow-sm uppercase tracking-wider">
+                        <Lock size={10} /> Imagen Oficial
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
@@ -208,28 +234,43 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
                     <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">JPG, PNG o WEBP</p>
                   </>
                 )}
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleImageChange} 
-                  accept="image/*" 
-                  className="hidden" 
-                />
+                {!isGlobal && (
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageChange} 
+                    accept="image/*" 
+                    className="hidden" 
+                  />
+                )}
               </div>
             </div>
 
             {/* Basic Info */}
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                  <Tag size={16} className="text-fowy-secondary" />
-                  Nombre del Producto
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <Tag size={16} className="text-fowy-secondary" />
+                    Nombre del Producto
+                  </label>
+                  {isGlobal && (
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-slate-200 uppercase tracking-wider">
+                      <Lock size={10} /> Catálogo Oficial
+                    </span>
+                  )}
+                </div>
                 <input 
                   required
+                  disabled={isGlobal}
                   type="text" 
                   placeholder="Ej: Hamburguesa Especial"
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 focus:bg-white transition-all text-slate-700 font-medium"
+                  className={cn(
+                    "w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 transition-all font-medium",
+                    isGlobal 
+                      ? "bg-slate-100/60 border-slate-200 text-slate-400 cursor-not-allowed" 
+                      : "bg-slate-50 border-slate-100 focus:bg-white text-slate-700"
+                  )}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -281,11 +322,23 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
                 </label>
                 <textarea 
                   rows={3}
-                  placeholder="Describe los ingredientes, tamaño o detalles especiales..."
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 focus:bg-white transition-all text-slate-700 font-medium resize-none"
+                  placeholder={isGlobal ? (globalProduct?.description || "Heredará descripción del catálogo global.") : "Describe los ingredientes, tamaño o detalles especiales..."}
+                  className={cn(
+                    "w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-secondary/20 transition-all font-medium resize-none",
+                    isGlobal && !description
+                      ? "bg-slate-50 border-slate-100 placeholder:text-slate-400 placeholder:italic"
+                      : "bg-slate-50 border-slate-100 focus:bg-white text-slate-700"
+                  )}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+                {isGlobal && (
+                  <p className="text-[10px] text-slate-400 font-semibold flex items-center gap-1.5 mt-1">
+                    {description 
+                      ? "✍️ Versión personalizada. Limpia el texto por completo para heredar de nuevo la descripción oficial." 
+                      : "💡 Heredando descripción original del catálogo de Fowy (actúa como sugerencia)."}
+                  </p>
+                )}
               </div>
             </div>
 

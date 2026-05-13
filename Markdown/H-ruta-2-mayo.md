@@ -20,31 +20,31 @@ Añadir una relación nullable `global_product_id` en la tabla `products` existe
 ### 🗺️ PLAN DE ACCIÓN DETALLADO
 
 #### 🛠️ Fase 1: Base de Datos y Seguridad (Supabase DDL & RLS)
-- [ ] **1.1 Crear la tabla `global_products`**: Crear la tabla maestra en el esquema público de Supabase con campos para id, nombre, descripción, URL de imagen, categoría por defecto y un campo `is_active` (boolean, default true) para habilitar Soft Delete.
-- [ ] **1.2 Extender la tabla `products`**: Agregar la columna `global_product_id` (UUID nullable) con una clave foránea que referencie a `global_products(id) ON DELETE RESTRICT` (para evitar borrados físicos accidentales) y crear un índice en esta columna para acelerar las consultas con fallback.
-- [ ] **1.3 Modificar restricciones de nulidad**: Permitir que `name`, `description` e `image_url` en `products` sean nulos para habilitar el fallback del catálogo.
-- [ ] **1.4 Configurar políticas RLS**:
+- [x] **1.1 Crear la tabla `global_products`**: Crear la tabla maestra en el esquema público de Supabase con campos para id, nombre, descripción, URL de imagen, categoría por defecto y un campo `is_active` (boolean, default true) para habilitar Soft Delete.
+- [x] **1.2 Extender la tabla `products`**: Agregar la columna `global_product_id` (UUID nullable) con una clave foránea que referencie a `global_products(id) ON DELETE RESTRICT` (para evitar borrados físicos accidentales) y crear un índice en esta columna para acelerar las consultas con fallback.
+- [x] **1.3 Modificar restricciones de nulidad**: Permitir que `name`, `description` e `image_url` en `products` sean nulos para habilitar el fallback del catálogo.
+- [x] **1.4 Configurar políticas RLS**:
   - `global_products`: Permitir `SELECT` público para todos; restringir `INSERT/UPDATE/DELETE` únicamente al rol de `super_admin`.
   - `products`: Mantener las políticas actuales donde los comercios solo pueden manipular sus propios productos.
 
 #### ⚙️ Fase 2: Integración de Hooks y Lógica de Datos (Crave Engine)
-- [ ] **2.1 Actualizar `useBusinessMenuData.ts`**:
+- [x] **2.1 Actualizar `useBusinessMenuData.ts`**:
   - Modificar la consulta para hacer un left join con `global_products`: `.select("*, global_products(*)")`.
   - Actualizar la función de mapeo para aplicar la lógica de fallback dinámico (`name: p.name || p.global_products?.name`).
-- [ ] **2.2 Actualizar `useProductManager.ts`**:
+- [x] **2.2 Actualizar `useProductManager.ts`**:
   - Modificar las consultas de listado en el hook del panel de socios para incluir la relación `global_products`.
   - Adaptar la función `addProduct` para que acepte opcionalmente un `global_product_id`.
 
 #### 🎨 Fase 3: Interfaz de Usuario y Componentes (Ethereal High-Tech UI)
-- [ ] **3.1 Diseñar el componente `GlobalProductSelector.tsx`**:
+- [x] **3.1 Diseñar el componente `GlobalProductSelector.tsx`**:
   - Crear el componente en `src/components/partners/business/menu/GlobalProductSelector.tsx`.
   - Implementar un grid visual de gaseosas pre-cargadas usando `PremiumImage` para evitar placeholders.
   - Añadir soporte de búsqueda server-side y paginación para optimizar la carga del catálogo global.
-- [ ] **3.2 Integrar el selector en el Panel del Comercio (`/business/menu`)**:
+- [x] **3.2 Integrar el selector en el Panel del Comercio (`/business/menu`)**:
   - Añadir un botón premium estilo "Agregar desde Catálogo Fowy" en la vista del menú del socio.
   - Implementar un flujo modal donde al hacer clic en una gaseosa, se despliegue un modal secundario (o panel) para ingresar el **precio local** y elegir la **categoría local** del menú del comercio.
   - Al guardar, insertar el registro correspondiente en la tabla `products`.
-- [ ] **3.3 Actualizar formularios existentes (`ProductFormModal.tsx`)**:
+- [x] **3.3 Actualizar formularios existentes (`ProductFormModal.tsx`)**:
   - Asegurar que al editar un producto de tipo global, el formulario reconozca que es heredado, bloqueando los campos fijos como Nombre e Imagen (indicándolos con un candado sutil).
   - Implementar la lógica híbrida inteligente para la **Descripción**:
     - *Por defecto (Vacío):* El campo mostrará en gris claro la descripción global de Fowy (actuando como placeholder o sugerencia). Si el socio no escribe nada, en la base de datos se guarda como `null` y el cliente final heredará la descripción global automáticamente.

@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 export interface Product {
   id: string;
   business_id: string;
+  global_product_id?: string | null;
   name: string;
   description: string;
   price: number;
@@ -17,6 +18,7 @@ export interface Product {
   is_recommended: boolean;
   category_name: string;
   created_at?: string;
+  global_products?: any;
 }
 
 export function useProductManager(businessId: string | null) {
@@ -34,12 +36,24 @@ export function useProductManager(businessId: string | null) {
     try {
       const { data, error: fetchError } = await supabase
         .from('products')
-        .select('*')
+        .select('*, global_products(*)')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
-      setProducts(data || []);
+
+      // Mapeamos los productos aplicando el fallback del catálogo global
+      const mappedData = (data || []).map((p: any) => {
+        const gp = p.global_products;
+        return {
+          ...p,
+          name: p.name || gp?.name || "",
+          description: p.description ?? gp?.description ?? "",
+          image_url: p.image_url || gp?.image_url || ""
+        };
+      });
+
+      setProducts(mappedData);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Error desconocido";
       setError(errorMsg);
@@ -56,12 +70,22 @@ export function useProductManager(businessId: string | null) {
       const { data, error: addError } = await supabase
         .from('products')
         .insert([{ ...product, business_id: businessId }])
-        .select()
+        .select('*, global_products(*)')
         .single();
 
       if (addError) throw addError;
-      setProducts(prev => [data, ...prev]);
-      return data;
+
+      // Aplicar fallback para el registro insertado para mantener la consistencia en el estado local del frontend
+      const gp = data.global_products;
+      const mappedData = {
+        ...data,
+        name: data.name || gp?.name || "",
+        description: data.description ?? gp?.description ?? "",
+        image_url: data.image_url || gp?.image_url || ""
+      };
+
+      setProducts(prev => [mappedData, ...prev]);
+      return mappedData;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Error desconocido";
       setError(errorMsg);
@@ -75,12 +99,22 @@ export function useProductManager(businessId: string | null) {
         .from('products')
         .update(updates)
         .eq('id', id)
-        .select()
+        .select('*, global_products(*)')
         .single();
 
       if (updateError) throw updateError;
-      setProducts(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
-      return data;
+
+      // Aplicar fallback para el registro actualizado
+      const gp = data.global_products;
+      const mappedData = {
+        ...data,
+        name: data.name || gp?.name || "",
+        description: data.description ?? gp?.description ?? "",
+        image_url: data.image_url || gp?.image_url || ""
+      };
+
+      setProducts(prev => prev.map(p => p.id === id ? mappedData : p));
+      return mappedData;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Error desconocido";
       setError(errorMsg);

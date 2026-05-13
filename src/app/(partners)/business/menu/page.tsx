@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   Layers,
   Pencil,
-  Trash2
+  Trash2,
+  Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProductManager, type Product } from "@/hooks/useProductManager";
@@ -23,6 +24,8 @@ import MenuCategoryManager from "@/components/partners/business/menu/MenuCategor
 import ProductFormModal from "@/components/partners/business/menu/ProductFormModal";
 import DeleteConfirmationModal from "@/components/partners/business/menu/DeleteConfirmationModal";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
+import GlobalProductSelector, { GlobalProduct } from "@/components/partners/business/menu/GlobalProductSelector";
+import GlobalProductSaveModal from "@/components/partners/business/menu/GlobalProductSaveModal";
 
 interface Business {
   id: string;
@@ -48,6 +51,16 @@ export default function MenuManagementPage() {
   const [productToEdit, setProductToEdit] = useState<Product | undefined>(undefined);
   const [productToDeleteId, setProductToDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Global Products Catálogo States
+  const [isGlobalSelectorOpen, setIsGlobalSelectorOpen] = useState(false);
+  const [isGlobalSaveModalOpen, setIsGlobalSaveModalOpen] = useState(false);
+  const [selectedGlobalProduct, setSelectedGlobalProduct] = useState<GlobalProduct | null>(null);
+
+  const handleSelectGlobalProduct = (product: GlobalProduct) => {
+    setSelectedGlobalProduct(product);
+    setIsGlobalSaveModalOpen(true);
+  };
   
   const supabase = createClient();
   const { 
@@ -215,15 +228,27 @@ export default function MenuManagementPage() {
             Administra tus productos, precios y etiquetas en tiempo real.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button 
+            type="button"
             onClick={() => setIsCategoryManagerOpen(true)}
             className="flex items-center justify-center gap-2 px-6 py-3 glass-morphism text-slate-600 rounded-2xl font-bold border border-white/50 hover:bg-white transition-all"
           >
             <Layers size={20} className="text-fowy-secondary" />
             Categorias
           </button>
+          
           <button 
+            type="button"
+            onClick={() => setIsGlobalSelectorOpen(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#7B61FF] to-[#4D8BFF] text-white rounded-2xl font-bold shadow-premium hover:opacity-95 transition-all"
+          >
+            <Sparkles size={20} className="text-white animate-pulse" />
+            Catálogo Fowy
+          </button>
+
+          <button 
+            type="button"
             onClick={handleAddNewProduct}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-fowy-secondary text-white rounded-2xl font-bold shadow-premium hover:opacity-90 transition-all"
           >
@@ -475,6 +500,32 @@ export default function MenuManagementPage() {
         description="Esta acción no se puede deshacer. El producto desaparecerá de tu menú inmediatamente."
         isLoading={isDeleting}
       />
+
+      {/* Global Product Selector Catalog */}
+      <GlobalProductSelector 
+        isOpen={isGlobalSelectorOpen}
+        onClose={() => setIsGlobalSelectorOpen(false)}
+        onSelectProduct={handleSelectGlobalProduct}
+      />
+
+      {/* Global Product Local Price / Category Save Modal */}
+      {isGlobalSaveModalOpen && businessId && selectedGlobalProduct && (
+        <GlobalProductSaveModal 
+          isOpen={isGlobalSaveModalOpen}
+          businessId={businessId}
+          globalProduct={selectedGlobalProduct}
+          onClose={() => {
+            setIsGlobalSaveModalOpen(false);
+            setSelectedGlobalProduct(null);
+          }}
+          onSuccess={() => {
+            refreshProducts();
+            setIsGlobalSaveModalOpen(false);
+            setSelectedGlobalProduct(null);
+            setIsGlobalSelectorOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
