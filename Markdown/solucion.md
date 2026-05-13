@@ -361,3 +361,47 @@ src/components/explorer/
 - [x] **4.4** Importar y renderizar `<CheckoutFormView />` cuando `checkoutStep === "checkout"`.
 - [x] **4.5** Mantener únicamente el backdrop/overlay, el `<AnimatePresence>` principal y el `<motion.div>` contenedor del sheet.
 - [x] **4.6** Validar que el archivo orquestador quede por debajo de **150 líneas**.
+
+---
+
+## 🛠️ REFACTORIZACIÓN: CATÁLOGO FOWY (Desacoplamiento de `page.tsx`)
+
+**Objetivo:** Dividir el monolito de 1,243 líneas (`src/app/admin/catalogo/page.tsx`) en componentes modulares, cumpliendo estrictamente con la regla de un máximo de 200-250 líneas por archivo establecida en `conceptos.md`.
+
+### Paso 1 — Extracción de Interfaces y Tipos (Shared Types)
+- [ ] **1.1** Crear un archivo `src/types/catalogo.ts` (o ubicar en carpeta pertinente de tipos).
+- [ ] **1.2** Extraer las interfaces `GlobalCategory` y `GlobalProduct` desde `page.tsx` y exportarlas.
+- [ ] **1.3** Importar estas interfaces en todos los nuevos componentes que se crearán.
+
+### Paso 2 — Modularización de Categorías Globales (CategoryTab)
+- [ ] **2.1** Crear el archivo `src/components/admin/catalogo/CategoryTab.tsx`.
+- [ ] **2.2** Trasladar toda la lógica de fetching (`fetchCategories`), estados locales (`categories`, `loading`, `searchTerm`) y acciones directas (`handleDeleteCategory`, `handleToggleActive`) a este componente.
+- [ ] **2.3** Mover el renderizado JSX de la pestaña "categories" (buscador, botón "Nueva Categoría", grid `filteredCategories`).
+- [ ] **2.4** Asegurar que el tamaño de este archivo quede en torno a las **150-200 líneas**.
+
+### Paso 3 — Extracción del Modal de Categorías (CategoryFormModal)
+- [ ] **3.1** Crear el archivo `src/components/admin/catalogo/CategoryFormModal.tsx`.
+- [ ] **3.2** Mover toda la lógica del formulario: estados de inputs, previsualización de imágenes, y la función `handleSaveCategory`.
+- [ ] **3.3** Mover el bloque JSX completo (`<AnimatePresence>`) que renderiza el modal.
+- [ ] **3.4** Configurar `props` para recibir: `isOpen`, `category` (para edición), `onClose`, y `onSuccess` (para refrescar el grid padre).
+- [ ] **3.5** Limitar el tamaño de este componente a un máximo de **200-250 líneas**.
+
+### Paso 4 — Modularización de Productos Globales (ProductTab)
+- [ ] **4.1** Crear el archivo `src/components/admin/catalogo/ProductTab.tsx`.
+- [ ] **4.2** Trasladar la lógica de fetching (`fetchProducts`), filtros (`productSearchTerm`, `selectedCategoryFilter`) y acciones rápidas del grid. *(Nota: este componente necesitará importar o hacer fetch de las `categories` para rellenar el dropdown de filtros).*
+- [ ] **4.3** Mover el JSX correspondiente a la pestaña "products" (barra de búsqueda, filtros y tarjetas de productos).
+- [ ] **4.4** Validar que su tamaño sea de aproximadamente **150-200 líneas**.
+
+### Paso 5 — Extracción del Modal de Productos (ProductFormModal)
+- [ ] **5.1** Crear el archivo `src/components/admin/catalogo/ProductFormModal.tsx`.
+- [ ] **5.2** Trasladar la compleja gestión del formulario: inputs, `category_default` dinámico, subida de imagen y `handleSaveProduct`.
+- [ ] **5.3** Extraer el JSX completo del modal de productos.
+- [ ] **5.4** Configurar las `props` necesarias: `isOpen`, `product`, `categories` (para el menú desplegable), `onClose`, y `onSuccess`.
+- [ ] **5.5** Asegurar que el código no supere las **250 líneas**.
+
+### Paso 6 — Limpieza del Orquestador Padre (`page.tsx`)
+- [ ] **6.1** Eliminar de `src/app/admin/catalogo/page.tsx` todos los estados, modales y lógica que fueron extraídos.
+- [ ] **6.2** Mantener el estado de la pestaña activa (`activeTab`).
+- [ ] **6.3** Preservar el JSX del Header principal ("Catálogo Fowy") y los botones selectores.
+- [ ] **6.4** Importar e inyectar condicionalmente `<CategoryTab />` y `<ProductTab />` según la pestaña seleccionada.
+- [ ] **6.5** Validar que el orquestador final quede sumamente limpio, preferiblemente con **menos de 100-150 líneas** de código.

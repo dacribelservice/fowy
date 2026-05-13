@@ -110,10 +110,10 @@ export default function ProductFormModal({ businessId, onClose, onSuccess, produ
       };
 
       if (productToEdit) {
-        await updateProduct(productToEdit.id, productData);
+        await updateProduct(productToEdit.id, productData as any);
         toast.success("Producto actualizado correctamente");
       } else {
-        await addProduct(productData);
+        await addProduct(productData as any);
         toast.success("Producto creado con éxito");
       }
 

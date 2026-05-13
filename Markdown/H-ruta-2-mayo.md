@@ -56,3 +56,46 @@ Añadir una relación nullable `global_product_id` en la tabla `products` existe
 - [ ] **4.1 Pruebas de compatibilidad móvil**: Validar que la cuadrícula y el modal funcionen sin desbordamientos en Safari/iOS (siguiendo las directrices de `iPhone.md`).
 - [ ] **4.2 Validar desactivación (Soft Delete)**: Probar que desactivar un producto global (`is_active = false`) lo oculte de las búsquedas en el selector de nuevos productos, pero mantenga intacto el menú de los comercios que ya lo tenían asociado.
 - [ ] **4.3 Comprimir imágenes del catálogo**: Subir las 20 gaseosas oficiales comprimiéndolas previamente con `compressImage` según estipula `conceptos.md`.
+
+---
+
+## 🍭 FASE 5: CATÁLOGO "CRAVE CATALOG" CENTRALIZADO (Categorías Circulares Automáticas y Ecosistema Admin-Socio)
+
+Esta fase integra la capacidad de crear categorías globales representadas por imágenes circulares y automatizar por completo la creación de las categorías locales equivalentes cuando un comercio activa productos globales desde el panel de socios.
+
+#### 🧱 Bloque 1: Base de Datos y Seguridad (Supabase DDL & RLS)
+- [x] **5.1 Tabla de Categorías Globales (`global_categories`)**:
+  - Crear la tabla con campos: `id` (UUID gen_random_uuid() primary key), `name` (text, unique), `image_url` (text, nullable), `is_active` (boolean, default true), y `created_at` (timestamp with time zone).
+- [x] **5.2 Relación en Productos Globales (`global_products`)**:
+  - Agregar la columna `global_category_id` (foreign key a `global_categories(id) ON DELETE RESTRICT`) y crear su índice correspondiente para consultas rápidas.
+- [x] **5.3 Políticas de Seguridad (RLS)**:
+  - `global_categories`: `SELECT` permitido para todo público; `INSERT/UPDATE/DELETE` restringido estrictamente para el rol de `super_admin`.
+
+#### 👑 Bloque 2: Panel de Administración de Fowy (`/admin`) — "Catálogo Fowy"
+- [x] **5.4 Ítem en la barra lateral (Sidebar)**:
+  - Añadir la opción **"Catálogo Fowy"** en la barra lateral del administrador con un ícono elegante y animaciones premium (con hover resplandeciente `glow` y micro-interacción táctil `active:scale-95`).
+- [x] **5.5 Creador de Categorías Globales**:
+  - Vista modularizada para listar categorías globales en un grid visual premium con bordes `rounded-fowy` (`20px`).
+  - Formulario modal con soporte de compresión previa obligatoria (`compressImage`) para subir la imagen de branding oficial (circular).
+- [x] **5.6 Creador de Productos Globales**:
+  - Formulario de creación de productos con un selector visual que cargue dinámicamente las categorías circulares desde `global_categories`.
+
+#### 🤝 Bloque 3: Panel del Comercio (`/business/menu`) — Activación Inteligente
+- [ ] **5.7 Carrusel de Categorías Circulares**:
+  - Implementar un carrusel horizontal con scroll táctil súper fluido justo debajo de "Etiquetas de tu Negocio".
+  - Renderizar las categorías globales como círculos perfectos (`w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 shadow-sm backdrop-blur-md`) usando `PremiumImage`.
+- [ ] **5.8 Pestaña/Subpantalla de Selección de Productos**:
+  - Al dar clic en una categoría circular (ej. "Coca-Cola"), transicionar mediante Framer Motion hacia una subvista que muestre todos los productos del catálogo asociados a ella.
+- [ ] **5.9 Switch Táctil de Activación y Automatización de Categoría Local**:
+  - **Lógica Inteligente de Creación Automática de Categoría**: Al activar el Switch del producto global (ej. "Coca-Cola Original 350ml"):
+    - Fowy buscará si el negocio ya posee una categoría local con el nombre exacto de la categoría global ("Coca-Cola").
+    - Si **no existe**, Fowy creará la categoría local automáticamente.
+    - Se creará el producto en la tabla `products` del comercio asociado automáticamente al ID de la categoría local correspondiente.
+  - **Edición Inline de Precios**: Habilitar campos inmediatos para fijar el **Precio Local** y una **Descripción Local** opcional en caliente sin cerrar la pestaña.
+
+#### 📱 Bloque 4: Menú Digital del Cliente (Explorer Edition)
+- [ ] **5.10 Renderizado Dinámico en la Barra de Categorías**:
+  - Asegurar que la categoría creada automáticamente por el sistema (ej. "Coca-Cola") se renderice como una píldora seleccionable en la barra horizontal de categorías del cliente.
+- [ ] **5.11 Carga Elegante de Productos Activos**:
+  - Mostrar los productos globales activados bajo la categoría correspondiente, consumiendo dinámicamente la imagen oficial de catálogo mediante `PremiumImage` y el precio local fijado por el comercio.
+

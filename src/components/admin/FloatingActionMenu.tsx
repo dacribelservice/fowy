@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, LayoutDashboard, Store, Users, 
   Briefcase, UserCircle, Wallet, ShieldCheck,
-  Sparkles
+  Sparkles, Layers
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -14,8 +14,9 @@ export default function FloatingActionMenu() {
   const router = useRouter();
 
   const menuItems = [
-    { icon: <LayoutDashboard size={22} />, href: "/admin/dashboard", delay: 0.35 },
-    { icon: <Store size={22} />, href: "/admin/negocios", delay: 0.3 },
+    { icon: <LayoutDashboard size={22} />, href: "/admin/dashboard", delay: 0.4 },
+    { icon: <Store size={22} />, href: "/admin/negocios", delay: 0.35 },
+    { icon: <Layers size={22} />, href: "/admin/catalogo", delay: 0.3 },
     { icon: <Users size={22} />, href: "/admin/vendedores", delay: 0.25 },
     { icon: <Briefcase size={22} />, href: "/admin/profesionales", delay: 0.2 },
     { icon: <UserCircle size={22} />, href: "/admin/usuarios", delay: 0.15 },

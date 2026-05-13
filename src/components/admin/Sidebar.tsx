@@ -12,7 +12,8 @@ import {
   Wallet, 
   ShieldCheck, 
   LogOut,
-  Sparkles
+  Sparkles,
+  Layers
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
@@ -27,6 +28,7 @@ function cn(...inputs: ClassValue[]) {
 const menuItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Negocios", href: "/admin/negocios", icon: Store },
+  { name: "Catálogo Fowy", href: "/admin/catalogo", icon: Layers },
   { name: "Vendedores", href: "/admin/vendedores", icon: Users },
   { name: "Profesionales", href: "/admin/profesionales", icon: Briefcase },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserCircle },
@@ -106,12 +108,12 @@ export default function Sidebar() {
             <Link key={item.name} href={item.href} className="block">
               <motion.div
                 whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: 0.95 }}
                 className={cn(
                   "flex items-center gap-4 px-4 py-3 rounded-fowy transition-all duration-300 group",
                   isActive 
-                    ? "bg-fowy-primary text-white shadow-premium" 
-                    : "text-slate-500 hover:bg-white/50 hover:text-fowy-red"
+                    ? "bg-fowy-primary text-white shadow-[0_4px_20px_rgba(255,90,95,0.35)]" 
+                    : "text-slate-500 hover:bg-white/50 hover:text-fowy-red hover:shadow-[0_0_15px_rgba(255,90,95,0.15)]"
                 )}
               >
                 <Icon size={20} className={cn("transition-colors", isActive ? "text-white" : "group-hover:text-fowy-red")} />
