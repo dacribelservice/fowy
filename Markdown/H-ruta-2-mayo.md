@@ -85,7 +85,7 @@ Esta fase integra la capacidad de crear categorías globales representadas por i
   - Eliminar el botón antiguo y redundante "Catálogo Fowy" en la esquina superior derecha para limpiar la interfaz.
   - Implementar un carrusel horizontal con scroll táctil súper fluido justo debajo de "Etiquetas de tu Negocio".
   - Renderizar las categorías globales como círculos perfectos (`w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 shadow-sm backdrop-blur-md`) usando `PremiumImage`.
-- [ ] **5.8 Pestaña/Subpantalla de Selección de Productos**:
+- [x] **5.8 Pestaña/Subpantalla de Selección de Productos**:
   - Al dar clic en una categoría circular (ej. "Coca-Cola"), transicionar mediante Framer Motion hacia una subvista que muestre todos los productos del catálogo asociados a ella.
 - [ ] **5.9 Switch Táctil de Activación y Automatización de Categoría Local**:
   - **Lógica Inteligente de Creación Automática de Categoría**: Al activar el Switch del producto global (ej. "Coca-Cola Original 350ml"):
