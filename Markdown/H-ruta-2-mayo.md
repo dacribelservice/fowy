@@ -107,18 +107,18 @@ Esta fase integra la capacidad de crear categorías globales representadas por i
 Esta fase integra el seguimiento inteligente de los estados de suscripción de los negocios (Activo, En Mora, Inactivo) dentro del panel administrativo de FOWY, aplicando el cálculo temporal exacto y manteniendo una estética "Ethereal High-Tech".
 
 #### 🧠 Bloque 1: Motor Lógico de Estados (Cálculo de Días)
-- [ ] **6.1 Extraer Fecha Segura**: Implementar la lógica para extraer el `payment_date` de cada negocio en el hook de gestión.
-- [ ] **6.2 Calcular `diffDays` con Precisión**: Usar las utilidades `getBogotaDate` y `parseSafeDate` de `bogotaTimeUtils.ts` para calcular los días de mora (`diffDays = hoy - payment_date`) asegurando sincronización de zona horaria inquebrantable.
-- [ ] **6.3 Clasificación Condicional**:
+- [x] **6.1 Extraer Fecha Segura**: Implementar la lógica para extraer el `payment_date` de cada negocio en el hook de gestión.
+- [x] **6.2 Calcular `diffDays` con Precisión**: Usar las utilidades `getBogotaDate` y `parseSafeDate` de `bogotaTimeUtils.ts` para calcular los días de mora (`diffDays = hoy - payment_date`) asegurando sincronización de zona horaria inquebrantable.
+- [x] **6.3 Clasificación Condicional**:
   - **Activo**: `diffDays <= 0` (fecha de pago vigente).
   - **En Mora**: `1 <= diffDays <= 7` (Etapa 1 de alerta flexible).
   - **Inactivo**: `diffDays > 7` o si está desactivado manualmente (`status = false`).
 
 #### 🎛️ Bloque 2: Integración de Filtros Inteligentes
-- [ ] **6.4 Actualizar Selector Visual**: Agregar la opción "En Mora" al selector de estado (`filterStatus`) en el componente `BusinessList.tsx`.
-- [ ] **6.5 Actualizar Hook Orquestador**: Modificar la lógica de filtrado en `useAdminBusinessManager.ts` para que filtre dinámicamente usando el cálculo de `diffDays` e identifique correctamente cada uno de los 3 estados al vuelo.
+- [x] **6.4 Actualizar Selector Visual**: Agregar la opción "En Mora" al selector de estado (`filterStatus`) en el componente `BusinessList.tsx`.
+- [x] **6.5 Actualizar Hook Orquestador**: Modificar la lógica de filtrado en `useAdminBusinessManager.ts` para que filtre dinámicamente usando el cálculo de `diffDays` e identifique correctamente cada uno de los 3 estados al vuelo.
 
 #### ✨ Bloque 3: Rediseño Visual Premium (Ethereal High-Tech)
-- [ ] **6.6 Cápsula Activo (Verde)**: Aplicar diseño tipo píldora *Glassmorphism* `bg-emerald-500/10` y `border-emerald-500/20` con texto esmeralda sin negrita (`font-medium`) e indicador LED palpitante en la celda "Estatus" (Desktop y Mobile).
-- [ ] **6.7 Cápsula En Mora (Amarillo)**: Aplicar diseño con degradado ámbar/naranja `bg-amber-500/10` y `border-amber-500/20` con texto ámbar sin negrita e indicador LED de alerta pulsante.
-- [ ] **6.8 Cápsula Inactivo (Rojo)**: Aplicar diseño de bloqueo con difuminado rojo `bg-rose-500/10` y `border-rose-500/20` con texto rojo tenue sin negrita e indicador LED estático rojo.
+- [x] **6.6 Cápsula Activo (Verde)**: Aplicar diseño tipo píldora *Glassmorphism* `bg-emerald-500/10` y `border-emerald-500/20` con texto esmeralda sin negrita (`font-medium`) e indicador LED palpitante en la celda "Estatus" (Desktop y Mobile).
+- [x] **6.7 Cápsula En Mora (Amarillo)**: Aplicar diseño con degradado ámbar/naranja `bg-amber-500/10` y `border-amber-500/20` con texto ámbar sin negrita e indicador LED de alerta pulsante.
+- [x] **6.8 Cápsula Inactivo (Rojo)**: Aplicar diseño de bloqueo con difuminado rojo `bg-rose-500/10` y `border-rose-500/20` con texto rojo tenue sin negrita e indicador LED estático rojo.

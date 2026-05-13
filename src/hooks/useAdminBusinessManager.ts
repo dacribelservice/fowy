@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Business } from "@/components/admin/businesses/BusinessList";
 import { useBusinessStats } from "@/hooks/useBusinessStats";
 import { storageService } from "@/services/storageService";
+import { getBogotaDate, parseSafeDate } from "@/utils/bogotaTimeUtils";
 
 const supabase = createClient();
 
@@ -60,7 +61,25 @@ export function useAdminBusinessManager(options: ManagerOptions) {
 
       // Status Filter
       if (filterStatus !== "all") {
-        query = query.eq('status', filterStatus === "active");
+        const hoy = getBogotaDate();
+        const hoyStart = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        const hoyIso = hoyStart.toISOString().split('T')[0];
+        
+        const limitDate = new Date(hoyStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const limitIso = limitDate.toISOString().split('T')[0];
+
+        if (filterStatus === "active") {
+          query = query
+            .eq('status', true)
+            .or(`payment_date.gte.${hoyIso},payment_date.is.null`);
+        } else if (filterStatus === "mora") {
+          query = query
+            .eq('status', true)
+            .lt('payment_date', hoyIso)
+            .gte('payment_date', limitIso);
+        } else if (filterStatus === "inactive") {
+          query = query.or(`status.eq.false,payment_date.lt.${limitIso}`);
+        }
       }
 
       const from = (currentPage - 1) * pageSize;
@@ -72,7 +91,35 @@ export function useAdminBusinessManager(options: ManagerOptions) {
 
       if (error) throw error;
 
-      setBusinesses((busData as unknown as Business[]) || []);
+      const hoy = getBogotaDate();
+      const hoyStart = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+      const processedBusinesses = ((busData || []) as any[]).map((business) => {
+        let diffDays = 0;
+        if (business.payment_date) {
+          const paymentDate = parseSafeDate(business.payment_date);
+          const paymentStart = new Date(paymentDate.getFullYear(), paymentDate.getMonth(), paymentDate.getDate());
+          const diffMs = hoyStart.getTime() - paymentStart.getTime();
+          diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        }
+
+        let computedStatus: 'active' | 'mora' | 'inactive' = 'active';
+        if (!business.status || diffDays > 7) {
+          computedStatus = 'inactive';
+        } else if (diffDays >= 1 && diffDays <= 7) {
+          computedStatus = 'mora';
+        } else {
+          computedStatus = 'active';
+        }
+
+        return {
+          ...business,
+          diffDays,
+          computedStatus
+        };
+      });
+
+      setBusinesses(processedBusinesses as Business[]);
       setTotalCount(count || 0);
 
     } catch (error: unknown) {

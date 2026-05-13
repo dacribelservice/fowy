@@ -26,6 +26,37 @@ export interface Business {
   logo_url: string;
   status: boolean;
   created_at: string;
+  diffDays?: number;
+  computedStatus?: 'active' | 'mora' | 'inactive';
+}
+
+function StatusBadge({ status, computedStatus }: { status: boolean; computedStatus?: 'active' | 'mora' | 'inactive' }) {
+  const current = computedStatus || (status ? 'active' : 'inactive');
+
+  if (current === 'active') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border bg-emerald-500/10 border-emerald-500/20 text-emerald-600 font-medium text-[11px] backdrop-blur-sm shadow-sm select-none whitespace-nowrap">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        Activo
+      </span>
+    );
+  }
+
+  if (current === 'mora') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border bg-amber-500/10 border-amber-500/20 text-amber-600 font-medium text-[11px] backdrop-blur-sm shadow-sm select-none animate-pulse-slow whitespace-nowrap">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+        En Mora
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border bg-rose-500/10 border-rose-500/20 text-rose-600 font-medium text-[11px] backdrop-blur-sm shadow-sm select-none whitespace-nowrap">
+      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+      Inactivo
+    </span>
+  );
 }
 
 interface BusinessListProps {
@@ -90,6 +121,7 @@ export default function BusinessList({
           >
             <option value="all">Estatus: Todos</option>
             <option value="active">Activos</option>
+            <option value="mora">En Mora</option>
             <option value="inactive">Inactivos</option>
           </select>
         </div>
@@ -147,10 +179,7 @@ export default function BusinessList({
                     </span>
                   </td>
                   <td className="px-6 py-5">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2.5 h-2.5 rounded-full shadow-sm animate-pulse ${b.status ? 'bg-green-400 shadow-green-200' : 'bg-red-400 shadow-red-200'}`} />
-                      <span className="text-xs font-bold text-slate-600">{b.status ? 'ACTIVO' : 'INACTIVO'}</span>
-                    </div>
+                    <StatusBadge status={b.status} computedStatus={b.computedStatus} />
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-2 text-sm font-medium text-slate-500" suppressHydrationWarning>
@@ -171,7 +200,7 @@ export default function BusinessList({
                     <div className="flex items-center justify-end gap-3">
                       <Link 
                         href={`/admin/negocios/${b.id}`}
-                        className="p-3 rounded-2xl bg-fowy-blue/5 text-fowy-blue hover:bg-fowy-blue hover:text-white transition-all shadow-sm"
+                        className="p-3 rounded-2xl bg-fowy-blue/5 text-fowy-blue hover:bg-gradient-to-br hover:from-[#FF5A5F] hover:to-[#FF9A3D] hover:text-white transition-all shadow-sm"
                       >
                         <Edit2 size={18} />
                       </Link>
@@ -221,11 +250,10 @@ export default function BusinessList({
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-white/40 p-3 rounded-2xl border border-white/50">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Estatus</span>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${b.status ? 'bg-green-400' : 'bg-red-400'}`} />
-                    <span className="text-xs font-bold text-slate-600">{b.status ? 'ACTIVO' : 'INACTIVO'}</span>
+                <div className="bg-white/40 p-3 rounded-2xl border border-white/50 flex flex-col justify-between">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Estatus</span>
+                  <div className="flex items-center">
+                    <StatusBadge status={b.status} computedStatus={b.computedStatus} />
                   </div>
                 </div>
                 <div className="bg-white/40 p-3 rounded-2xl border border-white/50">
