@@ -25,7 +25,7 @@ export default function BusinessLayout({
       <PartnerMobileMenu />
 
       {/* Main Content */}
-      <main className="flex-1 xl:ml-80 p-6 xl:p-10">
+      <main className="flex-1 min-w-0 xl:ml-80 p-6 xl:p-10">
         <div className="max-w-7xl mx-auto">
           <PartnerTopBar />
           {children}
