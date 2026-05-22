@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { HelpCircle, Star, TrendingUp, ExternalLink } from 'lucide-react';
+import { HelpCircle, Star, TrendingUp, ExternalLink, Phone } from 'lucide-react';
 
 export const ExplorerInfoRight = () => {
   return (
@@ -42,9 +42,15 @@ export const ExplorerInfoRight = () => {
         <p className="text-xs text-slate-500 leading-relaxed mb-4">
           Si tienes problemas con un pedido o quieres registrar tu negocio, contáctanos.
         </p>
-        <button className="w-full py-2 px-4 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition-all shadow-sm">
-          Centro de Soporte
-        </button>
+        <a 
+          href="https://wa.me/573008014770"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-2 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <Phone size={14} />
+          Contacto
+        </a>
       </div>
     </div>
   );
