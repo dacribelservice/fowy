@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { MobileFrame } from "@/components/explorer/MobileFrame";
 import { PageTransition } from "@/components/explorer/PageTransition";
-import { Search, User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck, Store, ShoppingBag } from "lucide-react";
+import { User, X, LogIn, Heart, FileText, LogOut, ChevronRight, ShieldCheck, Store, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
@@ -16,8 +16,6 @@ export default function ExplorerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const { addToCart } = useCart();
@@ -81,42 +79,6 @@ export default function ExplorerLayout({
 
 
           <div className="flex items-center gap-3">
-            {/* Expanding Search Engine */}
-            {isExplorerRoot && (
-              <motion.div 
-                layout
-                initial={false}
-                animate={{ 
-                  width: isSearchOpen ? "calc(100% - 132px)" : "48px",
-                }}
-                transition={{ type: "spring", damping: 20, stiffness: 200 }}
-                className="h-12 bg-white/80 backdrop-blur-xl border border-white/40 rounded-full shadow-xl pointer-events-auto flex items-center overflow-hidden"
-              >
-                <button 
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className="w-12 h-12 flex items-center justify-center text-slate-800 flex-shrink-0 hover:bg-white/10 transition-colors"
-                >
-                  {isSearchOpen ? <X size={20} strokeWidth={2.5} /> : <Search size={22} strokeWidth={2.5} />}
-                </button>
-                
-                <AnimatePresence>
-                  {isSearchOpen && (
-                    <motion.input
-                      autoFocus
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      type="text"
-                      placeholder="¿Qué buscas hoy?"
-                      value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
-                      className="w-full bg-transparent border-none outline-none text-sm font-bold text-slate-800 placeholder:text-slate-400 pr-4"
-                    />
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            )}
-
             {/* Profile / Login Button with Loading Shield */}
             {isLoading ? (
               <div className="w-12 h-12 rounded-full bg-white/40 backdrop-blur-xl border border-white/20 animate-pulse flex-shrink-0" />
