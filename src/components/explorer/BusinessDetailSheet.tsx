@@ -53,7 +53,9 @@ export default function BusinessDetailSheet({
             )}
             <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg">
               <Star size={10} className="fill-amber-400 text-amber-400" />
-              <span className="text-[10px] font-black text-amber-600">4.9</span>
+              <span className="text-[10px] font-black text-amber-600">
+                {business.rating ? parseFloat(String(business.rating)).toFixed(1) : "0.0"}
+              </span>
             </div>
           </div>
           <h2 className="text-2xl font-black text-slate-800 leading-tight mb-2">{business.name}</h2>

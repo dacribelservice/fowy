@@ -15,6 +15,7 @@ interface Business {
   color_identity: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  rating?: number | string | null;
 }
 
 interface ExplorerBusinessCardProps {
@@ -53,7 +54,9 @@ export default function ExplorerBusinessCard({ business, index }: ExplorerBusine
               </span>
               <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
                 <Star size={10} className="fill-amber-400 text-amber-400" />
-                <span className="text-[10px] font-black text-amber-700">4.9</span>
+                <span className="text-[10px] font-black text-amber-700">
+                  {business.rating ? parseFloat(String(business.rating)).toFixed(1) : "0.0"}
+                </span>
               </div>
             </div>
             <h3 className="text-lg font-black text-slate-700 leading-tight group-hover:text-fowy-red transition-colors">

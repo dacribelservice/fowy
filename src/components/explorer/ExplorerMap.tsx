@@ -116,7 +116,9 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness }: Ex
                         <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{biz.category_name}</span>
                         <div className="flex items-center gap-0.5">
                           <Star size={8} className="fill-amber-400 text-amber-400" />
-                          <span className="text-[8px] font-black">4.9</span>
+                          <span className="text-[8px] font-black">
+                            {biz.rating ? parseFloat(String(biz.rating)).toFixed(1) : "0.0"}
+                          </span>
                         </div>
                       </div>
                       <h4 className="text-sm font-black text-slate-800 leading-tight truncate">{biz.name}</h4>

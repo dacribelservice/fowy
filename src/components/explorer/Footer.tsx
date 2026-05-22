@@ -144,7 +144,7 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
             </h4>
             <div className="flex flex-col space-y-2.5">
               <a 
-                href="https://wa.me/573024601348" 
+                href="https://wa.me/573008014770" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-black hover:opacity-80 transition-colors"
@@ -152,7 +152,7 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
                 <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center !text-[#000000] border !border-[#000000]">
                   <MessageCircle size={16} />
                 </div>
-                <span className="font-normal">+57 302 4601348</span>
+                <span className="font-normal">+57 300 801 4770</span>
               </a>
 
               <a 
