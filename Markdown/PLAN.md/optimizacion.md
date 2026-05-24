@@ -7,16 +7,16 @@ Este documento detalla la hoja de ruta y la lista de comprobación (checklist) t
 ## 🗺️ Checklist de Implementación Técnica
 
 ### 1. 🌍 Filtrado Geográfico y Paginación en Base de Datos (PostGIS)
-- [ ] **1.1 Habilitar PostGIS**: Ejecutar el comando para habilitar la extensión espacial en la base de datos de Supabase.
+- [x] **1.1 Habilitar PostGIS**: Ejecutar el comando para habilitar la extensión espacial en la base de datos de Supabase.
   ```sql
   CREATE EXTENSION IF NOT EXISTS postgis;
   ```
-- [ ] **1.2 Agregar Columna Geográfica**: Crear la columna `geom` de tipo `geography(Point, 4326)` en la tabla `businesses` para almacenar la posición espacial exacta.
-- [ ] **1.3 Crear Índice Espacial GIST**: Crear un índice GIST sobre la columna `geom` para evitar escaneos completos de la tabla en búsquedas geográficas.
+- [x] **1.2 Agregar Columna Geográfica**: Crear la columna `geom` de tipo `geography(Point, 4326)` en la tabla `businesses` para almacenar la posición espacial exacta.
+- [x] **1.3 Crear Índice Espacial GIST**: Crear un índice GIST sobre la columna `geom` para evitar escaneos completos de la tabla en búsquedas geográficas.
   ```sql
   CREATE INDEX IF NOT EXISTS businesses_geom_gist_idx ON businesses USING GIST (geom);
   ```
-- [ ] **1.4 Trigger de Sincronización**: Crear un Trigger en PostgreSQL para que mantenga actualizada la columna `geom` automáticamente cuando se inserten o actualicen latitud (`latitude`) o longitud (`longitude`).
+- [x] **1.4 Trigger de Sincronización**: Crear un Trigger en PostgreSQL para que mantenga actualizada la columna `geom` automáticamente cuando se inserten o actualicen latitud (`latitude`) o longitud (`longitude`).
 - [ ] **1.5 Crear Función RPC de Viewport (Bounding Box)**: Crear la función SQL que reciba los límites del mapa (Norte, Sur, Este, Oeste) y retorne los negocios visibles filtrados por estado y categoría con un límite máximo (ej. `LIMIT 250`).
 - [ ] **1.6 Actualizar Cliente (`useExplorerManager.ts`)**: Modificar el hook para que use la nueva función RPC pasándole los límites dinámicos del mapa cada vez que el usuario mueva o haga zoom en el mapa (aplicando un Debounce de 300ms para evitar peticiones repetidas).
 
@@ -43,4 +43,12 @@ Este documento detalla la hoja de ruta y la lista de comprobación (checklist) t
 - [ ] **4.3 Crear RPC Consolidada**: Crear la función en la base de datos `get_business_menu_payload` que realice un único viaje a la base de datos y retorne los datos del negocio, sus categorías y sus banners publicitarios formateados como JSON.
 - [ ] **4.4 Actualizar Hook de Menú (`useBusinessMenuData.ts`)**: Reemplazar las múltiples peticiones simultáneas por una única llamada a la función RPC consolidada al entrar al menú digital de un negocio.
 
+---
 
+### 🛡️ 5. Modernización y Preparación de "Remolques" (Nuevas Reglas)
+*De acuerdo con la "Ley del Remolque" (conceptos.md), el código heredado NO se debe refactorizar. Estas tareas establecen la base para que los **nuevos** desarrollos nazcan robustos y escalables, además de blindar la UI actual sin destruirla.*
+
+- [ ] **5.1 Autogeneración de Tipos Estrictos**: Ejecutar `npx supabase gen types typescript --project-id <id>` para descargar el esquema oficial de la base de datos a `src/types/supabase.ts` y tenerlo disponible para futuros módulos.
+- [ ] **5.2 Resiliencia con Error Boundaries**: Envolver el componente principal del mapa (`ExplorerMap`) o vistas complejas en un `<ErrorBoundary>`. Es una capa protectora (remolque pasivo) que no rompe la lógica de React existente.
+- [ ] **5.3 Crear Plantilla de Módulo Nuevo (Zustand & React Query)**: Construir un archivo "esqueleto" de ejemplo que implemente Zustand y React Query/SWR correctamente. Esto será el estándar obligatorio y la guía visual para cualquier programador o IA que vaya a crear componentes **nuevos desde cero**.
+- [ ] **5.4 Esquemas de Zod listos para usarse**: Dejar instalada y configurada la base de Zod para validar estructuras JSON (como nuevos formularios o esquemas `schedules`) antes de guardarlos en base de datos.
