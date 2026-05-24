@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapPin, Navigation, ChevronRight, Star } from 'lucide-react';
@@ -17,9 +17,44 @@ L.Icon.Default.mergeOptions({
 
 function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
   const map = useMap();
+  
   useEffect(() => {
-    map.setView(center, zoom);
-  }, [center, zoom, map]);
+    const currentCenter = map.getCenter();
+    const currentZoom = map.getZoom();
+    
+    // Solo forzar el movimiento de la cámara si la posición deseada es realmente diferente
+    if (currentCenter.lat !== center[0] || currentCenter.lng !== center[1] || currentZoom !== zoom) {
+      map.setView(center, zoom);
+    }
+  }, [center[0], center[1], zoom, map]);
+  
+  return null;
+}
+
+function BoundsTracker({ onBoundsChange }: { onBoundsChange: (bounds: any) => void }) {
+  const map = useMapEvents({
+    moveend: () => {
+      const bounds = map.getBounds();
+      onBoundsChange({
+        minLat: bounds.getSouth(),
+        minLng: bounds.getWest(),
+        maxLat: bounds.getNorth(),
+        maxLng: bounds.getEast(),
+      });
+    },
+  });
+  
+  useEffect(() => {
+    const bounds = map.getBounds();
+    onBoundsChange({
+      minLat: bounds.getSouth(),
+      minLng: bounds.getWest(),
+      maxLat: bounds.getNorth(),
+      maxLng: bounds.getEast(),
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   return null;
 }
 
@@ -27,9 +62,10 @@ interface ExplorerMapProps {
   businesses: any[];
   center?: [number, number];
   onSelectBusiness?: (biz: any) => void;
+  setMapBounds?: (bounds: any) => void;
 }
 
-export default function ExplorerMap({ businesses, center, onSelectBusiness }: ExplorerMapProps) {
+export default function ExplorerMap({ businesses, center, onSelectBusiness, setMapBounds }: ExplorerMapProps) {
   const defaultCenter: [number, number] = [4.624335, -74.063644]; // Centro de Bogotá, Colombia (Fallback)
   let mapCenter: [number, number] = defaultCenter;
   
@@ -56,6 +92,8 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness }: Ex
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
         />
+
+        {setMapBounds && <BoundsTracker onBoundsChange={setMapBounds} />}
 
         {/* User Location Marker (Blue Dot) */}
         {center && (
@@ -105,7 +143,7 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness }: Ex
               }}
               icon={markerIcon}
             >
-              <Popup className="premium-popup">
+              <Popup autoPan={false} className="premium-popup">
                 <div className="w-64 p-2">
                   <div className="flex gap-3 mb-3">
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0">

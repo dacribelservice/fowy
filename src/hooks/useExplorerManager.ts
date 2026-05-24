@@ -18,15 +18,26 @@ export function useExplorerManager() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [locationError, setLocationError] = useState<"permission_denied" | "position_unavailable" | "unsupported" | "timeout" | null>(null);
 
+  // Nuevo estado para los límites del mapa
+  const [mapBounds, setMapBounds] = useState<{ minLat: number, minLng: number, maxLat: number, maxLng: number } | null>(null);
+  const [debouncedBounds, setDebouncedBounds] = useState(mapBounds);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedBounds(mapBounds), 300);
+    return () => clearTimeout(timer);
+  }, [mapBounds]);
+
   // Refs to hold latest state values (avoids stale closures in callbacks)
   const categoriesRef = useRef<any[]>([]);
   const selectedCategoryIdRef = useRef<string | null>(null);
   const userLocationRef = useRef<[number, number] | null>(null);
+  const debouncedBoundsRef = useRef(debouncedBounds);
 
   // Keep refs in sync with state
   useEffect(() => { categoriesRef.current = categories; }, [categories]);
   useEffect(() => { selectedCategoryIdRef.current = selectedCategoryId; }, [selectedCategoryId]);
   useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
+  useEffect(() => { debouncedBoundsRef.current = debouncedBounds; }, [debouncedBounds]);
 
   // Initial Geolocation
   useEffect(() => {
@@ -85,18 +96,26 @@ export function useExplorerManager() {
       const currentCategories = categoriesRef.current;
       const currentCategoryId = selectedCategoryIdRef.current;
       const currentLocation = userLocationRef.current;
+      const bounds = debouncedBoundsRef.current;
 
-      let query = supabase
-        .from('businesses')
-        .select('*, categories(name)')
-        .eq('status', true);
-
+      let selectedCategoryName = null;
       if (currentCategoryId && currentCategories.length > 0) {
         const selectedCategory = currentCategories.find((c: any) => c.id === currentCategoryId);
         if (selectedCategory) {
-          query = query.contains('tags', [selectedCategory.name]);
+          selectedCategoryName = selectedCategory.name;
         }
       }
+
+      const query = supabase
+        .rpc('get_businesses_in_viewport', {
+          p_min_lat: bounds?.minLat ?? null,
+          p_min_lng: bounds?.minLng ?? null,
+          p_max_lat: bounds?.maxLat ?? null,
+          p_max_lng: bounds?.maxLng ?? null,
+          p_category: selectedCategoryName,
+          p_limit: 250
+        })
+        .select('*, categories(name)');
 
       const { data: busData, error } = await query;
       if (error) throw error;
@@ -137,7 +156,7 @@ export function useExplorerManager() {
   // Sync effect
   useEffect(() => {
     fetchBusinesses();
-  }, [fetchBusinesses, selectedCategoryId, userLocation, categories]);
+  }, [fetchBusinesses, selectedCategoryId, userLocation, categories, debouncedBounds]);
 
   // Realtime
   useEffect(() => {
@@ -236,6 +255,7 @@ export function useExplorerManager() {
     setLocationError,
     handleSelectCategory,
     handleCenterUser,
-    handleSelectBusiness
+    handleSelectBusiness,
+    setMapBounds
   };
 }

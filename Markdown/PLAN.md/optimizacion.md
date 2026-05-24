@@ -17,8 +17,8 @@ Este documento detalla la hoja de ruta y la lista de comprobación (checklist) t
   CREATE INDEX IF NOT EXISTS businesses_geom_gist_idx ON businesses USING GIST (geom);
   ```
 - [x] **1.4 Trigger de Sincronización**: Crear un Trigger en PostgreSQL para que mantenga actualizada la columna `geom` automáticamente cuando se inserten o actualicen latitud (`latitude`) o longitud (`longitude`).
-- [ ] **1.5 Crear Función RPC de Viewport (Bounding Box)**: Crear la función SQL que reciba los límites del mapa (Norte, Sur, Este, Oeste) y retorne los negocios visibles filtrados por estado y categoría con un límite máximo (ej. `LIMIT 250`).
-- [ ] **1.6 Actualizar Cliente (`useExplorerManager.ts`)**: Modificar el hook para que use la nueva función RPC pasándole los límites dinámicos del mapa cada vez que el usuario mueva o haga zoom en el mapa (aplicando un Debounce de 300ms para evitar peticiones repetidas).
+- [x] **1.5 Crear Función RPC de Viewport (Bounding Box)**: Crear la función SQL que reciba los límites del mapa (Norte, Sur, Este, Oeste) y retorne los negocios visibles filtrados por estado y categoría con un límite máximo (ej. `LIMIT 250`).
+- [x] **1.6 Actualizar Cliente (`useExplorerManager.ts`)**: Modificar el hook para que use la nueva función RPC pasándole los límites dinámicos del mapa cada vez que el usuario mueva o haga zoom en el mapa (aplicando un Debounce de 300ms para evitar peticiones repetidas).
 
 ---
 

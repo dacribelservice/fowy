@@ -36,7 +36,8 @@ export default function ExplorarPage() {
     setLocationError,
     handleSelectCategory,
     handleCenterUser,
-    handleSelectBusiness
+    handleSelectBusiness,
+    setMapBounds
   } = useExplorerManager();
 
   const [showWarningBanner, setShowWarningBanner] = useState(true);
@@ -56,6 +57,7 @@ export default function ExplorarPage() {
           businesses={businesses} 
           center={userLocation || undefined} 
           onSelectBusiness={handleSelectBusiness}
+          setMapBounds={setMapBounds}
         />
       </div>
 
