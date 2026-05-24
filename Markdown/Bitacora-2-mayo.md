@@ -9,6 +9,15 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
 
 ## 🚩 HISTORIAL DE HITOS Y AVANCES (MAYO 2026)
 
+### 📌 Hito: Optimización de Escalabilidad Fase 1 (Filtrado Geográfico con PostGIS)
+- **Fecha**: 23 de Mayo de 2026
+- **Resumen**: Implementación de arquitectura geoespacial empresarial para soportar +10,000 negocios sin colapsos.
+- **Detalles Técnicos**:
+  - **Carga Inteligente (Bounding Box)**: La app pasó de descargar toda la base de datos a solicitar únicamente un límite máximo de 250 negocios que se encuentren dentro de las coordenadas del área visible en la pantalla del usuario.
+  - **PostGIS y GIST**: Activación de la extensión PostGIS en Supabase, agregando columna espacial `geom` con índice `GIST` y un Trigger de sincronización en caliente, reduciendo los tiempos de consulta de segundos a milisegundos.
+  - **Eficiencia en Cliente**: Se delegó el cálculo de proximidad (distancias pesadas) al motor de PostgreSQL en la nube, ahorrando batería y consumo de datos móviles (megas).
+  - **Corrección de Bugs**: Se resolvieron bucles infinitos en el mapa (`autoPan`) y bloqueos de interfaz relacionados con restricciones de geolocalización en iOS (iPhone).
+
 ### 📌 Hito 5.9, 5.10 & 5.11: Automatización de Categorías y Menú Digital en Tiempo Real
 - **Fecha**: 13 de Mayo de 2026
 - **Resumen**: Implementación de la automatización inteligente del Catálogo Centralizado ("Crave Catalog") y su renderizado inmediato en la experiencia de cliente.
