@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Star, MapPin } from "lucide-react";
+import { Star, MapPin, Share2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CraveBusinessHeaderProps {
   logoUrl: string;
@@ -20,6 +21,22 @@ export function CraveBusinessHeader({
   distance,
   votesCount = 0,
 }: CraveBusinessHeaderProps) {
+  const handleShare = async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link de menú copiado");
+      if (navigator.share) {
+        await navigator.share({
+          title: `Menú de ${name}`,
+          url: url
+        });
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   return (
     <div className="relative px-6 -mt-14 z-20 flex items-start gap-5">
       {/* Logo Circular */}
@@ -79,6 +96,16 @@ export function CraveBusinessHeader({
             </span>
           </div>
         )}
+
+        <div 
+          onClick={handleShare}
+          className="mt-1 flex items-center gap-1 text-slate-500 cursor-pointer active:opacity-70 transition-opacity"
+        >
+          <Share2 className="w-3.5 h-3.5" />
+          <span className="text-[11px] font-semibold uppercase tracking-wider">
+            COMPARTIR MENÚ
+          </span>
+        </div>
       </div>
     </div>
   );
