@@ -17,7 +17,11 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 let messaging: Messaging | undefined;
 
 if (typeof window !== "undefined") {
-  messaging = getMessaging(app);
+  try {
+    messaging = getMessaging(app);
+  } catch (error) {
+    console.warn("Firebase Messaging no está soportado en este navegador/dispositivo:", error);
+  }
 }
 
 export { app, messaging };
