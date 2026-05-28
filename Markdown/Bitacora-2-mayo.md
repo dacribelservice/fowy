@@ -25,3 +25,19 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
   - **Paso 5.9 (Activación Automatizada)**: Cuando el comercio activa un producto global, el sistema detecta si la categoría equivalente existe localmente; de lo contrario, la crea en caliente e inyecta el producto mapeando su categoría. Soporta edición de precio local e inline.
   - **Paso 5.10 & 5.11 (Visualización en Explorer)**: Las categorías autogeneradas se pintan dinámicamente como píldoras táctiles interactivas en la barra horizontal de `/explorer/[slug]`, mostrando bajo demanda los productos activos con fallbacks y precios configurados.
 - **Control de Calidad**: Compilación verificada con `npx tsc --noEmit` (**0 errores**).
+
+### 📌 Hito: Optimización de Escalabilidad Fase 2 (Consolidación de Menú por RPC)
+- **Fecha**: 28 de Mayo de 2026
+- **Resumen**: Eliminación del "efecto cascada" (waterfall) en la carga del menú de los negocios, aplicando la "Ley del Remolque".
+- **Detalles Técnicos**:
+  - **Desnormalización de Ratings**: Se agregaron las columnas `rating_average` y `rating_count` directamente a `businesses` para evitar consultas pesadas al cargar el perfil.
+  - **Triggers de Base de Datos**: Se implementó un trigger inteligente en `business_ratings` para auto-calcular y sincronizar el promedio de calificaciones en caliente.
+  - **Función Consolidada (RPC)**: Creación del procedimiento almacenado `get_business_menu_payload` que en un solo viaje ensambla y retorna el perfil, calificaciones, categorías y banners.
+  - **Ley del Remolque**: Se programó un hook totalmente nuevo (`useV2BusinessMenuData.ts`) y se conectó a la interfaz. Tras verificar su éxito y velocidad, el viejo hook ineficiente fue eliminado por completo, eliminando código muerto.
+
+### 📌 Hito: Modernización y Estandarización de Desarrollo (Paso 3.1)
+- **Fecha**: 28 de Mayo de 2026
+- **Resumen**: Blindaje del código fuente para asegurar que futuros módulos nazcan robustos.
+- **Detalles Técnicos**:
+  - **Autogeneración de Tipos Estrictos**: Extracción del esquema oficial de la base de datos de producción mediante Supabase CLI, creando `src/types/supabase.ts`.
+  - **Impacto**: Actúa como un "diccionario" de validación estricta que impide que programadores o IAs usen columnas inexistentes o cometan errores tipográficos, bloqueando posibles "crashes" de producción desde el editor de código.

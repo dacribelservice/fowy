@@ -89,6 +89,13 @@ Debido a las políticas obligatorias de la App Store de Apple, **todos los naveg
 
 ---
 
+### 6. Colapso Fatal por Inicialización de Firebase Cloud Messaging (FCM)
+* **El Problema:** Al cargar la aplicación en navegadores integrados de iOS (como los WebViews de Instagram, WhatsApp o Facebook) o en navegadores de iOS donde Push API no está habilitado o soportado, llamar directamente a [getMessaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L20) de Firebase lanza una excepción síncrona `messaging/unsupported-browser`.
+  * Como este error ocurre a nivel de importación de módulo en [firebase.ts](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts), rompe el hilo de ejecución principal de JavaScript. Esto provoca que Next.js falle inmediatamente y muestre la pantalla genérica de error "This page couldn't load. Reload to try again" a nivel de la raíz del sitio, antes de que cualquier componente o límite de error (`ErrorBoundary`) pueda actuar.
+* **La Solución:** Envolver la llamada a [getMessaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L20) dentro de un bloque `try/catch`. Si el navegador no soporta mensajería push, el error es capturado de manera segura, se imprime una advertencia en la consola y el símbolo [messaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L17) se exporta como `undefined`. El proveedor de notificaciones [NotificationProvider](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/NotificationProvider.tsx) ya cuenta con validaciones defensivas (`if (!messaging) return;`), por lo que la aplicación seguirá funcionando con total normalidad para el usuario sin crashear.
+
+---
+
 ## 🚫 ¿POR QUÉ ENTRAR DESDE LA APP DE GOOGLE EMPEORA LAS COSAS?
 Muchos usuarios de iPhone intentan resolver los problemas abriendo la web desde la app oficial de Google o Chrome. Esto empeora el rendimiento por las siguientes razones:
 1. **Pérdida de Cookies y Sesión:** Los navegadores dentro de aplicaciones (WebViews) limpian la memoria en cuanto el usuario sale de la app de Google. El usuario tendrá que iniciar sesión constantemente y su carrito de compras se perderá al minimizar.
@@ -126,4 +133,10 @@ Sigue esta lista paso a paso para auditar e implementar cada corrección en la b
 - [x] **5.1. Encapsulamiento del Storage:** Crear o utilizar una función envolvente para `localStorage` (`getItem`, `setItem`, `removeItem`) protegida con `try-catch` para evitar fallos catastróficos en modo incógnito de Safari.
 - [x] **5.2. Memoria en Caché Temporal (Memory Fallback):** Implementar un almacenamiento de respaldo en memoria volátil (objeto plano de JavaScript) dentro de la utilidad de almacenamiento, para que si `localStorage` falla, la app siga operando con datos temporales durante la sesión.
 - [x] **5.3. Cliente Supabase en Privado:** Asegurar que la configuración del cliente de autenticación de Supabase utilice un adaptador resistente o ignore de manera elegante la imposibilidad de persistir sesión si localStorage está deshabilitado por completo.
+
+### 💬 6. Blindaje de Firebase Cloud Messaging (FCM)
+- [ ] **6.1. Diagnóstico de soporte:** Identificar el fallo síncrono al instanciar [getMessaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L20) en WebViews/navegadores sin soporte de Push API.
+- [ ] **6.2. Envoltura try-catch en inicialización:** Modificar [firebase.ts](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts) para envolver la invocación de [getMessaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L20) en un bloque `try/catch` y evitar el colapso a nivel de importación.
+- [ ] **6.3. Verificación de uso defensivo en UI/Providers:** Asegurar que [NotificationProvider.tsx](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/NotificationProvider.tsx) maneje de manera segura el valor `undefined` de [messaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L17) en todos sus efectos y funciones.
+- [ ] **6.4. Pruebas de regresión:** Validar la carga de la aplicación en WebViews simulados o navegadores con Push API deshabilitado para confirmar la correcta carga de la página raíz.
 

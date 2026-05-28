@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
 import { Loader2, Navigation, Plus, AlertCircle, X } from "lucide-react";
 import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
@@ -51,14 +52,16 @@ export default function ExplorarPage() {
   return (
     <div className="h-full w-full relative overflow-hidden bg-transparent">
 
-      {/* Map Layer */}
+      {/* Map Layer con Error Boundary (Protección) */}
       <div className="absolute inset-0 z-0">
-        <ExplorerMap 
-          businesses={businesses} 
-          center={userLocation || undefined} 
-          onSelectBusiness={handleSelectBusiness}
-          setMapBounds={setMapBounds}
-        />
+        <ErrorBoundary fallbackMessage="El mapa no pudo cargar por un error de conexión, pero puedes seguir usando la aplicación sin problema.">
+          <ExplorerMap 
+            businesses={businesses} 
+            center={userLocation || undefined} 
+            onSelectBusiness={handleSelectBusiness}
+            setMapBounds={setMapBounds}
+          />
+        </ErrorBoundary>
       </div>
 
       {/* Geolocation Explanation / Warning Banner */}

@@ -34,6 +34,6 @@ Este documento detalla la hoja de ruta y la lista de comprobación (checklist) t
 *De acuerdo con la "Ley del Remolque" (conceptos.md), el código heredado NO se debe refactorizar. Estas tareas establecen la base para que los **nuevos** desarrollos nazcan robustos y escalables, además de blindar la UI actual sin destruirla.*
 
 - [x] **3.1 Autogeneración de Tipos Estrictos**: Ejecutar `npx supabase gen types typescript --project-id <id>` para descargar el esquema oficial de la base de datos a `src/types/supabase.ts` y tenerlo disponible para futuros módulos.
-- [ ] **3.2 Resiliencia con Error Boundaries**: Envolver el componente principal del mapa (`ExplorerMap`) o vistas complejas en un `<ErrorBoundary>`. Es una capa protectora (remolque pasivo) que no rompe la lógica de React existente.
+- [x] **3.2 Resiliencia con Error Boundaries**: Envolver el componente principal del mapa (`ExplorerMap`) o vistas complejas en un `<ErrorBoundary>`. Es una capa protectora (remolque pasivo) que no rompe la lógica de React existente.
 - [ ] **3.3 Crear Plantilla de Módulo Nuevo (Zustand & React Query)**: Construir un archivo "esqueleto" de ejemplo que implemente Zustand y React Query/SWR correctamente. Esto será el estándar obligatorio y la guía visual para cualquier programador o IA que vaya a crear componentes **nuevos desde cero**.
 - [ ] **3.4 Esquemas de Zod listos para usarse**: Dejar instalada y configurada la base de Zod para validar estructuras JSON (como nuevos formularios o esquemas `schedules`) antes de guardarlos en base de datos.
