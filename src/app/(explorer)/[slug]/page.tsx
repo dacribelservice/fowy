@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
-import { useBusinessMenuData } from "@/hooks/useBusinessMenuData";
+import { useV2BusinessMenuData } from "@/hooks/useV2BusinessMenuData";
 import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
 import { useFavorites } from "@/hooks/useFavorites";
 import { isBusinessOpen } from "@/utils/businessTime";
@@ -49,7 +49,7 @@ export default function BusinessMenuPage() {
     selectedCategory,
     setSelectedCategory,
     votesCount,
-  } = useBusinessMenuData(slug);
+  } = useV2BusinessMenuData(slug);
 
   useBusinessAnalytics(business?.id);
 

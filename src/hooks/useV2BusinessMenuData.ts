@@ -1,15 +1,13 @@
-// ⚠️ DEPRECATED (OBSOLETO) - NO MODIFICAR NI USAR EN CÓDIGO NUEVO.
-// ⚠️ EL HOOK ACTIVO AHORA ES useV2BusinessMenuData.ts (Basado en RPC Consolidado)
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 /**
- * Hook personalizado para manejar todo el estado y la obtención de datos 
- * en tiempo real del menú de negocios en Crave Vision.
+ * Hook V2 personalizado para manejar el estado y la obtención de datos
+ * del menú utilizando el RPC consolidado (Ley del Remolque).
  * 
  * @param slug Identificador del negocio
  */
-export function useBusinessMenuData(slug: string | string[] | undefined) {
+export function useV2BusinessMenuData(slug: string | string[] | undefined) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
@@ -33,7 +31,7 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Carga inicial del Negocio, Categorías y Banners
+  // Carga inicial Consolidada V2 (Un solo viaje a Base de Datos)
   useEffect(() => {
     async function fetchData() {
       if (!slug) return;
@@ -42,50 +40,24 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
 
         const activeSlug = Array.isArray(slug) ? slug[0] : slug;
 
-        // Obtener datos del negocio
-        const { data: busData, error: busError } = await supabase
-          .from("businesses")
-          .select("*")
-          .eq("slug", activeSlug)
-          .single();
+        // Llamada única al RPC consolidado
+        const { data, error } = await supabase.rpc("get_business_menu_payload", {
+          p_slug: activeSlug,
+        });
 
-        if (busError || !busData) {
-          console.error("Business not found in Production Menu:", busError);
+        if (error || !data || !data.business) {
+          console.error("Error fetching consolidated payload:", error);
           setBusiness(null);
           return;
         }
-        setBusiness(busData);
 
-        // Obtener cantidad exacta de calificaciones (votos reales)
-        const { count, error: countError } = await supabase
-          .from("business_ratings")
-          .select("*", { count: "exact", head: true })
-          .eq("business_id", busData.id);
+        setBusiness(data.business);
+        setCategories(data.categories || []);
+        setBanners(data.banners || []);
+        setVotesCount(data.votes_count || 0);
 
-        if (countError) {
-          console.error("Error counting business ratings:", countError);
-        }
-        setVotesCount(count || 0);
-
-        // Obtener categorías del menú
-        const { data: catData } = await supabase
-          .from("product_menu_categories")
-          .select("*")
-          .eq("business_id", busData.id)
-          .order("order_index", { ascending: true });
-
-        setCategories(catData || []);
-
-        // Obtener banners publicitarios
-        const { data: bannersData } = await supabase
-          .from("business_banners")
-          .select("*")
-          .eq("business_id", busData.id)
-          .order("order_index", { ascending: true });
-
-        setBanners(bannersData || []);
       } catch (error) {
-        console.error("Error fetching data in Production Menu:", error);
+        console.error("Error fetching data in V2 Production Menu:", error);
       } finally {
         setLoading(false);
       }
@@ -93,7 +65,7 @@ export function useBusinessMenuData(slug: string | string[] | undefined) {
     fetchData();
   }, [slug, supabase]);
 
-  // Filtrado reactivo de productos del lado del servidor (Supabase)
+  // Filtrado reactivo de productos del lado del servidor (Intacto)
   useEffect(() => {
     if (!business?.id) return;
 
