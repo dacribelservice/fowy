@@ -126,5 +126,5 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 ---
 
 ### 🚨 FASE 7: CORRECCIÓN DE FUGA ARQUITECTÓNICA DE SONIDO (Doble Reproducción)
-- [ ] **7.1. Sincronización Global de Preferencia:** Hacer que el sistema global de notificaciones (`NotificationProvider.tsx`) valide si el sonido está bloqueado o activo (ej. leyendo `business_audio_unlocked` de `localStorage`) antes de ejecutar incondicionalmente `audio.play()`.
-- [ ] **7.2. Prevención de Choque Acústico (Doble Trigger):** Decidir qué módulo se encarga del sonido de órdenes y eliminar el otro para evitar ecos. Si `NotificationProvider` asume la responsabilidad, eliminar el bloque de reproducción de audio en el hook `useOrderManager.ts`.
+- [x] **7.1. Sincronización Global de Preferencia:** Hacer que el sistema global de notificaciones (`NotificationProvider.tsx`) valide si el sonido está bloqueado o activo (ej. leyendo `business_audio_unlocked` de `localStorage`) antes de ejecutar incondicionalmente `audio.play()`.
+- [x] **7.2. Prevención de Choque Acústico (Doble Trigger):** Decidir qué módulo se encarga del sonido de órdenes y eliminar el otro para evitar ecos. Si `NotificationProvider` asume la responsabilidad, eliminar el bloque de reproducción de audio en el hook `useOrderManager.ts`.

@@ -6,6 +6,7 @@ import { messaging } from './firebase';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { PermissionPrompt } from './components/PermissionPrompt';
+import { safeLocalStorage } from '@/utils/storage';
 
 interface NotificationContextType {
   token: string | null;
@@ -29,6 +30,10 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
   // Audio helper
   const playNotificationSound = async (type: 'order' | 'alert' = 'alert') => {
+    // Check global preference before playing
+    const isUnlocked = safeLocalStorage.getItem("business_audio_unlocked");
+    if (isUnlocked !== "true") return;
+
     try {
       const audio = new Audio(type === 'order' ? '/sounds/cash-register.mp3' : '/sounds/alert.mp3');
       await audio.play();

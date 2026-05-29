@@ -144,16 +144,7 @@ export function useOrderManager(businessId: string | null) {
             return [newOrder, ...prev];
           });
           
-          // Reproducir sonido de notificación si el sonido está activo
-          if (isSoundActiveRef.current && audioRef.current) {
-            audioRef.current.play().catch((err) => {
-              if (err?.name === 'NotAllowedError' || err?.name === 'AbortError') {
-                console.warn('Audio play blocked or aborted by iOS browser:', err.name);
-              } else {
-                console.log("Audio play failed:", err);
-              }
-            });
-          }
+          // El sonido de notificación de órdenes ahora es manejado globalmente por NotificationProvider.tsx
         }
       )
       .subscribe((status) => {
