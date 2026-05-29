@@ -2,7 +2,6 @@ import React from "react";
 import PartnerSidebar from "@/components/partners/PartnerSidebar";
 import PartnerMobileMenu from "@/components/partners/PartnerMobileMenu";
 import PartnerTopBar from "@/components/partners/PartnerTopBar";
-import BusinessNotificationListener from "@/components/partners/BusinessNotificationListener";
 import BusinessMembershipGuard from "@/components/partners/BusinessMembershipGuard";
 
 export default function BusinessLayout({
@@ -14,9 +13,6 @@ export default function BusinessLayout({
     <div className="flex min-h-screen bg-[#FBFAFF]">
       {/* Guardián inteligente de membresía para socios */}
       <BusinessMembershipGuard />
-
-      {/* Escucha global de notificaciones sonoras */}
-      <BusinessNotificationListener />
 
       {/* Sidebar for Desktop */}
       <PartnerSidebar />
