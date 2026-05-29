@@ -109,6 +109,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
   // Request permission and get Token
   const requestPermission = async () => {
     if (!messaging) return;
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
 
     try {
       const permission = await Notification.requestPermission();
@@ -139,7 +140,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
   // Sync initial permission status
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermissionStatus(Notification.permission);
     }
   }, []);

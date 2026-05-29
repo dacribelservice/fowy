@@ -122,3 +122,9 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 - [x] **6.6 Cápsula Activo (Verde)**: Aplicar diseño tipo píldora *Glassmorphism* `bg-emerald-500/10` y `border-emerald-500/20` con texto esmeralda sin negrita (`font-medium`) e indicador LED palpitante en la celda "Estatus" (Desktop y Mobile).
 - [x] **6.7 Cápsula En Mora (Amarillo)**: Aplicar diseño con degradado ámbar/naranja `bg-amber-500/10` y `border-amber-500/20` con texto ámbar sin negrita e indicador LED de alerta pulsante.
 - [x] **6.8 Cápsula Inactivo (Rojo)**: Aplicar diseño de bloqueo con difuminado rojo `bg-rose-500/10` y `border-rose-500/20` con texto rojo tenue sin negrita e indicador LED estático rojo.
+
+---
+
+### 🚨 FASE 7: CORRECCIÓN DE FUGA ARQUITECTÓNICA DE SONIDO (Doble Reproducción)
+- [ ] **7.1. Sincronización Global de Preferencia:** Hacer que el sistema global de notificaciones (`NotificationProvider.tsx`) valide si el sonido está bloqueado o activo (ej. leyendo `business_audio_unlocked` de `localStorage`) antes de ejecutar incondicionalmente `audio.play()`.
+- [ ] **7.2. Prevención de Choque Acústico (Doble Trigger):** Decidir qué módulo se encarga del sonido de órdenes y eliminar el otro para evitar ecos. Si `NotificationProvider` asume la responsabilidad, eliminar el bloque de reproducción de audio en el hook `useOrderManager.ts`.

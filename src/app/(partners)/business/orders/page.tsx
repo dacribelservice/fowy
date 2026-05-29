@@ -141,12 +141,12 @@ export default function OrdersPage() {
               {isSoundActive ? (
                 <>
                   <Volume2 size={16} className="animate-pulse" />
-                  <span>Sonido Activo 🔊</span>
+                  <span>Sonido Activo</span>
                 </>
               ) : (
                 <>
                   <VolumeX size={16} />
-                  <span>Sonido Inactivo 🔇</span>
+                  <span>Sonido Inactivo</span>
                 </>
               )}
             </button>

@@ -140,3 +140,7 @@ Sigue esta lista paso a paso para auditar e implementar cada corrección en la b
 - [x] **6.3. Verificación de uso defensivo en UI/Providers:** Asegurar que [NotificationProvider.tsx](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/NotificationProvider.tsx) maneje de manera segura el valor `undefined` de [messaging](file:///c:/Users/cange/Documents/fowy/src/modules/notifications/firebase.ts#L17) en todos sus efectos y funciones.
 - [ ] **6.4. Pruebas de regresión:** Validar la carga de la aplicación en WebViews simulados o navegadores con Push API deshabilitado para confirmar la correcta carga de la página raíz.
 
+### 🚨 7. Fallo Fatal del Objeto `Notification` en iOS (WebView / Safari)
+- [x] **7.1. Diagnóstico:** Identificar que el objeto global `Notification` es `undefined` en iOS WebViews, provocando un error síncrono al invocar `Notification.permission` o `Notification.requestPermission()`.
+- [x] **7.2. Blindar consulta de permisos (`useEffect` inicial):** Modificar `NotificationProvider.tsx` para que verifique `'Notification' in window` antes de consultar `Notification.permission`.
+- [x] **7.3. Blindar solicitud de permisos (`requestPermission`):** Asegurar que la función que dispara el prompt de notificaciones no falle estrepitosamente si el objeto `Notification` no existe.
