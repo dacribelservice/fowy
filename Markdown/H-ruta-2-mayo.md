@@ -132,5 +132,4 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 ---
 
 ### 🚨 FASE 8: OCULTAR PRODUCTOS AGOTADOS EN EL MENÚ PÚBLICO
-- [ ] **8.1. Filtrar Productos Agotados:** En el componente del explorador (`src/app/(explorer)/[slug]/page.tsx`), aplicar un filtro directo al renderizar (`products.filter(p => p.in_stock === true)`) para ocultar los productos agotados, respetando la regla estricta de no refactorizar arquitecturas existentes (mantener el código estable actual).
-- [ ] **8.2. Verificación de Funcionamiento:** Validar que al poner el switch en "Agotado" desde el panel de negocios, el producto ya no aparezca en la versión pública del explorador.
+- [x] **8.1. Filtrar Productos Agotados:** En el componente del explorador (`src/app/(explorer)/[slug]/page.tsx`), aplicar un filtro directo al renderizar (`products.filter(p => p.in_stock === true)`) para ocultar los productos agotados, respetando la regla estricta de no refactorizar arquitecturas existentes (mantener el código estable actual).

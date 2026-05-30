@@ -204,9 +204,9 @@ export default function BusinessMenuPage() {
                 </div>
               ))}
             </div>
-          ) : products.length > 0 ? (
+          ) : products.filter((p) => p.in_stock !== false).length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
-              {products.map((product) => (
+              {products.filter((p) => p.in_stock !== false).map((product) => (
                 <LazyWrapper key={product.id}>
                   <CraveProductCard
                     product={product}
