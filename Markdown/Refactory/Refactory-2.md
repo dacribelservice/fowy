@@ -36,3 +36,18 @@ Refactorizar el archivo `src/app/(partners)/business/menu/page.tsx` (actualmente
 - [x] **5.2** Importar todos los componentes aislados en los pasos 1 a 4. (Aplicar `next/dynamic` si se agregan módulos muy pesados o que dependan fuertemente de visuales en cliente).
 - [x] **5.3** Confirmar que el archivo orquestador quede condensado a un máximo de 200 a 250 líneas.
 - [x] **5.4** Ejecutar `npx tsc --noEmit` para verificar que el tipado estricto se mantenga intacto.
+
+### Fase 6: Descomposición del Componente Footer (Reducción de +600 líneas)
+- [x] **6.1** Crear una subcarpeta dedicada `src/components/explorer/modals/` (o dentro de una estructura `shared/legal` si aplica) para alojar los modales de texto extenso.
+- [x] **6.2** Extraer el bloque del popup "Términos y Condiciones" hacia un nuevo componente `TermsModal.tsx`.
+- [x] **6.3** Extraer el bloque del popup "Políticas de Privacidad" hacia un nuevo componente `PrivacyModal.tsx`.
+- [x] **6.4** Extraer el bloque del popup "Políticas de Cookies" hacia un nuevo componente `CookiesModal.tsx`.
+- [x] **6.5** Extraer el bloque del popup "Nuestra Visión" hacia un nuevo componente `VisionModal.tsx`.
+- [x] **6.6** Aislar los íconos SVG manuales (`Instagram`, `Facebook`, `Twitter`) en un archivo de UI independiente (ej. `SocialIcons.tsx`) para limpiar la cabecera del archivo.
+- [x] **6.7** Actualizar `Footer.tsx` importando los nuevos componentes y pasándoles la prop para cerrar el modal (`onClose={() => setActiveModal(null)}`). Confirmar que `Footer.tsx` baje a menos de 150 líneas.
+
+### Fase 7: Resolución de Conflictos de Bloqueo de Auth (Singleton de Supabase)
+- [x] **7.1** Modificar `src/utils/supabase/client.ts` para implementar el patrón **Singleton de Supabase** en el navegador (instanciar el cliente a nivel de módulo en cliente y reutilizarlo), alineado con la **Regla 6.1 (Estabilidad Realtime)** de `conceptos.md`.
+- [x] **7.2** Confirmar que no aparezcan advertencias en consola del tipo `"lock:sb-...-auth-token"` ni excepciones `AbortError` (lock broken) causadas por la inicialización múltiple del SDK.
+- [x] **7.3** Verificar que las suscripciones en tiempo real del explorador (favoritos, pedidos e historial en `NotificationProvider.tsx`) sigan funcionando de forma normal.
+
