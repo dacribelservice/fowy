@@ -128,3 +128,9 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 ### 🚨 FASE 7: CORRECCIÓN DE FUGA ARQUITECTÓNICA DE SONIDO (Doble Reproducción)
 - [x] **7.1. Sincronización Global de Preferencia:** Hacer que el sistema global de notificaciones (`NotificationProvider.tsx`) valide si el sonido está bloqueado o activo (ej. leyendo `business_audio_unlocked` de `localStorage`) antes de ejecutar incondicionalmente `audio.play()`.
 - [x] **7.2. Prevención de Choque Acústico (Doble Trigger):** Decidir qué módulo se encarga del sonido de órdenes y eliminar el otro para evitar ecos. Si `NotificationProvider` asume la responsabilidad, eliminar el bloque de reproducción de audio en el hook `useOrderManager.ts`.
+
+---
+
+### 🚨 FASE 8: OCULTAR PRODUCTOS AGOTADOS EN EL MENÚ PÚBLICO
+- [ ] **8.1. Filtrar Productos Agotados:** En el componente del explorador (`src/app/(explorer)/[slug]/page.tsx`), aplicar un filtro directo al renderizar (`products.filter(p => p.in_stock === true)`) para ocultar los productos agotados, respetando la regla estricta de no refactorizar arquitecturas existentes (mantener el código estable actual).
+- [ ] **8.2. Verificación de Funcionamiento:** Validar que al poner el switch en "Agotado" desde el panel de negocios, el producto ya no aparezca en la versión pública del explorador.

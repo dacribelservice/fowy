@@ -144,3 +144,9 @@ Sigue esta lista paso a paso para auditar e implementar cada corrección en la b
 - [x] **7.1. Diagnóstico:** Identificar que el objeto global `Notification` es `undefined` en iOS WebViews, provocando un error síncrono al invocar `Notification.permission` o `Notification.requestPermission()`.
 - [x] **7.2. Blindar consulta de permisos (`useEffect` inicial):** Modificar `NotificationProvider.tsx` para que verifique `'Notification' in window` antes de consultar `Notification.permission`.
 - [x] **7.3. Blindar solicitud de permisos (`requestPermission`):** Asegurar que la función que dispara el prompt de notificaciones no falle estrepitosamente si el objeto `Notification` no existe.
+
+---
+
+### 👻 8. Colapso Total por Audio Síncrono (Componente Fantasma)
+- [x] **8.1. Diagnóstico del Error de Pantalla Blanca en iPhone:** Identificar que el componente invisible `BusinessNotificationListener.tsx` estaba invocando `new Audio()` de manera incondicional. En Safari de iOS (y WebViews), intentar inicializar canales de audio sin una interacción previa del usuario provocaba un bloqueo de seguridad crítico que desencadenaba el pantallazo blanco de carga ("This page couldn't load").
+- [x] **8.2. Eliminación de Componente Culpable:** Eliminar por completo el archivo `BusinessNotificationListener.tsx` y limpiar su importación en el `layout.tsx`. Esta acción solucionó el error de raíz y devolvió la compatibilidad total a la versión móvil en iOS.

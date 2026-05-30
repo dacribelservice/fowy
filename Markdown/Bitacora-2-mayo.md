@@ -41,3 +41,12 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
 - **Detalles Técnicos**:
   - **Autogeneración de Tipos Estrictos**: Extracción del esquema oficial de la base de datos de producción mediante Supabase CLI, creando `src/types/supabase.ts`.
   - **Impacto**: Actúa como un "diccionario" de validación estricta que impide que programadores o IAs usen columnas inexistentes o cometan errores tipográficos, bloqueando posibles "crashes" de producción desde el editor de código.
+
+### 📌 Hito: Compatibilidad Absoluta y Prevención de Crashes en iPhone (iOS)
+- **Fecha**: 29 de Mayo de 2026
+- **Resumen**: Diagnóstico profundo y resolución de colapsos fatales de pantalla blanca ("This page couldn't load") al abrir la aplicación en iOS Safari y navegadores integrados (WebViews).
+- **Detalles Técnicos**:
+  - **Blindaje Push API**: Se envolvió la inicialización de Firebase Cloud Messaging (`getMessaging()`) en un `try/catch` para evitar que la falta de soporte síncrona bloquee el hilo de React.
+  - **Manejo Seguro de Permisos**: Se validó `'Notification' in window` antes de invocar los permisos globales en `NotificationProvider.tsx`.
+  - **Erradicación de Componente Fantasma**: Se descubrió y eliminó `BusinessNotificationListener.tsx`, un componente oculto que intentaba cargar `new Audio()` sin interacción del usuario. En iOS, esta agresión a la *Autoplay Policy* generaba un bloqueo de seguridad crítico que mataba la aplicación.
+  - **Arquitectura de Sonido Unificada**: La reproducción de notificaciones de pedidos se centralizó en `useOrderManager.ts` (desbloqueando el sonido de forma legítima tras hacer clic en "Sonido Activo") y se configuró al proveedor global para que respete estrictamente esta preferencia almacenada localmente.
