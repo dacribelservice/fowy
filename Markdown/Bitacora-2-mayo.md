@@ -50,3 +50,11 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
   - **Manejo Seguro de Permisos**: Se validó `'Notification' in window` antes de invocar los permisos globales en `NotificationProvider.tsx`.
   - **Erradicación de Componente Fantasma**: Se descubrió y eliminó `BusinessNotificationListener.tsx`, un componente oculto que intentaba cargar `new Audio()` sin interacción del usuario. En iOS, esta agresión a la *Autoplay Policy* generaba un bloqueo de seguridad crítico que mataba la aplicación.
   - **Arquitectura de Sonido Unificada**: La reproducción de notificaciones de pedidos se centralizó en `useOrderManager.ts` (desbloqueando el sonido de forma legítima tras hacer clic en "Sonido Activo") y se configuró al proveedor global para que respete estrictamente esta preferencia almacenada localmente.
+
+### 📌 Hito: Estabilidad en Autenticación y Realtime (Singleton de Supabase)
+- **Fecha**: 30 de Mayo de 2026
+- **Resumen**: Resolución de conflictos concurrentes en el cliente Supabase del navegador (`AbortError: Lock broken by another request with the 'steal' option`) y optimización de suscripciones en tiempo real.
+- **Detalles Técnicos**:
+  - **Paso 7.1 (Singleton de Supabase)**: Implementación del patrón Singleton en `src/utils/supabase/client.ts` para compartir una única instancia del cliente del navegador, alineado con la **Regla 6.1 (Estabilidad Realtime)** de `conceptos.md`.
+  - **Eliminación de Conflictos de Bloqueo (Web Locks)**: Evita que múltiples inicializaciones del cliente luchen y "roben" la cerradura del token (`sb-...-auth-token`) en `localStorage`, lo que provocaba cierres inesperados de sesión y errores intermitentes en la consola.
+  - **Optimización de Conectividad**: Consolidación y reutilización de la conexión de websockets en tiempo real para todos los proveedores globales (favoritos, pedidos y notificaciones en `NotificationProvider.tsx`), reduciendo la sobrecarga de conexiones concurrentes.
