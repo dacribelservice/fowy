@@ -58,7 +58,7 @@ export default function ExplorerLayout({
     };
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       const newUser = session?.user ?? null;
       setUser(newUser);
       if (newUser) {

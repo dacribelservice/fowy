@@ -173,7 +173,7 @@ export function UserOrdersSheet({
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       if (active) {
         setUser(session?.user ?? null);
       }
