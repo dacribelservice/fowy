@@ -163,7 +163,7 @@ export default function MenuManagementPage() {
         .select('name')
         .order('name', { ascending: true });
       
-      if (catData) setDbCategories(catData.map(c => c.name));
+      if (catData) setDbCategories(catData.map((c: any) => c.name));
       setLoadingBiz(false);
     };
 
