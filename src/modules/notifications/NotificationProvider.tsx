@@ -61,7 +61,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
       if (data) {
         setNotifications(data);
-        setUnreadCount(data.filter(n => !n.is_read).length);
+        setUnreadCount(data.filter((n: any) => !n.is_read).length);
       }
     };
 
@@ -84,7 +84,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
             table: 'notifications',
             filter: `user_id=eq.${user.id}`
           },
-          (payload) => {
+          (payload: any) => {
             setNotifications(prev => [payload.new, ...prev]);
             setUnreadCount(prev => prev + 1);
             

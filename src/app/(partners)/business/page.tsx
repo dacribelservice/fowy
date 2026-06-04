@@ -85,7 +85,7 @@ export default function BusinessDashboard() {
           .eq('business_id', business.id);
 
         const orderCount = ordersData?.length || 0;
-        const totalSales = ordersData?.reduce((acc, curr) => acc + Number(curr.total_amount), 0) || 0;
+        const totalSales = ordersData?.reduce((acc: any, curr: any) => acc + Number(curr.total_amount), 0) || 0;
         const avgTicket = orderCount > 0 ? Math.round(totalSales / orderCount) : 0;
         const conversionRate = visitCount && visitCount > 0 ? (orderCount / visitCount) * 100 : 0;
 

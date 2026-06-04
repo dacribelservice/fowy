@@ -133,7 +133,7 @@ export function useOrderManager(businessId: string | null) {
           table: 'orders',
           filter: `business_id=eq.${businessId}`
         },
-        (payload) => {
+        (payload: any) => {
           console.log("New order received via Realtime:", payload.new);
           const newOrder = payload.new as Order;
           
@@ -147,7 +147,7 @@ export function useOrderManager(businessId: string | null) {
           // El sonido de notificación de órdenes ahora es manejado globalmente por NotificationProvider.tsx
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         console.log(`Realtime status for ${businessId}:`, status);
       });
 

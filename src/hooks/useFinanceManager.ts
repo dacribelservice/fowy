@@ -69,7 +69,7 @@ export function useFinanceManager(role: 'admin' | 'professional' = 'admin') {
       setApprovedProofs(fetchedProofs);
 
       // Map and combine service_orders and payment_proofs into a single transaction stream
-      const mappedOrders: FinanceTransaction[] = fetchedOrders.map(order => ({
+      const mappedOrders: FinanceTransaction[] = fetchedOrders.map((order: any) => ({
         id: order.id,
         type: 'service_order',
         businessName: order.businesses?.name || 'Negocio desconocido',
@@ -81,7 +81,7 @@ export function useFinanceManager(role: 'admin' | 'professional' = 'admin') {
         serviceOrderPlanName: order.plan_name
       }));
 
-      const mappedProofs: FinanceTransaction[] = fetchedProofs.map(proof => ({
+      const mappedProofs: FinanceTransaction[] = fetchedProofs.map((proof: any) => ({
         id: proof.id,
         type: 'membership',
         businessName: proof.businesses?.name || 'Negocio desconocido',

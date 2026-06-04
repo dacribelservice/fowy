@@ -50,7 +50,7 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
         const totalVisits = visitsCount || 0;
         const totalOrders = ordersData?.length || 0;
         const conversion = totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
-        const totalAmount = ordersData?.reduce((sum, order) => sum + Number(order.total_amount || 0), 0) || 0;
+        const totalAmount = ordersData?.reduce((sum: any, order: any) => sum + Number(order.total_amount || 0), 0) || 0;
         const avgTicket = totalOrders > 0 ? totalAmount / totalOrders : 0;
 
         setMetrics({

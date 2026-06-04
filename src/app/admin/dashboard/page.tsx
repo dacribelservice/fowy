@@ -36,13 +36,13 @@ export default function DashboardPage() {
 
       if (businesses) {
         const total = businesses.length;
-        const activos = businesses.filter(b => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
+        const activos = businesses.filter((b: any) => b.status === true || b.status === 'true' || b.status === 'active' || b.status === 'activo').length;
         
         // Expirations (Next 7 days)
         const hoy = new Date();
         const en7Dias = new Date();
         en7Dias.setDate(hoy.getDate() + 7);
-        const vencimientos = businesses.filter(b => {
+        const vencimientos = businesses.filter((b: any) => {
           if (!b.payment_date) return false;
           const fechaPago = new Date(b.payment_date);
           return fechaPago >= hoy && fechaPago <= en7Dias;
@@ -51,8 +51,8 @@ export default function DashboardPage() {
         // Conversion Rate (Mock logic based on created_at)
         const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
         const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-        const nuevosEsteMes = businesses.filter(b => new Date(b.created_at) >= inicioMesActual).length;
-        const nuevosMesPasado = businesses.filter(b => {
+        const nuevosEsteMes = businesses.filter((b: any) => new Date(b.created_at) >= inicioMesActual).length;
+        const nuevosMesPasado = businesses.filter((b: any) => {
           const d = new Date(b.created_at);
           return d >= inicioMesPasado && d < inicioMesActual;
         }).length;
@@ -62,8 +62,8 @@ export default function DashboardPage() {
         else if (nuevosEsteMes > 0) diff = 100;
 
         // Distribucion
-        const premiumCount = businesses.filter(b => (b.plan || '').toLowerCase().trim() === 'premium').length;
-        const proCount = businesses.filter(b => (b.plan || '').toLowerCase().trim() === 'pro').length;
+        const premiumCount = businesses.filter((b: any) => (b.plan || '').toLowerCase().trim() === 'premium').length;
+        const proCount = businesses.filter((b: any) => (b.plan || '').toLowerCase().trim() === 'pro').length;
         const standardCount = total - premiumCount - proCount;
 
         const premiumPercentage = total > 0 ? Math.round((premiumCount / total) * 100) : 0;
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         const growthData = last7Days.map(day => {
           const nextDay = new Date(day);
           nextDay.setDate(nextDay.getDate() + 1);
-          return businesses.filter(b => {
+          return businesses.filter((b: any) => {
             if (!b.created_at) return false;
             const bDate = new Date(b.created_at);
             return bDate >= day && bDate < nextDay;
@@ -94,11 +94,11 @@ export default function DashboardPage() {
         const growthNames = last7Days.map(day => {
           const nextDay = new Date(day);
           nextDay.setDate(nextDay.getDate() + 1);
-          return businesses.filter(b => {
+          return businesses.filter((b: any) => {
             if (!b.created_at) return false;
             const bDate = new Date(b.created_at);
             return bDate >= day && bDate < nextDay;
-          }).map(b => b.name);
+          }).map((b: any) => b.name);
         });
 
         setStats(prev => ({

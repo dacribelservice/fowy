@@ -35,7 +35,7 @@ export function useExperts() {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setExpertos(data.map(e => ({
+        setExpertos(data.map((e: any) => ({
           ...e,
           verified: true,
           category: e.specialty?.includes('CM') ? 'Marketing' : 

@@ -167,7 +167,7 @@ export function useExplorerManager() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'businesses' },
-        (payload) => {
+        (payload: any) => {
           fetchRef.current();
           if (payload.new && (payload.new as { id?: string }).id) {
             const newBiz = payload.new as any;
