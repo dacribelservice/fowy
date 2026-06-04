@@ -15,18 +15,24 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
+function ChangeView({ center, zoom, centerTrigger }: { center: [number, number], zoom: number, centerTrigger?: number }) {
   const map = useMap();
+  const prevTriggerRef = React.useRef(centerTrigger);
   
   useEffect(() => {
     const currentCenter = map.getCenter();
     const currentZoom = map.getZoom();
+    const triggered = centerTrigger !== prevTriggerRef.current;
     
-    // Solo forzar el movimiento de la cámara si la posición deseada es realmente diferente
-    if (currentCenter.lat !== center[0] || currentCenter.lng !== center[1] || currentZoom !== zoom) {
+    if (triggered) {
+      prevTriggerRef.current = centerTrigger;
+    }
+    
+    // Solo forzar el movimiento de la cámara si la posición deseada es realmente diferente o si se disparó el botón (triggered)
+    if (currentCenter.lat !== center[0] || currentCenter.lng !== center[1] || currentZoom !== zoom || triggered) {
       map.setView(center, zoom);
     }
-  }, [center[0], center[1], zoom, map]);
+  }, [center[0], center[1], zoom, map, centerTrigger]);
   
   return null;
 }
@@ -61,11 +67,12 @@ function BoundsTracker({ onBoundsChange }: { onBoundsChange: (bounds: any) => vo
 interface ExplorerMapProps {
   businesses: any[];
   center?: [number, number];
+  centerTrigger?: number;
   onSelectBusiness?: (biz: any) => void;
   setMapBounds?: (bounds: any) => void;
 }
 
-export default function ExplorerMap({ businesses, center, onSelectBusiness, setMapBounds }: ExplorerMapProps) {
+export default function ExplorerMap({ businesses, center, centerTrigger, onSelectBusiness, setMapBounds }: ExplorerMapProps) {
   const defaultCenter: [number, number] = [4.624335, -74.063644]; // Centro de Bogotá, Colombia (Fallback)
   let mapCenter: [number, number] = defaultCenter;
   
@@ -189,7 +196,7 @@ export default function ExplorerMap({ businesses, center, onSelectBusiness, setM
           );
         })}
 
-        <ChangeView center={mapCenter as [number, number]} zoom={center ? 17 : (businesses.length > 0 ? 16 : 14)} />
+        <ChangeView center={mapCenter as [number, number]} zoom={center ? 17 : (businesses.length > 0 ? 16 : 14)} centerTrigger={centerTrigger} />
       </MapContainer>
     </div>
   );

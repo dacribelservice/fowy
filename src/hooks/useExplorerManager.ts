@@ -17,6 +17,7 @@ export function useExplorerManager() {
   const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [locationError, setLocationError] = useState<"permission_denied" | "position_unavailable" | "unsupported" | "timeout" | null>(null);
+  const [centerTrigger, setCenterTrigger] = useState(0);
 
   // Nuevo estado para los límites del mapa
   const [mapBounds, setMapBounds] = useState<{ minLat: number, minLng: number, maxLat: number, maxLng: number } | null>(null);
@@ -206,6 +207,7 @@ export function useExplorerManager() {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
           setLocationError(null);
+          setCenterTrigger((prev) => prev + 1);
         },
         (error) => {
           switch (error.code) {
@@ -253,6 +255,7 @@ export function useExplorerManager() {
     setIsLocationModalOpen,
     locationError,
     setLocationError,
+    centerTrigger,
     handleSelectCategory,
     handleCenterUser,
     handleSelectBusiness,

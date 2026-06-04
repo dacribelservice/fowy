@@ -37,6 +37,7 @@ export default function ExplorarPage() {
     setLocationError,
     handleSelectCategory,
     handleCenterUser,
+    centerTrigger,
     handleSelectBusiness,
     setMapBounds
   } = useExplorerManager();
@@ -58,6 +59,7 @@ export default function ExplorarPage() {
           <ExplorerMap 
             businesses={businesses} 
             center={userLocation || undefined} 
+            centerTrigger={centerTrigger}
             onSelectBusiness={handleSelectBusiness}
             setMapBounds={setMapBounds}
           />
