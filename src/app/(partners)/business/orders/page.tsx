@@ -18,6 +18,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useOrderManager } from "@/hooks/useOrderManager";
 import { parseSafeDate } from "@/utils/bogotaTimeUtils";
 import { useMounted } from "@/hooks/useMounted";
+import OrderActionButtons from "@/components/partners/business/orders/OrderActionButtons";
+import OrderTicket, { OrderTicketData } from "@/components/partners/business/orders/OrderTicket";
 
 
 
@@ -28,6 +30,7 @@ export default function OrdersPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [businessRating, setBusinessRating] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
+  const [businessInfo, setBusinessInfo] = useState<{name: string, phone: string, slug: string} | null>(null);
   const mounted = useMounted();
 
   
@@ -46,13 +49,18 @@ export default function OrdersPage() {
 
       const { data: business } = await supabase
         .from('businesses')
-        .select('id, rating')
+        .select('id, rating, name, phone, slug')
         .eq('owner_id', user.id)
         .single();
 
       if (business) {
         setBusinessId(business.id);
         setBusinessRating(business.rating || 0);
+        setBusinessInfo({
+          name: business.name || '',
+          phone: business.phone || '',
+          slug: business.slug || ''
+        });
 
         // Fetch rating count
         const { count, error } = await supabase
@@ -244,26 +252,21 @@ export default function OrdersPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                      {order.status === 'pending' && (
-                        <>
-                          <button 
-                            onClick={() => updateOrderStatus(order.id, 'completed')}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-fowy-secondary text-white rounded-xl font-bold shadow-premium hover:opacity-90 transition-all"
-                          >
-                            <CheckCircle2 size={18} />
-                            Completar
-                          </button>
-                          <button 
-                            onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-red-500 border border-red-100 rounded-xl font-bold hover:bg-red-50 transition-all"
-                          >
-                            <XCircle size={18} />
-                            Cancelar
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    <OrderActionButtons 
+                      order={order} 
+                      onUpdateStatus={updateOrderStatus} 
+                      businessInfo={businessInfo} 
+                    />
+
+                    {/* Componente Oculto para Impresión */}
+                    <OrderTicket 
+                      order={{
+                        ...order,
+                        business_name: businessInfo?.name,
+                        business_phone: businessInfo?.phone,
+                        business_slug: businessInfo?.slug
+                      } as unknown as OrderTicketData} 
+                    />
                   </motion.div>
                 ))
               )}

@@ -50,35 +50,43 @@ Siguiente el principio de modularidad y desacoplamiento absoluto de componentes:
   - Modificar la función de guardado en Supabase para insertar estos nuevos campos en la tabla `orders` y asegurar que la información esté disponible para el panel de negocio al imprimir.
 
 ### 📦 Fase 1: Creación de Módulos Independientes (Código Nuevo - Desde Cero)
-- [ ] **1.1. Diseñar el Componente del Ticket (`OrderTicket.tsx`)**
-  - Crear un nuevo componente en `src/components/partners/orders/OrderTicket.tsx`.
+- [x] **1.1. Diseñar el Componente del Ticket (`OrderTicket.tsx`)**
+  - Crear un nuevo componente en `src/components/partners/business/orders/OrderTicket.tsx`.
   - **Tipado Estricto:** Definir una interfaz en TypeScript (`OrderTicketData`) para los props del componente. Esta interfaz debe extender `Order` de `useOrderManager` y declarar opcionalmente los campos nuevos (`delivery_address`, `notes`, `payment_method`, `cash_change`) para evitar errores de compilación sin alterar el código de tipos viejos de Supabase. Evitar el uso de `any` para los ítems y tipar los nuevos campos de dirección/pago, cumpliendo la regla 7.1.
   - **ESTRUCTURA DETALLADA DE LA COMANDA (Plantilla Predeterminada):**
-    - **A. Encabezado (Header Dinámico):** Extraer e imprimir únicamente el Nombre del Negocio y el Teléfono de contacto (Se omite dirección del negocio ya que no existe en base de datos).
+    - **A. Encabezado (Header Dinámico):** Extraer e imprimir únicamente el Nombre del Negocio y el Teléfono de contacto **(Todo el texto debe ir centrado)**. Se omite dirección del negocio ya que no existe en BD.
     - **B. Datos del Cliente y Envío:** Imprimir Nombre, Celular y Dirección de Entrega. *(NOTA: La Ubicación GPS o URL no va en la estructura de la comanda)*.
-    - **C. Cuerpo (Ítems y Notas):** Mapear el listado de `items` (cantidades, descripción, subtotales). **Crucial:** Renderizar de forma visible cualquier nota de preparación (ej: "sin salsas") debajo de cada producto.
-    - **D. Totales y Pago (Devuelta):** Mostrar Subtotal y Total a Pagar. Mostrar el Método de Pago. **Crucial:** Si es "Efectivo", mostrar el monto "Paga con: $X" y calcular/mostrar la "Devuelta: $Y".
-    - **E. Pie de Página (Footer dinámico):** Imprimir mensaje de agradecimiento y el enlace al menú web usando el `slug` del negocio:
+    - **C. Cuerpo (Ítems y Notas):** Mapear el listado de `items` (cantidades, descripción, subtotales). **Crucial:** Renderizar de forma visible las notas del pedido en un único bloque global al final del detalle (las notas individuales por producto no existen en BD).
+    - **D. Totales y Pago (Devuelta):** Mostrar únicamente el Total a Pagar (omitir subtotal para evitar redundancia). Mostrar el Método de Pago. **Crucial:** Si es "Efectivo", imprimir literalmente el valor del texto almacenado en `cash_change` (ej: "Lleva cambio de: $20.000"), sin intentar realizar cálculos matemáticos de devueltas.
+    - **E. Pie de Página (Footer dinámico):** Imprimir mensaje de agradecimiento y el enlace al menú web usando el `slug` del negocio **(Todo el texto debe ir centrado)**:
       ¡Gracias por tu compra!           
             Visita nuestro menú
       https://www.fowy.pro/[slug_del_negocio]
   - Aplicar estilos CSS específicos de ancho fijo (ej. `w-[80mm]` o `w-[58mm]`) y clases específicas para ocultarlo en la vista normal de pantalla, mostrándolo únicamente en el flujo de impresión.
-- [ ] **1.2. Desarrollar el Hook de Impresión (`useOrderPrinter.ts`)**
+- [x] **1.2. Desarrollar el Hook de Impresión (`useOrderPrinter.ts`)**
   - Crear un hook modular en `src/hooks/useOrderPrinter.ts`.
   - Implementar la función de formateo de texto plano ESC/POS para la opción RawBT (Opción B).
   - Implementar el disparador `window.print()` configurando el título del documento dinámicamente con el ID de la orden.
   - Implementar la lógica para disparar el Intent de Android hacia RawBT: `intent://...#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`.
 
 ### 🔗 Fase 2: Integración en la Interfaz (Código Heredado - Ley del Remolque)
-- [ ] **2.1. Adaptar la Fila de Pedidos (Componente Orquestador)**
-  - Para evitar que `page.tsx` supere las 250 líneas (Regla de la Carpeta Maestra), abstraer la lógica de renderizado de botones creando un nuevo componente `OrderActionButtons.tsx` en `src/components/partners/orders/`.
+- [x] **2.1. Adaptar la Fila de Pedidos (Componente Orquestador)**
+  - Para evitar que `page.tsx` supere las 250 líneas (Regla de la Carpeta Maestra), abstraer la lógica de renderizado de botones creando un nuevo componente `OrderActionButtons.tsx` en `src/components/partners/business/orders/`.
   - Este componente recibirá el `status` de la orden y decidirá qué botones renderizar (Pendiente = Completar/Cancelar | Completado = Botones de Impresión).
-  - **Ampliación de Consulta:** Modificar la consulta de Supabase en `page.tsx` para seleccionar no solo `id, rating`, sino también `name, phone, slug` del negocio, permitiendo pasar esta data (necesaria para el header y footer) a la comanda.
-- [ ] **2.2. Implementar los Botones de Acción (Flujo Optimizado)**
+  - **Ampliación de Consulta (Crucial):** Modificar la consulta de Supabase en `page.tsx` (que actualmente solo pide `id, rating`) para seleccionar explícitamente `name, phone, slug` del negocio, permitiendo pasar esta data (necesaria para el header y footer) a la comanda.
+- [x] **2.2. Implementar los Botones de Acción (Flujo Optimizado)**
   - Reemplazar la lógica actual de botones en `page.tsx` por el nuevo componente `OrderActionButtons.tsx`.
   - **Botones de Estado Pendiente**: Mantiene el comportamiento actual (Completar/Cancelar).
   - **Botones de Estado Completado**: Renderiza los botones de **Imprimir PC** e **Imprimir Android**. Llama a `useOrderPrinter` sin alterar el estado de la orden (ya está completada).
   - **Micro-animaciones:** Usar `AnimatePresence` de `framer-motion` para que la transición (cuando la orden pasa de Pendiente a Completada) revele los botones de impresión con una transición suave.
   - En caso de error al invocar la impresión, usar Toasts Premium (nunca `alert()`).
-- [ ] **2.3. Insertar el Componente Oculto en el DOM**
+- [x] **2.3. Insertar el Componente Oculto en el DOM**
   - Renderizar el componente `<OrderTicket />` dentro del mapa de pedidos de forma oculta para que el navegador lo detecte al invocar la cola de impresión.
+  - **Casting de Tipos (Ley del Remolque):** Al pasar los datos desde `page.tsx` hacia el nuevo componente, usar la técnica de casting explícito (`data={order as OrderTicketData}`) para forzar a TypeScript a reconocer los nuevos campos de envío y pago sin que marque error y sin modificar el hook heredado `useOrderManager`.
+
+### 🛠 Fase 3: Corrección y Pulido de Impresión Web
+- [x] **3.1. Aislamiento CSS de la Comanda Activa**
+  - Para resolver el problema de impresión de la interfaz completa y de múltiples tickets (las "16 hojas"), modificar `OrderTicket.tsx` para que asigne un `id` único dinámico al contenedor (ej: `id={"ticket-" + order.id}`).
+  - Actualizar la función `printWeb` en el hook `useOrderPrinter.ts` para que inserte temporalmente una hoja de estilos (`<style>`) en el `<head>`.
+  - Esta hoja de estilos debe ocultar el `body *` con `visibility: hidden;` y mostrar **exclusivamente** el ticket seleccionado (`#ticket-{orderId}`) y sus hijos con `visibility: visible;`, posicionándolo de forma absoluta en la parte superior izquierda (`top: 0; left: 0;`) para garantizar una impresión limpia en formato 80mm/58mm.
+  - Tras invocar `window.print()`, asegurar la limpieza eliminando dicha etiqueta `<style>`.

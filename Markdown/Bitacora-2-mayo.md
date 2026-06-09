@@ -66,3 +66,12 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
   - **Fallo Rápido de Vercel**: El motor estricto de compilación de TypeScript bloqueaba sistemáticamente los despliegues al detectar parámetros en callbacks sin tipos explícitos (`Parameter implicitly has an 'any' type`).
   - **Aplicación de la Ley del Remolque**: En lugar de tipar estrictamente el cliente global de Supabase (lo cual hubiera causado 32 errores colaterales en toda la app), se optó por una intervención quirúrgica de bajísimo riesgo.
   - **Curitas Locales (`: any`)**: Se rastrearon y aplicaron más de 20 "curitas" (forzando tipos locales explícitos `: any`) en 8 archivos, logrando que la aplicación satisfaga la compilación estricta mientras se preserva intacta la funcionalidad.
+
+### 📌 Hito: Implementación del Sistema de Impresión Híbrido (Web & Android RawBT)
+- **Fecha**: 9 de Junio de 2026
+- **Resumen**: Integración exitosa de impresión de comandas térmicas (58mm/80mm) para el panel de negocios, respetando estrictamente la arquitectura existente mediante la "Ley del Remolque".
+- **Detalles Técnicos**:
+  - **Componente Aislado (`OrderTicket.tsx`)**: Se diseñó una plantilla CSS oculta con dimensiones precisas (`print:w-[80mm]`) para la impresión en rollo térmico, extrayendo dinámicamente datos cruzados entre el pedido y el negocio.
+  - **Hook Modular (`useOrderPrinter.ts`)**: Se construyó un orquestador dual. Soporta impresión nativa en PC y también exportación de texto plano codificado hacia Intent URIs de Android para integración nativa con la app RawBT (`intent://...scheme=rawbt`).
+  - **Aislamiento CSS Quirúrgico**: Para evitar la impresión global de la interfaz web ("Problema de las 16 hojas"), se implementó una clonación temporal en el DOM y anulación global con `display: none !important`, logrando una impresión perfecta de 1 sola página sin tocar los estados de React ni refactorizar.
+  - **Ley del Remolque Respetada**: Toda la inyección de botones, micro-animaciones (Framer Motion) y manejo de datos se encapsuló en `OrderActionButtons.tsx` empleando casting explícito de TypeScript (`as unknown as OrderTicketData`), manteniendo el flujo legado de Supabase 100% intacto.
