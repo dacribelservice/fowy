@@ -20,22 +20,22 @@ Este documento detalla el plan de implementación para la funcionalidad de impre
 
 ## 🛠️ 2. FLUJO DE USUARIO EN PANTALLA
 
-Según la especificación, el comportamiento del botón "Completar" en la lista de pedidos pendientes será:
+Según la nueva especificación de UX (enfocada en no estorbar a los usuarios que no imprimen), el comportamiento en la lista de pedidos será:
 
 ```mermaid
 graph TD
-    A[Presionar botón 'Completar'] --> B{¿Desplegar opciones de Impresión?}
-    B --> C[Botón 1: Imprimir PC/Web 💻]
-    B --> D[Botón 2: Imprimir Android/RawBT 📱]
-    C --> E[Ejecuta Opción A y Completa Orden]
-    D --> F[Ejecuta Opción B y Completa Orden]
+    A[Estado del Pedido] --> B{¿Está Pendiente o Completado?}
+    B -- Pendiente --> C[Mostrar botones 'Completar' y 'Cancelar']
+    B -- Completado --> D[Mostrar botones permanentes 'Imprimir PC' y 'Imprimir Android']
+    C --> E[Click en 'Completar' -> Cambia estado a Completado]
+    E --> D
 ```
 
-1. El usuario da clic en el botón **"Completar"**.
-2. En lugar de ejecutar la acción directamente, el botón se expande o despliega dos opciones con iconos de impresión:
-   * **Opción PC / Web** (Impresión nativa de navegador).
-   * **Opción Android** (Impresión directa por comandos RawBT).
-3. Al hacer clic en cualquiera de las dos opciones, se ejecuta la impresión seleccionada y automáticamente se procesa el cambio de estado del pedido a completado.
+1. **Si el pedido está Pendiente:** Se muestran los botones normales de "Completar" y "Cancelar". Al darle "Completar", la orden simplemente pasa a completada sin popups ni confirmaciones extras (ideal para quien no usa impresora).
+2. **Si el pedido está Completado:** En el espacio vacío de acciones, se muestran **permanentemente** los dos botones de impresión:
+   * **Imprimir PC / Web** 💻
+   * **Imprimir Android / RawBT** 📱
+3. Esto permite a los negocios imprimir en el momento o re-imprimir pedidos viejos cuando lo deseen, respetando perfectamente a los distintos perfiles de usuario.
 
 ---
 
@@ -44,9 +44,9 @@ graph TD
 Siguiente el principio de modularidad y desacoplamiento absoluto de componentes:
 
 ### 🗄️ Fase 0: Adecuación de Datos (Pre-requisito Crítico)
-- [ ] **0.1. Modificar Tabla `orders` en Supabase**
+- [x] **0.1. Modificar Tabla `orders` en Supabase**
   - Añadir columnas opcionales (nullable) para almacenar los datos de envío y pago que actualmente solo se envían por WhatsApp: `delivery_address` (text), `notes` (text), `payment_method` (text), y `cash_change` (text). No alterar los datos existentes.
-- [ ] **0.2. Actualizar `useCheckoutLogic.ts`**
+- [x] **0.2. Actualizar `useCheckoutLogic.ts`**
   - Modificar la función de guardado en Supabase para insertar estos nuevos campos en la tabla `orders` y asegurar que la información esté disponible para el panel de negocio al imprimir.
 
 ### 📦 Fase 1: Creación de Módulos Independientes (Código Nuevo - Desde Cero)
@@ -70,13 +70,14 @@ Siguiente el principio de modularidad y desacoplamiento absoluto de componentes:
   - Implementar la lógica para disparar el Intent de Android hacia RawBT: `intent://...#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`.
 
 ### 🔗 Fase 2: Integración en la Interfaz (Código Heredado - Ley del Remolque)
-- [ ] **2.1. Adaptar el Estado en la Fila de Pedidos (Componente Orquestador)**
-  - Para evitar que `page.tsx` supere las 250 líneas (Regla de la Carpeta Maestra), abstraer la lógica de la sección de acciones creando un nuevo componente `OrderActionButtons.tsx` en `src/components/partners/orders/`.
-  - Este componente hijo manejará su propio estado local para controlar si se están mostrando las opciones de impresión.
-- [ ] **2.2. Implementar los Botones de Acción con Calidad Premium**
-  - Reemplazar el botón simple de "Completar" por el nuevo componente dinámico. Al hacer clic en "Completar", se mostrarán en su lugar los dos nuevos botones.
-  - **Micro-animaciones:** Usar `AnimatePresence` de `framer-motion` para que los botones de impresión aparezcan con una transición suave.
-  - **Botón Imprimir PC**: Muestra icono de PC + Icono de impresora. Llama a la impresión nativa y completa el pedido.
-  - **Botón Imprimir Android**: Muestra icono de Android + Icono de impresora. Llama al comando RawBT y completa el pedido. En caso de error, usar Toasts Premium (nunca `alert()`).
+- [ ] **2.1. Adaptar la Fila de Pedidos (Componente Orquestador)**
+  - Para evitar que `page.tsx` supere las 250 líneas (Regla de la Carpeta Maestra), abstraer la lógica de renderizado de botones creando un nuevo componente `OrderActionButtons.tsx` en `src/components/partners/orders/`.
+  - Este componente recibirá el `status` de la orden y decidirá qué botones renderizar (Pendiente = Completar/Cancelar | Completado = Botones de Impresión).
+- [ ] **2.2. Implementar los Botones de Acción (Flujo Optimizado)**
+  - Reemplazar la lógica actual de botones en `page.tsx` por el nuevo componente `OrderActionButtons.tsx`.
+  - **Botones de Estado Pendiente**: Mantiene el comportamiento actual (Completar/Cancelar).
+  - **Botones de Estado Completado**: Renderiza los botones de **Imprimir PC** e **Imprimir Android**. Llama a `useOrderPrinter` sin alterar el estado de la orden (ya está completada).
+  - **Micro-animaciones:** Usar `AnimatePresence` de `framer-motion` para que la transición (cuando la orden pasa de Pendiente a Completada) revele los botones de impresión con una transición suave.
+  - En caso de error al invocar la impresión, usar Toasts Premium (nunca `alert()`).
 - [ ] **2.3. Insertar el Componente Oculto en el DOM**
   - Renderizar el componente `<OrderTicket />` dentro del mapa de pedidos de forma oculta para que el navegador lo detecte al invocar la cola de impresión.
