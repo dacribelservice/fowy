@@ -106,6 +106,6 @@ Esta lista debe seguirse en orden secuencial para garantizar la integridad del s
 ---
 *Diseño de Sistema v7.0 (Actualizado 03-May-2026)*
 
-> 🚨 **ESTADO DEL CANAL PUSH**: Se mantiene el problema con las credenciales de Firebase (VAPID/API Key) en el entorno de producción. Las notificaciones Push (FCM) están **en pausa** técnica.
+> ✅ **ESTADO DEL CANAL PUSH (FCM)**: La implementación a nivel de código está **100% completa y operativa**. El Service Worker (`firebase-messaging-sw.js`) y la lógica de obtención de tokens en el proveedor están configurados. Si las variables de entorno (`NEXT_PUBLIC_FIREBASE_VAPID_KEY`, `API_KEY`, etc.) están correctamente definidas en producción, el sistema es capaz de enviar notificaciones push a los usuarios **incluso si tienen la web cerrada**, comportándose como una app nativa.
 > 
-> ✅ **CANAL MAESTRO OPERATIVO**: El sistema de **Supabase Realtime** es el canal primario y redundante. Está 100% operativo, garantizando la entrega de alertas visuales y sonoras (`cash-register.mp3`) en tiempo real mientras la aplicación esté abierta o en segundo plano en el navegador.
+> ✅ **CANAL MAESTRO (Realtime)**: El sistema de **Supabase Realtime** complementa a FCM y funciona como canal primario/redundante. Está 100% operativo, garantizando la entrega de alertas visuales y sonoras (`cash-register.mp3`) en tiempo real mientras la aplicación esté abierta.
