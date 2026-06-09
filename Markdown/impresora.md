@@ -52,7 +52,7 @@ Siguiente el principio de modularidad y desacoplamiento absoluto de componentes:
 ### 📦 Fase 1: Creación de Módulos Independientes (Código Nuevo - Desde Cero)
 - [ ] **1.1. Diseñar el Componente del Ticket (`OrderTicket.tsx`)**
   - Crear un nuevo componente en `src/components/partners/orders/OrderTicket.tsx`.
-  - **Tipado Estricto:** Definir una interfaz en TypeScript (ej. `OrderTicketData`) para los props del componente. Evitar el uso de `any` para el listado de ítems y tipar los nuevos campos de dirección/pago, cumpliendo la regla 7.1.
+  - **Tipado Estricto:** Definir una interfaz en TypeScript (`OrderTicketData`) para los props del componente. Esta interfaz debe extender `Order` de `useOrderManager` y declarar opcionalmente los campos nuevos (`delivery_address`, `notes`, `payment_method`, `cash_change`) para evitar errores de compilación sin alterar el código de tipos viejos de Supabase. Evitar el uso de `any` para los ítems y tipar los nuevos campos de dirección/pago, cumpliendo la regla 7.1.
   - **ESTRUCTURA DETALLADA DE LA COMANDA (Plantilla Predeterminada):**
     - **A. Encabezado (Header Dinámico):** Extraer e imprimir únicamente el Nombre del Negocio y el Teléfono de contacto (Se omite dirección del negocio ya que no existe en base de datos).
     - **B. Datos del Cliente y Envío:** Imprimir Nombre, Celular y Dirección de Entrega. *(NOTA: La Ubicación GPS o URL no va en la estructura de la comanda)*.
@@ -73,6 +73,7 @@ Siguiente el principio de modularidad y desacoplamiento absoluto de componentes:
 - [ ] **2.1. Adaptar la Fila de Pedidos (Componente Orquestador)**
   - Para evitar que `page.tsx` supere las 250 líneas (Regla de la Carpeta Maestra), abstraer la lógica de renderizado de botones creando un nuevo componente `OrderActionButtons.tsx` en `src/components/partners/orders/`.
   - Este componente recibirá el `status` de la orden y decidirá qué botones renderizar (Pendiente = Completar/Cancelar | Completado = Botones de Impresión).
+  - **Ampliación de Consulta:** Modificar la consulta de Supabase en `page.tsx` para seleccionar no solo `id, rating`, sino también `name, phone, slug` del negocio, permitiendo pasar esta data (necesaria para el header y footer) a la comanda.
 - [ ] **2.2. Implementar los Botones de Acción (Flujo Optimizado)**
   - Reemplazar la lógica actual de botones en `page.tsx` por el nuevo componente `OrderActionButtons.tsx`.
   - **Botones de Estado Pendiente**: Mantiene el comportamiento actual (Completar/Cancelar).
