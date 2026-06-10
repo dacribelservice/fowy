@@ -464,34 +464,46 @@ export type Database = {
       orders: {
         Row: {
           business_id: string | null
+          cash_change: string | null
           created_at: string | null
           customer_id: string | null
           customer_name: string
           customer_phone: string | null
+          delivery_address: string | null
           id: string
           items: Json
+          notes: string | null
+          payment_method: string | null
           status: string
           total_amount: number
         }
         Insert: {
           business_id?: string | null
+          cash_change?: string | null
           created_at?: string | null
           customer_id?: string | null
           customer_name: string
           customer_phone?: string | null
+          delivery_address?: string | null
           id?: string
           items?: Json
+          notes?: string | null
+          payment_method?: string | null
           status?: string
           total_amount?: number
         }
         Update: {
           business_id?: string | null
+          cash_change?: string | null
           created_at?: string | null
           customer_id?: string | null
           customer_name?: string
           customer_phone?: string | null
+          delivery_address?: string | null
           id?: string
           items?: Json
+          notes?: string | null
+          payment_method?: string | null
           status?: string
           total_amount?: number
         }
