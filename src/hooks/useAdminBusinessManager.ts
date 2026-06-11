@@ -51,7 +51,7 @@ export function useAdminBusinessManager(options: ManagerOptions) {
 
       // Search Filter
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,id.ilike.%${searchTerm}%`);
+        query = query.ilike('name', `%${searchTerm}%`);
       }
 
       // Plan Filter

@@ -23,8 +23,17 @@ export default function NegociosPage() {
   // UI States (Controlled by User)
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8); 
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
+
+  // Debounce for search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
   const [filterStatus, setFilterStatus] = useState("all");
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,15 +71,6 @@ export default function NegociosPage() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterPlan, filterStatus]);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-        <div className="w-12 h-12 border-4 border-fowy-orange/10 border-t-fowy-orange rounded-full animate-spin" />
-        <p className="text-slate-400 font-bold animate-pulse uppercase tracking-widest text-xs text-center px-4">Sincronizando el ecosistema...</p>
-      </div>
-    );
-  }
 
 
   return (
@@ -113,6 +113,9 @@ export default function NegociosPage() {
           <div className="flex items-center gap-4">
             <h3 className="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Establecimientos Afiliados</h3>
             <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold">{totalCount} Total</span>
+            {loading && (
+              <div className="w-4 h-4 border-2 border-fowy-orange/20 border-t-fowy-orange rounded-full animate-spin" />
+            )}
           </div>
           
           <button 
@@ -127,8 +130,8 @@ export default function NegociosPage() {
         <BusinessList 
           businesses={businesses} 
           onDelete={handleDeleteBusiness}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={searchInput}
+          onSearchChange={setSearchInput}
           filterPlan={filterPlan}
           onPlanChange={setFilterPlan}
           filterStatus={filterStatus}
