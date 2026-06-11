@@ -1209,6 +1209,7 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_admin_rankings: { Args: never; Returns: Json }
       get_business_menu_payload: { Args: { p_slug: string }; Returns: Json }
       get_businesses_in_viewport: {
         Args: {

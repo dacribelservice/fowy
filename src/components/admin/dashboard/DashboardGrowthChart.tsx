@@ -294,7 +294,7 @@ export function DashboardGrowthChart({
       <div className="relative bg-slate-50/40 rounded-2xl border border-slate-100/80 p-3 overflow-hidden select-none flex-1 flex flex-col justify-center min-h-[250px]">
         <AnimatePresence mode="wait">
           {viewMode !== "clics" && (
-            <DashboardSvgCurve chartData={chartData} isDynamic={isDynamic} />
+            <DashboardSvgCurve chartData={chartData} isDynamic={isDynamic} viewMode={viewMode} />
           )}
 
           {viewMode === "clics" && (

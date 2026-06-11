@@ -11,9 +11,10 @@ export interface DashboardSvgCurveProps {
     names?: string[];
   }[];
   isDynamic: boolean;
+  viewMode?: "afiliados" | "visitas" | "clics";
 }
 
-export function DashboardSvgCurve({ chartData, isDynamic }: DashboardSvgCurveProps) {
+export function DashboardSvgCurve({ chartData, isDynamic, viewMode = "afiliados" }: DashboardSvgCurveProps) {
   const [activePoint, setActivePoint] = useState<number | null>(null);
 
   const [width, height, paddingLeft, paddingRight, paddingTop, paddingBottom] = [500, 180, 40, 20, 25, 25];
@@ -152,7 +153,11 @@ export function DashboardSvgCurve({ chartData, isDynamic }: DashboardSvgCurvePro
               {points[activePoint].fullLabel}
             </span>
             <span className="text-[10px] font-black text-white leading-none">
-              {points[activePoint].value} {points[activePoint].value === 1 ? 'afiliado' : 'afiliados'}
+              {points[activePoint].value} {
+                viewMode === "visitas" 
+                  ? (points[activePoint].value === 1 ? 'visita' : 'visitas') 
+                  : (points[activePoint].value === 1 ? 'afiliado' : 'afiliados')
+              }
             </span>
             
             {/* Mostrar lista de nombres si es dinámico y hay nombres */}
