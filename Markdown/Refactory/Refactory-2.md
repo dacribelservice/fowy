@@ -51,3 +51,13 @@ Refactorizar el archivo `src/app/(partners)/business/menu/page.tsx` (actualmente
 - [x] **7.2** Confirmar que no aparezcan advertencias en consola del tipo `"lock:sb-...-auth-token"` ni excepciones `AbortError` (lock broken) causadas por la inicialización múltiple del SDK.
 - [x] **7.3** Verificar que las suscripciones en tiempo real del explorador (favoritos, pedidos e historial en `NotificationProvider.tsx`) sigan funcionando de forma normal.
 
+### Fase 8: Refactorización de DashboardGrowthChart.tsx (Reducción a < 250 líneas)
+- [ ] **8.1** Crear el nuevo componente especializado `src/components/admin/dashboard/DashboardSvgCurve.tsx` que se encargará del renderizado de la curva SVG y del tooltip interactivo de afiliaciones y visitas.
+- [ ] **8.2** Migrar la lógica matemática y de visualización del SVG a `DashboardSvgCurve.tsx` (cálculo de `maxValue`, generación de `points`, `pathD`, `areaD`, y renderizado del `<svg>` con sus nodos y guías).
+- [ ] **8.3** Mapear el Tooltip absoluto flotante interactivo y su estado `activePoint` dentro de `DashboardSvgCurve.tsx`.
+- [ ] **8.4** Simplificar `src/components/admin/dashboard/DashboardGrowthChart.tsx`, removiendo los bloques matemáticos y de visualización del SVG y el tooltip.
+- [ ] **8.5** Importar `DashboardSvgCurve` en `DashboardGrowthChart.tsx` y renderizarlo condicionalmente, pasándole el `chartData` procesado y los datos de `rankings`.
+- [ ] **8.6** Confirmar que el archivo `DashboardGrowthChart.tsx` quede por debajo de las 250 líneas de código, cumpliendo con la regla de arquitectura en `conceptos.md`.
+- [ ] **8.7** Verificar que las tres pestañas de visualización ("Afiliaciones", "Visitas" y "WhatsApp") sigan funcionando correctamente con sus filtros ("DÍA", "SEMANA", "MES") y la traducción al español de las etiquetas de tiempo.
+
+

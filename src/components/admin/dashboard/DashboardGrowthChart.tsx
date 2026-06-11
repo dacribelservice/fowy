@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, Calendar, Loader2 } from "lucide-react";
+import { DashboardRankingsList } from "./DashboardRankingsList";
 
 interface DashboardGrowthChartProps {
   businesses?: any[];
@@ -11,6 +12,13 @@ interface DashboardGrowthChartProps {
   growthNames?: string[][];
   title?: string;
   subtitle?: string;
+  rankings?: {
+    top_visits: any[];
+    top_clicks: any[];
+    visits_daily: any[];
+    visits_weekly: any[];
+    visits_monthly: any[];
+  };
 }
 
 export function DashboardGrowthChart({ 
@@ -19,10 +27,12 @@ export function DashboardGrowthChart({
   growthPercentages, 
   growthNames,
   title = "Crecimiento de la Red",
-  subtitle = "Negocios afiliados por semana"
+  subtitle = "Negocios afiliados por semana",
+  rankings
 }: DashboardGrowthChartProps) {
   const [filter, setFilter] = useState<"D" | "S" | "M">("D");
   const [activePoint, setActivePoint] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<"afiliados" | "visitas" | "clics">("afiliados");
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Determinar si es dinámico (Dashboard Admin) o estático heredado (Finanzas)
@@ -30,6 +40,47 @@ export function DashboardGrowthChart({
 
   // Procesamiento de datos de negocios según el filtro seleccionado
   const chartData = useMemo(() => {
+    // LÓGICA PARA VISITAS: Inyectar los datos del RPC
+    if (viewMode === "visitas" && rankings) {
+      const sourceData = 
+        filter === "D" ? rankings.visits_daily :
+        filter === "S" ? rankings.visits_weekly :
+        rankings.visits_monthly;
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      return (sourceData || []).map((item: any, i: number, arr: any[]) => {
+        let finalLabel = item.label;
+        
+        // Formateamos las etiquetas en español localmente para evitar bugs de idioma en SQL
+        if (filter === "D") {
+          const daysAgo = arr.length - 1 - i;
+          const d = new Date(now);
+          d.setDate(now.getDate() - daysAgo);
+          const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+          finalLabel = dayNames[d.getDay()];
+        } else if (filter === "S") {
+          const weeksAgo = arr.length - 1 - i;
+          finalLabel = weeksAgo === 0 ? "Act" : `S-${weeksAgo}`;
+        } else if (filter === "M") {
+          const monthsAgo = arr.length - 1 - i;
+          const d = new Date(now);
+          d.setDate(1);
+          d.setMonth(now.getMonth() - monthsAgo);
+          const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          finalLabel = monthNames[d.getMonth()];
+        }
+
+        return {
+          label: finalLabel,
+          value: item.value || 0,
+          fullLabel: item.full_label || finalLabel,
+          names: []
+        };
+      });
+    }
+
     if (isDynamic && businesses) {
       const now = new Date();
       now.setHours(0, 0, 0, 0);
@@ -155,7 +206,7 @@ export function DashboardGrowthChart({
     }
 
     return [];
-  }, [businesses, growthData, growthNames, filter, isDynamic]);
+  }, [businesses, growthData, growthNames, filter, isDynamic, viewMode, rankings]);
 
   const totalPeriodValue = useMemo(() => {
     return chartData.reduce((sum, p) => sum + p.value, 0);
@@ -212,14 +263,40 @@ export function DashboardGrowthChart({
       ref={containerRef}
     >
       {/* Cabecera & Controles de Filtro */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-        <div>
-          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-          <p className="text-slate-400 text-xs font-medium">
-            {isDynamic 
-              ? (filter === "D" ? "Negocios afiliados por día" : filter === "S" ? "Negocios afiliados por semanas" : "Negocios afiliados por mes")
-              : subtitle}
-          </p>
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+            <p className="text-slate-400 text-xs font-medium">
+              {isDynamic 
+                ? (filter === "D" ? "Negocios afiliados por día" : filter === "S" ? "Negocios afiliados por semanas" : "Negocios afiliados por mes")
+                : subtitle}
+            </p>
+          </div>
+
+          {/* Selector de Modos (Pill Toggle) */}
+          {isDynamic && (
+            <div className="flex bg-slate-100 p-1 rounded-full relative shadow-inner w-fit">
+              {(["afiliados", "visitas", "clics"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => { setViewMode(mode); setActivePoint(null); }}
+                  className={`relative px-4 py-1.5 text-[10px] font-black uppercase rounded-full transition-colors z-10 ${
+                    viewMode === mode ? "text-white" : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  {viewMode === mode && (
+                    <motion.div
+                      layoutId="pill-background"
+                      className="absolute inset-0 bg-green-400 rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                  {mode === "clics" ? "WhatsApp" : mode === "afiliados" ? "Afiliaciones" : mode}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Solo mostrar filtros interactivos si es el Dashboard dinámico */}
@@ -253,9 +330,19 @@ export function DashboardGrowthChart({
         )}
       </div>
 
-      {/* Gráfico SVG */}
-      <div className="relative bg-slate-50/40 rounded-2xl border border-slate-100/80 p-3 overflow-visible select-none flex-1 flex flex-col justify-center">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
+      {/* Contenido Dinámico según ViewMode */}
+      <div className="relative bg-slate-50/40 rounded-2xl border border-slate-100/80 p-3 overflow-hidden select-none flex-1 flex flex-col justify-center min-h-[250px]">
+        <AnimatePresence mode="wait">
+          {viewMode !== "clics" && (
+            <motion.div
+              key="svg-chart"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="w-full relative"
+            >
+              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
           <defs>
             <linearGradient id="growthChartGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#FF5A5F" />
@@ -360,6 +447,37 @@ export function DashboardGrowthChart({
                 </div>
               )}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-2 h-2 border-t-4 border-t-slate-900/95 border-x-4 border-x-transparent" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+            </motion.div>
+          )}
+
+          {viewMode === "clics" && (
+            <motion.div
+              key="clics-chart"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="w-full min-h-[300px] flex items-center justify-center bg-slate-900 rounded-xl p-4"
+            >
+              <DashboardRankingsList rankings={rankings} activeMetric="whatsapp" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Subcomponente de Visitas (Top 10 Leaderboard) debajo de la gráfica */}
+        <AnimatePresence>
+          {viewMode === "visitas" && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 pt-4 border-t border-slate-200/50"
+            >
+              <DashboardRankingsList rankings={rankings} activeMetric="visitas" />
             </motion.div>
           )}
         </AnimatePresence>

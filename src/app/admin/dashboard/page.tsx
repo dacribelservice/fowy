@@ -22,7 +22,14 @@ export default function DashboardPage() {
     growthNames: [[],[],[],[],[],[],[]] as string[][],
     conversionRate: 0,
     upcomingExpirations: 0,
-    businesses: [] as any[]
+    businesses: [] as any[],
+    rankings: {
+      top_visits: [] as any[],
+      top_clicks: [] as any[],
+      visits_daily: [] as any[],
+      visits_weekly: [] as any[],
+      visits_monthly: [] as any[]
+    }
   });
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -33,6 +40,9 @@ export default function DashboardPage() {
       const { data: businesses } = await supabase
         .from('businesses')
         .select('*');
+
+      // Fetch rankings
+      const { data: rankingsData } = await supabase.rpc('get_admin_rankings');
 
       if (businesses) {
         const total = businesses.length;
@@ -113,7 +123,8 @@ export default function DashboardPage() {
           growthData,
           growthPercentages,
           growthNames,
-          businesses
+          businesses,
+          rankings: rankingsData || prev.rankings
         }));
       }
     } catch (error) {
@@ -143,7 +154,7 @@ export default function DashboardPage() {
 
       {/* Main Content Area (Gráficas) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <DashboardGrowthChart businesses={stats.businesses} />
+        <DashboardGrowthChart businesses={stats.businesses} rankings={stats.rankings} />
 
         <DashboardDistributionChart 
           totalBusinesses={stats.totalBusinesses}
