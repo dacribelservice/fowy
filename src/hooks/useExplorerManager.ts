@@ -141,8 +141,8 @@ export function useExplorerManager() {
         });
       }
 
-      // Filtrar los negocios para mostrar solo los que actualmente están abiertos
-      const openBusinesses = sortedBus.filter((biz: any) => isBusinessOpen(biz.schedules));
+      // Filtrar los negocios para mostrar solo los que actualmente están activos y abiertos
+      const openBusinesses = sortedBus.filter((biz: any) => biz.status === true && isBusinessOpen(biz.schedules));
       setBusinesses(openBusinesses);
     } catch (error) {
       console.error("Error fetching explorer data:", error);

@@ -8,6 +8,7 @@ import { useV2BusinessMenuData } from "@/hooks/useV2BusinessMenuData";
 import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
 import { useFavorites } from "@/hooks/useFavorites";
 import { isBusinessOpen } from "@/utils/businessTime";
+import { Wrench, ChevronLeft } from "lucide-react";
 
 import { BusinessMenuSkeleton } from "@/components/explorer/BusinessMenuSkeleton";
 import { BusinessMenuNotFound } from "@/components/explorer/BusinessMenuNotFound";
@@ -135,6 +136,32 @@ export default function BusinessMenuPage() {
         "--accent-color-10": `${accentColor}1a`,
       } as React.CSSProperties}
     >
+      {/* PANTALLA DE MANTENIMIENTO GLASSMORPHISM PARA NEGOCIOS INACTIVOS */}
+      {business.status !== true && (
+        <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-md p-6 text-center">
+          <div className="bg-white/85 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.2)] max-w-[320px] w-full flex flex-col items-center gap-5">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 shadow-inner">
+              <Wrench size={32} className="animate-pulse text-slate-700" strokeWidth={1.5} />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight flex items-center justify-center gap-2">
+                ⚠️ Mantenimiento
+              </h3>
+              <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
+                Este menú se encuentra inactivo. Por favor, intenta de nuevo más tarde.
+              </p>
+            </div>
+            <button 
+              onClick={() => window.history.back()}
+              className="mt-2 w-full py-3.5 bg-slate-900 text-white font-semibold rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <ChevronLeft size={20} strokeWidth={2.5} />
+              Regresar al mapa
+            </button>
+          </div>
+        </div>
+      )}
+
       <CraveHeaderCompact 
         isScrolled={isScrolled} 
         logoUrl={logoUrl} 
