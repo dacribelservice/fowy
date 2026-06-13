@@ -139,17 +139,17 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 ### ⚡ FASE 9: OPTIMIZACIÓN DE VELOCIDAD DE CARGA DEL MENÚ DIGITAL (CLIENTE)
 
 #### 📦 Bloque 1: Carga Diferida de Modales Legales (Code Splitting)
-- [ ] **9.1. Dynamic Imports de Modales**: Reemplazar las importaciones estáticas de `TermsModal`, `PrivacyModal`, `CookiesModal` y `VisionModal` en [Footer.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/Footer.tsx) por carga dinámica `next/dynamic` con `ssr: false`.
+- [x] **9.1. Dynamic Imports de Modales**: Reemplazar las importaciones estáticas de `TermsModal`, `PrivacyModal`, `CookiesModal` y `VisionModal` en [Footer.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/Footer.tsx) por carga dinámica `next/dynamic` con `ssr: false`.
   - **Nivel de Riesgo**: **2/10** (Riesgo muy bajo; solo difiere la carga de scripts pesados e informativos sin afectar la funcionalidad de la app).
-- [ ] **9.2. Montaje Condicional en DOM**: Modificar la renderización de los modales en [Footer.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/Footer.tsx) para que se monten físicamente solo cuando estén activos (`activeModal === '...'`) en lugar de estar siempre montados en segundo plano.
+- [x] **9.2. Montaje Condicional en DOM**: Modificar la renderización de los modales en [Footer.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/Footer.tsx) para que se monten físicamente solo cuando estén activos (`activeModal === '...'`) en lugar de estar siempre montados en segundo plano.
   - **Nivel de Riesgo**: **2/10** (Riesgo muy bajo; optimiza memoria y recursos del navegador al no inicializar componentes inactivos).
 
 #### 🔀 Bloque 2: Consolidación de Payload Inicial (Eliminación de Cascada)
-- [ ] **9.3. Integración de Productos en RPC**: Modificar la función RPC `get_business_menu_payload` en PostgreSQL (Supabase) para que retorne los productos iniciales activos del negocio en el mismo viaje de red.
+- [x] **9.3. Integración de Productos en RPC**: Modificar la función RPC `get_business_menu_payload` en PostgreSQL (Supabase) para que retorne los productos iniciales activos del negocio en el mismo viaje de red.
   - **Nivel de Riesgo**: **5/10** (Riesgo moderado; requiere alterar la base de datos y la estructura del JSON de retorno).
-- [ ] **9.4. Consolidación en Hook**: Actualizar [useV2BusinessMenuData.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useV2BusinessMenuData.ts) para asignar los productos directamente desde la respuesta inicial de la RPC consolidada.
+- [x] **9.4. Consolidación en Hook**: Actualizar [useV2BusinessMenuData.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useV2BusinessMenuData.ts) para asignar los productos directamente desde la respuesta inicial de la RPC consolidada.
   - **Nivel de Riesgo**: **5/10** (Riesgo moderado; requiere sincronizar correctamente el estado inicial de productos y desactivar la pantalla de carga principal inmediatamente).
-- [ ] **9.5. Evitar Doble Petición en Inicio**: Implementar una referencia de control (`useRef`) en [useV2BusinessMenuData.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useV2BusinessMenuData.ts) para omitir la segunda petición de consulta de productos filtrados durante el render inicial, disparándola únicamente ante cambios del buscador o categorías.
+- [x] **9.5. Evitar Doble Petición en Inicio**: Implementar una referencia de control (`useRef`) en [useV2BusinessMenuData.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useV2BusinessMenuData.ts) para omitir la segunda petición de consulta de productos filtrados durante el render inicial, disparándola únicamente ante cambios del buscador o categorías.
   - **Nivel de Riesgo**: **6/10** (Riesgo moderado-alto; una mala configuración del ciclo de vida podría provocar que la carta de productos quede vacía en el render inicial).
 
   > ⚠️ **RECORDATORIO LEY DEL REMOLQUE**: Al ejecutar el paso 9.4 y 9.5, quien programe (yo o cualquier IA) tiene prohibido reescribir el archivo. Solo debe hacer intervenciones quirúrgicas súper precisas:

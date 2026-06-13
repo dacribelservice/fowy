@@ -11,10 +11,12 @@ import {
   MessageCircle 
 } from "lucide-react";
 import { Instagram, Facebook, Twitter } from "../shared/icons/SocialIcons";
-import TermsModal from "./modals/legal/TermsModal";
-import PrivacyModal from "./modals/legal/PrivacyModal";
-import CookiesModal from "./modals/legal/CookiesModal";
-import VisionModal from "./modals/legal/VisionModal";
+import dynamic from "next/dynamic";
+
+const TermsModal = dynamic(() => import("./modals/legal/TermsModal"), { ssr: false });
+const PrivacyModal = dynamic(() => import("./modals/legal/PrivacyModal"), { ssr: false });
+const CookiesModal = dynamic(() => import("./modals/legal/CookiesModal"), { ssr: false });
+const VisionModal = dynamic(() => import("./modals/legal/VisionModal"), { ssr: false });
 
 interface FooterProps {
   // Custom spacing / padding bottom to avoid floating cart collision (Fase 22.5)
@@ -147,10 +149,10 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
       </div>
 
       {/* Modales Extraídos */}
-      <TermsModal isOpen={activeModal === "terms"} onClose={() => setActiveModal(null)} />
-      <PrivacyModal isOpen={activeModal === "privacy"} onClose={() => setActiveModal(null)} />
-      <CookiesModal isOpen={activeModal === "cookies"} onClose={() => setActiveModal(null)} />
-      <VisionModal isOpen={activeModal === "vision"} onClose={() => setActiveModal(null)} />
+      {activeModal === "terms" && <TermsModal isOpen={activeModal === "terms"} onClose={() => setActiveModal(null)} />}
+      {activeModal === "privacy" && <PrivacyModal isOpen={activeModal === "privacy"} onClose={() => setActiveModal(null)} />}
+      {activeModal === "cookies" && <CookiesModal isOpen={activeModal === "cookies"} onClose={() => setActiveModal(null)} />}
+      {activeModal === "vision" && <VisionModal isOpen={activeModal === "vision"} onClose={() => setActiveModal(null)} />}
 
     </footer>
   );

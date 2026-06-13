@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 /**
@@ -20,6 +20,7 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [productsLoading, setProductsLoading] = useState(true);
   const [votesCount, setVotesCount] = useState<number>(0);
+  const initialLoadDone = useRef(false);
 
   const supabase = createClient();
 
@@ -56,6 +57,21 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
         setBanners(data.banners || []);
         setVotesCount(data.votes_count || 0);
 
+        if (data.products) {
+          const mappedInitialProducts = data.products.map((p: any) => {
+            const gp = p.global_products;
+            return {
+              ...p,
+              name: p.name || gp?.name || "",
+              description: p.description ?? gp?.description ?? null,
+              image_url: p.image_url || gp?.image_url || "",
+              is_promo: p.is_offer
+            };
+          });
+          setProducts(mappedInitialProducts);
+          setProductsLoading(false);
+        }
+
       } catch (error) {
         console.error("Error fetching data in V2 Production Menu:", error);
       } finally {
@@ -68,6 +84,11 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
   // Filtrado reactivo de productos del lado del servidor (Intacto)
   useEffect(() => {
     if (!business?.id) return;
+
+    if (!initialLoadDone.current && selectedCategory === "all" && !debouncedSearchQuery) {
+      initialLoadDone.current = true;
+      return;
+    }
 
     async function fetchFilteredProducts() {
       try {
