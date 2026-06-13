@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
@@ -151,13 +152,12 @@ export default function BusinessMenuPage() {
                 Este menú se encuentra inactivo. Por favor, intenta de nuevo más tarde.
               </p>
             </div>
-            <button 
-              onClick={() => window.history.back()}
+            <Link 
+              href="/explorar"
               className="mt-2 w-full py-3.5 bg-slate-900 text-white font-semibold rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
             >
-              <ChevronLeft size={20} strokeWidth={2.5} />
-              Regresar al mapa
-            </button>
+              Ver otros negocios {">"}
+            </Link>
           </div>
         </div>
       )}
