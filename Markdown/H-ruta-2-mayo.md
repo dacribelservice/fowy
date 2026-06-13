@@ -152,6 +152,11 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
 - [ ] **9.5. Evitar Doble Petición en Inicio**: Implementar una referencia de control (`useRef`) en [useV2BusinessMenuData.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useV2BusinessMenuData.ts) para omitir la segunda petición de consulta de productos filtrados durante el render inicial, disparándola únicamente ante cambios del buscador o categorías.
   - **Nivel de Riesgo**: **6/10** (Riesgo moderado-alto; una mala configuración del ciclo de vida podría provocar que la carta de productos quede vacía en el render inicial).
 
+  > ⚠️ **RECORDATORIO LEY DEL REMOLQUE**: Al ejecutar el paso 9.4 y 9.5, quien programe (yo o cualquier IA) tiene prohibido reescribir el archivo. Solo debe hacer intervenciones quirúrgicas súper precisas:
+  > 1. Inyectar el `useRef` arriba.
+  > 2. Poner `setProducts(data.products)` en el primer efecto.
+  > 3. Dejar todo el resto del código exactamente igual, especialmente el código que hace que la barra de búsqueda y los filtros de categorías funcionen hoy en día.
+
 #### 🖼️ Bloque 3: Optimización de Imágenes y CDN (Supabase Storage)
 - [ ] **9.6. Parámetros de Redimensionamiento de CDN**: Crear una función utilitaria para reescribir las URLs de imágenes cargadas en [CraveProductCard.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/CraveProductCard.tsx) solicitando compresión WebP y un tamaño máximo adecuado (ej. `width=300&quality=75`) directamente al Storage de Supabase.
   - **Nivel de Riesgo**: **3/10** (Riesgo bajo; solo podría resultar en imágenes rotas si el host del bucket o la URL está mal construida, lo cual es fácilmente reversible).
