@@ -3,6 +3,12 @@
 import React from "react";
 import { Plus, Heart } from "lucide-react";
 
+// Función utilitaria para optimizar imágenes de Supabase Storage vía CDN (Paso 9.6)
+// NOTA: Desactivado temporalmente porque el Image Transformation requiere plan Pro en Supabase.
+function getOptimizedImageUrl(url: string, width: number = 300, quality: number = 75) {
+  return url || ""; // Retorna la original intacta para evitar imágenes rotas
+}
+
 interface Product {
   id: string;
   name: string;
@@ -37,8 +43,9 @@ export function CraveProductCard({
         className="h-32 w-full relative overflow-hidden bg-slate-50 cursor-pointer"
       >
         <img
-          src={product.image_url}
+          src={getOptimizedImageUrl(product.image_url, 300, 75)}
           alt={product.name}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {product.is_promo && (

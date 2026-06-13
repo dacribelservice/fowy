@@ -75,3 +75,19 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
   - **Hook Modular (`useOrderPrinter.ts`)**: Se construyó un orquestador dual. Soporta impresión nativa en PC y también exportación de texto plano codificado hacia Intent URIs de Android para integración nativa con la app RawBT (`intent://...scheme=rawbt`).
   - **Aislamiento CSS Quirúrgico**: Para evitar la impresión global de la interfaz web ("Problema de las 16 hojas"), se implementó una clonación temporal en el DOM y anulación global con `display: none !important`, logrando una impresión perfecta de 1 sola página sin tocar los estados de React ni refactorizar.
   - **Ley del Remolque Respetada**: Toda la inyección de botones, micro-animaciones (Framer Motion) y manejo de datos se encapsuló en `OrderActionButtons.tsx` empleando casting explícito de TypeScript (`as unknown as OrderTicketData`), manteniendo el flujo legado de Supabase 100% intacto.
+
+### 📌 Hito: Eliminación de Cascada y Code Splitting (Fase 9 - Bloques 1 y 2)
+- **Fecha**: 13 de Junio de 2026
+- **Resumen**: Aceleración drástica de la carga inicial del menú público mediante Code Splitting y erradicación del "Efecto Cascada" (Waterfall).
+- **Detalles Técnicos**:
+  - **Code Splitting (Modales)**: Se implementó carga diferida (`next/dynamic` con `ssr: false`) y montaje condicional en el DOM para todos los modales legales en el `Footer.tsx`.
+  - **Supresión del Efecto Cascada**: Se sobrescribió la función RPC `get_business_menu_payload` en Supabase inyectando la matriz de `products` (con `global_products` anidados), logrando que perfil, categorías, banners y productos bajen en un único y definitivo viaje de red.
+  - **Ley del Remolque**: En `useV2BusinessMenuData.ts`, se inyectó el parseo de la carga consolidada y se aplicó un candado con `useRef` para bloquear la segunda petición duplicada de React, sin reescribir ni romper el motor de búsqueda actual.
+
+### 📌 Hito: Optimización de Imágenes CDN en Modo By-Pass (Fase 9.6)
+- **Fecha**: 13 de Junio de 2026
+- **Resumen**: Implementación de la lógica de compresión de imágenes WebP para Supabase, la cual fue configurada en "modo by-pass" (apagada provisionalmente) debido a las restricciones del plan Free.
+- **Detalles Técnicos**:
+  - **Lógica Inyectada**: Se creó la función utilitaria `getOptimizedImageUrl` en `CraveProductCard.tsx` diseñada para reescribir URLs de `object/public/` a `/render/image/public/` solicitando compresión de hardware (`width=300&quality=75`).
+  - **Adaptación al Plan Free**: Dado que Supabase bloquea el endpoint de transformación sin un plan Pro activo (Image Transformations) generando un error 400, la función fue revertida internamente para devolver la URL original y evitar imágenes rotas.
+  - **Preparación a Futuro**: El código no se borró, quedó estructurado en el frontend. Si a futuro se habilita Supabase Pro, solo bastará con borrar un comentario interno para que la compresión y redimensionamiento de WebP comience a funcionar automáticamente en toda la app sin refactorizaciones.

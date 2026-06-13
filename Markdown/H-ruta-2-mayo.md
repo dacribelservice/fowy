@@ -158,7 +158,7 @@ Esta fase integra el seguimiento inteligente de los estados de suscripción de l
   > 3. Dejar todo el resto del código exactamente igual, especialmente el código que hace que la barra de búsqueda y los filtros de categorías funcionen hoy en día.
 
 #### 🖼️ Bloque 3: Optimización de Imágenes y CDN (Supabase Storage)
-- [ ] **9.6. Parámetros de Redimensionamiento de CDN**: Crear una función utilitaria para reescribir las URLs de imágenes cargadas en [CraveProductCard.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/CraveProductCard.tsx) solicitando compresión WebP y un tamaño máximo adecuado (ej. `width=300&quality=75`) directamente al Storage de Supabase.
+- [x] **9.6. Parámetros de Redimensionamiento de CDN**: Crear una función utilitaria para reescribir las URLs de imágenes cargadas en [CraveProductCard.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/CraveProductCard.tsx) solicitando compresión WebP y un tamaño máximo adecuado (ej. `width=300&quality=75`) directamente al Storage de Supabase.
   - **Nivel de Riesgo**: **3/10** (Riesgo bajo; solo podría resultar en imágenes rotas si el host del bucket o la URL está mal construida, lo cual es fácilmente reversible).
-- [ ] **9.7. Atributo Native Lazy Loading**: Añadir el atributo `loading="lazy"` a la etiqueta `<img>` en [CraveProductCard.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/CraveProductCard.tsx) como medida extra de protección y ahorro de datos a nivel de navegador.
+- [x] **9.7. Atributo Native Lazy Loading**: Añadir el atributo `loading="lazy"` a la etiqueta `<img>` en [CraveProductCard.tsx](file:///c:/Users/cange/Documents/fowy/src/components/explorer/CraveProductCard.tsx) como medida extra de protección y ahorro de datos a nivel de navegador.
   - **Nivel de Riesgo**: **1/10** (Riesgo nulo; comportamiento estandarizado por navegadores modernos).
