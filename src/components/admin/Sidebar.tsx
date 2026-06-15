@@ -105,27 +105,53 @@ export default function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <Link key={item.name} href={item.href} className="block">
-              <motion.div
-                whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className={cn(
-                  "flex items-center gap-4 px-4 py-3 rounded-fowy transition-all duration-300 group",
-                  isActive 
-                    ? "bg-fowy-primary text-white shadow-[0_4px_20px_rgba(255,90,95,0.35)]" 
-                    : "text-slate-500 hover:bg-white/50 hover:text-fowy-red hover:shadow-[0_0_15px_rgba(255,90,95,0.15)]"
-                )}
-              >
-                <Icon size={20} className={cn("transition-colors", isActive ? "text-white" : "group-hover:text-fowy-red")} />
-                <span className="font-medium">{item.name}</span>
-                {isActive && (
-                  <motion.div 
-                    layoutId="active-pill"
-                    className="ml-auto w-1.5 h-1.5 rounded-full bg-white"
-                  />
-                )}
-              </motion.div>
-            </Link>
+            <div key={item.name} className="space-y-1">
+              <Link href={item.href} className="block">
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    "flex items-center gap-4 px-4 py-3 rounded-fowy transition-all duration-300 group",
+                    isActive 
+                      ? "bg-fowy-primary text-white shadow-[0_4px_20px_rgba(255,90,95,0.35)]" 
+                      : "text-slate-500 hover:bg-white/50 hover:text-fowy-red hover:shadow-[0_0_15px_rgba(255,90,95,0.15)]"
+                  )}
+                >
+                  <Icon size={20} className={cn("transition-colors", isActive ? "text-white" : "group-hover:text-fowy-red")} />
+                  <span className="font-medium">{item.name}</span>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="active-pill"
+                      className="ml-auto w-1.5 h-1.5 rounded-full bg-white"
+                    />
+                  )}
+                </motion.div>
+              </Link>
+              
+              {/* Sub-menú dinámico para Catálogo de Negocio Específico */}
+              {item.name === "Negocios" && pathname.match(/^\/admin\/negocios\/[^\/]+/) && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  className="pl-12 pr-4 py-1"
+                >
+                  <Link 
+                    href={`${pathname.replace(/\/catalogo$/, '')}/catalogo`} 
+                    className="block"
+                  >
+                    <div className={cn(
+                      "px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
+                      pathname.endsWith("/catalogo") 
+                        ? "bg-fowy-secondary text-white shadow-md shadow-fowy-secondary/30"
+                        : "text-slate-400 hover:text-slate-600 hover:bg-white/60"
+                    )}>
+                      <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                      Catálogo negocio
+                    </div>
+                  </Link>
+                </motion.div>
+              )}
+            </div>
           );
         })}
       </nav>
