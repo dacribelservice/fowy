@@ -10,3 +10,11 @@
 
 - [x] **2.1. Corregir contador de Pedidos Recibidos y Ticket Promedio**: Modificar `src/components/admin/businesses/BusinessMetricsList.tsx` para usar la consulta de conteo nativo de Supabase (`count: "exact"`) para la cantidad de pedidos y, preferiblemente, implementar una función RPC (ej. `get_business_sales_stats`) para calcular el ticket promedio sin descargar la tabla completa de pedidos (lo cual causa que el total se quede estancado en 1000 debido al límite de la base de datos).
 - [x] **2.2. Solucionar días vacíos ($0) en la Gráfica de Ventas**: Modificar el hook `src/components/admin/businesses/useFowySalesData.ts`. En la consulta principal (`supabase.from("orders")...`), calcular la fecha de inicio del período en el cliente (ej. 7 días, 6 semanas o 6 meses atrás) y añadir un filtro `.gte("created_at", fechaInicio)`. Esto evita descargar los 1000 registros más antiguos y garantiza que la gráfica siempre reciba los datos de los días recientes.
+
+### Fase 3: Gestión de Menú del Negocio desde el Panel de Administrador
+
+- [ ] **3.1. Agregar Botón de "Tienda" en la Tabla (BusinessList)**: Modificar la tabla de listado (`src/components/admin/businesses/BusinessList.tsx`) añadiendo un botón con el ícono de "Tienda" junto al botón de "Lápiz". Este nuevo botón enlazará a la ruta exclusiva: `/admin/negocios/[id]/catalogo`.
+- [ ] **3.2. Crear Nueva Pantalla Completa (Ruta de Catálogo)**: Crear un archivo totalmente nuevo en `src/app/admin/negocios/[id]/catalogo/page.tsx` para alojar la gestión del menú. Esto brindará todo el ancho de pantalla necesario y separará el contexto de configuración general (pagos, módulos) del contexto de inventario.
+- [ ] **3.3. Ensamblar el "Remolque" (Reutilización Segura)**: Construir la nueva pantalla importando los subcomponentes y ganchos del socio (`ProductFormModal`, `useProductManager`, etc.) pasándoles el `businessId` de la URL. **Prohibido tocar/modificar** la vista actual del dueño (`src/app/(partners)/business/menu/page.tsx`) cumpliendo estrictamente con la Regla del Remolque.
+- [ ] **3.4. Validar Políticas RLS de Supabase**: Asegurar que las políticas de seguridad (RLS) en Supabase permitan al Super Administrador insertar, actualizar y eliminar registros en las tablas de `products`, `product_categories` y `categories` para cualquier `business_id`.
+
