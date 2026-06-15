@@ -39,18 +39,40 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
 
         if (visitsError) throw visitsError;
 
-        // 2. Fetch orders total amount and count
-        const { data: ordersData, error: ordersError } = await supabase
-          .from("orders")
-          .select("total_amount")
-          .eq("business_id", businessId);
+        // 2. Intentar usar la función RPC para obtener estadísticas exactas (si existe)
+        const { data: rpcData, error: rpcError } = await supabase
+          .rpc('get_business_sales_stats', { p_business_id: businessId });
+          
+        let totalOrders = 0;
+        let totalAmount = 0;
 
-        if (ordersError) throw ordersError;
+        if (!rpcError && rpcData && rpcData.length > 0) {
+          totalAmount = Number(rpcData[0].total_sales || 0);
+          totalOrders = Number(rpcData[0].total_orders || 0);
+        } else {
+          // Fallback: usar el count exacto de Supabase para los pedidos
+          const { count: exactCount } = await supabase
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("business_id", businessId);
+            
+          totalOrders = exactCount || 0;
+          
+          // Traer limitados para aproximar el ticket promedio si no hay RPC
+          const { data: ordersData } = await supabase
+            .from("orders")
+            .select("total_amount")
+            .eq("business_id", businessId);
+            
+          totalAmount = ordersData?.reduce((sum: any, order: any) => sum + Number(order.total_amount || 0), 0) || 0;
+          // Ajustar ticket promedio usando los pedidos traídos, no el total
+          const fetchedOrders = ordersData?.length || 0;
+          const fallbackAvgTicket = fetchedOrders > 0 ? totalAmount / fetchedOrders : 0;
+          totalAmount = totalOrders * fallbackAvgTicket; // Estimación del total
+        }
 
         const totalVisits = visitsCount || 0;
-        const totalOrders = ordersData?.length || 0;
         const conversion = totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
-        const totalAmount = ordersData?.reduce((sum: any, order: any) => sum + Number(order.total_amount || 0), 0) || 0;
         const avgTicket = totalOrders > 0 ? totalAmount / totalOrders : 0;
 
         setMetrics({

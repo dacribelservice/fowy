@@ -51,11 +51,21 @@ export function useFowySalesData({
     async function fetchSalesData() {
       setLoading(true);
       try {
+        const startDate = new Date();
+        if (filter === "D") {
+          startDate.setDate(startDate.getDate() - 7);
+        } else if (filter === "S") {
+          startDate.setDate(startDate.getDate() - 42); // 6 semanas
+        } else if (filter === "M") {
+          startDate.setMonth(startDate.getMonth() - 6);
+        }
+        
         const { data, error } = await supabase
           .from("orders")
           .select("total_amount, created_at, status")
           .eq("business_id", businessId)
           .eq("status", "completed")
+          .gte("created_at", startDate.toISOString())
           .order("created_at", { ascending: true });
 
         if (error) throw error;

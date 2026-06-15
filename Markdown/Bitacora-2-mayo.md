@@ -91,3 +91,12 @@ Esta bitácora es el registro maestro del proyecto. Sirve para que cualquier ses
   - **Lógica Inyectada**: Se creó la función utilitaria `getOptimizedImageUrl` en `CraveProductCard.tsx` diseñada para reescribir URLs de `object/public/` a `/render/image/public/` solicitando compresión de hardware (`width=300&quality=75`).
   - **Adaptación al Plan Free**: Dado que Supabase bloquea el endpoint de transformación sin un plan Pro activo (Image Transformations) generando un error 400, la función fue revertida internamente para devolver la URL original y evitar imágenes rotas.
   - **Preparación a Futuro**: El código no se borró, quedó estructurado en el frontend. Si a futuro se habilita Supabase Pro, solo bastará con borrar un comentario interno para que la compresión y redimensionamiento de WebP comience a funcionar automáticamente en toda la app sin refactorizaciones.
+
+### 📌 Hito: Corrección de Carga en Negocios Inactivos (Fase 1.2 / 9.3)
+- **Fecha**: 14 de Junio de 2026
+- **Resumen**: Resolución del error de carga consolidada (`Error fetching consolidated payload: null`) y restauración de la pantalla Glassmorphism de mantenimiento para negocios inactivos.
+- **Detalles Técnicos**:
+  - **Causa Raíz**: Durante la optimización de la Fase 9.3 (eliminación de cascada inyectando productos en la RPC de menús), se introdujo accidentalmente la cláusula `WHERE slug = p_slug AND status = true` al obtener el negocio. Esto hacía que si un comercio estaba inactivo (`status = false`), la RPC retornara `null` completo en lugar del objeto del negocio inactivo.
+  - **Corrección en DB**: Se actualizó la función RPC `get_business_menu_payload` en Supabase eliminando el filtro de estado activo (`AND status = true`) de la consulta inicial del negocio.
+  - **Impacto**: El backend ahora retorna correctamente el payload básico del negocio inactivo. El frontend puede recibir el objeto con `status = false` y renderizar de forma segura la pantalla Glassmorphism que bloquea la navegación, en lugar de mostrar un error de "Menú no encontrado".
+
