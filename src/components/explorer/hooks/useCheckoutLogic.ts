@@ -89,7 +89,7 @@ export function useCheckoutLogic({
   };
 
   // ── WhatsApp + Supabase ────────────────────────────────────────
-  const handleSendWhatsApp = async () => {
+  const handleSendWhatsApp = () => {
     if (!customerName.trim() || !customerPhone.trim()) {
       setValidationError("Por favor, ingresa tu nombre y celular para enviar el pedido.");
       return;
@@ -154,43 +154,47 @@ ${itemsText}
 
 *¡Gracias por tu compra!*`;
 
-    // Guardar el pedido en Supabase
+    // Guardar el pedido en Supabase en segundo plano (Fire and Forget)
     if (businessId) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const totalAmount = cartItems.reduce((acc: number, curr: any) => acc + curr.price, 0);
-        const itemsPayload = groupedCart.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image_url: item.image_url ?? null,
-        }));
+      const saveOrderAsync = async () => {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          const totalAmount = cartItems.reduce((acc: number, curr: any) => acc + curr.price, 0);
+          const itemsPayload = groupedCart.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image_url: item.image_url ?? null,
+          }));
 
-        const { error: insertError } = await supabase.from("orders").insert({
-          business_id: businessId,
-          customer_id: user?.id ?? null,
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.trim(),
-          delivery_address: customerAddress.trim() || null,
-          notes: orderNotes.trim() || null,
-          payment_method: paymentMethod || null,
-          cash_change: cashChange.trim() || null,
-          items: itemsPayload,
-          total_amount: totalAmount,
-          status: "pending",
-        });
+          const { error: insertError } = await supabase.from("orders").insert({
+            business_id: businessId,
+            customer_id: user?.id ?? null,
+            customer_name: customerName.trim(),
+            customer_phone: customerPhone.trim(),
+            delivery_address: customerAddress.trim() || null,
+            notes: orderNotes.trim() || null,
+            payment_method: paymentMethod || null,
+            cash_change: cashChange.trim() || null,
+            items: itemsPayload,
+            total_amount: totalAmount,
+            status: "pending",
+          });
 
-        if (insertError) {
-          console.error("[FOWY] Error al guardar pedido en Supabase:", insertError.message, insertError.details, insertError.hint);
-        } else {
-          // Notificar a UserOrdersSheet para que recargue los pedidos del usuario
-          window.dispatchEvent(new CustomEvent("fowy:order-created"));
+          if (insertError) {
+            console.error("[FOWY] Error al guardar pedido en Supabase:", insertError.message, insertError.details, insertError.hint);
+          } else {
+            // Notificar a UserOrdersSheet para que recargue los pedidos del usuario
+            window.dispatchEvent(new CustomEvent("fowy:order-created"));
+          }
+        } catch (err) {
+          console.error("[FOWY] Error inesperado guardando el pedido:", err);
         }
-      } catch (err) {
-        console.error("[FOWY] Error inesperado guardando el pedido:", err);
-        // No bloqueamos el flujo: igual se envía por WhatsApp
-      }
+      };
+      
+      // Se invoca inmediatamente sin usar await para no bloquear la redirección a WhatsApp en iOS
+      saveOrderAsync();
     }
 
     const rawPhone = businessPhone || "3000000000";
@@ -203,7 +207,7 @@ ${itemsText}
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${normalizedPhone}&text=${encodedMessage}`;
-    window.open(whatsappUrl, "_blank");
+    window.location.href = whatsappUrl;
   };
 
   // ── Reset al cerrar el sheet ─────────────────────────────────────────────

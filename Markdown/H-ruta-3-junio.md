@@ -18,3 +18,8 @@
 - [x] **3.3. Ensamblar el "Remolque" (Reutilización Segura)**: Construir la nueva pantalla importando los subcomponentes y ganchos del socio (`ProductFormModal`, `useProductManager`, etc.) pasándoles el `businessId` de la URL. **Prohibido tocar/modificar** la vista actual del dueño (`src/app/(partners)/business/menu/page.tsx`) cumpliendo estrictamente con la Regla del Remolque.
 - [x] **3.4. Validar Políticas RLS de Supabase**: Asegurar que las políticas de seguridad (RLS) en Supabase permitan al Super Administrador insertar, actualizar y eliminar registros en las tablas de `products`, `product_categories` y `categories` para cualquier `business_id`.
 
+### Fase 4: Solución de Redirección a WhatsApp en iOS (Safari / WebViews)
+
+- [x] **4.1. Eliminar `await` en la inserción de base de datos**: Modificar el hook `src/components/explorer/hooks/useCheckoutLogic.ts` en `handleSendWhatsApp` para disparar la inserción en Supabase en segundo plano sin usar `await`. Esto preserva el hilo de ejecución síncrono para el evento de clic.
+- [x] **4.2. Cambiar redirección a `window.location.href`**: Reemplazar `window.open(whatsappUrl, "_blank")` por `window.location.href = whatsappUrl` en `useCheckoutLogic.ts`. Esto evita que iOS Safari bloquee el popup e invoque directamente la aplicación nativa de WhatsApp.
+- [ ] **4.3. Pruebas de compatibilidad**: Validar el flujo tanto en iPhone (Safari y WebViews) como en Android para confirmar que la redirección sea instantánea y que el pedido continúe registrándose correctamente en Supabase en segundo plano.
