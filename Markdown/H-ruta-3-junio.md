@@ -22,4 +22,4 @@
 
 - [x] **4.1. Eliminar `await` en la inserción de base de datos**: Modificar el hook `src/components/explorer/hooks/useCheckoutLogic.ts` en `handleSendWhatsApp` para disparar la inserción en Supabase en segundo plano sin usar `await`. Esto preserva el hilo de ejecución síncrono para el evento de clic.
 - [x] **4.2. Cambiar redirección a `window.location.href`**: Reemplazar `window.open(whatsappUrl, "_blank")` por `window.location.href = whatsappUrl` en `useCheckoutLogic.ts`. Esto evita que iOS Safari bloquee el popup e invoque directamente la aplicación nativa de WhatsApp.
-- [ ] **4.3. Pruebas de compatibilidad**: Validar el flujo tanto en iPhone (Safari y WebViews) como en Android para confirmar que la redirección sea instantánea y que el pedido continúe registrándose correctamente en Supabase en segundo plano.
+- [x] **4.3. Pruebas de compatibilidad**: Validar el flujo tanto en iPhone (Safari y WebViews) como en Android para confirmar que la redirección sea instantánea y que el pedido continúe registrándose correctamente en Supabase en segundo plano.

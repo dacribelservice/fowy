@@ -150,7 +150,8 @@ ${itemsText}
 📝 *Notas:* ${orderNotes.trim() ? orderNotes.trim() : "Ninguna"}
 💳 *Método de Pago:* ${paymentDetail}
 
-💰 *Total a Pagar:* $${totalText}
+💰 *Pedido total:* $${totalText}
+🛵 *+ Domicilio*
 
 *¡Gracias por tu compra!*`;
 
