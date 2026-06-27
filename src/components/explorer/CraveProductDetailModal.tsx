@@ -98,7 +98,7 @@ export function CraveProductDetailModal({
             <h2 className="text-lg font-black text-slate-900 leading-tight">
               {product.name}
             </h2>
-            <p className="text-slate-500 text-[12px] mt-2 leading-relaxed">
+            <p className="text-slate-500 text-[12px] mt-2 leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
 

@@ -84,7 +84,7 @@ export function CraveProductCard({
           <h3 className="font-bold text-slate-900 text-sm leading-tight line-clamp-2">
             {product.name}
           </h3>
-          <p className="text-slate-500 text-[11px] mt-1 line-clamp-2 flex-1 leading-snug">
+          <p className="text-slate-500 text-[11px] mt-1 line-clamp-2 flex-1 leading-snug whitespace-pre-line">
             {product.description}
           </p>
         </div>
