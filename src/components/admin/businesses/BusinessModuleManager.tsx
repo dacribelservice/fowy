@@ -44,7 +44,7 @@ function ModuleSwitch({ title, description, icon, active, onToggle }: ModuleSwit
       
       {/* Toggle UI */}
       <div className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${
-        active ? 'bg-fowy-orange' : 'bg-slate-200'
+        active ? 'bg-green-500' : 'bg-slate-200'
       }`}>
         <motion.div 
           animate={{ x: active ? 18 : 3 }}

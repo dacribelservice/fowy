@@ -120,7 +120,7 @@ export default function NegociosPage() {
           
           <button 
             onClick={() => setIsBusinessModalOpen(true)}
-            className="hidden sm:flex px-6 py-4 bg-fowy-primary text-white rounded-2xl shadow-lg shadow-fowy-red/20 hover:shadow-fowy-red/30 transition-all active:scale-95 items-center gap-3 group"
+            className="flex w-full sm:w-auto justify-center sm:justify-start px-6 py-4 bg-fowy-primary text-white rounded-2xl shadow-lg shadow-fowy-red/20 hover:shadow-fowy-red/30 transition-all active:scale-95 items-center gap-3 group"
           >
             <Plus size={18} className="group-hover:rotate-90 transition-transform" />
             <span className="text-[10px] font-black uppercase tracking-widest">Nuevo Negocio</span>
