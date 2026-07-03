@@ -16,8 +16,7 @@ interface AddBusinessModalProps {
 export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase, setToast, onSave }: AddBusinessModalProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
+
   const [whatsapp, setWhatsapp] = useState("");
   const [plan, setPlan] = useState("standard");
   const [logo, setLogo] = useState<File | null>(null);
@@ -53,8 +52,8 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
       const result = await onSave({
         name,
         slug,
-        city,
-        country,
+        city: null,
+        country: null,
         phone: whatsapp,
         plan,
         ownerEmail,
@@ -66,8 +65,6 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
         onClose();
         // Reset
         setName("");
-        setCity("");
-        setCountry("");
         setWhatsapp("");
         setOwnerEmail("");
         setLogo(null);
@@ -159,33 +156,7 @@ export default function AddBusinessModal({ isOpen, onClose, onSuccess, supabase,
                   />
                 </div>
 
-                {/* Ciudad */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                    <MapPin size={12} className="text-fowy-orange" /> Ciudad
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej. Cali"
-                    className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-fowy-orange/20 outline-none transition-all font-bold text-slate-700"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
-                </div>
 
-                {/* País */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                    <MapPin size={12} className="text-fowy-orange" /> País
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej. Colombia"
-                    className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-fowy-orange/20 outline-none transition-all font-bold text-slate-700"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                  />
-                </div>
 
                 {/* WhatsApp */}
                 <div className="space-y-2">

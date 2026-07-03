@@ -165,10 +165,16 @@ export default function BusinessList({
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                      <MapPin size={16} className="text-fowy-blue/60" />
-                      {b.city}, {b.country}
-                    </div>
+                    {(!b.city || !b.country) ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-200">
+                        <span>⚠️ Ubicación Pendiente</span>
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                        <MapPin size={16} className="text-fowy-blue/60" />
+                        {b.city}, {b.country}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-5">
                     <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
@@ -246,9 +252,15 @@ export default function BusinessList({
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-700 text-lg">{b.name}</h3>
-                    <div className="flex items-center gap-1 text-slate-400 text-xs font-semibold">
-                      <MapPin size={12} /> {b.city}
-                    </div>
+                    {(!b.city || !b.country) ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-200 mt-1">
+                        <span>⚠️ Ubicación Pendiente</span>
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-1 text-slate-400 text-xs font-semibold mt-1">
+                        <MapPin size={12} /> {b.city}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest ${

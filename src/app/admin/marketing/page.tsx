@@ -31,8 +31,15 @@ export default function MarketingPage() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "" });
 
-  const handleSave = async (file: File, title: string, linkUrl: string) => {
-    const result = await addBanner(file, title, linkUrl);
+  const handleSave = async (
+    file: File, 
+    title: string, 
+    linkUrl: string,
+    targetCity?: string | null,
+    targetBusinessId?: string | null,
+    destinationBusinessId?: string | null
+  ) => {
+    const result = await addBanner(file, title, linkUrl, targetCity, targetBusinessId, destinationBusinessId);
     if (result) {
       setToast({ show: true, message: "¡Banner subido con éxito!" });
       return true;

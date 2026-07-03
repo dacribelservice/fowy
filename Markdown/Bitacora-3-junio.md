@@ -15,3 +15,21 @@
   - **Identificación de la causa raíz**: El problema se originaba por la política de *User Activation* de WebKit (iOS), que bloquea `window.open` si este ocurre después de operaciones asíncronas (`await` de lectura/escritura en Supabase).
   - **Patrón "Fire and Forget"**: Se removió el `await` en `useCheckoutLogic.ts` aislando el guardado en Supabase a una función en segundo plano, para no demorar la redirección a WhatsApp.
   - **Redirección Síncrona Segura**: Se sustituyó `window.open(..., "_blank")` por la asignación directa a `window.location.href`, garantizando la apertura instantánea de la app nativa de WhatsApp.
+
+### 📌 Hito: Motor Central de Marketing y Banners Segmentados (Fase 5)
+- **Fecha**: 2 de Julio de 2026
+- **Resumen**: Implementación de la infraestructura de segmentación de banners por alcance (global, ciudad, negocio), carga automatizada interactiva con mapa, analíticas de clics de tráfico cruzado, y visualización móvil optimizada con caché y render diferido en el explorador.
+- **Detalles Técnicos**:
+  - **Base de Datos y Tipos**: Agregados campos de segmentación (`target_city`, `target_business_id`) y redirección a negocios (`destination_business_id`) en `marketing_banners`, y métrica de clics (`cross_traffic_clicks`) en `businesses`, sincronizando tipos en `supabase.ts` y creando el RPC `increment_cross_traffic`.
+  - **Panel de Administración**: 
+    - Integración de selector por pestañas (`BannerScopeSelector`) y autocompletador debounceado (`Autocomplete`) con 300ms de retardo.
+    - Autocompletado inteligente de `link_url` basado en el slug invariantivo al seleccionar un negocio Fowy de destino.
+    - Zero-Click UX en creación de negocios (`AddBusinessModal`) creando ubicación como nula y mostrando advertencia visual de `⚠️ Ubicación Pendiente` en el panel (`BusinessList`).
+    - Geolocalización OSM inversa inteligente en `LocationPicker` con fuzzy matching contra `colombia.json` y fallback automático a autocomplete manual.
+    - Integración de métrica de clics en tiempo real en `BusinessMetricsList`.
+  - **Explorador y Performance**:
+    - Nuevo hook asíncrono `useSegmentedBanners` usando `SWR` para caché y filtrado en JS de banners inactivos sin colapsar redirecciones externas.
+    - Marquee infinito en `AutoScrollBanners` usando Framer Motion (`useAnimationFrame` + `useMotionValue` con wrapping reactivo) para soporte fluido de swipe táctil manual, pausa de 3s y reanudación a velocidad constante.
+    - Carga dinámica diferida del bundle (`next/dynamic` con `ssr: false`) y renderizado bajo demanda utilizando `<LazyWrapper />` al hacer scroll.
+    - Registro asíncrono sin bloqueo de tráfico cruzado previo a la redirección instantánea.
+

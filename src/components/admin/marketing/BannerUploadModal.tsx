@@ -2,12 +2,24 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Image as ImageIcon, Link as LinkIcon, Sparkles, Loader2, UploadCloud } from "lucide-react";
+import { X, Image as ImageIcon, Link as LinkIcon, Sparkles, Loader2, UploadCloud, Store } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import BannerScopeSelector from "./BannerScopeSelector";
+import Autocomplete from "@/components/admin/shared/Autocomplete";
+
+const supabase = createClient();
 
 interface BannerUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (file: File, title: string, linkUrl: string) => Promise<any>;
+  onSave: (
+    file: File, 
+    title: string, 
+    linkUrl: string,
+    targetCity?: string | null,
+    targetBusinessId?: string | null,
+    destinationBusinessId?: string | null
+  ) => Promise<any>;
 }
 
 export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUploadModalProps) {
@@ -18,6 +30,15 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Scope (Segmentation) states
+  const [targetCity, setTargetCity] = useState<string | null>(null);
+  const [targetBusinessId, setTargetBusinessId] = useState<string | null>(null);
+
+  // Destination (Redirect) states
+  const [destinationType, setDestinationType] = useState<"link" | "business">("link");
+  const [destinationBusinessId, setDestinationBusinessId] = useState<string | null>(null);
+  const [destinationBusinessName, setDestinationBusinessName] = useState("");
 
   const handleFileChange = (file: File) => {
     if (file && file.type.startsWith("image/")) {
@@ -50,17 +71,75 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
     fileInputRef.current?.click();
   };
 
+  // Query businesses for target scope
+  const handleScopeBusinessSearch = async (query: string): Promise<{ id: string; name: string }[]> => {
+    const { data, error } = await supabase
+      .from("businesses")
+      .select("id, name")
+      .ilike("name", `%${query}%`)
+      .limit(10);
+    if (error) return [];
+    return data || [];
+  };
+
+  // Query businesses with slug for click destination
+  const handleDestinationAsyncSearch = async (query: string): Promise<string[]> => {
+    const { data, error } = await supabase
+      .from("businesses")
+      .select("id, name, slug")
+      .ilike("name", `%${query}%`)
+      .limit(10);
+    if (error) return [];
+    return (data || []).map((b: any) => `${b.name} [ID: ${b.id}, Slug: ${b.slug}]`);
+  };
+
+  // Handle click destination selection
+  const handleDestinationSelect = (selectedOption: string) => {
+    if (!selectedOption) {
+      setDestinationBusinessId(null);
+      setDestinationBusinessName("");
+      setLinkUrl("/explorar");
+      return;
+    }
+    
+    const match = selectedOption.match(/(.+) \[ID: (.+), Slug: (.+)\]/);
+    if (match && match[2] && match[3]) {
+      const name = match[1];
+      const id = match[2];
+      const slug = match[3];
+      setDestinationBusinessId(id);
+      setDestinationBusinessName(name);
+      setLinkUrl(`/${slug}`); // Auto-fill with the business route
+    } else {
+      setDestinationBusinessId(null);
+      setDestinationBusinessName("");
+      setLinkUrl("/explorar");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) return;
 
     setIsSubmitting(true);
     try {
-      const success = await onSave(selectedFile, title, linkUrl);
+      const success = await onSave(
+        selectedFile,
+        title,
+        linkUrl,
+        targetCity,
+        targetBusinessId,
+        destinationType === "business" ? destinationBusinessId : null
+      );
       if (success) {
-        // Reset states
+        // Reset all states
         setTitle("");
         setLinkUrl("/explorar");
+        setTargetCity(null);
+        setTargetBusinessId(null);
+        setDestinationType("link");
+        setDestinationBusinessId(null);
+        setDestinationBusinessName("");
         setSelectedFile(null);
         setPreviewUrl(null);
         onClose();
@@ -75,14 +154,14 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
 
           {/* Modal Container */}
@@ -90,7 +169,7 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-xl bg-white/95 backdrop-blur-md rounded-[32px] p-8 shadow-2xl border border-white/20 overflow-hidden"
+            className="relative w-full max-w-xl bg-white/95 backdrop-blur-md rounded-[32px] p-8 shadow-2xl border border-white/20 my-8 overflow-visible"
           >
             {/* Ambient Background Glow */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-fowy-primary/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-75 pointer-events-none" />
@@ -103,10 +182,11 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-slate-850">Crear Nuevo Banner</h3>
-                  <p className="text-slate-400 text-xs font-semibold">Sube una imagen y configura el enlace del banner.</p>
+                  <p className="text-slate-400 text-xs font-semibold">Sube una imagen y configura el alcance y destino.</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={onClose}
                 className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-450 hover:text-slate-700 transition-colors flex items-center justify-center"
               >
@@ -184,28 +264,95 @@ export default function BannerUploadModal({ isOpen, onClose, onSave }: BannerUpl
                 </div>
               </div>
 
-              {/* Redirect URL */}
+              {/* Decoupled Scope Selector */}
+              <BannerScopeSelector
+                targetCity={targetCity}
+                onChangeTargetCity={setTargetCity}
+                targetBusinessId={targetBusinessId}
+                onChangeTargetBusinessId={setTargetBusinessId}
+                onSearchBusinesses={handleScopeBusinessSearch}
+              />
+
+              {/* Click Destination Type Switch */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-550 uppercase tracking-widest block">
-                  Enlace de Redirección (URL)
+                  Destino del Clic
                 </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                    <LinkIcon size={16} />
-                  </div>
-                  <input
-                    type="text"
-                    value={linkUrl}
-                    onChange={(e) => setLinkUrl(e.target.value)}
-                    placeholder="Ej. /explorar o https://instagram.com/..."
-                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-primary/20 focus:bg-white transition-all text-slate-800 font-mono text-sm"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDestinationType("link");
+                      setDestinationBusinessId(null);
+                      setDestinationBusinessName("");
+                    }}
+                    className={`flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs transition-all ${
+                      destinationType === "link"
+                        ? "bg-white text-fowy-primary shadow-sm border border-slate-150"
+                        : "text-slate-400 hover:text-slate-650"
+                    }`}
+                  >
+                    <LinkIcon size={14} />
+                    <span>Enlace Web Libre</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDestinationType("business");
+                      setLinkUrl("/explorar");
+                    }}
+                    className={`flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs transition-all ${
+                      destinationType === "business"
+                        ? "bg-white text-fowy-primary shadow-sm border border-slate-150"
+                        : "text-slate-400 hover:text-slate-650"
+                    }`}
+                  >
+                    <Store size={14} />
+                    <span>Negocio de Fowy</span>
+                  </button>
                 </div>
-                <p className="text-[10px] font-semibold text-slate-400">
-                  Fallback por defecto: <code className="font-mono text-slate-500 bg-slate-100 px-1 py-0.5 rounded">/explorar</code>.
-                </p>
               </div>
+
+              {/* Dynamic Redirect URL or Business Search */}
+              {destinationType === "link" ? (
+                <div className="space-y-2 animate-in fade-in duration-200">
+                  <label className="text-xs font-black text-slate-550 uppercase tracking-widest block">
+                    Enlace de Redirección (URL)
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                      <LinkIcon size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      placeholder="Ej. /explorar o https://instagram.com/..."
+                      className="w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fowy-primary/20 focus:bg-white transition-all text-slate-800 font-mono text-sm"
+                      required
+                    />
+                  </div>
+                  <p className="text-[10px] font-semibold text-slate-400">
+                    Fallback por defecto: <code className="font-mono text-slate-500 bg-slate-100 px-1 py-0.5 rounded">/explorar</code>.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 animate-in fade-in duration-200">
+                  <label className="text-xs font-black text-slate-550 uppercase tracking-widest block">
+                    Seleccionar Negocio Destino
+                  </label>
+                  <Autocomplete
+                    value={destinationBusinessId ? `${destinationBusinessName} [ID: ${destinationBusinessId}]` : ""}
+                    onChange={handleDestinationSelect}
+                    onAsyncSearch={handleDestinationAsyncSearch}
+                    placeholder="Escribe para buscar negocio destino..."
+                  />
+                  <p className="text-[10px] font-semibold text-slate-400 ml-1">
+                    Redirección automática invisible a: <code className="font-mono text-fowy-primary bg-slate-100 px-1.5 py-0.5 rounded">{linkUrl}</code>
+                  </p>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">

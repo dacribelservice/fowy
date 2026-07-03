@@ -1,20 +1,107 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useActiveBanners } from "@/hooks/useActiveBanners";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useAnimationFrame } from "framer-motion";
+import { useSegmentedBanners } from "@/hooks/useSegmentedBanners";
 import { useActiveCTAs } from "@/hooks/useActiveCTAs";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
 import { useRouter } from "next/navigation";
 import { Map } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
-export function AutoScrollBanners() {
-  const { banners, loading, error } = useActiveBanners();
+const supabase = createClient();
+
+interface AutoScrollBannersProps {
+  businessId?: string;
+  city?: string | null;
+}
+
+export function AutoScrollBanners({ businessId = "", city = null }: AutoScrollBannersProps) {
+  const { banners, isLoading: loading, error } = useSegmentedBanners(businessId, city);
   const { ctas: activeCtas } = useActiveCTAs();
-  const [isPaused, setIsPaused] = useState(false);
+  
+  const x = useMotionValue(0);
+  const [isScrollingPaused, setIsScrollingPaused] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [currentCtaIndex, setCurrentCtaIndex] = useState(0);
   const router = useRouter();
+
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const speedPixelsPerSecond = 40;
+
+  // 1. Prepare base items to fill at least the screen width (min 4 items)
+  let baseBanners = [...(banners || [])];
+  while (baseBanners.length > 0 && baseBanners.length < 4) {
+    baseBanners = [...baseBanners, ...banners];
+  }
+
+  // 2. Duplicate the sequence exactly once for the mathematically perfect infinite marquee loop
+  const duplicatedBanners = [...baseBanners, ...baseBanners];
+
+  // 3. Calculate scroll distance
+  const itemWidth = 304; // 288px (w-72) + 16px (pr-4 padding)
+  const scrollDistance = baseBanners.length * itemWidth;
+
+  // useAnimationFrame to continuously scroll the marquee at constant speed
+  useAnimationFrame((time, delta) => {
+    if (isScrollingPaused || scrollDistance === 0) return;
+
+    const deltaSeconds = delta / 1000;
+    const cappedDelta = Math.min(deltaSeconds, 0.1); // Prevent layout jumping on tab change
+    const moveAmount = speedPixelsPerSecond * cappedDelta;
+
+    const currentX = x.get();
+    let newX = currentX - moveAmount;
+
+    x.set(newX);
+  });
+
+  // Watch x value changes to perform seamless wrap-around wrapping
+  useEffect(() => {
+    if (scrollDistance === 0) return;
+    const unsubscribe = x.on("change", (latest) => {
+      if (latest <= -scrollDistance) {
+        x.set(latest + scrollDistance);
+      } else if (latest > 0) {
+        x.set(latest - scrollDistance);
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollDistance, x]);
+
+  useEffect(() => {
+    return () => {
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleDragStart = () => {
+    setIsScrollingPaused(true);
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    dragTimeoutRef.current = setTimeout(() => {
+      setIsScrollingPaused(false);
+    }, 3000); // Wait 3 seconds before resuming scroll
+  };
+
+  const handleMouseEnter = () => {
+    setIsScrollingPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (!dragTimeoutRef.current) {
+      setIsScrollingPaused(false);
+    }
+  };
 
   // Fallback phrases if DB is empty, loading or error
   const fallbackCtas = [
@@ -74,10 +161,20 @@ export function AutoScrollBanners() {
     return null;
   }
 
-  const handleBannerClick = (url: string) => {
+  const handleBannerClick = (banner: any) => {
+    const url = banner.link_url;
     if (!url) return;
     
-    // If external URL, open in new tab. Otherwise push to router with loader state.
+    // Registrar el clic de tráfico cruzado en segundo plano
+    if (banner.destination_business_id) {
+      supabase
+        .rpc("increment_cross_traffic", { p_business_id: banner.destination_business_id })
+        .then((res: any) => {
+          if (res.error) console.error("Error al registrar clic de tráfico cruzado:", res.error);
+        });
+    }
+    
+    // Si la URL es externa, abrir en nueva pestaña. De lo contrario, usar el enrutador local.
     if (url.startsWith("http://") || url.startsWith("https://")) {
       window.open(url, "_blank", "noopener,noreferrer");
     } else {
@@ -86,21 +183,7 @@ export function AutoScrollBanners() {
     }
   };
 
-  // 1. Prepare base items to fill at least the screen width (min 4 items)
-  let baseBanners = [...banners];
-  while (baseBanners.length < 4) {
-    baseBanners = [...baseBanners, ...banners];
-  }
 
-  // 2. Duplicate the sequence exactly once for the mathematically perfect infinite marquee loop
-  const duplicatedBanners = [...baseBanners, ...baseBanners];
-
-  // 3. Calculate animation duration to guarantee a constant scrolling speed (e.g., 50px/sec)
-  // Banner width = 288px (w-72) + 16px (pr-4 padding) = 304px total width per item
-  const itemWidth = 304;
-  const scrollDistance = baseBanners.length * itemWidth; // Distance to translate (50% of the total container width)
-  const speedPixelsPerSecond = 40; // Sleek, smooth, easily readable scrolling pace
-  const duration = scrollDistance / speedPixelsPerSecond;
 
   return (
     <div className="w-full py-8 bg-slate-50/60 backdrop-blur-md border-t border-slate-200/50 overflow-hidden select-none relative">
@@ -159,18 +242,13 @@ export function AutoScrollBanners() {
       </AnimatePresence>
       {/* Self-contained high-performance CSS animation to prevent layout thrashing */}
       <style>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .animate-marquee-track {
+        .marquee-track {
           display: flex;
           width: max-content;
-          animation: marquee var(--marquee-duration, 30s) linear infinite;
+          cursor: grab;
+        }
+        .marquee-track:active {
+          cursor: grabbing;
         }
         @keyframes shimmer {
           0% {
@@ -218,21 +296,19 @@ export function AutoScrollBanners() {
         </motion.div>
 
         {/* Horizontal Scroll Track Wrapper */}
-        <div 
-          className="animate-marquee-track"
-          style={{ 
-            "--marquee-duration": `${duration}s`,
-            animationPlayState: isPaused ? "paused" : "running"
-          } as React.CSSProperties}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
+        <motion.div 
+          className="marquee-track"
+          style={{ x }}
+          drag="x"
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {duplicatedBanners.map((banner, index) => (
             <div key={`${banner.id}-${index}`} className="flex-shrink-0 pr-4">
               <motion.div
-                onClick={() => handleBannerClick(banner.link_url)}
+                onClick={() => handleBannerClick(banner)}
                 whileHover={{ 
                   scale: 1.03,
                   y: -5,
@@ -275,7 +351,7 @@ export function AutoScrollBanners() {
               </motion.div>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

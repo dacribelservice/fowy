@@ -12,6 +12,9 @@ export interface MarketingBanner {
   is_active: boolean;
   sort_order: number;
   created_at?: string;
+  target_city?: string | null;
+  target_business_id?: string | null;
+  destination_business_id?: string | null;
 }
 
 export interface MarketingCTA {
@@ -53,7 +56,14 @@ export function useMarketingManager() {
     }
   }, [supabase]);
 
-  const addBanner = async (file: File, title: string, linkUrl: string) => {
+  const addBanner = async (
+    file: File, 
+    title: string, 
+    linkUrl: string,
+    targetCity?: string | null,
+    targetBusinessId?: string | null,
+    destinationBusinessId?: string | null
+  ) => {
     setLoading(true);
     setError(null);
     try {
@@ -77,7 +87,10 @@ export function useMarketingManager() {
           title: title || null,
           link_url: linkUrl || "/explorar",
           is_active: true,
-          sort_order: nextOrder
+          sort_order: nextOrder,
+          target_city: targetCity || null,
+          target_business_id: targetBusinessId || null,
+          destination_business_id: destinationBusinessId || null
         }])
         .select()
         .single();
@@ -175,7 +188,10 @@ export function useMarketingManager() {
         link_url: banner.link_url,
         is_active: banner.is_active,
         sort_order: index,
-        created_at: banner.created_at
+        created_at: banner.created_at,
+        target_city: banner.target_city || null,
+        target_business_id: banner.target_business_id || null,
+        destination_business_id: banner.destination_business_id || null
       }));
 
       const { error: upsertError } = await supabase

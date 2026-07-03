@@ -24,8 +24,13 @@ import { CraveProductDetailModal } from "@/components/explorer/CraveProductDetai
 import { CraveMagicCart } from "@/components/explorer/CraveMagicCart";
 import { CraveCheckoutSheet } from "@/components/explorer/CraveCheckoutSheet";
 import { LazyWrapper } from "@/components/explorer/LazyWrapper";
-import { AutoScrollBanners } from "@/components/explorer/AutoScrollBanners";
 import Footer from "@/components/explorer/Footer";
+import dynamic from "next/dynamic";
+
+const AutoScrollBanners = dynamic(
+  () => import("@/components/explorer/AutoScrollBanners").then((mod) => mod.AutoScrollBanners),
+  { ssr: false }
+);
 
 
 /**
@@ -254,7 +259,9 @@ export default function BusinessMenuPage() {
         </div>
 
         {/* BLOQUE 4.5: MARKETING BANNERS (Fase 19.3.6) */}
-        <AutoScrollBanners />
+        <LazyWrapper>
+          <AutoScrollBanners businessId={business?.id} city={business?.city} />
+        </LazyWrapper>
 
         {/* BLOQUE 4.6: PIE DE PÁGINA (Fase 22.1.1 & 22.1.2) */}
         <Footer extraPaddingBottom={flatCartItems.length > 0 && !isCartOpen} />

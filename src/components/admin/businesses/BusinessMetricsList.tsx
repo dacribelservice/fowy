@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Eye, ShoppingBag, Percent, Receipt } from "lucide-react";
+import { Eye, ShoppingBag, Percent, Receipt, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface BusinessMetricsListProps {
@@ -14,6 +14,7 @@ interface MetricState {
   orders: number;
   conversionRate: number;
   avgTicket: number;
+  crossTrafficClicks: number;
 }
 
 export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
@@ -23,6 +24,7 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
     orders: 0,
     conversionRate: 0,
     avgTicket: 0,
+    crossTrafficClicks: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +40,16 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
           .eq("business_id", businessId);
 
         if (visitsError) throw visitsError;
+
+        // Fetch cross traffic clicks
+        const { data: businessData, error: businessError } = await supabase
+          .from("businesses")
+          .select("cross_traffic_clicks")
+          .eq("id", businessId)
+          .single();
+
+        if (businessError) throw businessError;
+        const crossTrafficClicks = businessData?.cross_traffic_clicks || 0;
 
         // 2. Intentar usar la función RPC para obtener estadísticas exactas (si existe)
         const { data: rpcData, error: rpcError } = await supabase
@@ -80,6 +92,7 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
           orders: totalOrders,
           conversionRate: parseFloat(conversion.toFixed(1)),
           avgTicket: Math.round(avgTicket),
+          crossTrafficClicks: crossTrafficClicks,
         });
       } catch (error) {
         console.error("Error fetching business metrics:", error);
@@ -114,12 +127,17 @@ export function BusinessMetricsList({ businessId }: BusinessMetricsListProps) {
       value: loading ? null : `$${metrics.avgTicket.toLocaleString()}`,
       icon: <Receipt size={14} className="text-slate-400 group-hover:text-rose-500 transition-colors" />,
     },
+    {
+      label: "Clics de Tráfico Cruzado",
+      value: loading ? null : metrics.crossTrafficClicks.toLocaleString(),
+      icon: <Share2 size={14} className="text-slate-400 group-hover:text-fowy-orange transition-colors" />,
+    },
   ];
 
   if (loading) {
     return (
       <div className="space-y-4 py-4">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded bg-slate-50 animate-pulse" />

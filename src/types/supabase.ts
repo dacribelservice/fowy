@@ -375,6 +375,9 @@ export type Database = {
           link_url: string
           sort_order: number
           title: string | null
+          target_city: string | null
+          target_business_id: string | null
+          destination_business_id: string | null
         }
         Insert: {
           created_at?: string
@@ -384,6 +387,9 @@ export type Database = {
           link_url?: string
           sort_order?: number
           title?: string | null
+          target_city?: string | null
+          target_business_id?: string | null
+          destination_business_id?: string | null
         }
         Update: {
           created_at?: string
@@ -393,8 +399,26 @@ export type Database = {
           link_url?: string
           sort_order?: number
           title?: string | null
+          target_city?: string | null
+          target_business_id?: string | null
+          destination_business_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "marketing_banners_destination_business_id_fkey"
+            columns: ["destination_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketing_banners_target_business_id_fkey"
+            columns: ["target_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       marketing_ctas: {
         Row: {
