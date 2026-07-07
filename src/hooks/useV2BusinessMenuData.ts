@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 /**
@@ -14,13 +14,12 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
   // Database States
   const [business, setBusiness] = useState<any | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [productsLoading, setProductsLoading] = useState(true);
   const [votesCount, setVotesCount] = useState<number>(0);
-  const initialLoadDone = useRef(false);
 
   const supabase = createClient();
 
@@ -68,7 +67,7 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
               is_promo: p.is_offer
             };
           });
-          setProducts(mappedInitialProducts);
+          setAllProducts(mappedInitialProducts);
           setProductsLoading(false);
         }
 
@@ -81,68 +80,28 @@ export function useV2BusinessMenuData(slug: string | string[] | undefined) {
     fetchData();
   }, [slug, supabase]);
 
-  // Filtrado reactivo de productos del lado del servidor (Intacto)
-  useEffect(() => {
-    if (!business?.id) return;
-
-    if (!initialLoadDone.current && selectedCategory === "all" && !debouncedSearchQuery) {
-      initialLoadDone.current = true;
-      return;
-    }
-
-    async function fetchFilteredProducts() {
-      try {
-        setProductsLoading(true);
-        let query = supabase
-          .from("products")
-          .select("*, global_products(*)")
-          .eq("business_id", business.id)
-          .eq("is_active", true);
-
-        // Filtro por categoría seleccionada
-        if (selectedCategory !== "all") {
-          const activeCat = categories.find((c) => c.id === selectedCategory);
-          if (activeCat) {
-            query = query.eq("category_name", activeCat.name);
-          }
+  // Filtrado reactivo de productos del lado del cliente
+  const products = useMemo(() => {
+    return allProducts.filter((product) => {
+      // 1. Filtro por categoría seleccionada
+      if (selectedCategory !== "all") {
+        const activeCat = categories.find((c) => c.id === selectedCategory);
+        if (activeCat && product.category_name !== activeCat.name) {
+          return false;
         }
-
-        // Filtro por búsqueda de texto
-        if (debouncedSearchQuery) {
-          query = query.or(
-            `name.ilike.%${debouncedSearchQuery}%,description.ilike.%${debouncedSearchQuery}%,global_products.name.ilike.%${debouncedSearchQuery}%,global_products.description.ilike.%${debouncedSearchQuery}%`
-          );
-        }
-
-        // Ordenamiento consistente
-        query = query.order("category_name", { ascending: true });
-
-        const { data, error } = await query;
-        if (error) {
-          console.error("Error fetching filtered products:", error);
-        } else {
-          // Mapeamos is_offer a is_promo para que el frontend visualice la etiqueta de promoción correctamente y aplicamos fallback del catálogo global
-          const mappedProducts = (data || []).map((p: any) => {
-            const gp = p.global_products;
-            return {
-              ...p,
-              name: p.name || gp?.name || "",
-              description: p.description ?? gp?.description ?? null,
-              image_url: p.image_url || gp?.image_url || "",
-              is_promo: p.is_offer
-            };
-          });
-          setProducts(mappedProducts);
-        }
-      } catch (err) {
-        console.error("Error in fetchFilteredProducts:", err);
-      } finally {
-        setProductsLoading(false);
       }
-    }
 
-    fetchFilteredProducts();
-  }, [business?.id, debouncedSearchQuery, selectedCategory, categories, supabase]);
+      // 2. Filtro por búsqueda de texto (busca en nombre y descripción, incluyendo fallbacks globales)
+      if (debouncedSearchQuery) {
+        const query = debouncedSearchQuery.toLowerCase();
+        const nameMatch = (product.name || "").toLowerCase().includes(query);
+        const descMatch = (product.description || "").toLowerCase().includes(query);
+        return nameMatch || descMatch;
+      }
+
+      return true;
+    });
+  }, [allProducts, selectedCategory, debouncedSearchQuery, categories]);
 
   return {
     business,
