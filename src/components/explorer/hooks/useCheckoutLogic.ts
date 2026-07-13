@@ -30,6 +30,7 @@ export function useCheckoutLogic({
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [customerNeighborhood, setCustomerNeighborhood] = useState("");
   const [gpsLocation, setGpsLocation] = useState("");
   const [isLocating, setIsLocating] = useState(false);
   const [orderNotes, setOrderNotes] = useState("");
@@ -95,6 +96,11 @@ export function useCheckoutLogic({
       return;
     }
 
+    if (!customerNeighborhood.trim()) {
+      setValidationError("Por favor, ingresa tu barrio.");
+      return;
+    }
+
     if (!customerAddress.trim() && !gpsLocation) {
       setValidationError("Por favor, ingresa tu dirección de entrega o comparte tu ubicación.");
       return;
@@ -142,6 +148,7 @@ export function useCheckoutLogic({
 
 👤 *Cliente:* ${customerName.trim()}
 📞 *Celular:* ${customerPhone.trim()}
+🏘️ *Barrio:* ${customerNeighborhood.trim()}
 📍 *Dirección de Entrega:* ${locationText}
 
 🛒 *Detalle del Pedido:*
@@ -151,7 +158,7 @@ ${itemsText}
 💳 *Método de Pago:* ${paymentDetail}
 
 💰 *Pedido total:* $${totalText}
-🛵 *+ Domicilio*
+🛵 *Sin Domicilio*
 
 *¡Gracias por tu compra!*`;
 
@@ -169,12 +176,14 @@ ${itemsText}
             image_url: item.image_url ?? null,
           }));
 
+          const fullAddress = `Barrio: ${customerNeighborhood.trim()} - Dirección: ${customerAddress.trim()}`;
+
           const { error: insertError } = await supabase.from("orders").insert({
             business_id: businessId,
             customer_id: user?.id ?? null,
             customer_name: customerName.trim(),
             customer_phone: customerPhone.trim(),
-            delivery_address: customerAddress.trim() || null,
+            delivery_address: fullAddress || null,
             notes: orderNotes.trim() || null,
             payment_method: paymentMethod || null,
             cash_change: cashChange.trim() || null,
@@ -234,6 +243,8 @@ ${itemsText}
     setCustomerPhone,
     customerAddress,
     setCustomerAddress,
+    customerNeighborhood,
+    setCustomerNeighborhood,
     gpsLocation,
     isLocating,
     orderNotes,

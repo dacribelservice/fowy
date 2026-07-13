@@ -26,6 +26,8 @@ export interface CheckoutFormViewProps {
   setCustomerPhone: (val: string) => void;
   customerAddress: string;
   setCustomerAddress: (val: string) => void;
+  customerNeighborhood: string;
+  setCustomerNeighborhood: (val: string) => void;
   gpsLocation: string;
   isLocating: boolean;
   orderNotes: string;
@@ -57,6 +59,8 @@ export function CheckoutFormView({
   setCustomerPhone,
   customerAddress,
   setCustomerAddress,
+  customerNeighborhood,
+  setCustomerNeighborhood,
   gpsLocation,
   isLocating,
   orderNotes,
@@ -152,6 +156,31 @@ export function CheckoutFormView({
                 rows={2}
                 className="w-full bg-white/60 border border-slate-200/80 text-slate-800 text-[14px] font-medium rounded-2xl py-3 px-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">
+                Barrio
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <MapPin className="w-4 h-4 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Escribe tu barrio"
+                  value={customerNeighborhood}
+                  onChange={(e) => {
+                    setCustomerNeighborhood(e.target.value);
+                    if (validationError) setValidationError("");
+                  }}
+                  className={`w-full bg-white/60 border ${
+                    validationError && !customerNeighborhood.trim()
+                      ? "border-red-400 focus:ring-red-300"
+                      : "border-slate-200/80 focus:ring-slate-300"
+                  } text-slate-800 text-[14px] font-medium rounded-2xl py-3 pl-11 pr-4 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all`}
+                />
+              </div>
             </div>
 
             <div>
