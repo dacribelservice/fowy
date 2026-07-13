@@ -11,6 +11,8 @@ interface CraveBusinessHeaderProps {
   rating?: number;
   distance?: string;
   votesCount?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export function CraveBusinessHeader({
@@ -20,6 +22,8 @@ export function CraveBusinessHeader({
   rating = 0.0,
   distance,
   votesCount = 0,
+  latitude,
+  longitude,
 }: CraveBusinessHeaderProps) {
   const handleShare = async () => {
     try {
@@ -89,12 +93,26 @@ export function CraveBusinessHeader({
         </div>
 
         {distance && (
-          <div className="mt-1 flex items-center gap-1 text-slate-500">
-            <MapPin className="w-3.5 h-3.5" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider">
-              DISTANCIA {distance}
-            </span>
-          </div>
+          latitude !== undefined && longitude !== undefined ? (
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 flex items-center gap-1 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer w-fit"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider underline decoration-dashed underline-offset-2">
+                DISTANCIA {distance}
+              </span>
+            </a>
+          ) : (
+            <div className="mt-1 flex items-center gap-1 text-slate-500">
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider">
+                DISTANCIA {distance}
+              </span>
+            </div>
+          )
         )}
 
         <div 

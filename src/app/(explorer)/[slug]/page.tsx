@@ -3,13 +3,14 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useV2BusinessMenuData } from "@/hooks/useV2BusinessMenuData";
 import { useBusinessAnalytics } from "@/hooks/useBusinessAnalytics";
 import { useFavorites } from "@/hooks/useFavorites";
 import { isBusinessOpen } from "@/utils/businessTime";
 import { Wrench, ChevronLeft } from "lucide-react";
+import { getDistance } from "@/utils/geo";
 
 import { BusinessMenuSkeleton } from "@/components/explorer/BusinessMenuSkeleton";
 import { BusinessMenuNotFound } from "@/components/explorer/BusinessMenuNotFound";
@@ -42,6 +43,20 @@ export default function BusinessMenuPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<any | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("fowy_user_location");
+      if (saved) {
+        try {
+          setUserLocation(JSON.parse(saved));
+        } catch (e) {
+          console.error("Error parsing user location from localStorage:", e);
+        }
+      }
+    }
+  }, []);
 
   // Custom Hooks (Data & Analytics)
   const {
@@ -115,6 +130,13 @@ export default function BusinessMenuPage() {
     }
   }, [flatCartItems.length]);
 
+  const distance = useMemo(() => {
+    if (userLocation && business?.latitude && business?.longitude) {
+      return `${getDistance(userLocation[0], userLocation[1], Number(business.latitude), Number(business.longitude)).toFixed(1)} km`;
+    }
+    return business?.distance || "1.2 km";
+  }, [userLocation, business]);
+
   if (loading) {
     return <BusinessMenuSkeleton />;
   }
@@ -127,7 +149,6 @@ export default function BusinessMenuPage() {
   const logoUrl = business.logo_url || "";
   const businessName = business.name || "";
   const rating = business.rating ?? 0.0;
-  const distance = business.distance || "1.2 km";
   const isOpen = business.status === true && isBusinessOpen(business.schedules);
 
 
@@ -202,6 +223,8 @@ export default function BusinessMenuPage() {
           rating={rating} 
           distance={distance} 
           votesCount={votesCount}
+          latitude={business.latitude ? Number(business.latitude) : undefined}
+          longitude={business.longitude ? Number(business.longitude) : undefined}
         />
 
         {/* BLOQUE 3: BÚSQUEDA Y NAVEGACIÓN */}

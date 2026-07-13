@@ -48,6 +48,7 @@ export function useExplorerManager() {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
+          localStorage.setItem("fowy_user_location", JSON.stringify([latitude, longitude]));
           setLocationError(null);
         },
         (error) => {

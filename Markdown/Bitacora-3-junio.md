@@ -33,3 +33,21 @@
     - Carga dinámica diferida del bundle (`next/dynamic` con `ssr: false`) y renderizado bajo demanda utilizando `<LazyWrapper />` al hacer scroll.
     - Registro asíncrono sin bloqueo de tráfico cruzado previo a la redirección instantánea.
 
+### 📌 Hito: Formulario de Envío — Campo Barrio y Ajustes de Domicilio
+- **Fecha**: 13 de Julio de 2026
+- **Resumen**: Implementación del campo de texto obligatorio "Barrio" en el checkout del explorador, mapeo seguro en base de datos y modificación de la plantilla del mensaje de WhatsApp para reflejar el Barrio y actualizar el domicilio.
+- **Detalles Técnicos**:
+  - **Formulario (UI)**: Se modificó `CheckoutFormView.tsx` y `useCheckoutLogic.ts` para crear el estado `customerNeighborhood` y renderizar un campo de entrada premium arriba de "Dirección de Entrega".
+  - **Plantilla de WhatsApp**: Se inyectó la línea `🏘️ Barrio: [dato]` y se modificó `🛵 + Domicilio` por `🛵 Sin Domicilio` en `useCheckoutLogic.ts`.
+  - **Persistencia (Supabase)**: Para no modificar la base de datos ni generar migraciones de esquema innecesarias, se concatenaron los campos en el backend del cliente (`"Barrio: [dato] - Dirección: [dato]"`) al rellenar la columna `delivery_address` en Supabase.
+
+### 📌 Hito: Distancia Dinámica en Menú y Navegación a Google Maps (Fase 6)
+- **Fecha**: 13 de Julio de 2026
+- **Resumen**: Integración de la persistencia de ubicación en `localStorage` para calcular la distancia real en la vista del menú (incluso en visitas directas o recargas de página) y conversión del indicador de distancia en un enlace de navegación directa a Google Maps con ruta trazada.
+- **Detalles Técnicos**:
+  - **Persistencia de GPS**: Modificado `useExplorerManager.ts` para guardar la ubicación `[latitude, longitude]` bajo la clave `'fowy_user_location'` en `localStorage` una vez que el usuario otorga el permiso de ubicación con éxito.
+  - **Cálculo en Cliente**: Modificado `src/app/(explorer)/[slug]/page.tsx` para cargar las coordenadas del storage, recalcular la distancia real usando `getDistance` y enviarla a la cabecera.
+  - **Enlace de Google Maps (Navegación)**: Modificado `CraveBusinessHeader.tsx` para recibir `latitude` y `longitude` del negocio y envolver el texto de distancia en un enlace `<a>` a Google Maps con la ruta de origen a destino (`maps/dir`).
+  - **Alineación con Reglas de Hooks**: Se solventó un error de orden de hooks (`Render Order Mismatch`) y referencia temporal (`ReferenceError`) reubicando el hook `useMemo` de distancia después del hook de datos `useV2BusinessMenuData` (donde se define `business`) pero obligatoriamente antes de las sentencias condicionales de retorno temprano (`if (loading)`).
+
+
