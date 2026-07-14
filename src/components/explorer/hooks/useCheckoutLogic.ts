@@ -7,6 +7,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { safeLocalStorage } from "@/utils/storage";
+
 
 export interface UseCheckoutLogicParams {
   cartItems: any[];
@@ -116,6 +118,20 @@ export function useCheckoutLogic({
       return;
     }
 
+    // Guardar datos del cliente de forma síncrona en localStorage (Fase 7.3)
+    // Se excluye estrictamente gpsLocation (Fase 7.2)
+    try {
+      const checkoutData = {
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        customerNeighborhood: customerNeighborhood.trim(),
+        customerAddress: customerAddress.trim(),
+      };
+      safeLocalStorage.setItem("fowy_customer_checkout_data", JSON.stringify(checkoutData));
+    } catch (e) {
+      console.error("[FOWY] Error al guardar datos en localStorage:", e);
+    }
+
     const itemsText = groupedCart
       .map((item: any) => `• ${item.quantity}x ${item.name} ($${(item.price * item.quantity).toLocaleString("es-CO")})`)
       .join("\n");
@@ -219,6 +235,26 @@ ${itemsText}
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${normalizedPhone}&text=${encodedMessage}`;
     window.location.href = whatsappUrl;
   };
+
+  // ── Carga Dinámica al Abrir el Sheet (Fase 7.1) ───────────────────────────
+  useEffect(() => {
+    if (isOpen) {
+      try {
+        const savedData = safeLocalStorage.getItem("fowy_customer_checkout_data");
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          if (parsed && typeof parsed === "object") {
+            if (parsed.customerName) setCustomerName(parsed.customerName);
+            if (parsed.customerPhone) setCustomerPhone(parsed.customerPhone);
+            if (parsed.customerNeighborhood) setCustomerNeighborhood(parsed.customerNeighborhood);
+            if (parsed.customerAddress) setCustomerAddress(parsed.customerAddress);
+          }
+        }
+      } catch (err) {
+        console.error("[FOWY] Error al leer datos de localStorage:", err);
+      }
+    }
+  }, [isOpen]);
 
   // ── Reset al cerrar el sheet ─────────────────────────────────────────────
   useEffect(() => {
