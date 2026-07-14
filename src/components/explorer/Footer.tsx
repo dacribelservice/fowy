@@ -143,7 +143,7 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
             &copy; {new Date().getFullYear()} FOWY. Todos los derechos reservados.
           </p>
           <p className="text-[10px] font-normal uppercase tracking-widest text-[#a58100]">
-            Versión 2.7.7
+            Versión 3.17.10
           </p>
         </div>
       </div>
