@@ -84,6 +84,7 @@ export function MenuHeroSliderV2({
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
+              aria-label={`Ver banner ${idx + 1}`}
               className={`h-1.5 rounded-full transition-all duration-500 ${
                 idx === currentIndex ? "w-6 bg-white opacity-100" : "w-1.5 bg-white opacity-40 hover:opacity-75"
               }`}
@@ -97,12 +98,14 @@ export function MenuHeroSliderV2({
         <div className="hidden md:block pointer-events-none absolute inset-0 z-10">
           <button 
             onClick={() => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)}
+            aria-label="Anterior diapositiva"
             className="pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/40"
           >
             <ChevronLeft size={20} />
           </button>
           <button 
             onClick={() => setCurrentIndex((prev) => (prev + 1) % images.length)}
+            aria-label="Siguiente diapositiva"
             className="pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/40"
           >
             <ChevronRight size={20} />

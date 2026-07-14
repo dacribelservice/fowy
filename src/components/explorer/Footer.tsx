@@ -121,14 +121,14 @@ export default function Footer({ extraPaddingBottom = false }: FooterProps) {
                 { icon: Facebook, href: "#" },
                 { icon: Twitter, href: "#" }
               ].map((social, idx) => (
-                <motion.a
+                <motion.div
                   key={idx}
-                  href={social.href}
+                  aria-hidden="true"
                   whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-8 h-8 rounded-full bg-black/5 border !border-[#000000] flex items-center justify-center !text-[#000000] hover:bg-black/10 transition-colors"
+                  className="w-8 h-8 rounded-full bg-black/5 border !border-[#000000] flex items-center justify-center !text-[#000000] hover:bg-black/10 transition-colors cursor-pointer"
                 >
                   <social.icon size={16} />
-                </motion.a>
+                </motion.div>
               ))}
             </div>
           </div>

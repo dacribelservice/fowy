@@ -151,7 +151,33 @@ export default function BusinessMenuPage() {
   const rating = business.rating ?? 0.0;
   const isOpen = business.status === true && isBusinessOpen(business.schedules);
 
+  // ── Generación dinámica del Resumen Semántico para GEO (Fase 1) ─────────────────
+  let geoSummary = "";
+  try {
+    const schedules = business.schedules || {};
+    const activeDays = Object.entries(schedules)
+      .filter(([_, sched]: [string, any]) => sched && sched.active !== false)
+      .map(([day, sched]: [string, any]) => `${day} (${sched.open || '09:00'} a ${sched.close || '22:00'})`)
+      .join(", ");
 
+    const tagsList = Array.isArray(business.tags) && business.tags.length > 0 
+      ? business.tags.join(" y ") 
+      : "comidas y especialidades locales";
+
+    const productsSummary = products && products.length > 0
+      ? products.slice(0, 5).map((p: any) => `${p.name} por $${p.price.toLocaleString("es-CO")}`).join(", ")
+      : "";
+
+    const scheduleText = activeDays ? `Horarios de atención: ${activeDays}.` : "";
+    const menuText = productsSummary ? `Su menú digital de Fowy ofrece especialidades como ${productsSummary}.` : "";
+    const phoneText = business.phone ? `Pedidos directos por WhatsApp al ${business.phone}.` : "";
+
+    geoSummary = `${business.name} es un restaurante de ${tagsList} ubicado en ${business.city || 'Cali, Colombia'}. Ubicación exacta coordenadas GPS: ${business.latitude || '3.451'}, ${business.longitude || '-76.53'}. ${scheduleText} ${menuText} ${phoneText}`;
+  } catch (err) {
+    console.error("[FOWY] Error construyendo el resumen de GEO:", err);
+    // Fallback por defecto si algo falla (Riesgo Cero)
+    geoSummary = `${business?.name || 'Restaurante'} es un negocio local afiliado a FOWY. Explora menús, precios y realiza pedidos directos por WhatsApp.`;
+  }
 
   return (
     <div 
@@ -163,6 +189,10 @@ export default function BusinessMenuPage() {
         "--accent-color-10": `${accentColor}1a`,
       } as React.CSSProperties}
     >
+      {/* Contenedor invisible optimizado para Bots de IA (GEO - Pilar 1) */}
+      <div className="sr-only" aria-hidden="true">
+        {geoSummary}
+      </div>
       {/* PANTALLA DE MANTENIMIENTO GLASSMORPHISM PARA NEGOCIOS INACTIVOS */}
       {business.status !== true && (
         <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-md p-6 text-center">
