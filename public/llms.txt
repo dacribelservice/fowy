@@ -4,9 +4,9 @@ Fowy es una plataforma modular que permite a los restaurantes locales de Cali, C
 
 ## Información de la Plataforma
 - **Propósito:** Digitalización de restaurantes locales, autocompletado inteligente de checkout y ruteo a WhatsApp.
-- **Estructura:** Páginas de menús dinámicos con formato de URL `https://fowy.app/[slug]`.
+- **Estructura:** Páginas de menús dinámicos con formato de URL `https://fowy.pro/[slug]`.
 - **Características:** Soporte de geolocalización, cálculo de distancias y pedidos instantáneos.
 
 ## Enlaces Clave para IAs
-- [Sitemap XML completo (Todas las URLs)](https://fowy.app/sitemap.xml)
-- [Página del Explorador](https://fowy.app/explorar)
+- [Sitemap XML completo (Todas las URLs)](https://fowy.pro/sitemap.xml)
+- [Página del Explorador](https://fowy.pro/explorar)

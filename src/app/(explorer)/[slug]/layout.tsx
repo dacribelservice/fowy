@@ -110,7 +110,7 @@ export default async function BusinessLayout({ children, params }: Props) {
         }))
       }))
 
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.app'
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.pro'
       const businessUrl = `${baseUrl}/${slug}`
       const ratingValue = business.rating ? parseFloat(String(business.rating)) : 5.0
 

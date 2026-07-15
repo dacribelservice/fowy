@@ -71,7 +71,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: ['/', '/explorar', '/[slug]'],
       disallow: ['/admin/', '/business/', '/login', '/registro'],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.app'}/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.pro'}/sitemap.xml`,
   }
 }
 ```

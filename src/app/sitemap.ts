@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://fowy.pro'
 
   // Rutas estáticas de la aplicación
   const staticPaths = [

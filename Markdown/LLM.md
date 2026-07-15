@@ -98,8 +98,8 @@ Evita que los bots consuman ancho de banda escaneando todo el sitio web a ciegas
     Fowy es una plataforma modular que permite a los restaurantes locales de Cali, Colombia, publicar sus menús digitales y recibir pedidos directamente por WhatsApp.
 
     ## Enlaces Útiles
-    - [Sitemap Completo](https://fowy.app/sitemap.xml)
-    - [Directorio del Explorador](https://fowy.app/explorar)
+    - [Sitemap Completo](https://fowy.pro/sitemap.xml)
+    - [Directorio del Explorador](https://fowy.pro/explorar)
     ```
 
 ### 🛡️ Pilar 5: Escudo Failsafe (Riesgo Cero)
