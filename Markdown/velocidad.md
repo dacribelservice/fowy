@@ -134,33 +134,37 @@ Tras auditar detalladamente el código base actual, se identifican las siguiente
 ## 📋 6. Checklist de Implementación Técnica (Paso a Paso)
 
 ### Fase 1: Optimización de Caché en Navegador (Nivel 1)
-*   [ ] **Paso 1.1:** Instalar y configurar `swr` en el hook `useV2BusinessMenuData.ts`.
-*   [ ] **Paso 1.2:** Modificar `useV2BusinessMenuData.ts` para usar `useSWR` y configurar la opción `fallbackData` con los datos pre-renderizados del servidor (`initialData`).
-*   [ ] **Paso 1.3:** Eliminar los estados locales de React (`useState` para `business`, `categories`, `products` y `banners`) y derivar directamente todas las variables desde el objeto de datos de `SWR` mediante `useMemo` para evitar dobles renders innecesarios.
-*   [ ] **Paso 1.4:** **[Mejora Consistencia]** Centralizar todo el mapeo y formato de productos dentro del `useMemo` del hook, consumiendo el payload crudo (`initialData`) tanto del servidor como de las consultas del cliente para evitar que los productos cambien de diseño o "parpadeen" al recargarse.
+*   [x] **Paso 1.1:** Instalar y configurar `swr` en el hook `useV2BusinessMenuData.ts`.
+*   [x] **Paso 1.2:** Modificar `useV2BusinessMenuData.ts` para usar `useSWR` y configurar la opción `fallbackData` con los datos pre-renderizados del servidor (`initialData`).
+*   [x] **Paso 1.3:** Eliminar los estados locales de React (`useState` para `business`, `categories`, `products` y `banners`) y derivar directamente todas las variables desde el objeto de datos de `SWR` mediante `useMemo` para evitar dobles renders innecesarios.
+*   [x] **Paso 1.4:** **[Mejora Consistencia]** Centralizar todo el mapeo y formato de productos dentro del `useMemo` del hook, consumiendo el payload crudo (`initialData`) tanto del servidor como de las consultas del cliente para evitar que los productos cambien de diseño o "parpadeen" al recargarse.
 *   [ ] **Paso 1.5:** Probar en el navegador local que el cambio de pestañas de categorías y navegación atrás/adelante se resuelva instantáneamente sin realizar consultas de red adicionales.
 
+---
+
+## 📄 Planificación de Fases Posteriores (Solo Informativo)
+
 ### Fase 2: Carga Dinámica de Firebase (FCM)
-*   [ ] **Paso 2.1:** Identificar y remover las importaciones estáticas de `firebase/messaging` y `firebase/app` en `src/modules/notifications/NotificationProvider.tsx`, así como la importación estática de `src/modules/notifications/firebase.ts` (ya que este archivo ejecuta importaciones estáticas internamente).
-*   [ ] **Paso 2.2:** Crear una función asíncrona de inicialización de Firebase bajo demanda (ej. `getFirebaseMessaging()`) dentro del proveedor, que importe dinámicamente (`await import`) las dependencias de Firebase en el cliente.
-*   [ ] **Paso 2.3:** **[Corrección de Oyente]** Asegurar que la suscripción al evento `onMessage` (el oyente de notificaciones) se reactive de forma dinámica únicamente después de que el SDK de Firebase se haya inicializado correctamente de fondo.
-*   [ ] **Paso 2.4:** **[Restricción de Alertas]** Condicionar el prompt de activación de notificaciones (`PermissionPrompt`) para que solo se intente cargar e inicializar para usuarios autenticados, evitando molestar a los clientes anónimos que entran a ver el menú.
-*   [ ] **Paso 2.5:** Configurar el disparador de sesión: Invocar la función de carga e inicialización del SDK cuando se detecte una sesión activa (`supabase.auth.getUser()`).
-*   [ ] **Paso 2.6:** Configurar el disparador de checkout: Vincular la función de carga del SDK a la acción de apertura de la hoja de checkout en el carrito de compras.
-*   [ ] **Paso 2.7:** Configurar el disparador de rutas: Detectar mediante `usePathname()` si el cliente ingresa a `/admin` o `/business` para inicializar y cargar de inmediato el SDK.
-*   [ ] **Paso 2.8:** Validar en la consola de red (Network Tab) que el script de Firebase no se descargue en la primera carga del menú individual de cliente anónimo.
+* Identificar y remover las importaciones estáticas de `firebase/messaging` y `firebase/app` en `src/modules/notifications/NotificationProvider.tsx`, así como la importación estática de `src/modules/notifications/firebase.ts` (ya que este archivo ejecuta importaciones estáticas internamente).
+* Crear una función asíncrona de inicialización de Firebase bajo demanda (ej. `getFirebaseMessaging()`) dentro del proveedor, que importe dinámicamente (`await import`) las dependencias de Firebase en el cliente.
+* **[Corrección de Oyente]** Asegurar que la suscripción al evento `onMessage` (el oyente de notificaciones) se reactive de forma dinámica únicamente después de que el SDK de Firebase se haya inicializado correctamente de fondo.
+* **[Restricción de Alertas]** Condicionar el prompt de activación de notificaciones (`PermissionPrompt`) para que solo se intente cargar e inicializar para usuarios autenticados, evitando molestar a los clientes anónimos que entran a ver el menú.
+* Configurar el disparador de sesión: Invocar la función de carga e inicialización del SDK cuando se detecte una sesión activa (`supabase.auth.getUser()`).
+* Configurar el disparador de checkout: Vincular la función de carga del SDK a la acción de apertura de la hoja de checkout en el carrito de compras.
+* Configurar el disparador de rutas: Detectar mediante `usePathname()` si el cliente ingresa a `/admin` o `/business` para inicializar y cargar de inmediato el SDK.
+* Validar en la consola de red (Network Tab) que el script de Firebase no se descargue en la primera carga del menú individual de cliente anónimo.
 
 ### Fase 3: Renderizado Híbrido en Servidor (SSR)
-*   [ ] **Paso 3.1:** Crear una función utilitaria de mapeo de productos compartida (ej. `src/utils/menuMapper.ts`) que resuelva de forma idéntica los fallbacks de nombres, descripciones e imágenes provenientes de `global_products`.
-*   [ ] **Paso 3.2:** Crear el componente de cliente `src/components/explorer/CraveMenuClient.tsx` y migrar allí la interactividad, estados, carrito y animaciones actuales de `page.tsx`.
-*   [ ] **Paso 3.3:** Modificar `src/app/(explorer)/[slug]/page.tsx` para quitar la directiva `"use client"`. Convertirlo en un Componente de Servidor asíncrono resolviendo `params` con `await params`.
-*   [ ] **Paso 3.4:** Importar el cliente de Supabase de servidor (`src/utils/supabase/server.ts`) en `page.tsx` y llamar al RPC `get_business_menu_payload`.
-*   [ ] **Paso 3.5:** Ejecutar la función utilitaria de mapeo de productos en el servidor (`page.tsx`) antes de enviar los datos al cliente. Esto garantiza que el HTML del servidor coincida con la hidratación del cliente, evitando errores de Hydration Mismatch.
-*   [ ] **Paso 3.6:** Añadir un bloque `try/catch` de contingencia (Failsafe) en el servidor que permita renderizar el componente de cliente con datos vacíos (nulo) para que realice la carga del lado del navegador si la consulta en el servidor falla, manteniendo la app activa en un 100%.
-*   [ ] **Paso 3.7:** Pasar el payload de datos pre-renderizados y ya mapeados de servidor a cliente vía `<CraveMenuClient initialData={payload} />`.
-*   [ ] **Paso 3.8:** **[Mejora de SEO Dinámico]** Configurar la función `generateMetadata` en `page.tsx` para extraer de forma dinámica el nombre, descripción y logotipo del negocio e inyectarlos en las etiquetas meta del servidor.
-*   [ ] **Paso 3.9:** Ajustar el bucle de renderizado de productos en `CraveMenuClient.tsx` para mostrar los primeros 6 platos de forma directa, y aplicar `LazyWrapper` únicamente a partir del séptimo producto para asegurar la indexación SEO de la pantalla inicial.
-*   [ ] **Paso 3.10:** Probar el pre-renderizado del sitio desactivando JavaScript en el navegador para asegurar la visibilidad completa del menú e imágenes, así como verificar que WhatsApp y Google lean correctamente el título y foto del negocio al compartir el enlace.
+* Crear una función utilitaria de mapeo de productos compartida (ej. `src/utils/menuMapper.ts`) que resuelva de forma idéntica los fallbacks de nombres, descripciones e imágenes provenientes de `global_products`.
+* Crear el componente de cliente `src/components/explorer/CraveMenuClient.tsx` y migrar allí la interactividad, estados, carrito y animaciones actuales de `page.tsx`.
+* Modificar `src/app/(explorer)/[slug]/page.tsx` para quitar la directiva `"use client"`. Convertirlo en un Componente de Servidor asíncrono resolviendo `params` con `await params`.
+* Importar el cliente de Supabase de servidor (`src/utils/supabase/server.ts`) in `page.tsx` y llamar al RPC `get_business_menu_payload`.
+* Ejecutar la función utilitaria de mapeo de productos en el servidor (`page.tsx`) antes de enviar los datos al cliente. Esto garantiza que el HTML del servidor coincida con la hidratación del cliente, evitando errores de Hydration Mismatch.
+* Añadir un bloque `try/catch` de contingencia (Failsafe) en el servidor que permita renderizar el componente de cliente con datos vacíos (nulo) para que realice la carga del lado del navegador si la consulta en el servidor falla, manteniendo la app activa en un 100%.
+* Pasar el payload de datos pre-renderizados y ya mapeados de servidor a cliente vía `<CraveMenuClient initialData={payload} />`.
+* **[Mejora de SEO Dinámico]** Configurar la función `generateMetadata` en `page.tsx` para extraer de forma dinámica el nombre, descripción y logotipo del negocio e inyectarlos en las etiquetas meta del servidor.
+* Ajustar el bucle de renderizado de productos en `CraveMenuClient.tsx` para mostrar los primeros 6 platos de forma directa, y aplicar `LazyWrapper` únicamente a partir del séptimo producto para asegurar la indexación SEO de la pantalla inicial.
+* Probar el pre-renderizado del sitio desactivando JavaScript en el navegador para asegurar la visibilidad completa del menú e imágenes, así como verificar que WhatsApp y Google lean correctamente el título y foto del negocio al compartir el enlace.
 
 ---
 
