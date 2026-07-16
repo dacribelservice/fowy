@@ -239,7 +239,7 @@ export default function BusinessMenuPage() {
         
         {/* 2.3 SLIDER DE BANNERS */}
         <MenuHeroSliderV2 
-          banners={banners.map(b => ({ id: String(b.id), image_url: b.image_url }))} 
+          banners={banners.map((b: any) => ({ id: String(b.id), image_url: b.image_url }))} 
           fallbackImage={business.banner_url || logoUrl} 
           businessName={businessName} 
           showBackButton={false} 
@@ -289,9 +289,9 @@ export default function BusinessMenuPage() {
                 </div>
               ))}
             </div>
-          ) : products.filter((p) => p.in_stock !== false).length > 0 ? (
+          ) : products.filter((p: any) => p.in_stock !== false).length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
-              {products.filter((p) => p.in_stock !== false).map((product) => (
+              {products.filter((p: any) => p.in_stock !== false).map((product: any) => (
                 <LazyWrapper key={product.id}>
                   <CraveProductCard
                     product={product}
