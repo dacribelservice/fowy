@@ -65,6 +65,7 @@ export function CraveProductCard({
             e.stopPropagation();
             if (onToggleFavorite) onToggleFavorite();
           }}
+          aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
           className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-sm transition-all active:scale-90 hover:bg-white/30 z-10 cursor-pointer"
         >
           <Heart 
@@ -98,6 +99,7 @@ export function CraveProductCard({
           {/* Botón flotante de acción premium */}
           <button
             onClick={onAddToCart}
+            aria-label={`Agregar ${product.name} al carrito`}
             className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90 hover:brightness-110 border border-white/20 cursor-pointer"
             style={{
               background: `linear-gradient(135deg, ${accentColor}e6 0%, ${accentColor} 100%)`,

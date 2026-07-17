@@ -138,7 +138,7 @@ Tras auditar detalladamente el código base actual, se identifican las siguiente
 *   [x] **Paso 1.2:** Modificar `useV2BusinessMenuData.ts` para usar `useSWR` y configurar la opción `fallbackData` con los datos pre-renderizados del servidor (`initialData`).
 *   [x] **Paso 1.3:** Eliminar los estados locales de React (`useState` para `business`, `categories`, `products` y `banners`) y derivar directamente todas las variables desde el objeto de datos de `SWR` mediante `useMemo` para evitar dobles renders innecesarios.
 *   [x] **Paso 1.4:** **[Mejora Consistencia]** Centralizar todo el mapeo y formato de productos dentro del `useMemo` del hook, consumiendo el payload crudo (`initialData`) tanto del servidor como de las consultas del cliente para evitar que los productos cambien de diseño o "parpadeen" al recargarse.
-*   [ ] **Paso 1.5:** Probar en el navegador local que el cambio de pestañas de categorías y navegación atrás/adelante se resuelva instantáneamente sin realizar consultas de red adicionales.
+*   [x] **Paso 1.5:** Probar en el navegador local que el cambio de pestañas de categorías y navegación atrás/adelante se resuelva instantáneamente sin realizar consultas de red adicionales.
 
 ---
 

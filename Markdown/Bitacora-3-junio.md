@@ -50,4 +50,9 @@
   - **Enlace de Google Maps (Navegación)**: Modificado `CraveBusinessHeader.tsx` para recibir `latitude` y `longitude` del negocio y envolver el texto de distancia en un enlace `<a>` a Google Maps con la ruta de origen a destino (`maps/dir`).
   - **Alineación con Reglas de Hooks**: Se solventó un error de orden de hooks (`Render Order Mismatch`) y referencia temporal (`ReferenceError`) reubicando el hook `useMemo` de distancia después del hook de datos `useV2BusinessMenuData` (donde se define `business`) pero obligatoriamente antes de las sentencias condicionales de retorno temprano (`if (loading)`).
 
-
+### 📌 Hito: Optimización de Caché SWR en Menú de Negocios y Resolución de Errores de Tipado Vercel (Fase 1 de Velocidad)
+- **Fecha**: 15 de Julio de 2026
+- **Resumen**: Implementación de la primera fase de optimización de velocidad de carga mediante caché en el navegador para la vista pública de negocios (`/[slug]`) y solución a errores de compilación estrictos en Vercel.
+- **Detalles Técnicos**:
+  - **Optimización de Caché (SWR)**: Se refactorizó el hook `useV2BusinessMenuData.ts` sustituyendo el uso de `useEffect` y peticiones directas por `useSWR`. Esto permite almacenar temporalmente los datos del negocio, productos y categorías en caché, reduciendo el parpadeo y acelerando significativamente la carga visual para clientes recurrentes.
+  - **Resolución de Error Vercel (Ley del Remolque)**: Se corrigió un error crítico de compilación en Vercel (`Parameter implicitly has an 'any' type`) en el archivo `src/app/(explorer)/[slug]/page.tsx` agregando tipado explícito local (`: any`) en las iteraciones de arreglos, respetando estrictamente la "Ley del Remolque" definida en los conceptos de arquitectura.
