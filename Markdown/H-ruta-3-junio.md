@@ -72,3 +72,13 @@
 - [x] **7.2. Exclusión de Coordenadas GPS**: Asegurar que **bajo ninguna circunstancia** se guarde el enlace de geolocalización dinámica (`gpsLocation`) en el `localStorage`, evitando que el cliente envíe coordenadas desactualizadas si realiza pedidos desde ubicaciones físicas distintas en el futuro.
 - [x] **7.3. Guardado Síncrono y Blindado al Enviar (Try-Catch & No Delay)**: Modificar `handleSendWhatsApp` en `useCheckoutLogic.ts` para guardar los 4 campos de texto de forma síncrona (instantánea) justo antes de redirigir. Todo el bloque de escritura en `localStorage` debe estar envuelto en un `try-catch` para evitar bloqueos catastróficos si el cliente navega en modo privado en iOS Safari, garantizando que la redirección a `window.location.href` ocurra de inmediato.
 
+### Fase 8: Agrupamiento de Marcadores en el Mapa (Clusterización & Rendimiento)
+
+- [x] **8.1. Importación Dinámica del Agrupador**: Instalar e importar la librería de agrupamiento en `src/components/explorer/ExplorerMap.tsx` utilizando `next/dynamic` con `{ ssr: false }` para evitar errores de hidratación en Next.js (cumpliendo con la Sección 2.3 de `conceptos.md`).
+- [x] **8.2. Envoltorio Estructural (Ley del Remolque)**: Envolver la lista de marcadores `<Marker>` dentro del componente `<MarkerClusterGroup>` en `ExplorerMap.tsx` sin modificar los callbacks existentes (`onSelectBusiness`), garantizando que la lógica del hook `useExplorerManager.ts` y la base de datos queden intactos.
+- [x] **8.3. Estilo Ethereal High-Tech de Burbujas**: Crear la función `createCustomClusterIcon` en `ExplorerMap.tsx` para generar círculos con los gradientes oficiales de Fowy (`#FF5A5F` / `#FF9A3D`) y la cifra numérica de negocios en tipografía destacada.
+- [x] **8.4. Preservación de Popups e Interacciones**: Validar que al tocar una burbuja agrupada la cámara realice un acercamiento (*zoom*) automático y que al presionar un punto individual se abra correctamente el Popup existente con las opciones de "Navegar" y "Menú". Configurar `disableClusteringAtZoom={16}` y `maxClusterRadius={35}` para asegurar la separación completa e independiente de los marcadores al hacer zoom de calle.
+
+
+
+

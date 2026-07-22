@@ -56,3 +56,12 @@
 - **Detalles Técnicos**:
   - **Optimización de Caché (SWR)**: Se refactorizó el hook `useV2BusinessMenuData.ts` sustituyendo el uso de `useEffect` y peticiones directas por `useSWR`. Esto permite almacenar temporalmente los datos del negocio, productos y categorías en caché, reduciendo el parpadeo y acelerando significativamente la carga visual para clientes recurrentes.
   - **Resolución de Error Vercel (Ley del Remolque)**: Se corrigió un error crítico de compilación en Vercel (`Parameter implicitly has an 'any' type`) en el archivo `src/app/(explorer)/[slug]/page.tsx` agregando tipado explícito local (`: any`) en las iteraciones de arreglos, respetando estrictamente la "Ley del Remolque" definida en los conceptos de arquitectura.
+
+### 📌 Hito: Agrupamiento Inteligente de Marcadores en el Mapa (Clusterización & Rendimiento - Fase 8)
+- **Fecha**: 21 de Julio de 2026
+- **Resumen**: Implementación del agrupamiento dinámico de marcadores en el mapa del explorador (`/explorar`), garantizando máxima fluidez y velocidad en celulares antiguos y escalabilidad ante miles de negocios simultáneos sin congelar la pantalla.
+- **Detalles Técnicos**:
+  - **Importación Dinámica**: Se integró `react-leaflet-cluster` usando `next/dynamic` con `{ ssr: false }` en `src/components/explorer/ExplorerMap.tsx`, evitando errores de hidratación en Next.js (cumpliendo con la Sección 2.3 de `conceptos.md`).
+  - **Estilo Ethereal High-Tech**: Se programó la función `createCustomClusterIcon` con tipado explícito para generar burbujas numéricas con el gradiente oficial de Fowy (`#FF5A5F` / `#FF9A3D`), bordes blancos y sombras elevadas.
+  - **Ajustes de Zoom de Calle**: Se configuró `disableClusteringAtZoom={16}`, `maxClusterRadius={35}` y `spiderfyOnMaxZoom={false}` para asegurar que, al acercar el mapa a nivel de barrio/calle, las burbujas se disuelvan automáticamente y los marcadores queden 100% independientes, manteniendo intactos los Popups y botones de "Navegar" y "Menú".
+
