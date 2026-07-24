@@ -11,6 +11,7 @@ import { BusinessModuleManager } from "@/components/admin/businesses/BusinessMod
 import { BusinessPaymentViewer } from "@/components/admin/businesses/BusinessPaymentViewer";
 import { BusinessPlanPill } from "@/components/admin/businesses/BusinessPlanPill";
 import { BusinessMetricsList } from "@/components/admin/businesses/BusinessMetricsList";
+import { BusinessTrafficChart } from "@/components/admin/businesses/BusinessTrafficChart";
 import { FowySalesChart } from "@/components/admin/businesses/FowySalesChart";
 
 
@@ -143,6 +144,11 @@ export default function BusinessDetailsPage() {
         <div className="bg-white rounded-3xl p-6 shadow-md shadow-slate-100/50 border border-slate-100">
           <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Métricas de Rendimiento</h3>
           <BusinessMetricsList businessId={business.id} />
+        </div>
+
+        {/* Capa 2.5: Rendimiento de Tráfico y Contactos WhatsApp */}
+        <div className="bg-white rounded-3xl p-6 shadow-md shadow-slate-100/50 border border-slate-100">
+          <BusinessTrafficChart businessId={business.id} />
         </div>
 
         {/* Capa 2.5: Tendencia de Ventas (Gráfica Interactiva) */}
