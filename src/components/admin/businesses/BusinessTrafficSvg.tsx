@@ -251,25 +251,31 @@ export function BusinessTrafficSvg({
       {/* Tooltip Absoluto Flotante Glassmorphic Adaptativo */}
       <AnimatePresence>
         {activePoint !== null && calculatedPoints[activePoint] && (() => {
+          const pointXPercent = (calculatedPoints[activePoint].x / width) * 100;
           const totalPts = calculatedPoints.length;
           const isRightEdge = activePoint >= totalPts - 2;
           const isLeftEdge = activePoint === 0;
 
-          const translateX = isRightEdge ? "-92%" : isLeftEdge ? "-8%" : "-50%";
-          const arrowLeft = isRightEdge ? "88%" : isLeftEdge ? "12%" : "50%";
+          // Anclaje de posición CSS inmune a sobreescrituras de Framer Motion
+          const containerStyle: React.CSSProperties = {
+            top: `${(Math.min(calculatedPoints[activePoint].yVisits, calculatedPoints[activePoint].yClicks) / height) * 100 - 15}%`,
+            ...(isRightEdge
+              ? { right: "12px", left: "auto" }
+              : isLeftEdge
+              ? { left: "12px", right: "auto" }
+              : { left: `${pointXPercent}%`, right: "auto" }),
+          };
 
           return (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute pointer-events-none bg-slate-900/95 backdrop-blur-md text-white rounded-xl py-2 px-3 shadow-lg shadow-slate-950/20 border border-white/10 flex flex-col items-center gap-1 text-center z-20"
-              style={{
-                left: `${(calculatedPoints[activePoint].x / width) * 100}%`,
-                top: `${(Math.min(calculatedPoints[activePoint].yVisits, calculatedPoints[activePoint].yClicks) / height) * 100 - 15}%`,
-                transform: `translate(${translateX}, -100%)`,
-              }}
+              className={`absolute pointer-events-none bg-slate-900/95 backdrop-blur-md text-white rounded-xl py-2 px-3 shadow-lg shadow-slate-950/20 border border-white/10 flex flex-col items-center gap-1 text-center z-20 ${
+                !isRightEdge && !isLeftEdge ? "-translate-x-1/2 -translate-y-full" : "-translate-y-full"
+              }`}
+              style={containerStyle}
             >
               <span className="text-[8px] font-black uppercase tracking-wider text-slate-400">
                 {calculatedPoints[activePoint].fullLabel}
@@ -287,7 +293,7 @@ export function BusinessTrafficSvg({
               <div
                 className="absolute bottom-0 w-2 h-2 border-t-4 border-t-slate-900/95 border-x-4 border-x-transparent"
                 style={{
-                  left: arrowLeft,
+                  left: isRightEdge ? "85%" : isLeftEdge ? "15%" : "50%",
                   transform: "translateX(-50%) translateY(100%)",
                 }}
               />

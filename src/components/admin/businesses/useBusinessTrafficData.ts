@@ -46,23 +46,34 @@ export function useBusinessTrafficData({
       }
 
       try {
-        setLoading(true);
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
-        // 1. Consulta de Visitas registradas en analytics_visits
+        // Definir fecha de inicio según el filtro temporal (DÍA: -7 días, SEMANA: -6 semanas, MES: -6 meses)
+        const startDate = new Date(now);
+        if (filter === "D") {
+          startDate.setDate(now.getDate() - 7);
+        } else if (filter === "S") {
+          startDate.setDate(now.getDate() - 42);
+        } else if (filter === "M") {
+          startDate.setMonth(now.getMonth() - 6);
+        }
+
+        // 1. Consulta de Visitas registradas en analytics_visits (Filtradas por fecha de inicio)
         const { data: visitsData, error: visitsError } = await supabase
           .from("analytics_visits")
           .select("created_at")
-          .eq("business_id", businessId);
+          .eq("business_id", businessId)
+          .gte("created_at", startDate.toISOString());
 
         if (visitsError) console.error("Error fetching visits data:", visitsError);
 
-        // 2. Consulta de Pedidos/Clics de WhatsApp registrados en orders
+        // 2. Consulta de Pedidos/Clics de WhatsApp registrados en orders (Filtrados por fecha de inicio)
         const { data: ordersData, error: ordersError } = await supabase
           .from("orders")
           .select("created_at")
-          .eq("business_id", businessId);
+          .eq("business_id", businessId)
+          .gte("created_at", startDate.toISOString());
 
         if (ordersError) console.error("Error fetching orders data:", ordersError);
 
