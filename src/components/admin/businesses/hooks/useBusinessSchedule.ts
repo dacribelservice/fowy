@@ -67,35 +67,9 @@ export function useBusinessSchedule(props?: UseBusinessScheduleProps) {
 
         const shouldBeOpen = isBusinessOpen(evalSchedules);
 
-        // Si el estado evaluado difiere del estado actual, ejecutamos la transición instantánea
-        if (shouldBeOpen !== currentStatus) {
-          isUpdatingRef.current = true;
-          try {
-            const { error } = await supabase
-              .from('businesses')
-              .update({ status: shouldBeOpen })
-              .eq('id', businessId);
-
-            if (!error) {
-              // Notificación de alta gama mediante Toast Premium de FOWY
-              toast.success(`⏰ Horario Automatizado`, {
-                description: `Tu establecimiento se ha ${shouldBeOpen ? 'Abierto' : 'Cerrado'} automáticamente según tu configuración de Bogotá (GMT-5).`,
-                duration: 5000,
-              });
-
-              // Informar al componente padre de la actualización de estado
-              if (onStatusChange) {
-                onStatusChange(shouldBeOpen);
-              }
-            } else {
-              console.error("Error al actualizar estado automático del negocio:", error);
-            }
-          } catch (err) {
-            console.error("Excepción en transición automática de horarios:", err);
-          } finally {
-            isUpdatingRef.current = false;
-          }
-        }
+        // NOTA: La sobrescritura automática de la columna 'status' en Supabase ha sido desactivada (Opción A)
+        // para preservar el Estatus Administrativo del negocio (Activo/Inactivo) establecido por el Admin.
+        // La evaluación de apertura/cierre por horarios se realiza dinámicamente en tiempo real en el frontend.
       }
     }, 1000);
 

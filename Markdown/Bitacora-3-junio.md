@@ -65,3 +65,12 @@
   - **Estilo Ethereal High-Tech**: Se programó la función `createCustomClusterIcon` con tipado explícito para generar burbujas numéricas con el gradiente oficial de Fowy (`#FF5A5F` / `#FF9A3D`), bordes blancos y sombras elevadas.
   - **Ajustes de Zoom de Calle**: Se configuró `disableClusteringAtZoom={16}`, `maxClusterRadius={35}` y `spiderfyOnMaxZoom={false}` para asegurar que, al acercar el mapa a nivel de barrio/calle, las burbujas se disuelvan automáticamente y los marcadores queden 100% independientes, manteniendo intactos los Popups y botones de "Navegar" y "Menú".
 
+### 📌 Hito: Desacoplamiento de Horarios y Solución al Bug de Estado (Opción A & Sincronización UI)
+- **Fecha**: 28 de Julio de 2026
+- **Resumen**: Solución definitiva al bug que desactivaba administrativamente los negocios en la Base de Datos (`status = false`) al cerrar su horario. Se desacopló el Estatus Administrativo de la evaluación en tiempo real por horario y se sincronizó el switch visual del socio.
+- **Detalles Técnicos**:
+  - **Desactivación de Sobrescritura en DB**: En `src/components/admin/businesses/hooks/useBusinessSchedule.ts`, se eliminó la consulta automática `supabase.from('businesses').update({ status: shouldBeOpen })`, garantizando que la columna `status` en Supabase permanezca intacta bajo el control exclusivo del Administrador (cumpliendo con la Opción A y la Ley del Remolque).
+  - **Evaluación Dinámica Realtime**: Se mantuvo la evaluación dinámica del cliente en el Explorador (`useExplorerManager.ts`), Mapa y vista del Menú (`[slug]/page.tsx`) mediante la función `isBusinessOpen(schedules)` de `src/utils/businessTime.ts`, la cual incluye lógica de *Midnight Crossover* para jornadas nocturnas que extienden su cierre a la madrugada.
+  - **Sincronización del Switch del Socio**: En `src/components/partners/PartnerTopBar.tsx`, se importó `isBusinessOpen` y se conectó la interfaz del switch visual a `isCurrentlyOpen = businessStatus === true && isBusinessOpen(schedules)`, de modo que la barra superior del socio refleje el estado real ("Automático • Abierto / Cerrado") en tiempo real sin escribir en la Base de Datos.
+
+

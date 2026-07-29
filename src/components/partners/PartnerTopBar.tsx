@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, AlertTriangle, Calendar, Clock, Loader2, Store } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useBusinessSchedule } from "@/components/admin/businesses/hooks/useBusinessSchedule";
+import { isBusinessOpen } from "@/utils/businessTime";
 import { toast } from "sonner";
 
 export default function PartnerTopBar() {
@@ -166,31 +167,36 @@ export default function PartnerTopBar() {
             </div>
 
             {/* Control del Switch Premium con Framer Motion (Modo Automático/Lectura) */}
-            <div className="flex items-center gap-3">
-              <span className={`text-[11px] font-black uppercase tracking-widest transition-colors duration-300 flex items-center gap-1.5 ${
-                businessStatus ? "text-emerald-500" : "text-red-500"
-              }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${
-                  businessStatus ? "bg-emerald-500 animate-pulse" : "bg-red-500"
-                }`} />
-                {businessStatus ? "Automático • Abierto" : "Automático • Cerrado"}
-              </span>
+            {(() => {
+              const isCurrentlyOpen = businessStatus === true && isBusinessOpen(schedules);
+              return (
+                <div className="flex items-center gap-3">
+                  <span className={`text-[11px] font-black uppercase tracking-widest transition-colors duration-300 flex items-center gap-1.5 ${
+                    isCurrentlyOpen ? "text-emerald-500" : "text-red-500"
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      isCurrentlyOpen ? "bg-emerald-500 animate-pulse" : "bg-red-500"
+                    }`} />
+                    {isCurrentlyOpen ? "Automático • Abierto" : "Automático • Cerrado"}
+                  </span>
 
-              <div 
-                className={`relative w-14 h-8 rounded-full cursor-default p-1 transition-all duration-300 select-none ${
-                  businessStatus 
-                    ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]' 
-                    : 'bg-gradient-to-r from-red-400 to-red-500 shadow-[0_0_12px_rgba(239,68,68,0.25)]'
-                }`}
-              >
-                <motion.div 
-                  layout
-                  className="w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"
-                  animate={{ x: businessStatus ? 24 : 0 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              </div>
-            </div>
+                  <div 
+                    className={`relative w-14 h-8 rounded-full cursor-default p-1 transition-all duration-300 select-none ${
+                      isCurrentlyOpen 
+                        ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]' 
+                        : 'bg-gradient-to-r from-red-400 to-red-500 shadow-[0_0_12px_rgba(239,68,68,0.25)]'
+                    }`}
+                  >
+                    <motion.div 
+                      layout
+                      className="w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"
+                      animate={{ x: isCurrentlyOpen ? 24 : 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </motion.div>
         )}
 
