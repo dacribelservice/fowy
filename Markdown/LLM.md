@@ -125,4 +125,20 @@ Dado que los datos de la inyección GEO dependen de consultas a Supabase en el s
 - [x] **3.1** Crear el archivo estático `public/llms.txt` en formato Markdown con el título H1 y la descripción general del sitemap y el directorio del explorador para facilitar la indexación rápida de los crawlers de LLM.
 
 ---
-*Última actualización: 14 de Julio de 2026 — Estrategia de GEO Pura detallada con checklist de pasos técnicos e inofensivos.*
+
+## 🚀 ¿Cómo podemos pasar del 9.5 al 10/10 Absoluto? (Oportunidades de Mejora Futuras)
+
+Para que FOWY sea inmune y dominante en la era de los LLM, aquí están las 3 mejoras estratégicas para implementar a futuro:
+
+1. **Inyección de Esquema `FAQPage` (Preguntas Frecuentes en JSON-LD):**
+   - Las IAs responden preguntas directas como: *"¿A qué hora cierra Sazon del Campo el martes?"* o *"¿Tienen domicilio a Vallegrande?"*.
+   - Inyectar un microdato JSON-LD tipo `FAQPage` con preguntas y respuestas precalculadas aumentará la probabilidad de que ChatGPT cite a FOWY como la respuesta principal.
+
+2. **Esquema de Migas de Pan (`BreadcrumbList`):**
+   - Agregar la jerarquía geográfica en el JSON-LD: `FOWY > Colombia > Cali > Comidas Rápidas > Nombre del Negocio`. Esto ayuda a Perplexity a ubicar el negocio en búsquedas hiperlocales de barrio.
+
+3. **Folleto Extendido `llms-full.txt`:**
+   - Crear el archivo `public/llms-full.txt` que resuma no solo la plataforma, sino las categorías de negocios disponibles por ciudad para que los bots de IA mapeen toda la red de un solo vistazo.
+
+---
+*Última actualización: 29 de Julio de 2026 — Estrategia de GEO Pura detallada con checklist de pasos técnicos y oportunidades de mejora a futuro.*
