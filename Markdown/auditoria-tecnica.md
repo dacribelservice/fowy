@@ -2,14 +2,20 @@
 
 > **Documento Oficial de Deuda Técnica, Seguridad y Roadmap de Ingeniería**  
 > **Fecha de emisión:** 1 de Agosto de 2026  
-> **Versión de Auditoría:** 1.0 (CTO Level Review)  
-> **Estado del Sistema:** Producción Temprana / MVP Maduro  
+> **Versión de Auditoría:** 1.1 (Actualizado con Infraestructura de Producción)  
+> **Estado del Sistema:** Producción Activa en Vivo (50 negocios registrados)  
+> **Infraestructura Activa:** Supabase Plan Pro ($25 USD/mes) | Vercel Plan Free  
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-FOWY se presenta como una plataforma multi-inquilino (*multi-tenant*) de comercio local y menús digitales de alto rendimiento. El estado general del proyecto refleja una **madurez de nivel MVP Avanzado / Producción Temprana**, destacando por un enfoque pragmático que priorizó la velocidad de lanzamiento (*Time-To-Market*) sin sacrificar la seguridad básica ni la estética visual.
+FOWY se presenta como una plataforma multi-inquilino (*multi-tenant*) de comercio local y menús digitales de alto rendimiento. El sistema se encuentra actualmente **desplegado en producción real con 50 negocios registrados y operativos**, destacando por un enfoque pragmático que priorizó la velocidad de lanzamiento (*Time-To-Market*) sin sacrificar la seguridad básica ni la estética visual.
+
+### **Infraestructura y Stack de Producción**
+- **Hosting & Frontend:** Vercel (Plan Free / Hobby).
+- **Backend & Base de Datos:** Supabase (Plan Pro - $25 USD/mes: PostgreSQL + RLS + PostGIS + WebSockets).
+- **Volumen Actual:** 50 negocios activos en producción en la plataforma.
 
 ### **Fortalezas Principales**
 1. **Arquitectura Direct-to-BaaS Eficiente:** El uso de Next.js 15 (App Router) junto con Supabase (PostgreSQL + RLS) eliminó la sobrecarga de mantener servidores de backend dedicados.
