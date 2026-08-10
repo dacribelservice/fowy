@@ -351,23 +351,29 @@ GRANT EXECUTE ON FUNCTION get_businesses_in_viewport(FLOAT, FLOAT, FLOAT, FLOAT,
 
 ---
 
-## 📋 6. Checklist de Ejecución Blindado (15 Criterios Quirúrgicos)
+## 📋 6. Checklist de Ejecución Paso a Paso
 
-- [ ] **Criterio 1**: Incluir la **Regla de Oro** en el encabezado del archivo.
-- [ ] **Criterio 2**: Aplicar la **Ley del Remolque**: modificar solo los callbacks de `useExplorerManager.ts` sin reescribir el hook ni romper retrocompatibilidad.
-- [ ] **Criterio 3 (Resolución de Categorías)**: Resolver el nombre de la categoría vía `categoriesRef.current` en `UPDATE` e `INSERT` para no dejar valores desactualizados o fijos.
-- [ ] **Criterio 4 (Compatibilidad UI)**: Asignar tanto `categories: { name: catName }` como `category_name: catName` en el payload mapeado en memoria.
-- [ ] **Criterio 5 (Proyección Estricta)**: Proyectar los atributos requeridos (`color_identity`, `schedules`, `tags`, `description`, `created_at`) en la consulta `.select(...)`.
-- [ ] **Criterio 6 (Horarios SQL vs JS)**: Mantener el filtrado circunstancial de horarios (`isBusinessOpen`) en JS y delegar `status = TRUE` a SQL.
-- [ ] **Criterio 7 (PostGIS GiST Index)**: Utilizar la ramificación `IF ... THEN` en PL/pgSQL para habilitar el uso del índice GiST en la ordenación por operador `<->`.
-- [ ] **Criterio 8 (Desacoplamiento React 19)**: Ejecutar `setSelectedBusiness(null)` y `setIsSheetOpen(false)` de forma secuencial en la raíz del callback Realtime.
-- [ ] **Criterio 9 (Casteo Numérico Geográfico)**: Aplicar `Number()` y comprobación `isNaN()` en `isInsideBounds` (`biz.latitude == null`).
-- [ ] **Criterio 10 (Migración SQL Limpia)**: Anteponer ejecuciones `DROP FUNCTION` en la migración SQL para evitar errores de actualización de firma en PostgreSQL.
-- [ ] **Criterio 11 (Stale Closures & Resiliencia)**: Garantizar IDs de canal únicos y `selectedBusinessRef.current` para prevenir cierres obsoletos en Realtime (Sección 6).
-- [ ] **Criterio 12 (ErrorBoundary & FPS)**: Mantener el `<ErrorBoundary>` visual envolviendo `ExplorerMap` (Sección 7.5) a 60 FPS en móviles.
-- [ ] **Criterio 13 (Ref selectedBusinessRef)**: Declarar e incluir `selectedBusinessRef` en las refs sincronizadas de `useExplorerManager.ts` para evitar `ReferenceError` en callbacks Realtime.
-- [ ] **Criterio 14 (Índice GiST DB & category_name en Fetch)**: Aplicar `CREATE INDEX IF NOT EXISTS idx_businesses_geo_location` en la base de datos y mapear `category_name` en la respuesta del `fetchBusinesses` inicial.
-- [ ] **Criterio 15 (Permisos PostgREST & Cleanup WebSocket)**: Ejecutar `GRANT EXECUTE ON FUNCTION...` tras el `DROP FUNCTION` en SQL y retornar `supabase.removeChannel(channel)` en el `useEffect` de Realtime para prevenir errores 403 y memoria colapsada.
+### 🗄️ FASE 1: Configuración en Base de Datos (Supabase SQL Editor)
+- [ ] **Paso 1.1**: Ejecutar `CREATE INDEX IF NOT EXISTS idx_businesses_geo_location ON businesses USING gist(...)` para indexar espacialmente las coordenadas.
+- [ ] **Paso 1.2**: Ejecutar sentencias `DROP FUNCTION IF EXISTS get_businesses_in_viewport(...)` para borrar todas las firmas previas del RPC y evitar conflictos.
+- [ ] **Paso 1.3**: Ejecutar `CREATE OR REPLACE FUNCTION get_businesses_in_viewport(...)` integrando la ordenación GiST `<->` por cercanía y el límite `p_limit DEFAULT 150`.
+- [ ] **Paso 1.4**: Ejecutar `GRANT EXECUTE ON FUNCTION get_businesses_in_viewport(...) TO anon, authenticated, service_role;` para otorgar los permisos de API.
+- [ ] **Paso 1.5**: Verificar en la consola de Supabase que el script SQL se haya ejecutado con éxito sin errores de sintaxis ni de permisos.
+
+### 💻 FASE 2: Modificación del Código Frontend (`src/hooks/useExplorerManager.ts`)
+- [ ] **Paso 2.1**: Declarar la referencia `selectedBusinessRef = useRef<any | null>(null)` y vincular su `useEffect` de sincronización continua.
+- [ ] **Paso 2.2**: Agregar la función auxiliar `isInsideBounds(biz, bounds)` con validación `Number()` e `isNaN()` para verificar la posición geográfica en pantalla.
+- [ ] **Paso 2.3**: Reemplazar el callback de Realtime en `useEffect` actualizando el estado local `setBusinesses` (manejando `UPDATE`, `INSERT` y `DELETE`) en lugar de hacer re-fetch a la DB.
+- [ ] **Paso 2.4**: Implementar la función `enrichBusiness` dentro del efecto Realtime para resolver dinámicamente `category_name` y la relación `categories: { name }` desde `categoriesRef.current`.
+- [ ] **Paso 2.5**: Actualizar la función `fetchBusinesses` reemplazando `select('*')` por la selección estricta de columnas y enviando las coordenadas `p_user_lat` y `p_user_lng` al RPC.
+- [ ] **Paso 2.6**: Mapear `category_name` en la respuesta inicial de la consulta y aplicar el filtro `isBusinessOpen(biz.schedules)`.
+
+### 🧪 FASE 3: Pruebas de Calidad y Verificación de Funcionamiento
+- [ ] **Paso 3.1**: Abrir `/explorar` en entorno local y verificar que el mapa cargue datos en menos de 200ms sin errores en la consola del navegador.
+- [ ] **Paso 3.2**: Seleccionar un negocio en el mapa y comprobar que `BusinessDetailSheet` muestre correctamente el nombre, la categoría, la calificación y la distancia.
+- [ ] **Paso 3.3**: Editar un negocio en Supabase (ej. cambiar status o nombre) y confirmar que la actualización ocurra en tiempo real en la pantalla sin recargar la página.
+- [ ] **Paso 3.4**: Pulsar el botón de centrar ubicación GPS y validar que los resultados se reordenen automáticamente por cercanía.
+- [ ] **Paso 3.5**: Ejecutar `npm run build` para asegurar que no existan errores de compilación ni de tipado en TypeScript.
 
 ---
 
