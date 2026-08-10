@@ -138,6 +138,7 @@ export type Database = {
           color_identity: string | null
           country: string | null
           created_at: string
+          cross_traffic_clicks: number
           geom: unknown
           id: string
           latitude: number | null
@@ -166,6 +167,7 @@ export type Database = {
           color_identity?: string | null
           country?: string | null
           created_at?: string
+          cross_traffic_clicks?: number
           geom?: unknown
           id?: string
           latitude?: number | null
@@ -194,6 +196,7 @@ export type Database = {
           color_identity?: string | null
           country?: string | null
           created_at?: string
+          cross_traffic_clicks?: number
           geom?: unknown
           id?: string
           latitude?: number | null
@@ -369,39 +372,39 @@ export type Database = {
       marketing_banners: {
         Row: {
           created_at: string
+          destination_business_id: string | null
           id: string
           image_url: string
           is_active: boolean
           link_url: string
           sort_order: number
-          title: string | null
-          target_city: string | null
           target_business_id: string | null
-          destination_business_id: string | null
+          target_city: string | null
+          title: string | null
         }
         Insert: {
           created_at?: string
+          destination_business_id?: string | null
           id?: string
           image_url: string
           is_active?: boolean
           link_url?: string
           sort_order?: number
-          title?: string | null
-          target_city?: string | null
           target_business_id?: string | null
-          destination_business_id?: string | null
+          target_city?: string | null
+          title?: string | null
         }
         Update: {
           created_at?: string
+          destination_business_id?: string | null
           id?: string
           image_url?: string
           is_active?: boolean
           link_url?: string
           sort_order?: number
-          title?: string | null
-          target_city?: string | null
           target_business_id?: string | null
-          destination_business_id?: string | null
+          target_city?: string | null
+          title?: string | null
         }
         Relationships: [
           {
@@ -417,7 +420,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       marketing_ctas: {
@@ -1251,6 +1254,7 @@ export type Database = {
           color_identity: string | null
           country: string | null
           created_at: string
+          cross_traffic_clicks: number
           geom: unknown
           id: string
           latitude: number | null
@@ -1280,6 +1284,10 @@ export type Database = {
         }
       }
       gettransactionid: { Args: never; Returns: unknown }
+      increment_cross_traffic: {
+        Args: { p_business_id: string }
+        Returns: undefined
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
