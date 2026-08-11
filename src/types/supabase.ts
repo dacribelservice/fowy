@@ -1242,10 +1242,12 @@ export type Database = {
         Args: {
           p_category?: string
           p_limit?: number
-          p_max_lat: number
-          p_max_lng: number
-          p_min_lat: number
-          p_min_lng: number
+          p_max_lat?: number
+          p_max_lng?: number
+          p_min_lat?: number
+          p_min_lng?: number
+          p_user_lat?: number
+          p_user_lng?: number
         }
         Returns: {
           category_id: string | null
