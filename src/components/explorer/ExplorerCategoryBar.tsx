@@ -12,17 +12,21 @@ interface ExplorerCategoryBarProps {
   categories: Category[];
   selectedCategoryId?: string | null;
   onSelectCategory: (id: string | null) => void;
+  hideHandle?: boolean;
 }
 
 export default function ExplorerCategoryBar({
   categories,
   selectedCategoryId,
   onSelectCategory,
+  hideHandle = false,
 }: ExplorerCategoryBarProps) {
   return (
-    <div className="pt-3 pb-4 w-full flex flex-col items-center">
-      {/* Drag handle superior estilo iOS */}
-      <div className="w-10 h-1 bg-slate-200/80 rounded-full mb-4" />
+    <div className={`w-full flex flex-col items-center ${hideHandle ? "py-1" : "pt-3 pb-4"}`}>
+      {/* Drag handle superior estilo iOS (ocultable) */}
+      {!hideHandle && (
+        <div className="w-10 h-1 bg-slate-200/80 rounded-full mb-4" />
+      )}
 
       {/* Carrusel */}
       <div className="w-full relative px-2">

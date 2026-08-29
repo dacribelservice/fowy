@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/client'
 import { compressImage } from '@/utils/imageCompression'
 
-export type BucketName = 'logos' | 'products' | 'payment-proofs' | 'banners' | 'identity-documents' | 'categories' | 'marketing'
+export type BucketName = 'logos' | 'products' | 'payment-proofs' | 'banners' | 'identity-documents' | 'categories' | 'marketing' | 'reels-thumbnails'
 
 /**
  * Servicio centralizado para la gestión de archivos en Supabase Storage.

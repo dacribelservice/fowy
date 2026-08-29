@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -8,6 +8,9 @@ import { Loader2, Navigation, Plus, AlertCircle, X } from "lucide-react";
 import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
 import BusinessListSheet from "@/components/explorer/BusinessListSheet";
 import BusinessDetailSheet from "@/components/explorer/BusinessDetailSheet";
+import { ReelsFeedButton } from "@/components/explorer/reels/ReelsFeedButton";
+import { ReelsFeedModal } from "@/components/explorer/reels/ReelsFeedModal";
+import { ReelDeepLinkHandler } from "@/components/explorer/reels/ReelDeepLinkHandler";
 import { useExplorerManager } from "@/hooks/useExplorerManager";
 
 // Dynamic Import for Map (SSR: false)
@@ -43,6 +46,8 @@ export default function ExplorarPage() {
   } = useExplorerManager();
 
   const [showWarningBanner, setShowWarningBanner] = useState(true);
+  const [isReelsOpen, setIsReelsOpen] = useState(false);
+  const [deepLinkReelId, setDeepLinkReelId] = useState<string | null>(null);
 
   useEffect(() => {
     if (locationError) {
@@ -128,6 +133,8 @@ export default function ExplorarPage() {
       <div 
         className="absolute right-4 bottom-[180px] z-[25] flex flex-col gap-3"
       >
+        <ReelsFeedButton onClick={() => setIsReelsOpen(true)} />
+
         <button 
           onClick={handleCenterUser}
           className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-full shadow-2xl flex items-center justify-center text-white active:scale-90 transition-all border border-white/20"
@@ -135,7 +142,6 @@ export default function ExplorarPage() {
         >
           <Navigation size={24} className="fill-white" />
         </button>
-
       </div>
 
       {/* Bottom Sheet for Businesses */}
@@ -182,6 +188,32 @@ export default function ExplorarPage() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Reels Feed Modal */}
+      <ReelsFeedModal
+        isOpen={isReelsOpen}
+        onClose={() => {
+          setIsReelsOpen(false);
+          setDeepLinkReelId(null);
+        }}
+        categories={categories}
+        userLocation={userLocation}
+        onViewOnMap={(businessId) => {
+          setIsReelsOpen(false);
+          handleSelectBusiness(businessId);
+        }}
+        initialReelId={deepLinkReelId}
+      />
+
+      {/* Deep-link URL param handler */}
+      <Suspense fallback={null}>
+        <ReelDeepLinkHandler
+          onOpenReelId={(reelId) => {
+            setDeepLinkReelId(reelId);
+            setIsReelsOpen(true);
+          }}
+        />
+      </Suspense>
 
       {/* Location Permission Modal */}
       <LocationPermissionModal 
