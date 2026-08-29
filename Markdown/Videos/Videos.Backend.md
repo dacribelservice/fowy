@@ -89,16 +89,18 @@ BEGIN
       b.logo_url AS business_logo_url,
       b.category_id AS business_category_id,
       ST_Distance(
-        b.geo_location, 
+        ST_SetSRID(ST_MakePoint(b.longitude, b.latitude), 4326)::geography, 
         ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326)::geography
       ) AS distance_meters
     FROM business_reels r
     INNER JOIN businesses b ON r.business_id = b.id
     WHERE r.is_active = true 
-      AND b.status = 'active'
+      AND b.status = true
+      AND b.latitude IS NOT NULL 
+      AND b.longitude IS NOT NULL
       AND (filter_category_id IS NULL OR b.category_id = filter_category_id)
     ORDER BY 
-      b.geo_location <-> ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326)::geometry,
+      ST_SetSRID(ST_MakePoint(b.longitude, b.latitude), 4326) <-> ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326),
       r.created_at DESC
     LIMIT page_limit
     OFFSET page_offset;
@@ -123,7 +125,7 @@ BEGIN
     FROM business_reels r
     INNER JOIN businesses b ON r.business_id = b.id
     WHERE r.is_active = true 
-      AND b.status = 'active'
+      AND b.status = true
       AND (filter_category_id IS NULL OR b.category_id = filter_category_id)
     ORDER BY 
       r.views_count DESC,
@@ -137,7 +139,7 @@ $$;
 
 ---
 
-## 🛡️ 3. Políticas de Seguridad RLS (Row Level Security)
+## 🛡️ 3. Políticas de Seguridad RLS (Row Level Security) y Funciones RPC
 
 ```sql
 ALTER TABLE business_reels ENABLE ROW LEVEL SECURITY;
@@ -161,8 +163,10 @@ USING (
 );
 ```
 
-### Función Atómica para la Métrica de Oro:
+### Funciones Atómicas RPC & Permisos de Ejecución:
+
 ```sql
+-- 1. Métrica de Oro: Clics al Menú desde el Video
 CREATE OR REPLACE FUNCTION increment_reel_menu_click(target_reel_id UUID)
 RETURNS VOID
 LANGUAGE plpgsql
@@ -174,6 +178,24 @@ BEGIN
   WHERE id = target_reel_id;
 END;
 $$;
+
+-- 2. Métrica de Vistas: Registro Atómico de Visualización al Reproducir
+CREATE OR REPLACE FUNCTION increment_reel_view(target_reel_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  UPDATE business_reels 
+  SET views_count = views_count + 1 
+  WHERE id = target_reel_id;
+END;
+$$;
+
+-- 3. Permisos de Ejecución Pública (PostgREST / Supabase Client API)
+GRANT EXECUTE ON FUNCTION get_reels_feed(DOUBLE PRECISION, DOUBLE PRECISION, UUID, INTEGER, INTEGER) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION increment_reel_menu_click(UUID) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION increment_reel_view(UUID) TO anon, authenticated, service_role;
 ```
 
 ---
@@ -181,6 +203,7 @@ $$;
 ## 📦 4. Almacenamiento de Miniaturas (Supabase Storage)
 
 * **Bucket:** `reels-thumbnails` (Acceso público para lectura).
+* **Extensión de Tipos:** Se agrega `'reels-thumbnails'` al tipo `BucketName` en [`src/services/storageService.ts`](file:///c:/Users/cange/Documents/fowy/src/services/storageService.ts).
 * **Política de Subida:** Restringida al rol `super_admin`.
 * **Formato Estricto:** Imágenes WebP comprimidas (< 35 KB por miniatura, relación 9:16).
 * **Limpieza Automática:** Al editar una miniatura o eliminar un reel, se invoca `storageService.deleteFileByUrl` para no dejar imágenes huérfanas en el bucket.
@@ -256,6 +279,27 @@ export function getInstagramEmbedUrl(rawOrCleanUrl: string): string {
   if (!shortcode) return "";
   return `https://www.instagram.com/reel/${shortcode}/embed/`;
 }
+```
+
+### 5.3. Mapeo Explícito de Tipos RPC (`snake_case` DB ➔ `camelCase` TS)
+Dado que el procedimiento PostgreSQL retorna identificadores en `snake_case`, el hook [`src/hooks/useReelsFeed.ts`](file:///c:/Users/cange/Documents/fowy/src/hooks/useReelsFeed.ts) mapea explícitamente cada registro al contrato `ReelFeedItem`:
+
+```typescript
+const mappedItems: ReelFeedItem[] = (rawRpcData || []).map((raw: any) => ({
+  reelId: raw.reel_id,
+  title: raw.title,
+  instagramUrl: raw.instagram_url,
+  thumbnailUrl: raw.thumbnail_url,
+  viewsCount: raw.views_count || 0,
+  clicksToMenuCount: raw.clicks_to_menu_count || 0,
+  createdAt: raw.created_at,
+  businessId: raw.business_id,
+  businessName: raw.business_name,
+  businessSlug: raw.business_slug,
+  businessLogoUrl: raw.business_logo_url,
+  businessCategoryId: raw.business_category_id,
+  distanceMeters: raw.distance_meters !== null ? Number(raw.distance_meters) : null
+}));
 ```
 
 ---

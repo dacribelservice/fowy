@@ -29,14 +29,14 @@
 ```
 
 * **Puerta 1 (Menú Directo - 0 Distracciones):** El cliente que entra por WhatsApp busca inmediatez. Entra a `/[slug]`, navega el menú y compra en 4 clics. **No ve videos ni mapas**.
-* **Puerta 2 (Descubrimiento Visual):** El cliente entra al mapa (`/explorar/mapa`), toca el botón flotante de videos, abre el feed de experiencias, ve los platos reales por cercanía, se le despierta el antojo y desde el video salta con un clic a la Puerta 1 (`/[slug]`).
+* **Puerta 2 (Descubrimiento Visual):** El cliente entra al explorador (`/explorar`), toca el botón flotante de videos, abre el feed de experiencias, ve los platos reales por cercanía, se le despierta el antojo y desde el video salta con un clic a la Puerta 1 (`/[slug]`).
 
 ---
 
 ## 📱 2. Wireframe y Flujo del Explorador Móvil (`(explorer)`)
 
-### 1. Botón Flotante en el Mapa (`ReelsFeedButton.tsx`)
-* **Ubicación:** Lateral derecho inferior de [`/explorar/mapa`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/mapa/page.tsx), ubicado a 16px arriba del botón de geolocalización.
+### 1. Botón Flotante en el Explorador (`ReelsFeedButton.tsx`)
+* **Ubicación:** Lateral derecho inferior de [`/explorar`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/page.tsx) (pantalla principal interactiva con mapa y categorías, ubicado a 16px arriba de los controles de navegación) y accesible también en [`/explorar/mapa`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/mapa/page.tsx).
 * **Diseño:** Círculo blanco/glassmorphism (48x48px) con borde naranja sutil y el icono de **Claqueta / Play de Video** (`Film` o `Clapperboard` de Lucide).
 * **Animación:** Pulso sutil (*ping*) en el perímetro si hay videos nuevos de negocios a menos de 1 km.
 
@@ -79,7 +79,7 @@
 * **Interacción:** Al tocar un negocio, se resalta su anillo en naranja intenso y filtra la cuadrícula para mostrar exclusivamente los videos de ese restaurante.
 
 #### Nivel 2: Tira de Categorías (Reutilización de [`ExplorerCategoryBar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/ExplorerCategoryBar.tsx))
-* **Reutilización de Componente:** Se importa y consume directamente el componente existente [`src/components/explorer/ExplorerCategoryBar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/ExplorerCategoryBar.tsx) (72 líneas, 0 código duplicado).
+* **Reutilización de Componente:** Se importa y consume directamente el componente existente [`src/components/explorer/ExplorerCategoryBar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/ExplorerCategoryBar.tsx) (72 líneas, 0 código duplicado). Se le añade el prop opcional `hideHandle?: boolean` para ocultar el tirador gris superior de arrastre cuando se monte dentro del modal.
 * **Reutilización de Datos (0 ms / 0 peticiones SQL):** Recibe vía prop `categories={categories}` el arreglo que ya fue descargado por [`useExplorerManager.ts`](file:///c:/Users/cange/Documents/fowy/src/hooks/useExplorerManager.ts#L93-L102), evitando cualquier consulta de red redundante.
 * **Primera Burbuja:** **`[ 🍽️ Todo ]`** (resetea el filtro de categoría a `null`).
 * **Chips Circulares:** Muestra los iconos oficiales de *Arepas, Asados, Comida Mexicana, Chuzos, Hamburguesas, etc.*
@@ -103,6 +103,8 @@
 
 ### 3. Reproductor Inmersivo Full-Screen (`ReelPlayerModal.tsx`)
 * **Apertura:** Al tocar cualquier miniatura del grid 9:16.
+* **Registro Atómico de Vista:** Al abrirse el modal, dispara en segundo plano de forma no bloqueante:
+  `supabase.rpc('increment_reel_view', { target_reel_id: reel.reelId })`.
 * **Estrategia "Zero Pantalla Negra" (Skeleton Blur):** Mientras el iframe de Instagram carga en conexiones 4G lentas, la pantalla muestra de inmediato la miniatura WebP en alta definición con filtro `blur-sm` y un spinner fino de FOWY (0 ms de espera visual).
 * **Blindaje Móvil (iOS Safari & Android Chrome):**
   * Configuración del `iframe` con sandboxing y permisos multimedia explícitos:
@@ -124,9 +126,18 @@
       * Dispara la llamada asíncrona no bloqueante:
         `supabase.rpc('increment_reel_menu_click', { target_reel_id: reel.reelId })`.
       * Ejecuta la navegación instantánea en cliente con Next.js: `router.push('/' + reel.businessSlug)`.
-    * **Botón Secundario (Gris/Translúcido) `[ 📍 Ver en Mapa ]`:**
+    * **Botón de Ubicación (Gris/Translúcido) `[ 📍 Ver en Mapa ]`:**
       * Cierra el modal `ReelsFeedModal.tsx`.
       * Invoca el callback `onSelectBusiness(reel.businessId)` que conecta con [`ExplorerMap.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/ExplorerMap.tsx), ejecutando `map.flyTo([lat, lng], 16)` y abriendo automáticamente [`BusinessDetailSheet.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/BusinessDetailSheet.tsx).
+    * **Botón de Compartir (Viral) `[ ↗️ Compartir ]` (con ícono `Share2`):**
+      * Genera el Deep-Link único del video: `${window.location.origin}/explorar?reel=${reel.reelId}`.
+      * Invoca `navigator.share` en móviles con el texto:
+        `"¡Mira este plato de ${reel.businessName} en FOWY! 🤤🔥 Míralo aquí: ${url}"`.
+      * Fallback en desktop: Copia al portapapeles y notifica vía `SuccessToast("¡Enlace del video copiado!")`.
+
+* **Manejo de Deep-Linking Automático (`?reel=ID` con `<Suspense>` en Next.js 15):**
+  * En Next.js 15 App Router, la lectura de `useSearchParams().get('reel')` se encapsula dentro de un subcomponente aislado envuelto en `<Suspense fallback={null}>` para garantizar la compatibilidad con el renderizado del framework.
+  * Al ingresar a la ruta con el parámetro `?reel=...`, se abre automáticamente `ReelPlayerModal.tsx` en pantalla completa con ese video específico (0 clics para el receptor). Al cerrar, el usuario queda en el explorador interactivo.
 
 ---
 
@@ -148,7 +159,7 @@
   5. **Acciones:**
      * Botón de **Preview** (`Eye`): Abre el modal `ReelPlayerModal` para validar el video en vivo.
      * Botón de **Editar** (`Edit2`): Abre el modal `ReelFormModal` precargando los datos del reel.
-     * Botón de **Eliminar** (`Trash2`): Abre el modal de confirmación reutilizable [`src/components/admin/shared/DeleteConfirmModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/DeleteConfirmModal.tsx), borra el registro en DB, elimina la imagen en Storage y notifica con [`src/components/admin/shared/SuccessToast.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/SuccessToast.tsx).
+     * Botón de **Eliminar** (`Trash2`): Abre el modal de confirmación reutilizable [`src/components/admin/shared/DeleteConfirmModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/DeleteConfirmModal.tsx), borra el registro en DB, elimina la imagen en Storage (`storageService.deleteFileByUrl`) y notifica con [`src/components/admin/shared/SuccessToast.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/SuccessToast.tsx).
 * **Paginación:** Reutiliza el componente [`src/components/admin/shared/Pagination.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Pagination.tsx) para listados extensos.
 
 ---
@@ -158,7 +169,7 @@
 * **Patrón de Arquitectura:** Sigue el diseño probado de [`CategoryFormModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/catalogo/CategoryFormModal.tsx), recibiendo `isOpen: boolean`, `reelToEdit: BusinessReel | null`, `onClose: () => void` y `onSuccess: () => void`.
 
 #### Modo Creación:
-1. **Paso 1 (Seleccionar Negocio):** Reutiliza el componente compartido [`src/components/admin/shared/Autocomplete.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Autocomplete.tsx) alimentado por `supabase.from('businesses').select('id, name, logo_url, slug')`.
+1. **Paso 1 (Seleccionar Negocio):** Reutiliza el componente compartido [`src/components/admin/shared/Autocomplete.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Autocomplete.tsx). Como `Autocomplete` opera con strings (nombre del negocio), el hook `useReelFormLogic.ts` mantiene el listado en memoria y resuelve el `business_id` buscando la coincidencia: `businesses.find(b => b.name === selectedName)?.id`.
 2. **Paso 2 (Enlace de Instagram con Sanitización en Vivo):** 
    * Input de texto para pegar la URL.
    * Limpieza automática de parámetros de rastreo mediante `extractInstagramShortcode` y `sanitizeInstagramUrl` (definidos en [`src/utils/instagram.ts`](file:///c:/Users/cange/Documents/fowy/Markdown/Videos/Videos.Backend.md#L220)).
@@ -225,22 +236,22 @@ Se renderiza una tarjeta adicional con el icono `Clapperboard` de Lucide:
 | :--- | :--- | :---: |
 | **`src/types/reels.ts`** | Contrato estricto de interfaces (`BusinessReel`, `ReelFeedItem`). | ~40 L |
 | **`src/utils/instagram.ts`** | Regex, extractor de shortcode y sanitizador de URLs de Instagram. | ~45 L |
-| **`src/hooks/useReelsFeed.ts`** | Hook del explorador móvil (consume RPC `get_reels_feed` con SWR). | ~85 L |
+| **`src/hooks/useReelsFeed.ts`** | Hook del explorador móvil (consume RPC `get_reels_feed` con SWR y mapeo camelCase). | ~85 L |
 | **`src/hooks/useReelsManager.ts`** | Hook de administración (CRUD de reels, optimismo y storage cleanup). | ~120 L |
-| **`src/components/explorer/reels/ReelsFeedButton.tsx`** | Botón flotante [🎬] sobre el mapa en `mapa/page.tsx`. | ~50 L |
+| **`src/components/explorer/reels/ReelsFeedButton.tsx`** | Botón flotante [🎬] sobre el explorador en `explorar/page.tsx`. | ~50 L |
 | **`src/components/explorer/reels/ReelsFeedModal.tsx`** | Cascarón del modal orquestador con animación slide-up. | ~80 L |
 | **`src/components/explorer/reels/ReelsProximityBar.tsx`** | Carrusel horizontal de negocios con botón "🌟 Todos". | ~75 L |
 | **`src/components/explorer/reels/ReelsSearchBar.tsx`** | Barra compacta de búsqueda predictiva con reseteo rápido. | ~45 L |
 | **`src/components/explorer/reels/ReelsGrid.tsx`** | Contenedor de cuadrícula 3 columnas con scroll infinito y empty state. | ~70 L |
 | **`src/components/explorer/reels/ReelCard.tsx`** | Tarjeta individual de video 9:16 con miniatura WebP y overlay de vistas. | ~60 L |
-| **`src/components/explorer/reels/ReelPlayerModal.tsx`** | Cascarón del reproductor inmersivo, iframe sandbox y skeleton blur. | ~95 L |
+| **`src/components/explorer/reels/ReelPlayerModal.tsx`** | Cascarón del reproductor inmersivo, iframe sandbox, skeleton blur e incremento de vista. | ~95 L |
 | **`src/components/explorer/reels/ReelActionCard.tsx`** | Tarjeta flotante inferior (*Glassmorphism*) con botón `[ 🛒 Ver Menú ]`. | ~65 L |
 | **`src/app/admin/reels/page.tsx`** | Página contenedora de la ruta administrativa de Reels. | ~50 L |
 | **`src/components/admin/reels/ReelsAdminTable.tsx`** | Tabla de gestión con buscador, switches, previews y acciones. | ~130 L |
 | **`src/components/admin/reels/ReelFormModal.tsx`** | Cascarón del modal crear/editar, header, footer y botones. | ~75 L |
 | **`src/components/admin/reels/ReelFormFields.tsx`** | Inputs de texto, selector Autocomplete y validación de URL. | ~85 L |
 | **`src/components/admin/reels/ReelThumbnailUploader.tsx`** | Zona drag & drop de portada, compresión WebP y preview. | ~70 L |
-| **`src/components/admin/reels/useReelFormLogic.ts`** | Hook de estado, validación Zod y llamadas de guardado a Supabase. | ~80 L |
+| **`src/components/admin/reels/useReelFormLogic.ts`** | Hook de estado, mapeo de nombres de Autocomplete a UUID y guardado. | ~80 L |
 
 ---
 *Documento consolidado, 100% atómico y blindado contra sobrecrecimiento de líneas.*
