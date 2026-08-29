@@ -79,6 +79,10 @@
 - [x] **8.3. Estilo Ethereal High-Tech de Burbujas**: Crear la función `createCustomClusterIcon` en `ExplorerMap.tsx` para generar círculos con los gradientes oficiales de Fowy (`#FF5A5F` / `#FF9A3D`) y la cifra numérica de negocios en tipografía destacada.
 - [x] **8.4. Preservación de Popups e Interacciones**: Validar que al tocar una burbuja agrupada la cámara realice un acercamiento (*zoom*) automático y que al presionar un punto individual se abra correctamente el Popup existente con las opciones de "Navegar" y "Menú". Configurar `disableClusteringAtZoom={16}` y `maxClusterRadius={35}` para asegurar la separación completa e independiente de los marcadores al hacer zoom de calle.
 
+### Fase 9: Conexión Autenticada de CARTO con API Key & Estética Positron Oficial
 
-
-
+- [x] ~~**9.1. Reemplazo por OpenStreetMap Estándar**~~: *(DESCARTADO POR SATURACIÓN)*: Se probó la capa estándar de OpenStreetMap, pero se descarta debido al exceso de ruido visual (cruces oscuras de farmacias, siluetas de edificios y sombreados topográficos) que no lucen limpios ni elegantes al acercar el mapa en dispositivos móviles.
+- [x] ~~**9.2. Filtro Grayscale sobre OpenStreetMap**~~: *(DESCARTADO)*: El filtro en blanco y negro acentúa el contraste de los iconos negros de OpenStreetMap, generando saturación y perdiendo la estética minimalista original de FOWY.
+- [x] ~~**9.3. Implementación de Esri Light Gray Canvas**~~: *(DESCARTADO POR FALTA DE ETIQUETAS Y ZOOM LIMITADO)*: Se probó la capa base de Esri, pero se descarta porque no incluye los nombres de las calles en la misma capa y al hacer zoom profundo en el mapa de Cali no dispone de mosaicos detallados, arrojando el mensaje de error *"Map data not yet available"*.
+- [x] **9.4. Configuración de Variable de Entorno en `.env.local`**: Añadir la clave `NEXT_PUBLIC_CARTO_API_KEY` en el archivo de entorno `.env.local` con la clave oficial de Basemaps (`cb1_2igi_1_950cd0c9d7eb9c5ff77bdd97`) para una gestión centralizada y segura.
+- [x] **9.5. Integración del Token Autenticado en `ExplorerMap.tsx`**: Restablecer el proveedor oficial **CARTO Positron Light** en el `<TileLayer />` de `src/components/explorer/ExplorerMap.tsx` pasando el parámetro de autenticación: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY || ''}`, eliminando de raíz la marca de agua *"API KEY REQUIRED"* y garantizando nombres de calles nítidos y zoom profundo sin errores.

@@ -113,8 +113,8 @@ export default function ExplorerMap({ businesses, center, centerTrigger, onSelec
         zoomControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url={`https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png${process.env.NEXT_PUBLIC_CARTO_API_KEY ? `?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}` : ''}`}
         />
 
         {setMapBounds && <BoundsTracker onBoundsChange={setMapBounds} />}

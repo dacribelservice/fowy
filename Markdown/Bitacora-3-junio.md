@@ -80,3 +80,15 @@
   - **Manejo Realtime en RAM (Paso 2.1 - 2.4)**: En `src/hooks/useExplorerManager.ts`, se declaró `selectedBusinessRef` para evitar *stale closures* y se reemplazó el callback de Realtime para actualizar eventos `UPDATE`, `INSERT` y `DELETE` directamente en el estado local de React. Se incorporó el helper `enrichBusiness` para mantener las categorías vivas desde `categoriesRef.current`.
   - **Proyección y Selección Estricta (Paso 2.5 - 2.6)**: Se reemplazó `select('*')` por la lista exacta de columnas necesarias (`id, name, slug, city, logo_url, latitude, longitude, rating, category_id, status, color_identity, schedules, tags, created_at, categories(name)`), reduciendo el peso por recarga de ~2.5 MB a ~120 KB.
   - **Verificación y Calidad**: Se ejecutó la prueba de compilación de producción `npm run build` confirmando 0 errores de TypeScript y empaquetado exitoso de las 32 rutas de la aplicación.
+
+### 📌 Hito: Restauración y Autenticación de CARTO Basemaps Positron (Fase 9 — Erradicación de Marca de Agua)
+- **Fecha**: 29 de Agosto de 2026
+- **Resumen**: Solución definitiva a la marca de agua *"API KEY REQUIRED"* en el mapa del explorador (`/explorar`). Se evaluaron alternativas de mapas públicos, se descartaron por saturación y falta de cobertura urbana profunda en Cali, y se conectó la clave oficial autenticada de CARTO Basemaps con soporte para 5,000,000 de solicitudes mensuales gratuitas.
+- **Detalles Técnicos**:
+  - **Diagnóstico de la Marca de Agua**: CARTO deprecó el acceso anónimo abierto a sus mosaicos raster en `basemaps.cartocdn.com/light_all/`, requiriendo un parámetro de autenticación en la URL de Leaflet para servir los mosaicos limpios.
+  - **Auditoría y Descarte de Alternativas**:
+    - *OpenStreetMap Estándar*: Descartado debido a saturación y exceso de ruido visual (cruces oscuras de farmacias, siluetas de edificios y sombreados topográficos) que, al aplicarles filtros monocromáticos, competían con los pines de FOWY.
+    - *Esri Light Gray Canvas*: Descartado debido a la ausencia de nombres de calles integradas en la misma capa y a la falta de cobertura en niveles de zoom urbano profundo (zoom 17/18 en Cali), mostrando el error *"Map data not yet available"*.
+  - **Configuración de Credenciales Seguras**: Se registró la clave oficial de mosaicos de CARTO (`cb1_2igi_1_950cd0c9d7eb9c5ff77bdd97`) bajo la variable de entorno `NEXT_PUBLIC_CARTO_API_KEY` en `.env.local`.
+  - **Integración en Leaflet (`ExplorerMap.tsx`)**: Se actualizó el componente `<TileLayer />` en `src/components/explorer/ExplorerMap.tsx` inyectando el parámetro `?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}` en la URL de `CARTO Positron Light`.
+  - **Resultado**: Erradicación total de la marca de agua, preservación del lienzo gris/blanco minimalista característico de FOWY, máxima legibilidad en nombres de vías a cualquier nivel de zoom y retención del 100% de la lógica de clusters, pines naranjas y hojas de detalle.
