@@ -36,14 +36,16 @@
 ## 📱 2. Wireframe y Flujo del Explorador Móvil (`(explorer)`)
 
 ### 1. Botón Flotante en el Explorador (`ReelsFeedButton.tsx`)
-* **Ubicación:** Lateral derecho inferior de [`/explorar`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/page.tsx) (pantalla principal interactiva con mapa y categorías, ubicado a 16px arriba de los controles de navegación) y accesible también en [`/explorar/mapa`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/mapa/page.tsx).
-* **Diseño:** Círculo blanco/glassmorphism (48x48px) con borde naranja sutil y el icono de **Claqueta / Play de Video** (`Film` o `Clapperboard` de Lucide).
+* **Ubicación & Integración Limpia:** Se integra directamente en el contenedor vertical de botones flotantes existente en [`src/app/(explorer)/explorar/page.tsx:L128`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/page.tsx#L128) (`className="absolute right-4 bottom-[180px] z-[25] flex flex-col gap-3"`), situándose estratégicamente justo arriba del botón de centrado GPS (`handleCenterUser`).
+* **Diseño:** Círculo blanco/glassmorphism (56x56px) con borde naranja sutil, sombra premium y el icono de **Claqueta / Play de Video** (`Clapperboard` de Lucide).
 * **Animación:** Pulso sutil (*ping*) en el perímetro si hay videos nuevos de negocios a menos de 1 km.
+* **Ergonomía:** 100% accesible con una sola mano en cualquier teléfono móvil (incluyendo pantallas compactas como iPhone SE) sin tapar la barra de categorías ni los controles del mapa.
 
 ---
 
 ### 2. Modal Principal del Feed (`ReelsFeedModal.tsx`)
 * **Apertura:** Animación suave *Slide-Up* (de abajo hacia arriba) ocupando la pantalla móvil (Mobile-First Shell).
+* **Capa Visual Blindada (`z-index`):** Configurado con `z-[1001]` para garantizar que quede 100% por encima de los mosaicos, marcadores y controles de Leaflet (que operan entre `z-[400]` y `z-[1000]`), así como de las hojas de detalle (`z-30`/`z-40`).
 * **Jerarquía Visual Vertical de 4 Niveles:**
 
 ```text
@@ -83,7 +85,7 @@
 * **Reutilización de Datos (0 ms / 0 peticiones SQL):** Recibe vía prop `categories={categories}` el arreglo que ya fue descargado por [`useExplorerManager.ts`](file:///c:/Users/cange/Documents/fowy/src/hooks/useExplorerManager.ts#L93-L102), evitando cualquier consulta de red redundante.
 * **Primera Burbuja:** **`[ 🍽️ Todo ]`** (resetea el filtro de categoría a `null`).
 * **Chips Circulares:** Muestra los iconos oficiales de *Arepas, Asados, Comida Mexicana, Chuzos, Hamburguesas, etc.*
-* **Interacción:** Al tocar una categoría, filtra la cuadrícula en memoria RAM (`useMemo`) comparando `reel.businessCategoryId === selectedCategoryId`.
+* **Filtrado Híbrido:** Al tocar una categoría, filtra la cuadrícula instantáneamente en memoria RAM a 60 FPS (`useMemo`) comparando `reel.businessCategoryId === selectedCategoryId`. Si se activa la paginación profunda o búsqueda aislada, `useReelsFeed` pasa el `filter_category_id` al RPC en PostgreSQL.
 
 #### Nivel 3: Buscador de Antojos (`ReelsSearchBar.tsx`)
 * Barra de búsqueda delgada y ergonómica (40px de altura) con icono `Search`.
@@ -102,9 +104,18 @@
 ---
 
 ### 3. Reproductor Inmersivo Full-Screen (`ReelPlayerModal.tsx`)
-* **Apertura:** Al tocar cualquier miniatura del grid 9:16.
-* **Registro Atómico de Vista:** Al abrirse el modal, dispara en segundo plano de forma no bloqueante:
-  `supabase.rpc('increment_reel_view', { target_reel_id: reel.reelId })`.
+* **Apertura & Capa Visual:** Al tocar cualquier miniatura del grid 9:16, se abre en pantalla completa con capa `z-[1050]`.
+* **Registro Atómico de Vista Protegido (Pestillo `useRef`):** Al abrirse el modal, dispara en segundo plano de forma no bloqueante:
+  ```typescript
+  // Ejecución única por apertura con protección contra re-renders:
+  const hasIncrementedViewRef = useRef(false);
+  useEffect(() => {
+    if (!hasIncrementedViewRef.current && reel?.reelId) {
+      hasIncrementedViewRef.current = true;
+      void supabase.rpc('increment_reel_view', { target_reel_id: reel.reelId });
+    }
+  }, [reel?.reelId]);
+  ```
 * **Estrategia "Zero Pantalla Negra" (Skeleton Blur):** Mientras el iframe de Instagram carga en conexiones 4G lentas, la pantalla muestra de inmediato la miniatura WebP en alta definición con filtro `blur-sm` y un spinner fino de FOWY (0 ms de espera visual).
 * **Blindaje Móvil (iOS Safari & Android Chrome):**
   * Configuración del `iframe` con sandboxing y permisos multimedia explícitos:
@@ -118,6 +129,7 @@
     />
     ```
   * **Audio Móvil:** Respeta la política *User Gesture Required* de WebKit y Chrome Móvil. El usuario activa el sonido con 1 toque en el control nativo del reproductor de Instagram sin interrumpir el flujo.
+  * **Resiliencia de Contenido:** Si una publicación de Instagram es eliminada o marcada como privada, la tarjeta flotante inferior de FOWY permanece 100% activa permitiendo la conversión inmediata al menú del negocio.
 * **Tarjeta Flotante Inferior (*Glassmorphism*):**
   * Contenedor translúcido fijado en la parte inferior del video (`bg-black/60 backdrop-blur-md z-30`).
   * **Fila 1:** Logo redondo del negocio + Nombre en negrita + Distancia calculada o ciudad (ej. *"El Rincón Paisa • a 650m de ti"*).
@@ -143,61 +155,133 @@
 
 ## 🖥️ 3. Wireframe y Flujo del Panel Administrador (`admin`)
 
-### 1. Navegación en el Sidebar
-* Nuevo ítem en el menú lateral [`Sidebar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx): **"🎬 Fowy Reels"** (`/admin/reels`), agregando `{ name: "Fowy Reels", href: "/admin/reels", icon: Clapperboard }` al arreglo `menuItems`.
+### 1. Navegación en el Sidebar & Acceso Cruzado
+* **Menú Lateral ([`Sidebar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx)):** Nuevo ítem **"🎬 Fowy Reels"** (`/admin/reels`), agregando `{ name: "Fowy Reels", href: "/admin/reels", icon: Clapperboard }` al arreglo `menuItems`.
+* **Acceso Cruzado en Negocios ([`negocios/page.tsx`](file:///c:/Users/cange/Documents/fowy/src/app/admin/negocios/page.tsx)):** En la tabla general de negocios (columna *Acciones*), además del icono de catálogo y configuración, se añade el botón con icono de claqueta `[ 🎬 ]` para saltar directamente a la galería de videos de ese restaurante (`/admin/reels/[businessId]`).
 
 ---
 
-### 2. Tabla Principal de Gestión (`ReelsAdminTable.tsx`)
-* **Ubicación:** `src/components/admin/reels/ReelsAdminTable.tsx` consumido por la página `src/app/admin/reels/page.tsx`.
-* **Barra Superior:** Buscador por nombre de restaurante + Filtro por estado (Todos / Activos / Pausados) + Botón **`[ + Nuevo Reel ]`**.
-* **Columnas de la Tabla:**
-  1. **Portada:** Preview vertical 9:16 pequeña (40x60px) con [`PremiumImage.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/PremiumImage.tsx).
-  2. **Negocio & Título:** Logo del negocio + Nombre + Título del video.
-  3. **Métricas en Vivo:** Badge de Vistas (`views_count`) y Badge de Clics al Menú (`clicks_to_menu_count`).
-  4. **Interruptor Rápido (Switch):** Switch interactivo para activar/pausar el video en 1 solo clic (`onToggleActive`).
-  5. **Acciones:**
-     * Botón de **Preview** (`Eye`): Abre el modal `ReelPlayerModal` para validar el video en vivo.
-     * Botón de **Editar** (`Edit2`): Abre el modal `ReelFormModal` precargando los datos del reel.
-     * Botón de **Eliminar** (`Trash2`): Abre el modal de confirmación reutilizable [`src/components/admin/shared/DeleteConfirmModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/DeleteConfirmModal.tsx), borra el registro en DB, elimina la imagen en Storage (`storageService.deleteFileByUrl`) y notifica con [`src/components/admin/shared/SuccessToast.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/SuccessToast.tsx).
-* **Paginación:** Reutiliza el componente [`src/components/admin/shared/Pagination.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Pagination.tsx) para listados extensos.
+### 2. Central Principal de Fowy Reels (`/admin/reels`)
+### 2. Central Principal de Fowy Reels (`/admin/reels`)
+* **Página Contenedora:** `src/app/admin/reels/page.tsx`.
+* **Jerarquía de la Pantalla en 3 Bloques:**
+
+#### Bloque A: Cabecera de KPIs Globales (`ReelsGlobalKPIs.tsx`)
+Cuatro tarjetas resumen con estilo de cristal (*glassmorphism*) y acentos de color FOWY, acompañadas de un ranking rápido:
+
+```text
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│ 🎬 Videos Activos│  │ 👁️ Vistas Totales│  │ 🛒 Clics al Menú │  │ 📈 Tasa Conversión│
+│ 48               │  │ 128,450          │  │ 14,230           │  │ 11.1%            │
+│ En 33 negocios   │  │ Global plataforma│  │ Enviados a pedir │  │ Vistas vs Clics  │
+└──────────────────┘  └──────────────────┘  └──────────────────┘  └──────────────────┘
+```
+
+#### Bloque B: Gráfica Global Reutilizada (`ReelsTrafficChart.tsx` heredando [`BusinessTrafficSvg.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessTrafficSvg.tsx))
+Se reutiliza directamente el motor gráfico vectorial SVG de FOWY para visualizar el comportamiento acumulado de toda la red:
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  🔴 Curva Naranja: Reproducciones Globales de Video                                    │
+│  🟢 Barras Verdes: Clics Globales en "Ver Menú & Pedir"                                │
+│                                                              [ DÍA ]  [ SEMANA ] [ MES ]│
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│     850 ┬                                                                              │
+│         │     ╭──╮                                                                     │
+│     425 ┼────╯    ╰───────────╮                                                        │
+│         │     █               ╰───────╮          ╭──╮                                  │
+│       0 ┴─────█───────────────────────╰──█───────╯──╰──█──                             │
+│              Dom     Lun     Mar     Mié     Jue     Vie     Sáb                       │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  📅 Resumen del Período:         👁️ 154,200 Reproducciones     🛒 14,350 Clics Menú     │
+│  🏆 Top 5 Negocios con Más Reproducciones (Ranking con copa dorada)                    │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Bloque C: Tabla de Negocios para Reels (`ReelsBusinessesTable.tsx`)
+Lista completa de comercios afiliados con buscador predictivo y filtros rápidos:
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  [ 🔍 Buscar negocio por nombre o ID... ]               [ Todos los Planes ▾ ] [ Estado ▾ ]│
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  ESTABLECIMIENTO        UBICACIÓN        VIDEOS    VISTAS TOTALES   CLICS MENÚ  ACCIONES│
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  🍔 COMIDAS RÁPIDAS ALEJO Cali, Valle    3 videos  👁️ 4,250         🛒 890         [ 🎬 ]│
+│     ID: 2D10E5A0                                                                       │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  🍕 MERYS PIZZA 🍕       Cali, Valle    1 video   👁️ 1,820         🛒 310         [ 🎬 ]│
+│     ID: 97E246E5                                                                       │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  🥩 SANTO GRILL 🔥       Cali, Valle    0 videos  —                —             [ 🎬 ]│
+│     ID: 2995D43E                                                                       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+* **Columnas:**
+  1. **Establecimiento:** Logo circular, Nombre comercial e ID corto.
+  2. **Ubicación:** Ciudad y departamento.
+  3. **Videos:** Contador de reels activos registrados (`totalReels`).
+  4. **Vistas Totales:** Total acumulado de visualizaciones del negocio.
+  5. **Clics al Menú:** Total de compras iniciadas desde los videos del restaurante.
+  6. **Acciones (Único Botón):** Botón directo con ícono de claqueta `[ 🎬 ]` (*"Gestionar Reels"*) que abre la galería de videos exclusiva de ese restaurante (`/admin/reels/[businessId]`). La edición general del comercio se mantiene 100% en el módulo de "Negocios".
+* **Paginación:** Reutiliza [`src/components/admin/shared/Pagination.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Pagination.tsx).
 
 ---
 
-### 3. Modal Unificado de Creación y Edición (`ReelFormModal.tsx`)
+### 3. Pantalla de Gestión de Videos por Negocio (`/admin/reels/[businessId]`)
+* **Página Contenedora:** `src/app/admin/reels/[businessId]/page.tsx`.
+* **Estructura Visual Completa con Gráfica Individual:**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  ← VOLVER AL LISTADO DE REELS                                      [ + NUEVO REEL ]   │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  🍔 COMIDAS RÁPIDAS ALEJO                                                             │
+│  Plan Standard • Cali, Valle del Cauca • 3 videos activos                             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  MÉTRICAS DEL RESTAURANTE:                                                             │
+│  👁️ 4,250 Vistas Totales  •  🛒 890 Clics al Menú  •  📈 20.9% Tasa de Conversión      │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  GRÁFICA DE RENDIMIENTO DE REELS (REUTILIZADA PARA ESTE NEGOCIO):                      │
+│  🔴 Curva: Reproducciones del Negocio  |  🟢 Barras: Clics en "Ver Menú"              │
+│  [ DÍA ] [ SEMANA ] [ MES ]  •  Resumen: 👁️ 4,250 Vistas  🛒 890 Clics                │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  GALERÍA DE REELS:                                                                     │
+│                                                                                        │
+│  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐                   │
+│  │ ┌─────────────┐ │     │ ┌─────────────┐ │     │ ┌─────────────┐ │                   │
+│  │ │             │ │     │ │             │ │     │ │             │ │                   │
+│  │ │ Portada 9:16│ │     │ │ Portada 9:16│ │     │ │ Portada 9:16│ │                   │
+│  │ │             │ │     │ │             │ │     │ │             │ │                   │
+│  │ └─────────────┘ │     │ └─────────────┘ │     │ └─────────────┘ │                   │
+│  │ "Hamburguesa X" │     │ "Arepa Especial"│     │ "Chuzo Desgran" │                   │
+│  │ 👁️ 1.8k  🛒 420 │     │ 👁️ 1.4k  🛒 290 │     │ 👁️ 1.0k  🛒 180 │                   │
+│  │ Estado:  [ ON ] │     │ Estado:  [ ON ] │     │ Estado:  [ OFF] │                   │
+│  │ [👁️ Ver] [✏️ Edit]│     │ [👁️ Ver] [✏️ Edit]│     │ [👁️ Ver] [✏️ Edit]│                   │
+│  └─────────────────┘     └─────────────────┘     └─────────────────┘                   │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+* **Gráfica de Negocio Reutilizada (`ReelsTrafficChart businessId={businessId}`):**
+  * Renderiza la misma gráfica SVG alimentada por el hook `useReelsTrafficData({ businessId, filter })`.
+  * La **curva naranja** traza las reproducciones exclusivas de este restaurante y las **barras verdes** representan los clientes derivados al menú en cada día/semana/mes.
+* **Galería Interactiva 9:16 (`ReelsBusinessGallery.tsx` & `AdminReelCard.tsx`):**
+  * Cada tarjeta vertical presenta la portada WebP, título del plato, métricas en vivo (Vistas / Clics), interruptor Switch rápido ON/OFF y botones de acción (Ver `Eye`, Editar `Edit2`, Eliminar `Trash2`).
+* **Estado Vacío Amigable (*Empty State*):** Si el comercio no tiene videos registrados aún, se presenta un contenedor centrado con ilustración y el botón destacado **`[ 🚀 + Publicar Primer Reel ]`**.
+
+---
+
+### 4. Modal Unificado de Creación y Edición (`ReelFormModal.tsx`)
 * **Ubicación:** `src/components/admin/reels/ReelFormModal.tsx`.
-* **Patrón de Arquitectura:** Sigue el diseño probado de [`CategoryFormModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/catalogo/CategoryFormModal.tsx), recibiendo `isOpen: boolean`, `reelToEdit: BusinessReel | null`, `onClose: () => void` y `onSuccess: () => void`.
-
-#### Modo Creación:
-1. **Paso 1 (Seleccionar Negocio):** Reutiliza el componente compartido [`src/components/admin/shared/Autocomplete.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Autocomplete.tsx). Como `Autocomplete` opera con strings (nombre del negocio), el hook `useReelFormLogic.ts` mantiene el listado en memoria y resuelve el `business_id` buscando la coincidencia: `businesses.find(b => b.name === selectedName)?.id`.
-2. **Paso 2 (Enlace de Instagram con Sanitización en Vivo):** 
-   * Input de texto para pegar la URL.
-   * Limpieza automática de parámetros de rastreo mediante `extractInstagramShortcode` y `sanitizeInstagramUrl` (definidos en [`src/utils/instagram.ts`](file:///c:/Users/cange/Documents/fowy/Markdown/Videos/Videos.Backend.md#L220)).
-   * Validación reactiva en tiempo real: Muestra `✓ Enlace válido (Shortcode: C8xYz...)` o alerta de formato.
-3. **Paso 3 (Miniatura de Portada WebP):** 
-   * Área *Drag & Drop* para subir la imagen.
-   * Compresión y subida mediante [`src/services/storageService.ts`](file:///c:/Users/cange/Documents/fowy/src/services/storageService.ts#L15):
-     ```typescript
-     storageService.uploadFile(file, 'reels-thumbnails', {
-       shouldCompress: true,
-       maxWidth: 720,
-       quality: 0.8
-     });
-     ```
-4. **Paso 4 (Título & Publicación):** Input de texto breve + Botón **`[ 🚀 Publicar Reel ]`** con spinner animado `RefreshCw`.
-
-#### Modo Edición:
-1. **Pre-llenado de Datos:** Carga automática del negocio asociado, URL limpia del Reel, título y estado activo/inactivo. Las métricas (`views_count`, `clicks_to_menu_count`) son de solo lectura y se preservan.
-2. **Gestión Inteligente de Miniatura:**
-   * Muestra la miniatura actual como vista previa (`imagePreview = reelToEdit.thumbnail_url`).
-   * **Si NO se sube un nuevo archivo:** Conserva `thumbnail_url` original (0 llamadas a Storage).
-   * **Si se SUBE una nueva imagen:** Sube la nueva imagen comprimida y elimina la anterior con `storageService.deleteFileByUrl(oldUrl, 'reels-thumbnails')` para evitar basura en la nube.
-3. **Guardado & Feedback:** Actualización optimista en RAM, mutación `UPDATE` en PostgreSQL y notificación vía [`SuccessToast.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/SuccessToast.tsx).
+* **Inyección Inteligente de Negocio:** Al abrirse desde `/admin/reels/[businessId]`, el `business_id` se pre-asigna automáticamente sin requerir selección manual. Si se abre desde la central general, permite seleccionar mediante `Autocomplete.tsx` con desambiguación (`name + city`).
+* **Pasos del Formulario:**
+  1. **Enlace de Instagram:** Input con limpieza automática de parámetros de rastreo (`sanitizeInstagramUrl`).
+  2. **Portada WebP:** Subida drag & drop con compresión en cliente a través de `storageService.uploadFile` en el bucket `'reels-thumbnails'`.
+  3. **Título y Publicación:** Input de texto breve y guardado optimista.
 
 ---
 
-## 📊 4. Conexión con Métricas del Negocio (`BusinessMetricsList.tsx`)
-
+### 5. Conexión con Métricas del Negocio (`BusinessMetricsList.tsx`)
 En el componente existente [`src/components/admin/businesses/BusinessMetricsList.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessMetricsList.tsx) (y en el dashboard de socio [`/business`](file:///c:/Users/cange/Documents/fowy/src/app/(partners)/business/page.tsx)), se agrega la lectura de la **Métrica de Oro**:
 
 ```typescript
@@ -210,48 +294,43 @@ const { data: reelsData } = await supabase
 const totalReelMenuClicks = (reelsData || []).reduce((acc, r) => acc + (r.clicks_to_menu_count || 0), 0);
 ```
 
-Se renderiza una tarjeta adicional con el icono `Clapperboard` de Lucide:
-
-| Métrica | Icono | Descripción |
-| :--- | :---: | :--- |
-| **Visitas Totales** | `Eye` | Tráfico total a la página del menú. |
-| **Pedidos Recibidos** | `ShoppingBag` | Cantidad de pedidos cerrados por WhatsApp. |
-| **Tasa de Conversión** | `Percent` | Porcentaje de visitas que se convierten en pedido. |
-| **Ticket Promedio** | `Receipt` | Promedio en dinero por pedido. |
-| **Clics de Tráfico Cruzado** | `Share2` | Clientes derivados de otros comercios. |
-| **🔥 Clics desde Reels & Videos** | `Clapperboard` | **Personas enviadas directamente al menú desde los videos de FOWY.** |
-
 ---
 
-## 📁 5. Mapa de Nuevos Archivos, Desglose Atómico y Presupuesto de Líneas
+## 📁 6. Mapa de Nuevos Archivos, Desglose Atómico y Presupuesto de Líneas
 
 > 🛑 **REGLA DE TECHO DURO (PRESUPUESTO MÁXIMO 180 LÍNEAS / LÍMITE INQUEBRANTABLE 250L)**:
 > 1. **Cero Archivos Monolíticos:** Ningún archivo nuevo puede superar las 180 líneas. Todo componente complejo se descompone preventivamente en sub-archivos atómicos de responsabilidad única.
 > 2. **Separación de Lógica y Vista:** Si un formulario o vista maneja más de 3 estados o lógica asíncrona, es **OBLIGATORIO** aislar su lógica en un hook dedicado (`use...Logic.ts`) para mantener el componente visual puramente declarativo (< 80L).
-> 3. **Protocolo de Parada Inmediata:** Si durante la implementación un archivo alcanza las 180 líneas, se detiene la edición y se extrae la sección a un subcomponente antes de continuar.
 
 ### Desglose Anatómico de Archivos a Construir:
 
 | Archivo a Crear | Responsabilidad Única | Techo de Líneas |
 | :--- | :--- | :---: |
-| **`src/types/reels.ts`** | Contrato estricto de interfaces (`BusinessReel`, `ReelFeedItem`). | ~40 L |
+| **`src/types/reels.ts`** | Contratos de interfaces (`BusinessReel`, `ReelFeedItem`, `BusinessReelsSummary`, `AdminReelsGlobalStats`). | ~60 L |
 | **`src/utils/instagram.ts`** | Regex, extractor de shortcode y sanitizador de URLs de Instagram. | ~45 L |
 | **`src/hooks/useReelsFeed.ts`** | Hook del explorador móvil (consume RPC `get_reels_feed` con SWR y mapeo camelCase). | ~85 L |
 | **`src/hooks/useReelsManager.ts`** | Hook de administración (CRUD de reels, optimismo y storage cleanup). | ~120 L |
+| **`src/hooks/useAdminReelsSummary.ts`** | Hook para cargar métricas globales y listado de negocios con conteo de reels. | ~95 L |
 | **`src/components/explorer/reels/ReelsFeedButton.tsx`** | Botón flotante [🎬] sobre el explorador en `explorar/page.tsx`. | ~50 L |
-| **`src/components/explorer/reels/ReelsFeedModal.tsx`** | Cascarón del modal orquestador con animación slide-up. | ~80 L |
+| **`src/components/explorer/reels/ReelsFeedModal.tsx`** | Cascarón del modal orquestador con animación slide-up y capa `z-[1001]`. | ~80 L |
 | **`src/components/explorer/reels/ReelsProximityBar.tsx`** | Carrusel horizontal de negocios con botón "🌟 Todos". | ~75 L |
 | **`src/components/explorer/reels/ReelsSearchBar.tsx`** | Barra compacta de búsqueda predictiva con reseteo rápido. | ~45 L |
 | **`src/components/explorer/reels/ReelsGrid.tsx`** | Contenedor de cuadrícula 3 columnas con scroll infinito y empty state. | ~70 L |
 | **`src/components/explorer/reels/ReelCard.tsx`** | Tarjeta individual de video 9:16 con miniatura WebP y overlay de vistas. | ~60 L |
-| **`src/components/explorer/reels/ReelPlayerModal.tsx`** | Cascarón del reproductor inmersivo, iframe sandbox, skeleton blur e incremento de vista. | ~95 L |
+| **`src/components/explorer/reels/ReelPlayerModal.tsx`** | Reproductor inmersivo full-screen con capa `z-[1050]`, iframe sandbox y pestillo `hasIncrementedViewRef`. | ~95 L |
 | **`src/components/explorer/reels/ReelActionCard.tsx`** | Tarjeta flotante inferior (*Glassmorphism*) con botón `[ 🛒 Ver Menú ]`. | ~65 L |
-| **`src/app/admin/reels/page.tsx`** | Página contenedora de la ruta administrativa de Reels. | ~50 L |
-| **`src/components/admin/reels/ReelsAdminTable.tsx`** | Tabla de gestión con buscador, switches, previews y acciones. | ~130 L |
+| **`src/app/admin/reels/page.tsx`** | Página principal de la Central de Fowy Reels (KPIs + Tabla de Negocios). | ~60 L |
+| **`src/components/admin/reels/ReelsGlobalKPIs.tsx`** | Tarjetas de métricas globales (Videos, Vistas, Clics, Conversión, Top 5). | ~85 L |
+| **`src/components/admin/reels/ReelsTrafficChart.tsx`** | Gráfica de reproducciones y clics al menú heredando `BusinessTrafficSvg`. | ~90 L |
+| **`src/components/admin/reels/useReelsTrafficData.ts`** | Hook para calcular puntos temporales D/S/M globales o por negocio. | ~80 L |
+| **`src/components/admin/reels/ReelsBusinessesTable.tsx`** | Tabla de comercios con buscador, métricas agregadas y botón `[ 🎬 ]`. | ~110 L |
+| **`src/app/admin/reels/[businessId]/page.tsx`** | Página de gestión de videos por negocio específico. | ~70 L |
+| **`src/components/admin/reels/ReelsBusinessGallery.tsx`** | Galería de tarjetas 9:16 con switch ON/OFF y empty state amigable. | ~80 L |
+| **`src/components/admin/reels/AdminReelCard.tsx`** | Tarjeta visual 9:16 individual para administración de reel. | ~75 L |
 | **`src/components/admin/reels/ReelFormModal.tsx`** | Cascarón del modal crear/editar, header, footer y botones. | ~75 L |
-| **`src/components/admin/reels/ReelFormFields.tsx`** | Inputs de texto, selector Autocomplete y validación de URL. | ~85 L |
+| **`src/components/admin/reels/ReelFormFields.tsx`** | Inputs de texto, selector Autocomplete (opcional) y validación de URL. | ~85 L |
 | **`src/components/admin/reels/ReelThumbnailUploader.tsx`** | Zona drag & drop de portada, compresión WebP y preview. | ~70 L |
-| **`src/components/admin/reels/useReelFormLogic.ts`** | Hook de estado, mapeo de nombres de Autocomplete a UUID y guardado. | ~80 L |
+| **`src/components/admin/reels/useReelFormLogic.ts`** | Hook de estado, guardado y pre-asignación automática de `businessId`. | ~85 L |
 
 ---
-*Documento consolidado, 100% atómico y blindado contra sobrecrecimiento de líneas.*
+*Documento consolidado, 100% atómico, escalable y blindado contra sobrecrecimiento de líneas.*

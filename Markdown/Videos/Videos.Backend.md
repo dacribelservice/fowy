@@ -198,6 +198,9 @@ GRANT EXECUTE ON FUNCTION increment_reel_menu_click(UUID) TO anon, authenticated
 GRANT EXECUTE ON FUNCTION increment_reel_view(UUID) TO anon, authenticated, service_role;
 ```
 
+> 🔒 **Patrón de Ejecución Frontend para Vistas (`hasIncrementedViewRef`)**:
+> En el cliente React, la llamada a `increment_reel_view` se ejecuta en un `useEffect` con un pestillo booleano `useRef(false)` (`hasIncrementedViewRef`). Esto garantiza que la métrica se incremente exactamente **1 sola vez por apertura de video**, protegiendo la base de datos contra incrementos duplicados por re-renderizados internos del modal.
+
 ---
 
 ## 📦 4. Almacenamiento de Miniaturas (Supabase Storage)
@@ -241,6 +244,32 @@ export interface ReelFeedItem {
   businessLogoUrl: string | null;
   businessCategoryId: string | null; // Para filtrado reactivo cruzado en cliente
   distanceMeters: number | null; // null cuando se navega en modo fallback sin GPS
+}
+
+/** Resumen de métricas de Reels por negocio para la tabla de /admin/reels */
+export interface BusinessReelsSummary {
+  businessId: string;
+  businessName: string;
+  businessSlug: string;
+  businessLogoUrl: string | null;
+  businessCity: string | null;
+  status: boolean;
+  totalReels: number;
+  totalViews: number;
+  totalClicksToMenu: number;
+}
+
+/** Métricas globales consolidadas para la cabecera de /admin/reels */
+export interface AdminReelsGlobalStats {
+  totalActiveReels: number;
+  totalViews: number;
+  totalClicksToMenu: number;
+  globalConversionRate: number;
+  topBusinesses: {
+    businessId: string;
+    businessName: string;
+    totalViews: number;
+  }[];
 }
 ```
 
@@ -310,3 +339,6 @@ const mappedItems: ReelFeedItem[] = (rawRpcData || []).map((raw: any) => ({
 2. **Índice GiST `idx_businesses_geo_location`:** Búsquedas por cercanía espacial ejecutadas a nivel binario en PostgreSQL.
 3. **Caché en Cliente con SWR:** 5 minutos de revalidación en memoria RAM para navegación instantánea (0ms).
 4. **Resiliencia de Conexión:** Si el usuario no tiene GPS, el RPC conmuta a ordenamiento B-Tree por vistas/fecha sin penalizar tiempo de respuesta (<15ms).
+5. **Arquitectura Híbrida de Filtrado por Categoría:**
+   - **En RAM (60 FPS):** Filtrado reactivo instantáneo (`useMemo`) sobre el feed activo para máxima fluidez táctil sin latencia de red.
+   - **En Servidor SQL (`filter_category_id`):** Si se requiere paginación aislada por categoría o si el usuario busca agotar la totalidad de videos de un rubro específico, el RPC `get_reels_feed` procesa la cláusula `(filter_category_id IS NULL OR b.category_id = filter_category_id)` directamente en PostgreSQL.
