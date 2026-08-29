@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   LogOut,
   Sparkles,
-  Layers
+  Layers,
+  Clapperboard
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
@@ -29,6 +30,7 @@ const menuItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Negocios", href: "/admin/negocios", icon: Store },
   { name: "Catálogo Fowy", href: "/admin/catalogo", icon: Layers },
+  { name: "Fowy Reels", href: "/admin/reels", icon: Clapperboard },
   { name: "Vendedores", href: "/admin/vendedores", icon: Users },
   { name: "Profesionales", href: "/admin/profesionales", icon: Briefcase },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserCircle },

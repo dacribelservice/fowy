@@ -130,6 +130,53 @@ export type Database = {
           },
         ]
       }
+      business_reels: {
+        Row: {
+          business_id: string
+          clicks_to_menu_count: number | null
+          created_at: string | null
+          id: string
+          instagram_url: string
+          is_active: boolean | null
+          thumbnail_url: string
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          business_id: string
+          clicks_to_menu_count?: number | null
+          created_at?: string | null
+          id?: string
+          instagram_url: string
+          is_active?: boolean | null
+          thumbnail_url: string
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          business_id?: string
+          clicks_to_menu_count?: number | null
+          created_at?: string | null
+          id?: string
+          instagram_url?: string
+          is_active?: boolean | null
+          thumbnail_url?: string
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reels_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           category_id: string | null
@@ -1285,9 +1332,41 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_reels_feed: {
+        Args: {
+          filter_category_id?: string
+          page_limit?: number
+          page_offset?: number
+          user_lat?: number
+          user_lng?: number
+        }
+        Returns: {
+          business_category_id: string
+          business_id: string
+          business_logo_url: string
+          business_name: string
+          business_slug: string
+          clicks_to_menu_count: number
+          created_at: string
+          distance_meters: number
+          instagram_url: string
+          reel_id: string
+          thumbnail_url: string
+          title: string
+          views_count: number
+        }[]
+      }
       gettransactionid: { Args: never; Returns: unknown }
       increment_cross_traffic: {
         Args: { p_business_id: string }
+        Returns: undefined
+      }
+      increment_reel_menu_click: {
+        Args: { target_reel_id: string }
+        Returns: undefined
+      }
+      increment_reel_view: {
+        Args: { target_reel_id: string }
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }

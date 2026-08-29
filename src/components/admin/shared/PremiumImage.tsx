@@ -17,12 +17,17 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    setStatus("loading");
-    setDisplaySrc(src);
+    if (!src) {
+      setStatus("error");
+      setDisplaySrc("");
+    } else {
+      setStatus("loading");
+      setDisplaySrc(src);
+    }
   }, [src]);
 
   useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
+    if (displaySrc && imgRef.current && imgRef.current.complete) {
       setStatus("loaded");
     }
   }, [displaySrc]);
@@ -31,7 +36,7 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
     <div className={`relative overflow-hidden bg-slate-50 flex items-center justify-center ${className}`}>
       {/* Loading Skeleton */}
       <AnimatePresence>
-        {status === "loading" && (
+        {status === "loading" && displaySrc && (
           <motion.div 
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -44,7 +49,7 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
 
       {/* Error / Placeholder State */}
       <AnimatePresence>
-        {status === "error" && (
+        {(status === "error" || !displaySrc) && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -62,16 +67,18 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
       </AnimatePresence>
 
       {/* Actual Image */}
-      <img
-        ref={imgRef}
-        src={displaySrc}
-        alt={alt}
-        className={`w-full h-full object-cover transition-all duration-500 ${
-          status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105"
-        }`}
-        onLoad={() => setStatus("loaded")}
-        onError={() => setStatus("error")}
-      />
+      {displaySrc ? (
+        <img
+          ref={imgRef}
+          src={displaySrc}
+          alt={alt}
+          className={`w-full h-full object-cover transition-all duration-500 ${
+            status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105"
+          }`}
+          onLoad={() => setStatus("loaded")}
+          onError={() => setStatus("error")}
+        />
+      ) : null}
     </div>
   );
 }

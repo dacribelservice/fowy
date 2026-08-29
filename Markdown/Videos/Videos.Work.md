@@ -327,83 +327,83 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
 
 ## 🖥️ FASE 5: Módulo de Administración Fowy Reels (`admin`)
 
-- [ ] **Paso 5.1: Navegación Global y Enlaces Cruzados (`Sidebar.tsx` y `BusinessList.tsx`)**
+- [x] **Paso 5.1: Navegación Global y Enlaces Cruzados (`Sidebar.tsx` y `BusinessList.tsx`)**
   * **Objetivo:** Añadir el acceso oficial en el sidebar del panel admin y el botón directo en la tabla de comercios.
   * **Acciones:**
     1. Agregar `{ name: "Fowy Reels", href: "/admin/reels", icon: Clapperboard }` al arreglo `menuItems` en [`src/components/admin/Sidebar.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx).
     2. Agregar el botón de acción con icono de claqueta `[ 🎬 ]` (`/admin/reels/${b.id}`) en la tabla desktop y tarjetas móviles de [`src/components/admin/businesses/BusinessList.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessList.tsx).
-  * **Resultado de Cierre:** Rutas administrativas accesibles desde la navegación global y desde cada negocio.
+  * **Resultado de Cierre:** Rutas administrativas accesibles desde la navegación global y desde cada negocio. ✅
 
-- [ ] **Paso 5.2: Subcomponentes Atómicos de Formularios Admin (`useReelFormLogic.ts`, `ReelThumbnailUploader.tsx`, `ReelFormFields.tsx`)**
+- [x] **Paso 5.2: Subcomponentes Atómicos de Formularios Admin (`useReelFormLogic.ts`, `ReelThumbnailUploader.tsx`, `ReelFormFields.tsx`)**
   * **Objetivo:** Descomponer preventivamente la lógica y vista del formulario en piezas puras de menos de 85 líneas.
   * **Acciones:**
     1. Crear `src/components/admin/reels/useReelFormLogic.ts` (máximo 85 líneas) con manejo de estados, sanitización de URL, compresión WebP y resolución por `Map<string, UUID>` para el selector `Autocomplete`.
     2. Crear `src/components/admin/reels/ReelThumbnailUploader.tsx` (máximo 70 líneas) con área drag & drop para portadas 9:16 y preview.
     3. Crear `src/components/admin/reels/ReelFormFields.tsx` (máximo 85 líneas) con inputs de título, enlace de Instagram y selector de comercio (cuando no esté pre-asignado).
-  * **Resultado de Cierre:** Bloques de formulario modulares, testeables y altamente mantenibles.
+  * **Resultado de Cierre:** Bloques de formulario modulares, testeables y altamente mantenibles. ✅
 
-- [ ] **Paso 5.3: Modal Unificado de Creación y Edición (`ReelFormModal.tsx`)**
+- [x] **Paso 5.3: Modal Unificado de Creación y Edición (`ReelFormModal.tsx`)**
   * **Objetivo:** Ensamblar el modal de creación y edición reutilizable tanto en la central general como en la galería por negocio.
   * **Acciones:**
     1. Crear `src/components/admin/reels/ReelFormModal.tsx` (máximo 75 líneas).
     2. Ensamblar `ReelThumbnailUploader` y `ReelFormFields` gobernados por `useReelFormLogic`.
     3. Integrar retroalimentación visual mediante `SuccessToast`.
-  * **Resultado de Cierre:** Modal de creación/edición 100% operativo.
+  * **Resultado de Cierre:** Modal de creación/edición 100% operativo. ✅
 
-- [ ] **Paso 5.4: Componentes de KPIs y Gráfica Vectorial Global (`ReelsGlobalKPIs.tsx` y `ReelsTrafficChart.tsx`)**
+- [x] **Paso 5.4: Componentes de KPIs y Gráfica Vectorial Global (`ReelsGlobalKPIs.tsx` y `ReelsTrafficChart.tsx`)**
   * **Objetivo:** Crear los paneles analíticos de la cabecera reutilizando el motor gráfico vectorial SVG.
   * **Acciones:**
     1. Crear `src/components/admin/reels/ReelsGlobalKPIs.tsx` (máximo 85 líneas) con tarjetas de métricas (Videos, Vistas, Clics Menú, Tasa de Conversión) y ranking Top 5.
     2. Crear `src/components/admin/reels/ReelsTrafficChart.tsx` (máximo 90 líneas) que consuma `useReelsTrafficData.ts` y renderice [`BusinessTrafficSvg.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessTrafficSvg.tsx) con curva de reproducciones y barras de clics al menú.
-  * **Resultado de Cierre:** Visualización analítica global y por restaurante completamente funcional.
+  * **Resultado de Cierre:** Visualización analítica global y por restaurante completamente funcional. ✅
 
-- [ ] **Paso 5.5: Tabla de Negocios para Reels (`ReelsBusinessesTable.tsx`)**
+- [x] **Paso 5.5: Tabla de Negocios para Reels (`ReelsBusinessesTable.tsx`)**
   * **Objetivo:** Construir la tabla con buscador predictivo, métricas agregadas por negocio y paginación.
   * **Acciones:**
     1. Crear `src/components/admin/reels/ReelsBusinessesTable.tsx` (máximo 110 líneas).
     2. Columnas: Establecimiento, Ubicación, Conteo de Videos, Vistas Totales, Clics al Menú y Botón `[ 🎬 ]`.
     3. Integrar buscador predictivo y paginación con [`Pagination.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/Pagination.tsx).
-  * **Resultado de Cierre:** Tabla administrativa con control granular de videos por restaurante.
+  * **Resultado de Cierre:** Tabla administrativa con control granular de videos por restaurante. ✅
 
-- [ ] **Paso 5.6: Página Central Principal de Reels (`src/app/admin/reels/page.tsx`)**
+- [x] **Paso 5.6: Página Central Principal de Reels (`src/app/admin/reels/page.tsx`)**
   * **Objetivo:** Ensamblar la pantalla principal de la Central de Fowy Reels en el panel de Super Admin.
   * **Acciones:**
     1. Crear `src/app/admin/reels/page.tsx` (máximo 60 líneas).
     2. Ensamblar `ReelsGlobalKPIs`, `ReelsTrafficChart` (modo global), `ReelsBusinessesTable` y botón `[ + Nuevo Reel ]` que abre `ReelFormModal`.
-  * **Resultado de Cierre:** Ruta `/admin/reels` 100% terminada y navegable.
+  * **Resultado de Cierre:** Ruta `/admin/reels` 100% terminada y navegable. ✅
 
-- [ ] **Paso 5.7: Componentes de Galería por Negocio (`AdminReelCard.tsx` y `ReelsBusinessGallery.tsx`)**
+- [x] **Paso 5.7: Componentes de Galería por Negocio (`AdminReelCard.tsx` y `ReelsBusinessGallery.tsx`)**
   * **Objetivo:** Construir la galería visual interactiva 9:16 para administrar los videos de un negocio específico.
   * **Acciones:**
     1. Crear `src/components/admin/reels/AdminReelCard.tsx` (máximo 75 líneas) con miniatura 9:16, métricas (vistas/clics), switch ON/OFF y botones de acción (Ver, Editar, Eliminar).
     2. Crear `src/components/admin/reels/ReelsBusinessGallery.tsx` (máximo 80 líneas) con grid responsivo, estado vacío amigable y modal de confirmación [`DeleteConfirmModal.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/shared/DeleteConfirmModal.tsx).
-  * **Resultado de Cierre:** Galería interactiva individual completamente funcional.
+  * **Resultado de Cierre:** Galería interactiva individual completamente funcional. ✅
 
-- [ ] **Paso 5.8: Página de Gestión de Videos por Negocio (`src/app/admin/reels/[businessId]/page.tsx`)**
+- [x] **Paso 5.8: Página de Gestión de Videos por Negocio (`src/app/admin/reels/[businessId]/page.tsx`)**
   * **Objetivo:** Ensamblar la vista dedicada de administración de videos para un restaurante específico.
   * **Acciones:**
     1. Crear `src/app/admin/reels/[businessId]/page.tsx` (máximo 70 líneas).
     2. Cabecera con datos del negocio, botón de retorno, KPIs individuales y botón `[ + Nuevo Reel ]` con `businessId` pre-inyectado.
     3. Integrar `ReelsTrafficChart` filtrada para ese `businessId` y la galería `ReelsBusinessGallery`.
-  * **Resultado de Cierre:** Ruta `/admin/reels/[businessId]` 100% operativa.
+  * **Resultado de Cierre:** Ruta `/admin/reels/[businessId]` 100% operativa. ✅
 
-- [ ] **Paso 5.9: Integración de la Métrica de Oro en Métricas de Negocio (`BusinessMetricsList.tsx`)**
+- [x] **Paso 5.9: Integración de la Métrica de Oro en Métricas de Negocio (`BusinessMetricsList.tsx`)**
   * **Objetivo:** Visualizar las conversiones de video dentro de la tarjeta de métricas existente del panel de negocios.
   * **Acciones:**
     1. En [`src/components/admin/businesses/BusinessMetricsList.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/admin/businesses/BusinessMetricsList.tsx), consultar `clicks_to_menu_count` de la tabla `business_reels` para ese `businessId`.
     2. Agregar el 6.º ítem visual con icono de claqueta: *"Clics al Menú desde Videos / Reels"*.
-  * **Resultado de Cierre:** Tarjeta de métricas actualizada sin alterar cálculos previos de tickets o visitas.
+  * **Resultado de Cierre:** Tarjeta de métricas actualizada sin alterar cálculos previos de tickets o visitas. ✅
 
 ---
 
 ## 🧪 FASE 6: Validación Integral, Verificación de Compilación y Cierre
 
-- [ ] **Paso 6.1: Verificación Estricta de Tipos TypeScript y Presupuesto de Líneas**
+- [x] **Paso 6.1: Verificación Estricta de Tipos TypeScript y Presupuesto de Líneas**
   * **Objetivo:** Garantizar cero errores de compilación y cumplimiento del techo duro de 180 líneas.
   * **Acciones:**
     1. Auditar que ningún archivo nuevo supere las 180 líneas de código.
     2. Ejecutar `npm run build` para verificar que la compilación de producción se complete de manera 100% limpia sin errores de tipado o dependencias.
-  * **Resultado de Cierre:** Código 100% válido y listo para despliegue.
+  * **Resultado de Cierre:** Código 100% válido y listo para despliegue. ✅
 
 - [ ] **Paso 6.2: Verificación E2E de Flujos de Usuario y Conversión Móvil**
   * **Objetivo:** Comprobar la experiencia fluida de descubrimiento y compra desde el explorador.

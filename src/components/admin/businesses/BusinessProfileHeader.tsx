@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Save, Globe, Phone, MapPin, Zap, Star } from "lucide-react";
 import { BusinessData } from "@/app/admin/negocios/[id]/page";
+import PremiumImage from "@/components/admin/shared/PremiumImage";
 
 interface TopBarProps {
   onBack: () => void;
@@ -51,8 +52,12 @@ export function BusinessProfileCard({ business }: ProfileCardProps) {
       {/* Logo */}
       <div className="w-14 h-14 rounded-2xl p-0.5 bg-gradient-to-tr from-fowy-red to-fowy-orange shadow-md flex-shrink-0 mb-2">
         <div className="w-full h-full rounded-[14px] overflow-hidden border-2 border-white bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={business.logo_url} className="w-full h-full object-cover" alt={business.name} />
+          <PremiumImage 
+            src={business.logo_url} 
+            alt={business.name} 
+            className="w-full h-full" 
+            fallbackType="logo" 
+          />
         </div>
       </div>
 

@@ -10,7 +10,8 @@ import {
   MapPin, 
   Calendar,
   MoreVertical,
-  Store
+  Store,
+  Clapperboard
 } from "lucide-react";
 import Link from "next/link";
 import PremiumImage from "@/components/admin/shared/PremiumImage";
@@ -206,6 +207,13 @@ export default function BusinessList({
                   <td className="px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <Link 
+                        href={`/admin/reels/${b.id}`}
+                        className="p-3 rounded-2xl bg-orange-500/10 text-orange-500 hover:bg-gradient-to-br hover:from-[#FF5A5F] hover:to-[#FF9A3D] hover:text-white transition-all shadow-sm"
+                        title="Gestionar Fowy Reels"
+                      >
+                        <Clapperboard size={18} />
+                      </Link>
+                      <Link 
                         href={`/admin/negocios/${b.id}/catalogo`}
                         className="p-3 rounded-2xl bg-fowy-secondary/5 text-fowy-secondary hover:bg-gradient-to-br hover:from-[#FF5A5F] hover:to-[#FF9A3D] hover:text-white transition-all shadow-sm"
                         title="Gestionar Catálogo"
@@ -290,6 +298,9 @@ export default function BusinessList({
                 <a href={`https://wa.me/${b.phone}`} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-[20px] bg-green-500 text-white font-bold text-sm shadow-lg shadow-green-200 active:scale-95 transition-all">
                   <Phone size={18} /> WhatsApp
                 </a>
+                <Link href={`/admin/reels/${b.id}`} className="p-4 rounded-[20px] bg-white border border-white/50 text-orange-500 hover:bg-gradient-to-br hover:from-[#FF5A5F] hover:to-[#FF9A3D] hover:text-white shadow-sm active:scale-95 transition-all" title="Gestionar Fowy Reels">
+                  <Clapperboard size={20} />
+                </Link>
                 <Link href={`/admin/negocios/${b.id}/catalogo`} className="p-4 rounded-[20px] bg-white border border-white/50 text-fowy-secondary hover:bg-gradient-to-br hover:from-[#FF5A5F] hover:to-[#FF9A3D] hover:text-white shadow-sm active:scale-95 transition-all" title="Gestionar Catálogo">
                   <Store size={20} />
                 </Link>
