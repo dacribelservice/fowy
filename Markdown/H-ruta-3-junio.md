@@ -86,3 +86,28 @@
 - [x] ~~**9.3. Implementación de Esri Light Gray Canvas**~~: *(DESCARTADO POR FALTA DE ETIQUETAS Y ZOOM LIMITADO)*: Se probó la capa base de Esri, pero se descarta porque no incluye los nombres de las calles en la misma capa y al hacer zoom profundo en el mapa de Cali no dispone de mosaicos detallados, arrojando el mensaje de error *"Map data not yet available"*.
 - [x] **9.4. Configuración de Variable de Entorno en `.env.local`**: Añadir la clave `NEXT_PUBLIC_CARTO_API_KEY` en el archivo de entorno `.env.local` con la clave oficial de Basemaps (`cb1_2igi_1_950cd0c9d7eb9c5ff77bdd97`) para una gestión centralizada y segura.
 - [x] **9.5. Integración del Token Autenticado en `ExplorerMap.tsx`**: Restablecer el proveedor oficial **CARTO Positron Light** en el `<TileLayer />` de `src/components/explorer/ExplorerMap.tsx` pasando el parámetro de autenticación: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY || ''}`, eliminando de raíz la marca de agua *"API KEY REQUIRED"* y garantizando nombres de calles nítidos y zoom profundo sin errores.
+
+### Fase 10: Filtrado Multi-Etiqueta en FOWY REELS (Búsqueda Cruzada por Categoría y Tags)
+
+- [x] **10.1. Actualizar la Función RPC en Supabase SQL (`get_reels_feed`)**:
+  * Modificar el procedimiento almacenado `get_reels_feed` en PostgreSQL para que devuelva la columna `b.tags AS business_tags` (`TEXT[]`) en el `RETURNS TABLE` y en ambos bloques de consulta (`SELECT` con PostGIS espacial `<->` y `SELECT` de fallback sin GPS).
+  * Ampliar la cláusula condicional de filtrado para que, en caso de ejecutarse con `filter_category_id`, evalúe tanto la categoría principal como el arreglo de etiquetas: `(filter_category_id IS NULL OR b.category_id = filter_category_id OR EXISTS (SELECT 1 FROM categories c WHERE c.id = filter_category_id AND c.name ILIKE ANY(b.tags)))`.
+  * Preservar los permisos de ejecución pública: `GRANT EXECUTE ON FUNCTION get_reels_feed(...) TO anon, authenticated, service_role;`.
+
+- [x] **10.2. Extender el Contrato de Tipos TypeScript (`src/types/reels.ts`)**:
+  * Actualizar la interfaz `ReelFeedItem` en `src/types/reels.ts` para incorporar la propiedad `businessTags: string[] | null;`, manteniendo el tipado estricto y seguro en toda la aplicación.
+
+- [x] **10.3. Mapear los Tags en el Hook de Datos (`src/hooks/useReelsFeed.ts`)**:
+  * En la función `fetchReelsFeed` dentro de `src/hooks/useReelsFeed.ts`, agregar el mapeo del nuevo campo `businessTags: raw.business_tags || []` para que los componentes React y el motor de filtrado del cliente reciban las etiquetas completas de cada negocio.
+
+- [x] **10.4. Ajustar el Filtrado Reactivo Multi-Etiqueta en RAM a 60 FPS (`src/components/explorer/reels/ReelsGrid.tsx`)**:
+  * En `src/components/explorer/reels/ReelsGrid.tsx`, derivar con `useMemo` el nombre en minúsculas de la categoría seleccionada (`selectedCategoryName = categories.find(c => c.id === selectedCategoryId)?.name.trim().toLowerCase()`).
+  * Actualizar la condición `matchCat` dentro del filtrado para que un reel coincida si:
+    1. No hay categoría activa (`!selectedCategoryId`), **O**
+    2. Coincide el ID de la categoría principal (`r.businessCategoryId === selectedCategoryId`), **O**
+    3. El arreglo de etiquetas del negocio contiene la categoría seleccionada (`r.businessTags?.some(tag => tag.trim().toLowerCase() === selectedCategoryName)`).
+
+- [x] **10.5. Verificación de Compilación y Validación Visual E2E**:
+  * Ejecutar `npm run build` para comprobar que la compilación de producción termine con 0 errores de TypeScript.
+  * Validar en el explorador móvil que al seleccionar chips como *"Hamburguesas"*, se muestren todos los videos de restaurantes que tengan esa etiqueta en su perfil (ej. Burguer Park, Kaprichos, etc.), garantizando paridad exacta con el filtrado del mapa interactivo.
+

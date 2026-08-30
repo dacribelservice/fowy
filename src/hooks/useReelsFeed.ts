@@ -45,6 +45,7 @@ async function fetchReelsFeed(
     businessSlug: raw.business_slug,
     businessLogoUrl: raw.business_logo_url || null,
     businessCategoryId: raw.business_category_id || null,
+    businessTags: raw.business_tags || [],
     distanceMeters:
       raw.distance_meters !== null && raw.distance_meters !== undefined
         ? Number(raw.distance_meters)

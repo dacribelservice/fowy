@@ -24,6 +24,7 @@ export interface ReelFeedItem {
   businessSlug: string;
   businessLogoUrl: string | null;
   businessCategoryId: string | null;
+  businessTags: string[] | null;
   distanceMeters: number | null;
 }
 

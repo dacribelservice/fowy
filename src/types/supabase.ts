@@ -1346,6 +1346,7 @@ export type Database = {
           business_logo_url: string
           business_name: string
           business_slug: string
+          business_tags: string[]
           clicks_to_menu_count: number
           created_at: string
           distance_meters: number

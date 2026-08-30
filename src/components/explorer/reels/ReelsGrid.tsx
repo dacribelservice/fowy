@@ -39,19 +39,37 @@ export function ReelsGrid({
     return Array.from(map.values());
   }, [reels]);
 
+  // Nombre de la categoría seleccionada para contrastar contra el arreglo de tags
+  const selectedCategoryName = useMemo(() => {
+    if (!selectedCategoryId || !categories || categories.length === 0) return null;
+    const cat = categories.find((c: any) => c.id === selectedCategoryId);
+    return cat ? cat.name.trim().toLowerCase() : null;
+  }, [selectedCategoryId, categories]);
+
   // Filtrado reactivo cruzado en memoria RAM a 60 FPS
   const filteredReels = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return reels.filter((r) => {
       const matchBiz = !selectedBusinessId || r.businessId === selectedBusinessId;
-      const matchCat = !selectedCategoryId || r.businessCategoryId === selectedCategoryId;
+      
+      // Coincide por ID de categoría principal O por cualquiera de las etiquetas (tags) del negocio
+      const matchCat =
+        !selectedCategoryId ||
+        r.businessCategoryId === selectedCategoryId ||
+        (selectedCategoryName !== null &&
+          Array.isArray(r.businessTags) &&
+          r.businessTags.some(
+            (tag) => typeof tag === "string" && tag.trim().toLowerCase() === selectedCategoryName
+          ));
+
       const matchText =
         !q ||
         r.title.toLowerCase().includes(q) ||
         r.businessName.toLowerCase().includes(q);
+
       return matchBiz && matchCat && matchText;
     });
-  }, [reels, selectedBusinessId, selectedCategoryId, searchQuery]);
+  }, [reels, selectedBusinessId, selectedCategoryId, selectedCategoryName, searchQuery]);
 
   const handleResetFilters = () => {
     setSelectedBusinessId(null);
