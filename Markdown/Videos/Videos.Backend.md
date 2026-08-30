@@ -66,6 +66,7 @@ RETURNS TABLE (
   business_slug VARCHAR,
   business_logo_url TEXT,
   business_category_id UUID,
+  business_tags TEXT[],
   distance_meters DOUBLE PRECISION
 ) 
 LANGUAGE plpgsql
@@ -88,6 +89,7 @@ BEGIN
       b.slug AS business_slug,
       b.logo_url AS business_logo_url,
       b.category_id AS business_category_id,
+      b.tags AS business_tags,
       ST_Distance(
         ST_SetSRID(ST_MakePoint(b.longitude, b.latitude), 4326)::geography, 
         ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326)::geography
@@ -121,6 +123,7 @@ BEGIN
       b.slug AS business_slug,
       b.logo_url AS business_logo_url,
       b.category_id AS business_category_id,
+      b.tags AS business_tags,
       NULL::DOUBLE PRECISION AS distance_meters
     FROM business_reels r
     INNER JOIN businesses b ON r.business_id = b.id

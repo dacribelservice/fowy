@@ -423,3 +423,65 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     3. Probar eliminación de un reel verificando que la imagen se borre del bucket de Storage.
     4. Probar la actualización de gráficas SVG y métricas en `/admin/reels` y `/admin/reels/[businessId]`.
   * **Resultado de Cierre:** Sistema FOWY REELS 100% desplegado, operativo y documentado. ✅
+
+---
+
+## 🚀 FASE 7: Checklist de Implementación de Optimizaciones & Upgrade (Fowy Reels 100% Blindado)
+
+> 🎯 **Principio de Atomicidad Estricta**: Cada paso es una unidad completa e integral de desarrollo que concluye al 100% la funcionalidad de su archivo o módulo, garantizando que el sistema compile limpiamente sin pasos divididos ni dependencias rotas.
+
+- [ ] **Paso 7.1: Carga Diferida Real (*Lazy Loading*), Prefetch Silencioso y Limpieza de URL (`explorar/page.tsx` y `ReelsFeedButton.tsx`)**
+  * **Objetivo:** Eliminar el 100% del JavaScript de Reels del bundle inicial de `/explorar`, asegurar la animación de salida (*Slide-Down*) y limpiar la URL al cerrar el modal o ir al mapa.
+  * **Acciones:**
+    1. En [`src/app/(explorer)/explorar/page.tsx`](file:///c:/Users/cange/Documents/fowy/src/app/(explorer)/explorar/page.tsx), reemplazar la importación estática por `const ReelsFeedModal = dynamic(() => import("@/components/explorer/reels/ReelsFeedModal").then((mod) => mod.ReelsFeedModal), { ssr: false })`.
+    2. Envolver el renderizado de `{isReelsOpen && <ReelsFeedModal ... />}` dentro del `<AnimatePresence>` existente en el orquestador principal.
+    3. En `onClose` y `onViewOnMap`, agregar la limpieza atómica de la URL con `window.history.replaceState(null, "", window.location.pathname)` si `window.location.search` contiene `reel=`.
+    4. En [`src/components/explorer/reels/ReelsFeedButton.tsx`](file:///c:/Users/cange/Documents/fowy/src/components/explorer/reels/ReelsFeedButton.tsx), agregar el manejador `handlePrefetch = () => void import("@/components/explorer/reels/ReelsFeedModal")` conectado a `onMouseEnter` y `onTouchStart`.
+  * **Resultado de Cierre:** Bundle inicial de `/explorar` liberado de ~50 KB de JS, prefetch reactivo al interactuar con el botón y animación de cierre fluida sin saltos visuales.
+
+- [ ] **Paso 7.2: Paginación & Scroll Infinito con Deduplicación y Memoización (`src/hooks/useReelsFeed.ts`)**
+  * **Objetivo:** Refactorizar el hook de datos para consumir `useSWRInfinite` con paginación reactiva, freno automático al fin de catálogo y deduplicación estricta.
+  * **Acciones:**
+    1. Actualizar `fetchReelsFeed` para aceptar la tupla de clave `[string, number | null, number | null, string | null, number, number]` incluyendo `pageLimit` y `pageOffset`.
+    2. Implementar la función generadora `getKey = (pageIndex, previousPageData)` que retorna `null` cuando `previousPageData.length < PAGE_SIZE` (corte automático) o genera la clave con `page_offset = pageIndex * PAGE_SIZE`.
+    3. Implementar la deduplicación estricta de elementos por `reelId` mediante `Map<string, ReelFeedItem>` sobre `data.flat()`.
+    4. Crear la función `loadMore` memoizada con `useCallback` validando `!isReachingEnd && !isLoadingMore && !isValidating`.
+    5. Retornar `{ reels, loading, loadingMore, isReachingEnd, isValidating, loadMore, refreshFeed: mutate }`.
+  * **Resultado de Cierre:** Hook analítico y de catálogo con soporte nativo de paginación infinita, memoizado y protegido contra peticiones duplicadas.
+
+- [ ] **Paso 7.3: Sensor de Scroll Infinito con Debounce Anti-Cascada (`src/components/explorer/reels/ReelsGrid.tsx`)**
+  * **Objetivo:** Detectar la proximidad al final de la cuadrícula para precargar automáticamente la siguiente página de videos 250px antes del fondo con protección anti-cascade.
+  * **Acciones:**
+    1. Actualizar `ReelsGridProps` para recibir `onLoadMore: () => void`, `loadingMore: boolean`, `isReachingEnd: boolean` e `isValidating: boolean`.
+    2. Implementar `sentinelRef` al final del componente observado mediante `IntersectionObserver` con `rootMargin: "250px"`.
+    3. Incorporar control de `debounceTimeoutRef` de 250ms antes de invocar `onLoadMore()` cuando el centinela es visible y `!isValidating && !isReachingEnd && !loadingMore`.
+    4. Renderizar el indicador spinner centrado (`Loader2`) condicionado a `loadingMore && !isReachingEnd`.
+  * **Resultado de Cierre:** Cuadrícula con scroll infinito continuo a 60 FPS sin tirones visuales ni saturación de consultas.
+
+- [ ] **Paso 7.4: Orquestación Reactiva del Feed, Fallback Deep-Link Resiliente y Conexión al Reproductor (`src/components/explorer/reels/ReelsFeedModal.tsx`)**
+  * **Objetivo:** Gobernar la apertura, sincronización reactiva de la lista de videos para el swipe infinito y resolución segura de deep-links fuera de la primera página.
+  * **Acciones:**
+    1. Retirar el prop `isOpen` de `ReelsFeedModalProps` y eliminar el `<AnimatePresence>` interno, dejando `<motion.div>` como nodo raíz con animación `exit={{ y: "100%" }}`.
+    2. Mantener el estado `activeReelId: string | null` y derivar reactivamente `activePlayerList` combinando `deepLinkedReel` (si existe) con `filteredReels` para que los nuevos videos de SWR se integren automáticamente al reproductor.
+    3. Implementar el fallback de deep-link con pestillo `hasHandledDeepLinkRef` y extracción segura `const biz: any = Array.isArray(data.businesses) ? data.businesses[0] : data.businesses`.
+    4. Conectar `ReelPlayerModal` pasando `reels={activePlayerList}`, `initialIndex={activeIndex}`, `onClose={() => setActiveReelId(null)}` y `onLoadMore={loadMore}`.
+  * **Resultado de Cierre:** Modal orquestador reactivo que resuelve deep-links instantáneamente y alimenta el reproductor swipable sin límite de videos.
+
+- [ ] **Paso 7.5: Reproductor Full-Screen Inmersivo con Gestos Táctiles Verticales, Passthrough de Audio e Inducción Visual (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
+  * **Objetivo:** Construir la experiencia completa de visualización estilo TikTok/Reels con navegación gestual vertical, cero pantalla negra, desmuteo táctil, conteo atómico de vistas y guía animada con `localStorage`.
+  * **Acciones:**
+    1. Actualizar `ReelPlayerModalProps` para recibir `reels: ReelFeedItem[]`, `initialIndex?: number`, `onClose`, `onViewOnMap` y `onLoadMore?: () => void`.
+    2. Implementar la capa gestual superior con `<motion.div drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={0.2}>` evaluando `offset.y` y `velocity.y` (*Flick*) para navegar entre videos (`setCurrentIndex`) e invocar `onLoadMore()` al aproximarse al final de la lista.
+    3. Configurar el montaje del `iframe` y contenedor con `key={currentReel.reelId}` y desacoplar `setIframeLoaded(false)` por `currentReelId` para mostrar inmediatamente la portada WebP blur con spinner (0ms pantalla negra).
+    4. Registrar visualizaciones únicas por sesión mediante `viewedReelIdsRef` (`Set<string>`) invocando `supabase.rpc('increment_reel_view', ...)`.
+    5. Integrar la micro-animación de inducción táctil (*Swipe Up Hint*) con icono `Pointer` animado y persistencia en `localStorage` (`"fowy_reel_swipe_hint"`).
+  * **Resultado de Cierre:** Reproductor inmersivo vertical 100% fluido con soporte de gestos táctiles, audio nativo y cero fotogramas residuales.
+
+- [ ] **Paso 7.6: Verificación Integral, Prueba de Compilación Limpia (`npm run build`) y Control de Techo de Líneas**
+  * **Objetivo:** Auditar que todo el código optimizado cumpla el presupuesto de líneas (<180L por componente / <250L en orquestador) y compile sin errores en producción.
+  * **Acciones:**
+    1. Auditar el conteo de líneas de los 5 archivos modificados: `explorar/page.tsx` (<240L), `useReelsFeed.ts` (<110L), `ReelsGrid.tsx` (<160L), `ReelsFeedModal.tsx` (<130L) y `ReelPlayerModal.tsx` (<160L).
+    2. Ejecutar `npm run build` para validar que la compilación de Next.js se complete con cero errores de TypeScript y ESLint.
+    3. Validar en emulador móvil la fluidez del *Lazy Loading*, el scroll infinito en la cuadrícula, la navegación táctil por *Swipe Up/Down*, la reproducción de audio y la limpieza de deep-links en la URL.
+  * **Resultado de Cierre:** Sistema FOWY REELS optimizado al 100%, validado y listo para producción.
+
