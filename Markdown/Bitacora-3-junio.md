@@ -129,3 +129,33 @@
     - **Presupuesto de Líneas**: Todos los 20+ archivos nuevos respetan el límite modular estricto (<180 líneas en componentes estándar y <250 líneas en páginas compuestas).
     - **Compilación de Producción**: `npm run build` ejecutado exitosamente con `Exit code 0` y cero errores de TypeScript.
     - **Ley del Remolque**: Cero impacto en módulos preexistentes en producción (logos, banners, productos y pedidos intactos).
+
+### 📌 Hito: Optimización de Rendimiento, Scroll Infinito y Gestos Verticales en FOWY REELS (Fase 7 de Upgrade)
+- **Fecha**: 30 de Agosto de 2026
+- **Resumen**: Implementación integral del paquete de optimizaciones de alta gama para FOWY REELS. Se redujo el bundle inicial del explorador (~50 KB liberados), se implementó scroll infinito con SWR Infinite y corte automático, se incorporó navegación vertical táctil (*Swipe Up / Down* con aceleración *Flick*), se eliminaron pantallas negras en transiciones entre videos mediante clave única y portada WebP blur, se aseguró la resolución resiliente de enlaces profundos (*Deep-Links*) y se añadieron micro-animaciones de inducción táctil con memoria local.
+- **Detalles Técnicos**:
+  - **1. Carga Diferida y Ciclo de Salida (`explorar/page.tsx` & `ReelsFeedButton.tsx`)**:
+    - Se reemplazó la carga estática por `next/dynamic` con `{ ssr: false }`, eliminando el peso de los modales de reels en la carga inicial del mapa.
+    - Se envolvió el modal en `<AnimatePresence>` gobernado desde el orquestador principal, garantizando animaciones fluidas de apertura y cierre (*Slide-Down*) sin saltos de DOM.
+    - Se implementó prefetch silencioso (`onMouseEnter` y `onTouchStart`) en el botón flotante de claqueta para precargar el código antes del primer clic.
+    - Limpieza atómica de URL (`history.replaceState`) para remover `?reel=` al cerrar o saltar al mapa sin recargar la página.
+  - **2. Paginación Infinita y Deduplicación SWR (`useReelsFeed.ts`)**:
+    - Migración a `useSWRInfinite` con generador de claves por tupla y paginación en lotes de 18 elementos.
+    - **Freno Inteligente**: Corte automático (`getKey` retorna `null`) cuando la última página contiene menos de 18 elementos, previniendo consultas innecesarias a Supabase.
+    - **Deduplicación Estricta**: Estructura `Map<string, ReelFeedItem>` sobre `data.flat()` para garantizar unicidad absoluta de videos y prevenir advertencias de claves en React.
+    - Función `loadMore` memoizada con `useCallback` sujeta a `!isReachingEnd && !isLoadingMore && !isValidating`.
+  - **3. Sensor de Proximidad Anti-Cascada (`ReelsGrid.tsx`)**:
+    - Integración de `sentinelRef` observado mediante `IntersectionObserver` con `rootMargin: "250px"` para precargar la siguiente tanda antes de tocar el fondo.
+    - Control de `debounceTimeoutRef` de 250ms para evitar solicitudes en cascada al filtrar categorías o negocios en memoria RAM a 60 FPS.
+    - Indicador de carga inferior (`Loader2`) centrado condicionado a `loadingMore && !isReachingEnd`.
+  - **4. Orquestación Reactiva y Deep-Link Resiliente (`ReelsFeedModal.tsx`)**:
+    - Sincronización viva de `activePlayerList` gobernada por `activeReelId`, integrando automáticamente nuevas páginas descargadas por SWR al reproductor.
+    - Fallback de enlaces compartidos con consulta puntual a Supabase y extracción segura de arreglos (`Array.isArray(data.businesses) ? data.businesses[0] : data.businesses`).
+  - **5. Reproductor Full-Screen Inmersivo con Gestos Verticales (`ReelPlayerModal.tsx`)**:
+    - Navegación táctil vertical con `<motion.div drag="y">` evaluando distancia y velocidad de lanzamiento (`velocity.y` / *Flick*) para avanzar o retroceder de video.
+    - Montaje instantáneo a 0ms con `key={currentReel.reelId}`, WebP Blur skeleton y reseteo de carga de iframe por ID de video (cero pantallas negras ni residuos de fotogramas).
+    - Registro atómico de vistas (1 sola vista por video por sesión) mediante `viewedReelIdsRef` (`Set<string>`) invocando `increment_reel_view`.
+    - Micro-animación de inducción táctil (*Swipe Up Hint*) con icono `Pointer` animado y persistencia en `localStorage` (`"fowy_reel_swipe_hint"`).
+  - **6. Cumplimiento Arquitectónico y Compilación**:
+    - Todos los 5 archivos modificados cumplen estrictamente la regla de líneas (<180L por componente y 250L en el orquestador).
+    - Compilación de producción (`npm run build`) validada con 0 errores de TypeScript y ESLint (`Exit code: 0`).

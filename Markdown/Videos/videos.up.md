@@ -606,3 +606,4 @@ Cumpliendo con la **Regla de Techo Duro (< 180 líneas por componente / Máximo 
 
 ---
 *Documento oficial de actualización técnica — FOWY 2026 (Versión 100% Madura, Auditada y Blindada)*
+

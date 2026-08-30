@@ -485,3 +485,38 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     3. Validar en emulador móvil la fluidez del *Lazy Loading*, el scroll infinito en la cuadrícula, la navegación táctil por *Swipe Up/Down*, la reproducción de audio y la limpieza de deep-links en la URL.
   * **Resultado de Cierre:** Sistema FOWY REELS optimizado al 100%, validado y listo para producción. ✅
 
+---
+
+## 🚀 FASE 8: Perfeccionamiento Táctil, Animación de Desplazamiento Vertical (Slide 60 FPS), Cargador Wave Dots y Métricas Blindadas
+
+- [ ] **Paso 8.1: Liberación Táctil del Botón Play & Registro Blindado de Clics de Menú (`ReelPlayerModal.tsx` & `ReelActionCard.tsx`)**
+  * **Objetivo:** Permitir que los clics en el botón de reproducción/sonido de Instagram interactúen directamente con el iframe sin bloqueo de la capa de gestos, y asegurar que la redirección a la carta espere la confirmación del RPC de métricas.
+  * **Acciones:**
+    1. En `ReelPlayerModal.tsx`, configurar la capa gestual superior dividida en zonas táctiles (laterales/tercios de deslizamiento) o con área central transparente a eventos (`pointer-events-none` sobre el centro interactivo de Instagram), permitiendo que el usuario active el Play/Sonido de Instagram inmediatamente sin interferencia.
+    2. En `ReelActionCard.tsx`, transformar `handleGoToMenu` a función asíncrona con `try/finally` y `await supabase.rpc('increment_reel_menu_click', { target_reel_id: reel.reelId })` antes de invocar `router.push('/' + reel.businessSlug)`, evitando que WebKit/Safari aborte la petición al desmontar el componente.
+  * **Resultado de Cierre:** Botón Play de Instagram 100% responsivo en móviles y PC, y 100% de los clics a la carta registrados en Supabase.
+
+- [ ] **Paso 8.2: Cargador Elegante de 3 Puntos Ondulantes (*Bouncing Wave Dots Loader* - `ReelPlayerModal.tsx`)**
+  * **Objetivo:** Sustituir el spinner circular convencional por una cápsula glassmorphic flotante con 3 puntos animados en gradiente corporativo FOWY.
+  * **Acciones:**
+    1. En `ReelPlayerModal.tsx`, reemplazar el div con borde circular animado por una cápsula glassmorphic con fondo `bg-black/50 backdrop-blur-xl border border-white/15 shadow-2xl`.
+    2. Renderizar 3 puntos `<motion.span>` en gradiente `bg-gradient-to-tr from-[#FF5A5F] to-[#FF9A3D]` con oscilación vertical suave (`y: [0, -6, 0]`), micro-escala (`scale: [1, 1.2, 1]`) y delay escalonado (`delay: i * 0.18s`).
+  * **Resultado de Cierre:** Indicador de carga dinámico, moderno y visualmente atractivo sobre la portada WebP blur.
+
+- [ ] **Paso 8.3: Animación Direccional Vertical y Desplazamiento Físico (*Slide Up / Down 60 FPS* - `ReelPlayerModal.tsx`)**
+  * **Objetivo:** Dotar al reproductor de inercia y feedback visual continuo al cambiar de video mediante `AnimatePresence` y variantes direccionadas.
+  * **Acciones:**
+    1. En `ReelPlayerModal.tsx`, crear el estado de dirección `const [direction, setDirection] = useState<1 | -1>(1)`.
+    2. Definir `slideVariants` con desplazamiento físico en el eje Y (`y: direction > 0 ? "100%" : "-100%"` para entrada y `-100% / 100%` para salida) con animación `spring` de 60 FPS (`stiffness: 300, damping: 30`).
+    3. Envolver el contenedor del video en `<AnimatePresence initial={false} custom={direction}>` y actualizar `setDirection(1)` en *Swipe Up* y `setDirection(-1)` en *Swipe Down*.
+  * **Resultado de Cierre:** Transición de video fluida con inercia física estilo TikTok/Reels donde el usuario percibe con total claridad el cambio de video.
+
+- [ ] **Paso 8.4: Micro-Animación Elástica del Logo del Restaurante y Verificación de Compilación (`ReelActionCard.tsx`)**
+  * **Objetivo:** Animar la entrada elástica del logo y nombre del restaurante al cambiar de video y auditar que todo el código compile limpiamente bajo el presupuesto de líneas.
+  * **Acciones:**
+    1. En `ReelActionCard.tsx`, envolver el bloque de logo y nombre con `<AnimatePresence mode="wait">` y `<motion.div key={reel.businessId}>` con entrada desde la izquierda (`x: -15 -> 0`), escala (`0.9 -> 1`) y rebote suave `spring`.
+    2. Auditar el conteo de líneas de los componentes (`ReelPlayerModal.tsx` < 180L, `ReelActionCard.tsx` < 140L).
+    3. Ejecutar `npm run build` para asegurar 0 errores de TypeScript y ESLint.
+  * **Resultado de Cierre:** Tarjeta de acción viva y dinámica con entrada elástica sincronizada, sistema 100% validado y probado para producción.
+
+
