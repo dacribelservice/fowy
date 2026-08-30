@@ -21,7 +21,7 @@ export function ReelCard({ reel, onOpen }: ReelCardProps) {
     <motion.div
       whileTap={{ scale: 0.96 }}
       onClick={() => onOpen(reel)}
-      className="aspect-[9/16] relative rounded-2xl overflow-hidden cursor-pointer group bg-slate-950 shadow-sm border border-slate-100/10"
+      className="aspect-[9/16] relative overflow-hidden cursor-pointer group bg-slate-950"
     >
       {/* Miniatura */}
       <img

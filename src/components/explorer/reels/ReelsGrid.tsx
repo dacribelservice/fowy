@@ -87,7 +87,7 @@ export function ReelsGrid({
 
       {/* 4. Cuadrícula 9:16 de Reels */}
       {filteredReels.length > 0 ? (
-        <div className="grid grid-cols-3 gap-2 px-3 pt-1">
+        <div className="grid grid-cols-3 gap-[1px] px-[2px] pt-1 [&>*:first-child]:rounded-tl-[24px] [&>*:nth-child(3)]:rounded-tr-[24px]">
           {filteredReels.map((reel) => (
             <ReelCard key={reel.reelId} reel={reel} onOpen={onOpenReel} />
           ))}

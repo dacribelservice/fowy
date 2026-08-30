@@ -405,7 +405,7 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     2. Ejecutar `npm run build` para verificar que la compilación de producción se complete de manera 100% limpia sin errores de tipado o dependencias.
   * **Resultado de Cierre:** Código 100% válido y listo para despliegue. ✅
 
-- [ ] **Paso 6.2: Verificación E2E de Flujos de Usuario y Conversión Móvil**
+- [x] **Paso 6.2: Verificación E2E de Flujos de Usuario y Conversión Móvil**
   * **Objetivo:** Comprobar la experiencia fluida de descubrimiento y compra desde el explorador.
   * **Acciones:**
     1. Probar apertura del feed desde el botón flotante en `/explorar`.
@@ -413,13 +413,13 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     3. Probar reproductor full-screen (Zero pantalla negra, incremento de vista x1 con pestillo).
     4. Probar botón `[ 🛒 Ver Menú & Pedir ]` (incremento de clic a menú y redirección a `/[slug]`).
     5. Probar deep-linking con URL `https://fowy.com/explorar?reel=ID`.
-  * **Resultado de Cierre:** Embudo de conversión visual probado y validado.
+  * **Resultado de Cierre:** Embudo de conversión visual probado y validado. ✅
 
-- [ ] **Paso 6.3: Verificación E2E de Gestión Administrativa y Storage**
+- [x] **Paso 6.3: Verificación E2E de Gestión Administrativa y Storage**
   * **Objetivo:** Comprobar el correcto funcionamiento del panel de administración.
   * **Acciones:**
     1. Probar creación de un reel con subida WebP a `reels-thumbnails`.
     2. Probar edición y alternancia de estado ON/OFF.
     3. Probar eliminación de un reel verificando que la imagen se borre del bucket de Storage.
     4. Probar la actualización de gráficas SVG y métricas en `/admin/reels` y `/admin/reels/[businessId]`.
-  * **Resultado de Cierre:** Sistema FOWY REELS 100% desplegado, operativo y documentado.
+  * **Resultado de Cierre:** Sistema FOWY REELS 100% desplegado, operativo y documentado. ✅
