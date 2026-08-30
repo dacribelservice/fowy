@@ -1,6 +1,7 @@
 "use client";
 
-import useSWR from "swr";
+import { useCallback, useMemo } from "react";
+import useSWRInfinite from "swr/infinite";
 import { createClient } from "@/utils/supabase/client";
 import { ReelFeedItem } from "@/types/reels";
 
@@ -8,10 +9,9 @@ interface UseReelsFeedParams {
   userLat?: number | null;
   userLng?: number | null;
   filterCategoryId?: string | null;
-  pageLimit?: number;
-  pageOffset?: number;
 }
 
+const PAGE_SIZE = 18;
 const supabase = createClient();
 
 async function fetchReelsFeed(
@@ -57,26 +57,69 @@ export function useReelsFeed({
   userLat = null,
   userLng = null,
   filterCategoryId = null,
-  pageLimit = 18,
-  pageOffset = 0,
 }: UseReelsFeedParams = {}) {
-  const swrKey: [string, number | null, number | null, string | null, number, number] = [
-    "reels-feed",
-    userLat ?? null,
-    userLng ?? null,
-    filterCategoryId ?? null,
-    pageLimit,
-    pageOffset,
-  ];
+  // Generador de claves para cada página consecutiva
+  const getKey = (
+    pageIndex: number,
+    previousPageData: ReelFeedItem[] | null
+  ) => {
+    // FRENO INTELIGENTE: Si la página anterior vino vacía o menor a PAGE_SIZE,
+    // se llegó al final del catálogo y NO se hacen más consultas a la DB.
+    if (previousPageData && previousPageData.length < PAGE_SIZE) return null;
 
-  const { data, error, isLoading, mutate } = useSWR(swrKey, fetchReelsFeed, {
-    revalidateOnFocus: false,
-    dedupingInterval: 60000,
-  });
+    return [
+      "reels-feed",
+      userLat ?? null,
+      userLng ?? null,
+      filterCategoryId ?? null,
+      PAGE_SIZE,
+      pageIndex * PAGE_SIZE, // page_offset dinámico
+    ];
+  };
+
+  const { data, error, size, setSize, isValidating, mutate } = useSWRInfinite(
+    getKey,
+    fetchReelsFeed,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+    }
+  );
+
+  // Deduplicación estricta por reelId para prevenir warnings de claves duplicadas en React
+  const reels: ReelFeedItem[] = useMemo(() => {
+    if (!data) return [];
+    const flat = data.flat();
+    const map = new Map<string, ReelFeedItem>();
+    flat.forEach((item) => {
+      if (item && !map.has(item.reelId)) {
+        map.set(item.reelId, item);
+      }
+    });
+    return Array.from(map.values());
+  }, [data]);
+
+  const isLoadingInitialData = !data && !error;
+  const isLoadingMore =
+    Boolean(size > 0 && data && typeof data[size - 1] === "undefined");
+  const isEmpty = data?.[0]?.length === 0;
+  const isReachingEnd =
+    Boolean(isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE));
+
+  // Memoización estricta con useCallback para no romper el IntersectionObserver
+  const loadMore = useCallback(() => {
+    if (!isReachingEnd && !isLoadingMore && !isValidating) {
+      setSize((prev) => prev + 1);
+    }
+  }, [isReachingEnd, isLoadingMore, isValidating, setSize]);
 
   return {
-    reels: data || [],
-    loading: isLoading,
+    reels,
+    loading: isLoadingInitialData,
+    loadingMore: isLoadingMore,
+    isReachingEnd,
+    isValidating,
+    loadMore,
     error,
     refreshFeed: mutate,
   };

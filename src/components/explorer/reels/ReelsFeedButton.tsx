@@ -9,11 +9,17 @@ interface ReelsFeedButtonProps {
 }
 
 export function ReelsFeedButton({ onClick }: ReelsFeedButtonProps) {
+  const handlePrefetch = () => {
+    void import("@/components/explorer/reels/ReelsFeedModal");
+  };
+
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
+      onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
       className="w-14 h-14 bg-gradient-to-tr from-[#FF5A5F] via-[#FF7A45] to-[#FF9A3D] rounded-full shadow-2xl flex items-center justify-center text-white border border-white/30 relative group shadow-orange-500/30"
       title="Ver Fowy Reels"
     >

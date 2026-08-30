@@ -4,15 +4,20 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
-import { Loader2, Navigation, Plus, AlertCircle, X } from "lucide-react";
+import { Loader2, Navigation, AlertCircle, X } from "lucide-react";
 import LocationPermissionModal from "@/components/explorer/LocationPermissionModal";
 import BusinessListSheet from "@/components/explorer/BusinessListSheet";
 import BusinessDetailSheet from "@/components/explorer/BusinessDetailSheet";
 import { ReelsFeedButton } from "@/components/explorer/reels/ReelsFeedButton";
-import { ReelsFeedModal } from "@/components/explorer/reels/ReelsFeedModal";
 import { ReelDeepLinkHandler } from "@/components/explorer/reels/ReelDeepLinkHandler";
 import { createClient } from "@/utils/supabase/client";
 import { useExplorerManager } from "@/hooks/useExplorerManager";
+
+// Dynamic Import for Reels Feed Modal (SSR: false)
+const ReelsFeedModal = dynamic(
+  () => import("@/components/explorer/reels/ReelsFeedModal").then((mod) => mod.ReelsFeedModal),
+  { ssr: false }
+);
 
 // Dynamic Import for Map (SSR: false)
 const ExplorerMap = dynamic(() => import("@/components/explorer/ExplorerMap"), { 
@@ -58,7 +63,6 @@ export default function ExplorarPage() {
 
   return (
     <div className="h-full w-full relative overflow-hidden bg-transparent">
-
       {/* Map Layer con Error Boundary (Protección) */}
       <div className="absolute inset-0 z-0">
         <ErrorBoundary fallbackMessage="El mapa no pudo cargar por un error de conexión, pero puedes seguir usando la aplicación sin problema.">
@@ -190,38 +194,42 @@ export default function ExplorarPage() {
         )}
       </AnimatePresence>
 
-      {/* Reels Feed Modal */}
-      <ReelsFeedModal
-        isOpen={isReelsOpen}
-        onClose={() => {
-          setIsReelsOpen(false);
-          setDeepLinkReelId(null);
-        }}
-        categories={categories}
-        userLocation={userLocation}
-        onViewOnMap={async (businessId) => {
-          setIsReelsOpen(false);
-          const found = businesses.find((b) => b.id === businessId);
-          if (found) {
-            handleSelectBusiness(found);
-          } else {
-            const supabase = createClient();
-            const { data } = await supabase
-              .from("businesses")
-              .select("id, name, slug, city, logo_url, latitude, longitude, rating, category_id, status, color_identity, schedules, tags, created_at, categories(name)")
-              .eq("id", businessId)
-              .single();
-            if (data) {
-              const enriched = {
-                ...data,
-                category_name: (data as any).categories?.name || "Comercio",
-              };
-              handleSelectBusiness(enriched);
-            }
-          }
-        }}
-        initialReelId={deepLinkReelId}
-      />
+      {/* Reels Feed Modal con AnimatePresence y Carga Diferida */}
+      <AnimatePresence>
+        {isReelsOpen && (
+          <ReelsFeedModal
+            isOpen={isReelsOpen}
+            onClose={() => {
+              setIsReelsOpen(false);
+              setDeepLinkReelId(null);
+              if (typeof window !== "undefined" && window.location.search.includes("reel=")) {
+                window.history.replaceState(null, "", window.location.pathname);
+              }
+            }}
+            categories={categories}
+            userLocation={userLocation}
+            onViewOnMap={async (businessId) => {
+              setIsReelsOpen(false);
+              setDeepLinkReelId(null);
+              if (typeof window !== "undefined" && window.location.search.includes("reel=")) {
+                window.history.replaceState(null, "", window.location.pathname);
+              }
+              const found = businesses.find((b) => b.id === businessId);
+              if (found) return handleSelectBusiness(found);
+              const supabase = createClient();
+              const { data } = await supabase
+                .from("businesses")
+                .select("id, name, slug, city, logo_url, latitude, longitude, rating, category_id, status, color_identity, schedules, tags, created_at, categories(name)")
+                .eq("id", businessId)
+                .single();
+              if (data) {
+                handleSelectBusiness({ ...data, category_name: (data as any).categories?.name || "Comercio" });
+              }
+            }}
+            initialReelId={deepLinkReelId}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Deep-link URL param handler */}
       <Suspense fallback={null}>

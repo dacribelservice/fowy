@@ -1,27 +1,61 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { ReelFeedItem } from "@/types/reels";
 import { ReelsProximityBar } from "./ReelsProximityBar";
 import ExplorerCategoryBar from "@/components/explorer/ExplorerCategoryBar";
 import { ReelsSearchBar } from "./ReelsSearchBar";
 import { ReelCard } from "./ReelCard";
-import { Film, RotateCcw } from "lucide-react";
+import { Film, RotateCcw, Loader2 } from "lucide-react";
 
 interface ReelsGridProps {
   reels: ReelFeedItem[];
   categories: any[];
   onOpenReel: (reel: ReelFeedItem) => void;
+  onLoadMore?: () => void;
+  loadingMore?: boolean;
+  isReachingEnd?: boolean;
+  isValidating?: boolean;
 }
 
 export function ReelsGrid({
   reels,
   categories,
   onOpenReel,
+  onLoadMore,
+  loadingMore = false,
+  isReachingEnd = false,
+  isValidating = false,
 }: ReelsGridProps) {
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sensor de Scroll Infinito con control anti-cascada y debounce
+  useEffect(() => {
+    if (!sentinelRef.current || isReachingEnd || loadingMore || isValidating) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isValidating && !isReachingEnd && !loadingMore) {
+          if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+          debounceTimeoutRef.current = setTimeout(() => {
+            onLoadMore?.();
+          }, 250);
+        }
+      },
+      { rootMargin: "250px" }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => {
+      observer.disconnect();
+      if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+    };
+  }, [onLoadMore, isReachingEnd, loadingMore, isValidating]);
 
   // Extracción única de negocios con distancia para el carrusel
   const uniqueBusinesses = useMemo(() => {
@@ -130,6 +164,13 @@ export function ReelsGrid({
           </button>
         </div>
       )}
+
+      {/* 5. Elemento Centinela al pie de la cuadrícula con Spinner */}
+      <div ref={sentinelRef} className="w-full py-4 flex justify-center items-center">
+        {loadingMore && !isReachingEnd && (
+          <Loader2 className="animate-spin text-orange-500" size={22} />
+        )}
+      </div>
     </div>
   );
 }
