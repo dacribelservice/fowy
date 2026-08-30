@@ -57,7 +57,7 @@ export default function PremiumImage({ src, alt, className = "", fallbackType = 
           >
             {fallbackType === "logo" ? (
               <div className="w-full h-full flex items-center justify-center bg-fowy-orange/5 text-fowy-orange/30">
-                <span className="font-black text-[10px] uppercase tracking-tighter">{alt.slice(0, 2)}</span>
+                <span className="font-black text-[10px] uppercase tracking-tighter">{(alt || "FW").slice(0, 2)}</span>
               </div>
             ) : (
               <AlertCircle className="text-slate-300" size={20} />

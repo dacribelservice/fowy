@@ -11,6 +11,7 @@ import BusinessDetailSheet from "@/components/explorer/BusinessDetailSheet";
 import { ReelsFeedButton } from "@/components/explorer/reels/ReelsFeedButton";
 import { ReelsFeedModal } from "@/components/explorer/reels/ReelsFeedModal";
 import { ReelDeepLinkHandler } from "@/components/explorer/reels/ReelDeepLinkHandler";
+import { createClient } from "@/utils/supabase/client";
 import { useExplorerManager } from "@/hooks/useExplorerManager";
 
 // Dynamic Import for Map (SSR: false)
@@ -198,9 +199,26 @@ export default function ExplorarPage() {
         }}
         categories={categories}
         userLocation={userLocation}
-        onViewOnMap={(businessId) => {
+        onViewOnMap={async (businessId) => {
           setIsReelsOpen(false);
-          handleSelectBusiness(businessId);
+          const found = businesses.find((b) => b.id === businessId);
+          if (found) {
+            handleSelectBusiness(found);
+          } else {
+            const supabase = createClient();
+            const { data } = await supabase
+              .from("businesses")
+              .select("id, name, slug, city, logo_url, latitude, longitude, rating, category_id, status, color_identity, schedules, tags, created_at, categories(name)")
+              .eq("id", businessId)
+              .single();
+            if (data) {
+              const enriched = {
+                ...data,
+                category_name: (data as any).categories?.name || "Comercio",
+              };
+              handleSelectBusiness(enriched);
+            }
+          }
         }}
         initialReelId={deepLinkReelId}
       />

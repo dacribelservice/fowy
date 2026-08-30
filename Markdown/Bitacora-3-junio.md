@@ -92,3 +92,40 @@
   - **Configuración de Credenciales Seguras**: Se registró la clave oficial de mosaicos de CARTO (`cb1_2igi_1_950cd0c9d7eb9c5ff77bdd97`) bajo la variable de entorno `NEXT_PUBLIC_CARTO_API_KEY` en `.env.local`.
   - **Integración en Leaflet (`ExplorerMap.tsx`)**: Se actualizó el componente `<TileLayer />` en `src/components/explorer/ExplorerMap.tsx` inyectando el parámetro `?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}` en la URL de `CARTO Positron Light`.
   - **Resultado**: Erradicación total de la marca de agua, preservación del lienzo gris/blanco minimalista característico de FOWY, máxima legibilidad en nombres de vías a cualquier nivel de zoom y retención del 100% de la lógica de clusters, pines naranjas y hojas de detalle.
+
+### 📌 Hito: Implementación Integral del Módulo FOWY REELS (Fases 1 a 6)
+- **Fecha**: 30 de Agosto de 2026
+- **Resumen**: Implementación arquitectónica completa del sistema de videos inmersivos y comercio visual gastronómico "FOWY REELS". Incluye backend en PostgreSQL/Supabase, motor de ingesta de Instagram con portadas WebP, reproductor full-screen "Zero Pantalla Negra", métricas de conversión atómicas ("Métrica de Oro"), panel de administración Super Admin con analítica vectorial SVG, y feed interactivo en el explorador con filtrado espacial GiST a 60 FPS.
+- **Detalles Técnicos**:
+  - **1. Backend y Base de Datos (PostgreSQL & Supabase Storage - Fase 1)**:
+    - **Tabla Principal `business_reels`**: Creada con claves foráneas, índices (`business_id`, `is_active`, `created_at DESC`) y columnas para tracking atómico de vistas (`views_count`) y conversiones de menú (`clicks_to_menu_count`).
+    - **Procedimiento RPC `get_reels_feed`**: Consulta espacial optimizada con PostGIS (`<->`) que calcula la distancia euclidiana exacta en metros cuando el usuario tiene GPS activo, o fallback por popularidad/novedad sin GPS.
+    - **Funciones Atómicas de Métricas**: `increment_reel_view` e `increment_reel_menu_click` con `SECURITY DEFINER` y permisos `GRANT EXECUTE` para registrar interacciones sin demoras en red.
+    - **Políticas RLS en DB y Storage**: Políticas de lectura pública para videos activos y portadas en el bucket `reels-thumbnails`, y permisos completos de escritura restringidos a `super_admin`.
+  - **2. Utilidades y Hooks de Ingesta (Fase 2)**:
+    - `src/utils/instagram.ts`: Sanitización de URLs mediante expresiones regulares para limpiar parámetros de rastreo (`?igsi=...`, `?utm_source=...`) y generar URLs de incrustación `https://www.instagram.com/reel/[id]/embed/`.
+    - `useReelsFeed.ts`: Hook desacoplado con paginación, debounce de búsqueda y gestión de estado local para el feed del explorador.
+    - `useReelsManager.ts`: Hook para el CRUD administrativo de videos con optimización de subida WebP y eliminación en cascada de portadas huérfanas en Supabase Storage.
+    - `useAdminReelsSummary.ts` y `useReelsTrafficData.ts`: Procesamiento de métricas globales, cálculo de tasas de conversión y agrupamiento cronológico (Día/Semana/Mes) para la gráfica vectorial SVG.
+  - **3. Experiencia Móvil en el Explorador (`(explorer)` - Fase 3 y 4)**:
+    - `ReelsFeedButton.tsx`: Botón flotante animado de claqueta con efecto de pulso sobre el mapa de `/explorar`.
+    - `ReelsFeedModal.tsx`: Modal inmersivo con soporte para notch móvil, branding `fowy reels` en minúsculas con tipografía Google Poppins (peso 700 bold, `#ff0000`) y selector de cierre.
+    - `ReelsProximityBar.tsx`: Carrusel horizontal de burbujas de negocios con distancia exacta, indicador activo (`ring-2 ring-offset-2`) y padding de protección superior.
+    - `ReelsSearchBar.tsx` y `ReelsGrid.tsx`: Barra de búsqueda de antojos y cuadrícula 9:16 con filtrado reactivo en memoria RAM a 60 FPS.
+    - `ReelPlayerModal.tsx` ("Zero Pantalla Negra"): Reproductor inmersivo que muestra la portada WebP con desenfoque (`blur`) mientras el iframe de Instagram conecta, haciendo una transición suave al video y disparando `increment_reel_view` con pestillo `useRef` para evitar conteos duplicados.
+    - `ReelActionCard.tsx`: Tarjeta flotante con logo, distancia, botón de compartir viral con Web Share API / portapapeles, botón de mapa con centrado en el local (`onViewOnMap`) y botón destacado `[ 🛒 VER MENÚ & PEDIR ]` que incrementa la Métrica de Oro y redirige a `/[slug]`.
+    - `ReelDeepLinkHandler.tsx`: Manejador con `Suspense` para abrir automáticamente reels compartidos vía URL `https://fowy.com/explorar?reel=ID`.
+  - **4. Panel de Administración Super Admin (`admin` - Fase 5)**:
+    - `ReelThumbnailUploader.tsx`: Dropzone drag & drop 9:16 con compresión WebP automática en cliente (`maxWidth: 720, quality: 0.85`).
+    - `ReelFormFields.tsx` y `useReelFormLogic.ts`: Formulario con autocompletado desambiguado de restaurantes mediante `Map<string, string>`.
+    - `ReelFormModal.tsx`: Modal glassmorphic con `framer-motion` para crear y editar videos.
+    - `ReelsGlobalKPIs.tsx`: 4 tarjetas métricas (Videos, Vistas, Clics Menú, Conversión) y ranking Top 5 de restaurantes gastronómicos.
+    - `ReelsTrafficChart.tsx`: Integración del motor SVG de tráfico vectorial (`BusinessTrafficSvg.tsx`) con selector de granularidad Día/Semana/Mes.
+    - `ReelsBusinessesTable.tsx`: Tabla de negocios vinculados con buscador, conteo de videos, vistas, clics y paginación.
+    - `AdminReelCard.tsx` y `ReelsBusinessGallery.tsx`: Galería visual individual con switch ON/OFF, miniaturas 9:16, botones de ver, editar y eliminar con `DeleteConfirmModal.tsx`.
+    - Rutas ensambladas: `/admin/reels` (Hub central) y `/admin/reels/[businessId]` (Gestión dedicada por restaurante).
+    - `BusinessMetricsList.tsx`: Agregado el 6.º ítem métrico ("Clics desde Fowy Reels") sin alterar cálculos previos de tickets o visitas.
+  - **5. Validación Integral y Cumplimiento de Reglas (Fase 6)**:
+    - **Presupuesto de Líneas**: Todos los 20+ archivos nuevos respetan el límite modular estricto (<180 líneas en componentes estándar y <250 líneas en páginas compuestas).
+    - **Compilación de Producción**: `npm run build` ejecutado exitosamente con `Exit code 0` y cero errores de TypeScript.
+    - **Ley del Remolque**: Cero impacto en módulos preexistentes en producción (logos, banners, productos y pedidos intactos).
