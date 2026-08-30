@@ -159,3 +159,25 @@
   - **6. Cumplimiento Arquitectónico y Compilación**:
     - Todos los 5 archivos modificados cumplen estrictamente la regla de líneas (<180L por componente y 250L en el orquestador).
     - Compilación de producción (`npm run build`) validada con 0 errores de TypeScript y ESLint (`Exit code: 0`).
+
+### 📌 Hito: Perfeccionamiento Táctil, Animación Slide 60 FPS, Cargador Wave Dots y Métricas Blindadas en FOWY REELS (Fase 8)
+- **Fecha**: 30 de Agosto de 2026
+- **Resumen**: Implementación de la Fase 8 de FOWY REELS enfocada en la experiencia de usuario de alta gama y fidelidad de métricas. Se liberó la interacción táctil con el reproductor de Instagram resolviendo el bloqueo del botón Play, se incorporó un cargador glassmorphic flotante con 3 puntos en onda continua (*Bouncing Wave Dots*), se implementó la animación física direccional vertical (*Slide Up / Down* a 60 FPS con Framer Motion), se añadió micro-animación elástica al logo del negocio en la tarjeta de conversión y se blindó el registro asíncrono de clics al menú con `await supabase.rpc`.
+- **Detalles Técnicos**:
+  - **1. Liberación Táctil del Botón Play & Registro Asíncrono (`ReelPlayerModal.tsx` & `ReelActionCard.tsx`)**:
+    - Se dividió la capa gestual superior en franjas perimetrales (superior 35%, inferior 28% y rieles laterales) dejando el área central (70% × 40%) completamente libre y transparente a eventos (`pointer-events-none`).
+    - Al pulsar el botón central de Play, pausa o audio de Instagram, los toques llegan directamente al iframe con 100% de responsividad en móviles y PC sin interferir con los gestos de deslizamiento.
+    - En `ReelActionCard.tsx`, `handleGoToMenu` se convirtió en función `async` con `try/finally` y `await supabase.rpc('increment_reel_menu_click', ...)` antes de `router.push`, garantizando el registro en Supabase sin cancelaciones por navegación en Safari/iOS (WebKit).
+  - **2. Cargador Elegante de 3 Puntos Ondulantes (*Bouncing Wave Dots Loader* - `ReelPlayerModal.tsx`)**:
+    - Se sustituyó el spinner estático/circular por una cápsula flotante glassmorphic (`bg-black/50 backdrop-blur-xl border border-white/15 shadow-2xl`).
+    - Se renderizaron 3 puntos animados con Framer Motion en el gradiente corporativo FOWY (`#FF5A5F` a `#FF9A3D`) con oscilación vertical suave (`y: [0, -6, 0]`), micro-escala (`scale: [1, 1.2, 1]`) y delay escalonado (0.18s), generando una onda armónica mientras el video conecta.
+  - **3. Animación Direccional Vertical y Desplazamiento Físico (*Slide Up / Down 60 FPS* - `ReelPlayerModal.tsx`)**:
+    - Integración de estado `direction: 1 | -1` y variantes `slideVariants` con curvas `spring` de 60 FPS (`stiffness: 300, damping: 30`).
+    - Envoltorio con `<AnimatePresence initial={false} custom={direction}>` donde el video saliente se desplaza físicamente fuera de pantalla (`-100%` en swipe up / `100%` en swipe down) mientras el nuevo ingresa desde la dirección contraria, emulando la física exacta de TikTok e Instagram Reels.
+  - **4. Micro-Animación Elástica de Identidad de Restaurante (`ReelActionCard.tsx`)**:
+    - Envoltorio de la fila de identidad con `<AnimatePresence mode="wait">` y `key={reel.businessId}`, animando el logo circular, nombre y distancia con micro-escala (`0.95 -> 1`), traslación horizontal suave (`x: -12 -> 0`) y transición elástica `spring`.
+  - **5. Control de Techo de Líneas y Compilación Limpia**:
+    - `ReelPlayerModal.tsx`: **167 líneas** (estrictamente inferior al techo de 180L).
+    - `ReelActionCard.tsx`: **133 líneas** (estrictamente inferior al techo de 140L/180L).
+    - Compilación de producción validada exitosamente con `npm run build` (**0 errores de TypeScript, 0 errores de ESLint, 33 rutas compiladas, `Exit code: 0`**).
+

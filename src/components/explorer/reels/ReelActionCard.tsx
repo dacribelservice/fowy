@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, MapPin, Share2, Check } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { ReelFeedItem } from "@/types/reels";
@@ -29,11 +30,16 @@ export function ReelActionCard({
         : `a ${(reel.distanceMeters / 1000).toFixed(1)}km de ti`
       : "Recomendado para ti";
 
-  const handleGoToMenu = () => {
-    void supabase.rpc("increment_reel_menu_click", {
-      target_reel_id: reel.reelId,
-    });
-    router.push("/" + reel.businessSlug);
+  const handleGoToMenu = async () => {
+    try {
+      await supabase.rpc("increment_reel_menu_click", {
+        target_reel_id: reel.reelId,
+      });
+    } catch (err) {
+      console.error("Error incrementing reel menu click:", err);
+    } finally {
+      router.push("/" + reel.businessSlug);
+    }
   };
 
   const handleViewOnMap = () => {
@@ -60,24 +66,33 @@ export function ReelActionCard({
 
   return (
     <div className="w-full bg-black/70 backdrop-blur-xl border border-white/10 rounded-3xl p-4 flex flex-col gap-3 shadow-2xl">
-      {/* Fila 1: Logo del Negocio, Nombre y Distancia */}
-      <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/40 bg-white flex-shrink-0 shadow-md">
-          <img
-            src={reel.businessLogoUrl || "/placeholder-logo.png"}
-            alt={reel.businessName}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-extrabold text-white truncate leading-tight">
-            {reel.businessName}
-          </h4>
-          <p className="text-xs font-semibold text-orange-400 truncate">
-            {distanceText}
-          </p>
-        </div>
-      </div>
+      {/* Fila 1: Logo del Negocio, Nombre y Distancia con Animación Elástica */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={reel.businessId}
+          initial={{ opacity: 0, x: -12, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: 12, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 350, damping: 25 }}
+          className="flex items-center gap-3"
+        >
+          <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/40 bg-white flex-shrink-0 shadow-md">
+            <img
+              src={reel.businessLogoUrl || "/placeholder-logo.png"}
+              alt={reel.businessName}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-extrabold text-white truncate leading-tight">
+              {reel.businessName}
+            </h4>
+            <p className="text-xs font-semibold text-orange-400 truncate">
+              {distanceText}
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Fila 2: Botones de Acción y Conversión */}
       <div className="flex items-center gap-2">
