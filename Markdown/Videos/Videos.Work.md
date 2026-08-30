@@ -519,4 +519,40 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     3. Ejecutar `npm run build` para asegurar 0 errores de TypeScript y ESLint.
   * **Resultado de Cierre:** Tarjeta de acción viva y dinámica con entrada elástica sincronizada, sistema 100% validado y probado para producción. ✅
 
+---
+
+## 🚀 FASE 9: Sincronización Reactiva en Caliente de Vistas (*Optimistic View Counter 60 FPS* en RAM) & Robustez RPC
+
+- [x] **Paso 9.1: Mutador Local Optimista en el Hook de Datos (`src/hooks/useReelsFeed.ts`)**
+  * **Objetivo:** Permitir la actualización instantánea en memoria RAM del contador de vistas de cualquier reel sin esperar peticiones de red ni invalidaciones lentas.
+  * **Acciones:**
+    1. En `useReelsFeed.ts`, implementar la función memoizada `incrementLocalView(targetReelId: string)` utilizando `mutate` sobre las páginas de `useSWRInfinite`.
+    2. Modificar el arreglo de páginas en caliente sumando `+1` a `viewsCount` en el reel coincidente con `shouldRevalidate: false`.
+    3. Exportar `incrementLocalView` en el objeto de retorno del hook.
+  * **Resultado de Cierre:** Función de mutación local lista para reflejar visualmente el incremento de vistas a 0 ms. ✅
+
+- [x] **Paso 9.2: Canalización del Callback hacia el Reproductor (`src/components/explorer/reels/ReelsFeedModal.tsx`)**
+  * **Objetivo:** Conectar el mutador optimista de `useReelsFeed` hacia el modal del reproductor.
+  * **Acciones:**
+    1. En `ReelsFeedModal.tsx`, extraer `incrementLocalView` desde `useReelsFeed`.
+    2. Pasar `onIncrementView={incrementLocalView}` como prop a `<ReelPlayerModal />`.
+  * **Resultado de Cierre:** Conexión reactiva completada entre el feed orquestador y el reproductor inmersivo. ✅
+
+- [x] **Paso 9.3: Disparo Sincronizado en RAM y Persistencia en Supabase con Manejo de Errores (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
+  * **Objetivo:** Incrementar la vista visualmente al instante y blindar la llamada RPC con captura de errores.
+  * **Acciones:**
+    1. Agregar `onIncrementView?: (reelId: string) => void` a `ReelPlayerModalProps`.
+    2. En el `useEffect` de registro de vistas, invocar `onIncrementView?.(currentReelId)` inmediatamente tras agregar el ID al set `viewedReelIdsRef`.
+    3. Envolver la llamada a `supabase.rpc("increment_reel_view", { target_reel_id: currentReelId })` con captura de respuesta y log de errores (`console.error`).
+  * **Resultado de Cierre:** Contador de vistas actualizado a 60 FPS en pantalla y persistido con robustez en PostgreSQL. ✅
+
+- [x] **Paso 9.4: Verificación Integral, Techo de Líneas y Compilación Limpia (`npm run build`)**
+  * **Objetivo:** Validar que los 3 archivos modificados se mantengan estrictamente dentro del presupuesto de líneas (<180L) y que el sistema compile sin errores.
+  * **Acciones:**
+    1. Auditar líneas de código: `useReelsFeed.ts` (<180L), `ReelsFeedModal.tsx` (<180L) y `ReelPlayerModal.tsx` (<180L).
+    2. Ejecutar `npm run build` para asegurar 0 errores de TypeScript y ESLint.
+    3. Probar en el explorador móvil que al abrir un reel su tarjeta en el grid pase de `▶ 0` a `▶ 1` de inmediato sin recargar.
+  * **Resultado de Cierre:** Sistema FOWY REELS con métricas de vistas 100% reactivas, validado y probado para producción. ✅
+
+
 

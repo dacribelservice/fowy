@@ -113,6 +113,30 @@ export function useReelsFeed({
     }
   }, [isReachingEnd, isLoadingMore, isValidating, setSize]);
 
+  // Mutación optimista en memoria RAM (0 ms) para reflejar incrementos de vistas instantáneos
+  const incrementLocalView = useCallback(
+    (targetReelId: string) => {
+      void mutate(
+        (currentPages) => {
+          if (!currentPages) return currentPages;
+          return currentPages.map((page) =>
+            page.map((item) => {
+              if (item.reelId === targetReelId) {
+                return {
+                  ...item,
+                  viewsCount: (item.viewsCount || 0) + 1,
+                };
+              }
+              return item;
+            })
+          );
+        },
+        { revalidate: false }
+      );
+    },
+    [mutate]
+  );
+
   return {
     reels,
     loading: isLoadingInitialData,
@@ -120,6 +144,7 @@ export function useReelsFeed({
     isReachingEnd,
     isValidating,
     loadMore,
+    incrementLocalView,
     error,
     refreshFeed: mutate,
   };

@@ -14,6 +14,7 @@ interface ReelPlayerModalProps {
   onClose: () => void;
   onViewOnMap?: (businessId: string) => void;
   onLoadMore?: () => void;
+  onIncrementView?: (reelId: string) => void;
 }
 
 const supabase = createClient();
@@ -24,6 +25,7 @@ export function ReelPlayerModal({
   onClose,
   onViewOnMap,
   onLoadMore,
+  onIncrementView,
 }: ReelPlayerModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [direction, setDirection] = useState<1 | -1>(1);
@@ -51,9 +53,21 @@ export function ReelPlayerModal({
   useEffect(() => {
     if (currentReelId && !viewedReelIdsRef.current.has(currentReelId)) {
       viewedReelIdsRef.current.add(currentReelId);
-      void supabase.rpc("increment_reel_view", { target_reel_id: currentReelId });
+      onIncrementView?.(currentReelId);
+      void (async () => {
+        try {
+          const { error } = await supabase.rpc("increment_reel_view", {
+            target_reel_id: currentReelId,
+          });
+          if (error) {
+            console.error("Error incrementing reel view:", error);
+          }
+        } catch (err) {
+          console.error("Error in increment_reel_view:", err);
+        }
+      })();
     }
-  }, [currentReelId]);
+  }, [currentReelId, onIncrementView]);
 
   // Swipe Up Hint guiado con persistencia en localStorage
   useEffect(() => {

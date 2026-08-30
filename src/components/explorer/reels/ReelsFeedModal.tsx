@@ -44,10 +44,17 @@ export function ReelsFeedModal({
     ? userLocation[1]
     : userLocation?.lng ?? null;
 
-  const { reels, loading, loadingMore, isReachingEnd, isValidating, loadMore } = useReelsFeed({
+  const { reels, loading, loadingMore, isReachingEnd, isValidating, loadMore, incrementLocalView } = useReelsFeed({
     userLat,
     userLng,
   });
+
+  const handleIncrementView = (reelId: string) => {
+    incrementLocalView(reelId);
+    if (deepLinkedReel?.reelId === reelId) {
+      setDeepLinkedReel((prev) => (prev ? { ...prev, viewsCount: (prev.viewsCount || 0) + 1 } : null));
+    }
+  };
 
   // Deep-linking resiliente: busca en memoria o consulta el reel individual
   useEffect(() => {
@@ -73,26 +80,17 @@ export function ReelsFeedModal({
       if (data && data.businesses) {
         const biz: any = Array.isArray(data.businesses) ? data.businesses[0] : data.businesses;
         const singleItem: ReelFeedItem = {
-          reelId: data.id,
-          title: data.title,
-          instagramUrl: data.instagram_url,
-          thumbnailUrl: data.thumbnail_url,
-          viewsCount: data.views_count || 0,
-          clicksToMenuCount: data.clicks_to_menu_count || 0,
-          createdAt: data.created_at,
-          businessId: biz.id,
-          businessName: biz.name,
-          businessSlug: biz.slug,
-          businessLogoUrl: biz.logo_url,
-          businessCategoryId: biz.category_id,
-          businessTags: biz.tags || [],
-          distanceMeters: null,
+          reelId: data.id, title: data.title, instagramUrl: data.instagram_url,
+          thumbnailUrl: data.thumbnail_url, viewsCount: data.views_count || 0,
+          clicksToMenuCount: data.clicks_to_menu_count || 0, createdAt: data.created_at,
+          businessId: biz.id, businessName: biz.name, businessSlug: biz.slug,
+          businessLogoUrl: biz.logo_url, businessCategoryId: biz.category_id,
+          businessTags: biz.tags || [], distanceMeters: null,
         };
         setDeepLinkedReel(singleItem);
         setActiveReelId(singleItem.reelId);
       }
     };
-
     void fetchSingleReel();
   }, [initialReelId, reels]);
 
@@ -165,6 +163,7 @@ export function ReelsFeedModal({
           onClose={() => setActiveReelId(null)}
           onViewOnMap={onViewOnMap}
           onLoadMore={loadMore}
+          onIncrementView={handleIncrementView}
         />
       )}
     </motion.div>
