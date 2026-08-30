@@ -2,11 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Compass } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
+import { Poppins } from "next/font/google";
 import { useReelsFeed } from "@/hooks/useReelsFeed";
 import { ReelsGrid } from "./ReelsGrid";
 import { ReelPlayerModal } from "./ReelPlayerModal";
 import { ReelFeedItem } from "@/types/reels";
+
+const poppins = Poppins({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+});
 
 interface ReelsFeedModalProps {
   isOpen: boolean;
@@ -61,19 +67,11 @@ export function ReelsFeedModal({
         className="absolute inset-0 z-[70] bg-white flex flex-col overflow-hidden rounded-[40px]"
       >
         {/* Cabecera del Feed con espacio superior para el notch */}
-        <div className="flex items-center justify-between px-4 pt-10 pb-2.5 bg-white/95 backdrop-blur-md border-b border-slate-100 z-10">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF5A5F] to-[#FF9A3D] flex items-center justify-center text-white shadow-sm">
-              <Compass size={18} />
-            </div>
-            <div>
-              <h2 className="text-base font-black text-slate-900 leading-tight">
-                Descubre en {cityName}
-              </h2>
-              <p className="text-[10px] font-semibold text-slate-500">
-                Videos y antojos en tiempo real
-              </p>
-            </div>
+        <div className="flex items-center justify-between px-5 pt-10 pb-3 bg-white/95 backdrop-blur-md border-b border-slate-100 z-10">
+          <div className="flex items-center">
+            <span className={`${poppins.className} text-2xl font-bold text-[#ff0000] tracking-tight lowercase select-none`}>
+              fowy reels
+            </span>
           </div>
 
           <button

@@ -29,8 +29,8 @@ export function ReelsProximityBar({
   onSelectBusiness,
 }: ReelsProximityBarProps) {
   return (
-    <div className="w-full relative px-2">
-      <div className="flex items-center gap-3.5 overflow-x-auto scroll-smooth px-2 pb-2 scrollbar-none">
+    <div className="w-full relative px-2 pt-1">
+      <div className="flex items-center gap-3.5 overflow-x-auto scroll-smooth px-2 pt-2.5 pb-2 scrollbar-none">
         {/* Botón Todos */}
         <motion.button
           whileTap={{ scale: 0.95 }}
