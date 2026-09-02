@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Pointer } from "lucide-react";
+import { X } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { ReelFeedItem } from "@/types/reels";
 import { getInstagramEmbedUrl } from "@/utils/instagram";
 import { ReelActionCard } from "./ReelActionCard";
+import { SwipeUpGestureHint } from "./SwipeUpGestureHint";
 
 interface ReelPlayerModalProps {
   reels: ReelFeedItem[];
@@ -76,7 +77,7 @@ export function ReelPlayerModal({
       if (!hasSeenHint) {
         setShowSwipeHint(true);
         localStorage.setItem("fowy_reel_swipe_hint", "true");
-        const timer = setTimeout(() => setShowSwipeHint(false), 2500);
+        const timer = setTimeout(() => setShowSwipeHint(false), 3000);
         return () => clearTimeout(timer);
       }
     }
@@ -139,14 +140,14 @@ export function ReelPlayerModal({
             transition={{ y: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.15 } }}
             className="absolute inset-0 flex flex-col items-center justify-center"
           >
-            {/* Skeleton Blur WebP con Cargador de Puntos Ondulantes */}
+            {/* Skeleton Blur WebP con Cargador Frosted Glass de 4 Puntos Ondulantes */}
             {!iframeLoaded && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
                 <img src={currentReel.thumbnailUrl || "/placeholder-reel.jpg"} alt={currentReel.title} className="w-full h-full object-cover filter blur-md opacity-60 scale-105" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/50 backdrop-blur-xl border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span key={i} className="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-[#FF5A5F] to-[#FF9A3D] shadow-sm shadow-orange-500/50" animate={{ y: [0, -6, 0], scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }} transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.18, ease: "easeInOut" }} />
+                  <div className="flex items-center gap-2.5 px-5 py-3 rounded-full bg-white/20 backdrop-blur-2xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+                    {[0, 1, 2, 3].map((i) => (
+                      <motion.span key={i} className="w-2.5 h-2.5 rounded-full bg-white shadow-sm shadow-white/50" animate={{ y: [0, -6, 0], scale: [1, 1.25, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }} />
                     ))}
                   </div>
                 </div>
@@ -160,14 +161,9 @@ export function ReelPlayerModal({
           </motion.div>
         </AnimatePresence>
 
-        {/* Micro-Animación de Inducción Táctil (Swipe Up Hint) */}
+        {/* Micro-Animación de Inducción Táctil (Flecha con degradado y mano con Motion Trail) */}
         <AnimatePresence>
-          {showSwipeHint && (
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 0 }} animate={{ opacity: 1, scale: 1, y: -16 }} exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.4 } }} transition={{ y: { repeat: Infinity, repeatType: "reverse", duration: 0.7, ease: "easeInOut" }, opacity: { duration: 0.3 } }} className="absolute z-40 pointer-events-none flex flex-col items-center gap-1.5 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl">
-              <Pointer size={22} className="text-white drop-shadow-md -rotate-12" />
-              <span className="text-[10px] font-extrabold text-white uppercase tracking-wider">Desliza hacia arriba</span>
-            </motion.div>
-          )}
+          {showSwipeHint && <SwipeUpGestureHint onFinish={() => setShowSwipeHint(false)} />}
         </AnimatePresence>
 
         {/* Tarjeta Flotante Inferior de Conversión */}

@@ -558,21 +558,22 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
 
 ## 🚀 FASE 10: Perfeccionamiento Visual Glassmorphism — Indicador Táctil Swipe Up (Estilo TikTok/YouTube Shorts) & Cargador Frosted Glass de 4 Puntos Ondulantes
 
-- [ ] **Paso 10.1: Cargador Skeleton en Cápsula Frosted Glass de 4 Puntos Ondulantes (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
+- [x] **Paso 10.1: Cargador Skeleton en Cápsula Frosted Glass de 4 Puntos Ondulantes (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
   * **Objetivo:** Sustituir el indicador de carga actual por una cápsula de cristal esmerilado (*frosted glass*) con 4 puntos blancos/glow que oscilan en onda continua mientras el video de Instagram termina de inicializarse.
   * **Acciones:**
     1. En `ReelPlayerModal.tsx`, estilizar el contenedor del loader intermedio con acabado `backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.35)] rounded-full px-5 py-3`.
     2. Renderizar 4 puntos `<motion.span>` en blanco puro (`w-2.5 h-2.5 rounded-full bg-white shadow-sm shadow-white/50`) mediante el mapeo `[0, 1, 2, 3]`.
     3. Configurar animación vertical sincronizada en onda (`y: [0, -6, 0]`, `scale: [1, 1.25, 1]`, `opacity: [0.6, 1, 0.6]`) con retardo escalonado (`delay: i * 0.15s`, `duration: 0.9s`, `repeat: Infinity`).
-  * **Resultado de Cierre:** Cargador visualmente premium, 100% coherente con la identidad glassmorphic del menú de FOWY y fluido a 60 FPS.
+  * **Resultado de Cierre:** Cargador visualmente premium, 100% coherente con la identidad glassmorphic del menú de FOWY y fluido a 60 FPS. ✅
 
-- [ ] **Paso 10.2: Micro-Animación de Inducción Táctil (*Swipe Up Hint*) Glassmorphic con Efecto TikTok / YouTube Shorts (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
-  * **Objetivo:** Rediseñar la píldora de inducción táctil para que ofrezca una estética vanguardista con reflejos translúcidos, chevrons/rastro ascendente dinámico y tipografía premium.
+- [x] **Paso 10.2: Micro-Animación de Inducción Táctil (*Swipe Up Hint*) con Flecha en Degradado Vertical y Mano con Rastro de Movimiento (*Motion Trail* - `src/components/explorer/reels/SwipeUpGestureHint.tsx` & `ReelPlayerModal.tsx`)**
+  * **Objetivo:** Renderizar una animación ultra-limpia y nativa sobre el video compuesta por una flecha translúcida en gradiente vertical y una mano táctil con 4 capas de rastro de movimiento (*motion trail*) que se desvanece suavemente a los 3 segundos.
   * **Acciones:**
-    1. En `ReelPlayerModal.tsx`, actualizar la cápsula de inducción táctil con `bg-black/40 backdrop-blur-2xl border border-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.6)] px-5 py-2.5 rounded-full`.
-    2. Incorporar un conjunto visual de flechas/chevrons o mano estilizada en cascada ascendente con animación en bucle continuo de traslación Y (`y: [4, -12, 4]`) y desvanecimiento progresivo (*fade wave*).
-    3. Mantener la persistencia en `localStorage` (`"fowy_reel_swipe_hint"`) y el desvanecimiento automático tras 2.5 segundos o al realizar el primer gesto táctil.
-  * **Resultado de Cierre:** Indicador de deslizamiento vertical ultra-elegante, no intrusivo y alineado con los estándares visuales de TikTok y YouTube Shorts.
+    1. Crear el subcomponente atómico `SwipeUpGestureHint.tsx` (89 líneas) con el vector SVG de flecha ancha (`linearGradient` vertical de 5% a 95% de opacidad) y la mano en ángulo de toque con 4 capas en cascada de opacidad (`15%`, `35%`, `65%`, `100%`).
+    2. Configurar la animación ascendente continua en bucle con Framer Motion (`y: [36, -26, 36]`, `opacity: [0.3, 1, 0.3]`, `duration: 1.4s`) a 60 FPS con aceleración GPU.
+    3. Integrar `<SwipeUpGestureHint />` en `ReelPlayerModal.tsx` dentro de `<AnimatePresence>` sin fondos de cápsula oscura.
+    4. Ajustar el temporizador de `localStorage` (`"fowy_reel_swipe_hint"`) a 3000 ms (3 segundos exactos) y desvanecimiento automático al primer deslizamiento táctil.
+  * **Resultado de Cierre:** Gesto de deslizamiento vertical elegante, fluido a 60 FPS, sin código residual y 100% fiel a la referencia visual. ✅
 
 - [ ] **Paso 10.3: Control de Presupuesto de Líneas (<180L) y Verificación de Compilación (`npm run build`)**
   * **Objetivo:** Garantizar que las optimizaciones visuales mantengan `ReelPlayerModal.tsx` por debajo del techo estricto de 180 líneas y compilen con cero errores.
