@@ -554,5 +554,34 @@ Todos los puntos estratégicos han sido resueltos e incorporados a la especifica
     3. Probar en el explorador móvil que al abrir un reel su tarjeta en el grid pase de `▶ 0` a `▶ 1` de inmediato sin recargar.
   * **Resultado de Cierre:** Sistema FOWY REELS con métricas de vistas 100% reactivas, validado y probado para producción. ✅
 
+---
+
+## 🚀 FASE 10: Perfeccionamiento Visual Glassmorphism — Indicador Táctil Swipe Up (Estilo TikTok/YouTube Shorts) & Cargador Frosted Glass de 4 Puntos Ondulantes
+
+- [ ] **Paso 10.1: Cargador Skeleton en Cápsula Frosted Glass de 4 Puntos Ondulantes (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
+  * **Objetivo:** Sustituir el indicador de carga actual por una cápsula de cristal esmerilado (*frosted glass*) con 4 puntos blancos/glow que oscilan en onda continua mientras el video de Instagram termina de inicializarse.
+  * **Acciones:**
+    1. En `ReelPlayerModal.tsx`, estilizar el contenedor del loader intermedio con acabado `backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.35)] rounded-full px-5 py-3`.
+    2. Renderizar 4 puntos `<motion.span>` en blanco puro (`w-2.5 h-2.5 rounded-full bg-white shadow-sm shadow-white/50`) mediante el mapeo `[0, 1, 2, 3]`.
+    3. Configurar animación vertical sincronizada en onda (`y: [0, -6, 0]`, `scale: [1, 1.25, 1]`, `opacity: [0.6, 1, 0.6]`) con retardo escalonado (`delay: i * 0.15s`, `duration: 0.9s`, `repeat: Infinity`).
+  * **Resultado de Cierre:** Cargador visualmente premium, 100% coherente con la identidad glassmorphic del menú de FOWY y fluido a 60 FPS.
+
+- [ ] **Paso 10.2: Micro-Animación de Inducción Táctil (*Swipe Up Hint*) Glassmorphic con Efecto TikTok / YouTube Shorts (`src/components/explorer/reels/ReelPlayerModal.tsx`)**
+  * **Objetivo:** Rediseñar la píldora de inducción táctil para que ofrezca una estética vanguardista con reflejos translúcidos, chevrons/rastro ascendente dinámico y tipografía premium.
+  * **Acciones:**
+    1. En `ReelPlayerModal.tsx`, actualizar la cápsula de inducción táctil con `bg-black/40 backdrop-blur-2xl border border-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.6)] px-5 py-2.5 rounded-full`.
+    2. Incorporar un conjunto visual de flechas/chevrons o mano estilizada en cascada ascendente con animación en bucle continuo de traslación Y (`y: [4, -12, 4]`) y desvanecimiento progresivo (*fade wave*).
+    3. Mantener la persistencia en `localStorage` (`"fowy_reel_swipe_hint"`) y el desvanecimiento automático tras 2.5 segundos o al realizar el primer gesto táctil.
+  * **Resultado de Cierre:** Indicador de deslizamiento vertical ultra-elegante, no intrusivo y alineado con los estándares visuales de TikTok y YouTube Shorts.
+
+- [ ] **Paso 10.3: Control de Presupuesto de Líneas (<180L) y Verificación de Compilación (`npm run build`)**
+  * **Objetivo:** Garantizar que las optimizaciones visuales mantengan `ReelPlayerModal.tsx` por debajo del techo estricto de 180 líneas y compilen con cero errores.
+  * **Acciones:**
+    1. Auditar el conteo de líneas de `ReelPlayerModal.tsx` asegurando que no exceda las 180 líneas.
+    2. Ejecutar `npm run build` para comprobar 0 advertencias y 0 errores de compilación TypeScript/Next.js.
+    3. Validar en emulador móvil la fluidez de ambas animaciones a 60 FPS sin parpadeos ni solapamientos.
+  * **Resultado de Cierre:** Upgrade visual de FOWY Reels 100% verificado y listo para producción.
+
+
 
 
