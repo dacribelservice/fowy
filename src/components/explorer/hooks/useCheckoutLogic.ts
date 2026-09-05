@@ -173,8 +173,8 @@ ${itemsText}
 📝 *Notas:* ${orderNotes.trim() ? orderNotes.trim() : "Ninguna"}
 💳 *Método de Pago:* ${paymentDetail}
 
-💰 *Pedido total:* $${totalText}
-🛵 *Sin Domicilio*
+💰 *Pedido SubTotal:* $${totalText}
+🛵 *El domicilio es por aparte*
 
 *¡Gracias por tu compra!*`;
 
