@@ -2,7 +2,7 @@
 
 > ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.  
 > **Fecha de creación:** 5 de Septiembre de 2026  
-> **Versión:** 1.1 (Blindaje 100%: Idempotencia Webhook, Traspasos, Crons UTC-5, Fallback Audios y Confirmación sin Re-inferencia)  
+> **Versión:** 1.3 (Blindaje 100%: Aislamiento en Tabla Satélite business_subscriptions, Cero Escritura en businesses y RLS Admin)  
 > **Ubicación:** `Markdown/Contabilidad/AGENTE.md`  
 > **Documento de Referencia Contable:** [`Markdown/Contabilidad/CONTABILIDAD.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/CONTABILIDAD.md)  
 > **Destinatario:** Cristian (CEO de FOWY)  
@@ -76,13 +76,32 @@ graph TD
     event_type: payload.event
   });
   ```
-- **Ruta Rápida para Confirmaciones ('1' / 'Confirmar'): Cero Tokens, Cero Re-inferencia (<50 ms):**
-  - Si el texto recibido es simplemente `"1"` o `"confirmar"`, el backend consulta la tabla `pending_actions` donde `channel = 'whatsapp' AND status = 'pending' AND expires_at > NOW()`.
-  - Si existe una acción pendiente, ejecuta inmediatamente el procedimiento SQL atómico correspondiente (`apply_confirmed_membership_payment` o `apply_account_transfer`) y despacha la confirmación a WhatsApp sin despertar a Gemini.
+- **Variables de Entorno Requeridas:**
+  - `EVOLUTION_API_URL`: URL base del microservicio Evolution API en Docker (ej: `https://evolution-fowy.onrender.com`).
+  - `EVOLUTION_API_KEY`: Clave de autenticación maestra para llamadas outbound hacia Evolution API.
+  - `EVOLUTION_INSTANCE_NAME`: Identificador de la instancia vinculada (ej: `fowy-ceo`).
+  - `CEO_PHONE_NUMBER`: Número celular de Cristian con código de país (ej: `573001234567`).
+
+- **Ruta Rápida para Confirmaciones ('CONFIRMADO'): Cero Tokens, Cero Re-inferencia (<50 ms):**
+  - Si el texto recibido es la palabra `"CONFIRMADO"` (o `"confirmado"`), el backend consulta la tabla `pending_actions` donde `channel = 'whatsapp' AND status = 'pending' AND expires_at > NOW()` ordenado por `created_at DESC LIMIT 1`.
+  - Según el `action_type` registrado:
+    - `register_payment`: Ejecuta `apply_confirmed_membership_payment(...)` (incluyendo registro automático de saldo restante si fue abono parcial).
+    - `register_expense`: Ejecuta `apply_confirmed_expense(...)` (descontando saldo de cuenta y registrando OPEX atómicamente).
+    - `register_transfer`: Ejecuta `apply_account_transfer(...)`.
+    - `schedule_task`: Inserta la tarea en `ceo_tasks`.
+  - Despacha la confirmación a WhatsApp y actualiza `status = 'executed'` sin despertar a Gemini.
+
+- **Ruta Rápida para Cancelaciones ('CANCELAR') (<20 ms):**
+  - Si el texto recibido es `"CANCELAR"`, `"cancelar"` o `"anular"`, el backend busca la acción pendiente activa, actualiza su estado a `status = 'cancelled'` y despacha inmediatamente:  
+    `"❌ Acción cancelada. No se ejecutó ningún movimiento en el sistema."`
+
+- **Mecanismo Anti-Colisión (Superseded Actions):**
+  - Si Cristian envía un nuevo mensaje o audio que genera una nueva acción antes de confirmar la anterior, el backend actualiza automáticamente las acciones pendientes previas de ese canal a `status = 'superseded'`. Así, responder `"CONFIRMADO"` siempre confirmará exclusivamente la última propuesta emitida.
+
 - **Manejo de Notas de Voz (Audios de WhatsApp):**
   - Evolution API envía el audio en formato `.ogg` (Opus) o `.mp3` como buffer Base64 o URL temporal segura.
   - El backend de Next.js pasa el buffer directamente a **Gemini 1.5 Flash**, el cual soporta procesamiento multimodal nativo de audio sin necesidad de servicios intermedios como Whisper.
-- **Salida hacia WhatsApp:** Mensajes de texto estructurados con emojis directivos y opciones numeradas de confirmación rápida (`Responde 1 para Confirmar, 2 para Cancelar`).
+- **Salida hacia WhatsApp:** Mensajes de texto estructurados con emojis directivos y opciones de confirmación rápida (`Responde CONFIRMADO para aplicar, o CANCELAR para anular`).
 
 ---
 
@@ -158,10 +177,10 @@ REGLAS DE ORO DE COMPORTAMIENTO:
    - Traspasos de Fondos Internos: Si Cristian menciona mover dinero entre sus cuentas ("pasé 100k de Nequi a Bancolombia" o "retiré 50k a efectivo para viáticos"), invoca prepare_account_transfer_action. Esto no afecta la utilidad del mes, solo redistribuye liquidez entre cuentas.
 3. ROL SECRETARIA EJECUTIVA:
    - Cuando Cristian mencione visitas, citas o tareas operativas ("acuérdame visitar a...", "hay que mandar a imprimir volantes para..."), extrae la fecha, hora, tipo de tarea y negocio vinculado, e invoca schedule_secretary_task.
-   - Al completar tareas de volantes o fotos, notifica que se actualizará el estado de entregables del negocio automáticamente.
+   - Al completar tareas de volantes o fotos, notifica que se actualizará el estado de entregables en la tabla satélite business_subscriptions automáticamente sin tocar la tabla businesses.
 4. CONFIRMACIÓN EN DOS PASOS (TWO-STEP CONFIRMATION):
    - TIENES TERMINANTEMENTE PROHIBIDO ejecutar INSERT o UPDATE en transacciones financieras o estados de negocios sin confirmación.
-   - Construye siempre la propuesta estructurada (tarjeta en web o respuesta con opción '1 para confirmar' en WhatsApp) y espera la aprobación expresa de Cristian.
+   - Construye siempre la propuesta estructurada (tarjeta en web o respuesta pidiendo la palabra clave 'CONFIRMADO' en WhatsApp) y espera la aprobación expresa de Cristian.
 5. DESAMBIGUACIÓN:
    - Si Cristian menciona un nombre ambiguo (ej: "Juanjo"), no adivines: consulta la base de datos y pregunta a cuál negocio se refiere.
 6. RESILIENCIA ANTE AUDIOS EN LA CALLE:
@@ -195,7 +214,7 @@ Retorna el balance general de caja, cuentas bancarias, ingresos del mes, gastos 
 ---
 
 ### 🛠️ Herramienta 2: `query_business_dossier`
-Consulta el expediente 360° de un restaurante específico.
+Consulta el expediente 360° de un restaurante específico. Invoca en base de datos la función RPC consolidada `get_business_dossier(p_business_identifier)` ejecutándose en **<10 ms en 1 RTT**.
 * **Parámetros:**
   ```json
   {
@@ -217,9 +236,9 @@ Consulta el expediente 360° de un restaurante específico.
       "deliverables": {"photos": "uploaded", "flyers": "delivered", "stickers_qr": "delivered"}
     },
     "recent_metrics": {
-      "whatsapp_clicks_last_30d": 142,
       "total_orders_last_30d": 42,
       "estimated_gross_sales": 1680000.00,
+      "average_ticket": 40000.00,
       "fowy_cost_per_order": 1190.47
     },
     "pending_commitments": [],
@@ -230,24 +249,26 @@ Consulta el expediente 360° de un restaurante específico.
 ---
 
 ### 🛠️ Herramienta 3: `prepare_payment_action`
-Prepara la tarjeta de registro de un cobro de membresía o servicio extra.
+Prepara la tarjeta de registro de un cobro de membresía o servicio extra, con soporte de abonos parciales.
 * **Parámetros:**
   ```json
   {
     "business_id": {"type": "string", "description": "UUID del negocio que realiza el pago."},
-    "amount": {"type": "number", "description": "Monto total pagado en COP."},
+    "amount": {"type": "number", "description": "Monto pagado en COP."},
     "payment_method": {
       "type": "string",
       "enum": ["nequi", "daviplata", "bancolombia", "cash", "other"],
       "description": "Método o cuenta receptora del dinero."
     },
     "extension_days": {"type": "integer", "description": "Días de renovación (usualmente 30 días). Default: 30."},
-    "is_partial": {"type": "boolean", "description": "Indica si es un abono parcial (ej: $25.000). Default: false."},
+    "is_partial": {"type": "boolean", "description": "Indica si es un abono parcial (ej: $25.000 de $50.000). Default: false."},
+    "remaining_amount": {"type": "number", "description": "Saldo restante pendiente de pago si es abono parcial. Default: 0."},
+    "remaining_due_date": {"type": "string", "format": "date", "description": "Fecha acordada para saldar el restante (YYYY-MM-DD)."},
     "commitment_id": {"type": "string", "description": "UUID del compromiso verbal previo que se salda con este pago (opcional)."},
     "notes": {"type": "string", "description": "Notas u observaciones del pago."}
   }
   ```
-* **Comportamiento:** No escribe en la DB; genera el payload estructurado y lo registra en `pending_actions` con TTL de 10 min para que el frontend o WhatsApp presente la confirmación al CEO.
+* **Comportamiento:** No escribe directamente en la DB; genera el payload estructurado y lo registra en `pending_actions` con TTL de 10 min. Al confirmarse, ejecuta el RPC atómico `apply_confirmed_membership_payment(...)`, el cual crea automáticamente una fila en `payment_commitments` si existe saldo restante.
 
 ---
 
@@ -271,6 +292,7 @@ Prepara la tarjeta de registro de un gasto o egreso operativo (OPEX).
     "related_business_id": {"type": "string", "description": "UUID del restaurante al que se imputa el costo (opcional)."}
   }
   ```
+* **Comportamiento:** Registra la intención en `pending_actions` con TTL de 10 min. Al confirmarse, ejecuta el RPC atómico `apply_confirmed_expense(...)` que descuenta el saldo de `financial_accounts` e inserta en `operational_expenses` en 1 RTT.
 
 ---
 
@@ -370,22 +392,24 @@ Prepara el traspaso o retiro de fondos entre cuentas de liquidez (Nequi, Davipla
                    │
                    ▼
 [ SALIDA ]  ──► Devuelve propuesta al frontend o WhatsApp:
-                   ├──► En Web: Renderiza tarjeta con botón [ ✅ Confirmar y Aplicar ]
-                   └──► En WhatsApp: Envía texto con opción "Responde '1' para Confirmar"
+                   ├──► En Web: Renderiza tarjeta con botones [ ✅ Confirmar ] [ ❌ Cancelar ]
+                   └──► En WhatsApp: Envía texto con opciones:
+                        "Responde 'CONFIRMADO' para aplicar"
+                        "Responde 'CANCELAR' para anular"
                    │
-[ CONFIRM ] ──► Cristian aprueba con un clic o respondiendo '1' en WhatsApp
-                   │
-                   ▼ (RUTA RÁPIDA: <50 ms, CERO LLM, CERO TOKENS)
-[ SERVER ]  ──► Consulta pending_actions, valida TTL y ejecuta RPC atómico:
-                   apply_confirmed_membership_payment(p_business_id, p_account_id, ...)
-                   1. Inserta fila en membership_payments.
-                   2. Suma balance en financial_accounts (Nequi).
-                   3. Actualiza next_billing_date en businesses (+30 días).
-                   4. Genera recibo consecutivo REC-025.
-                   5. Marca pending_action como 'executed'.
-                   │
-                   ▼
-[ ÉXITO ]   ──► "✅ Transacción exitosa. Recibo #REC-025 generado. Kaprichos al día hasta el 5 de Oct."
+[ RESPUESTA CRISTIAN ]
+       ├──► Si responde 'CONFIRMADO' ──► (RUTA RÁPIDA: <50 ms, CERO TOKENS)
+       │       Ejecuta RPC atómico (apply_confirmed_membership_payment / apply_confirmed_expense)
+       │       1. Impacta tabla contable (membership_payments u operational_expenses).
+       │       2. Actualiza saldo en financial_accounts (suma o resta según corresponda).
+       │       3. Si fue membresía, actualiza next_billing_date en business_subscriptions y crea cartera si fue abono parcial.
+       │       4. Genera recibo consecutivo oficial (REC-025).
+       │       5. Marca pending_action como 'executed'.
+       │       └──► Notifica éxito: "✅ Transacción exitosa. Recibo #REC-025 generado."
+       │
+       └──► Si responde 'CANCELAR' ──► (RUTA RÁPIDA: <20 ms, CERO TOKENS)
+               1. Marca pending_action como 'cancelled'.
+               └──► Notifica cancelación: "❌ Acción cancelada. No se modificaron fondos."
 ```
 
 ---
@@ -400,6 +424,8 @@ Prepara el traspaso o retiro de fondos entre cuentas de liquidez (Nequi, Davipla
    Si la API de Gemini sufre un corte de servicio temporal, el sistema nocturno ejecuta un balance 100% matemático en PostgreSQL sin fallar el cierre contable.
 4. **Verificación Local Obligatoria:**  
    Cualquier código que implemente o modifique este agente debe pasar `npm run build` en local con cero errores antes de cualquier despliegue.
+5. **Aislamiento Sagrado de la Tabla `businesses` (Solo Lectura):**  
+   La IA tiene **terminantemente prohibido ejecutar sentencias `UPDATE`, `INSERT` o `DELETE` sobre la tabla `businesses`**. La tabla madre queda pura para los comensales. Todas las modificaciones operativas y de cobro se ejecutan exclusivamente sobre la tabla satélite `business_subscriptions`.
 
 ---
 *Fin de la Especificación Técnica Oficial del Agente — FOWY 2026*

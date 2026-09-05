@@ -101,6 +101,9 @@
 
 | Archivo | Descripción | Cuándo leer |
 |---------|-------------|-------------|
+| **[iA.Backend.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/iA.Backend.md)** | Especificación técnica del motor de backend, base de datos PostgreSQL, tabla satélite `business_subscriptions`, procedimientos RPC en 1 RTT, índices y seguridad RLS. | Al implementar tablas, procedimientos almacenados o consultas SQL del módulo de finanzas e IA. |
+| **[iA.UX-UI.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/iA.UX-UI.md)** | Especificación de interfaz visual, wireframes de `/admin/finanzas`, componentes <250L, tabla virtualizada a 60 FPS y modo lectura en la ficha de negocios. | Al construir o modificar la interfaz de finanzas, el drawer del copilot o la vista de cobros. |
+| **[iA.Work.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/iA.Work.md)** | Auditoría de puntos de contacto en vivo, evaluación de riesgos (1.8/10), reglas inquebrantables y checklist maestra de implementación paso a paso. | Al planificar, verificar o ejecutar las fases de desarrollo del módulo de finanzas e IA. |
 | **[CONTABILIDAD.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/CONTABILIDAD.md)** | Plan maestro de contabilidad integral, control de periodos de prueba, cobro de membresías, OPEX, arqueo de cajas y tracking de entregables (fotos, volantes). | Al diseñar, construir o auditar el módulo de finanzas (`/admin/finanzas`), gestión de cobros o modelos contables en Supabase. |
 | **[AGENTE.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/AGENTE.md)** | Especificación técnica exhaustiva del Agente autónomo (CFO Virtual + Secretaria Ejecutiva): conexión WhatsApp Evolution API QR, tools Function Calling, prompts y parámetros. | Al construir, modificar o auditar el asistente de IA, webhooks de WhatsApp, herramientas de backend o cron jobs. |
 | **[Optimizacion-iA.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/Optimizacion-iA.md)** | Guía de alto rendimiento y arquitectura sin deuda técnica: RPC consolidado (1 RTT), índices B-Tree, modularización <250L, lazy loading y webhook asíncrono de WhatsApp. | Al implementar código, optimizar velocidad de respuesta (<100ms UI / <1.2s IA) o prevenir cuellos de botella. |
@@ -111,9 +114,9 @@
 
 | Si la tarea es sobre... | Lee estos archivos |
 |------------------------|-------------------|
-| 💰 Contabilidad / Cobros / Finanzas | `Contabilidad/CONTABILIDAD.md` |
-| 🤖 Agente CFO / Secretaria / WhatsApp | `Contabilidad/AGENTE.md` |
-| ⚡ Rendimiento & Cero Deuda Finanzas | `Contabilidad/Optimizacion-iA.md` |
+| 💰 Contabilidad / Cobros / Finanzas | `Contabilidad/iA.Backend.md` + `Contabilidad/iA.UX-UI.md` + `Contabilidad/CONTABILIDAD.md` |
+| 🤖 Agente CFO / Secretaria / WhatsApp | `Contabilidad/AGENTE.md` + `Contabilidad/iA.Work.md` |
+| ⚡ Rendimiento & Cero Deuda Finanzas | `Contabilidad/Optimizacion-iA.md` + `Contabilidad/iA.Backend.md` |
 | 🎬 FOWY Reels / Videos | `Videos/Videos.UX-UI.md` + `Videos/Videos.Backend.md` + `Videos/videos.up.md` |
 | 🗺️ Mapa / Explorador / PostGIS | `mapa.md` + `rol/rol-usuario.md` |
 | 📑 Auditoría Técnica / Arquitectura | `auditoria-tecnica.md` + `conceptos.md` |

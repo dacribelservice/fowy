@@ -2,7 +2,7 @@
 
 > ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.  
 > **Fecha de actualización:** 5 de Septiembre de 2026  
-> **Versión:** 2.1 (Blindaje 100%: DDL Pending Actions con TTL, Idempotencia Webhook y RPC Atómico 1 RTT)  
+> **Versión:** 2.3 (Blindaje 100%: Tabla Satélite business_subscriptions, Cero Alteración en businesses, P&L Completo y GIN Trigram)  
 > **Ubicación:** `Markdown/Contabilidad/Optimizacion-iA.md`  
 > **Documentos Relacionados:** [`CONTABILIDAD.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/CONTABILIDAD.md) | [`AGENTE.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/AGENTE.md)  
 > **Destinatario:** Cristian (CEO de FOWY)  
@@ -57,32 +57,59 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
+    v_income NUMERIC := 0.00;
+    v_expenses NUMERIC := 0.00;
+    v_paid_count INT := 0;
+    v_receivables NUMERIC := 0.00;
     v_metrics JSONB;
     v_accounts JSONB;
     v_today_tasks JSONB;
     v_counts JSONB;
 BEGIN
-    -- 1. Agregaciones matemáticas instantáneas del mes (1 RTT en DB)
-    SELECT jsonb_build_object(
-        'month_income', COALESCE(SUM(amount) FILTER (WHERE period_start >= date_trunc('month', CURRENT_DATE)), 0),
-        'total_paid_count', COUNT(*) FILTER (WHERE period_start >= date_trunc('month', CURRENT_DATE))
-    ) INTO v_metrics FROM membership_payments;
+    -- 1. Ingresos y pagos del mes
+    SELECT 
+        COALESCE(SUM(amount), 0),
+        COUNT(*)
+    INTO v_income, v_paid_count
+    FROM membership_payments 
+    WHERE period_start >= date_trunc('month', CURRENT_DATE);
 
-    -- 2. Conteo de negocios por semáforo (Agregación SQL sobre 10.000+ filas en <3ms)
+    -- 2. Egresos y gastos operativos (OPEX) del mes
+    SELECT COALESCE(SUM(amount), 0)
+    INTO v_expenses
+    FROM operational_expenses
+    WHERE expense_date >= date_trunc('month', CURRENT_DATE);
+
+    -- 3. Cartera pendiente (compromisos verbales activos)
+    SELECT COALESCE(SUM(agreed_amount), 0)
+    INTO v_receivables
+    FROM payment_commitments
+    WHERE status = 'pending';
+
+    -- 4. Consolidar métricas P&L y flujo de caja real (1 RTT en DB)
+    v_metrics := jsonb_build_object(
+        'month_income', v_income,
+        'month_expenses', v_expenses,
+        'net_profit', v_income - v_expenses,
+        'pending_receivables', v_receivables,
+        'total_paid_count', v_paid_count
+    );
+
+    -- 5. Conteo de negocios por semáforo en la tabla satélite (Agregación SQL sobre 10.000+ filas en <3ms)
     SELECT jsonb_build_object(
         'active', COUNT(*) FILTER (WHERE subscription_status = 'active'),
         'trial', COUNT(*) FILTER (WHERE subscription_status = 'trial'),
         'grace_period', COUNT(*) FILTER (WHERE subscription_status = 'grace_period'),
         'suspended', COUNT(*) FILTER (WHERE subscription_status = 'suspended'),
-        'total', COUNT(*)
-    ) INTO v_counts FROM businesses;
+        'total', (SELECT COUNT(*) FROM businesses)
+    ) INTO v_counts FROM business_subscriptions;
 
-    -- 3. Arqueo de cajas de fondos activas
+    -- 6. Arqueo de cajas de fondos activas
     SELECT jsonb_agg(jsonb_build_object(
         'id', id, 'code', code, 'name', name, 'current_balance', current_balance
     )) INTO v_accounts FROM financial_accounts WHERE is_active = TRUE;
 
-    -- 4. Agenda de visitas y mandados del CEO para hoy
+    -- 7. Agenda de visitas y mandados del CEO para hoy
     SELECT jsonb_agg(jsonb_build_object(
         'id', id, 'title', title, 'task_type', task_type, 'due_time', due_time, 'status', status, 'business_id', business_id
     )) INTO v_today_tasks FROM ceo_tasks WHERE due_date = CURRENT_DATE AND status = 'pending';
@@ -117,11 +144,12 @@ DECLARE
     v_rows JSONB;
     v_total_filtered INT;
 BEGIN
-    -- Conteo rápido de coincidencias filtradas
+    -- Conteo rápido de coincidencias filtradas uniendo tabla madre con tabla satélite
     SELECT COUNT(*) INTO v_total_filtered
-    FROM businesses
-    WHERE (p_status = 'all' OR subscription_status = p_status)
-      AND (p_search = '' OR name ILIKE '%' || p_search || '%');
+    FROM businesses b
+    LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
+    WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)
+      AND (p_search = '' OR b.name ILIKE '%' || p_search || '%');
 
     -- Selección quirúrgica con paginación
     SELECT jsonb_agg(jsonb_build_object(
@@ -135,15 +163,22 @@ BEGIN
         'onboarding_flyers', onboarding_flyers
     )) INTO v_rows
     FROM (
-        SELECT id, name, subscription_status, trial_ends_at, next_billing_date, monthly_fee, onboarding_photos, onboarding_flyers
-        FROM businesses
-        WHERE (p_status = 'all' OR subscription_status = p_status)
-          AND (p_search = '' OR name ILIKE '%' || p_search || '%')
+        SELECT b.id, b.name, 
+               COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
+               bs.trial_ends_at, 
+               bs.next_billing_date, 
+               COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee, 
+               COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
+               COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers
+        FROM businesses b
+        LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
+        WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)
+          AND (p_search = '' OR b.name ILIKE '%' || p_search || '%')
         ORDER BY 
-            CASE WHEN subscription_status = 'grace_period' THEN 1
-                 WHEN subscription_status = 'trial' THEN 2
+            CASE WHEN COALESCE(bs.subscription_status, 'trial') = 'grace_period' THEN 1
+                 WHEN COALESCE(bs.subscription_status, 'trial') = 'trial' THEN 2
                  ELSE 3 END,
-            next_billing_date ASC NULLS LAST
+            bs.next_billing_date ASC NULLS LAST
         LIMIT p_limit OFFSET p_offset
     ) sub;
 
@@ -169,9 +204,9 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE INDEX IF NOT EXISTS idx_businesses_name_trgm 
 ON businesses USING gin (name gin_trgm_ops);
 
--- 2. Índice B-Tree compuesto para el semáforo y orden de cortes
-CREATE INDEX IF NOT EXISTS idx_businesses_billing_status_date 
-ON businesses(subscription_status, next_billing_date ASC NULLS LAST);
+-- 2. Índice B-Tree compuesto para el semáforo y orden de cortes en la tabla satélite
+CREATE INDEX IF NOT EXISTS idx_business_subscriptions_status_date 
+ON business_subscriptions(subscription_status, next_billing_date ASC NULLS LAST);
 
 -- 3. Consultas de cobros históricos y filtro por mes sin escanear la tabla entera
 CREATE INDEX IF NOT EXISTS idx_membership_payments_period_lookup 
@@ -239,13 +274,14 @@ El webhook de WhatsApp (`POST /api/webhooks/whatsapp`):
 - **Deduplicación e Idempotencia:** Valida el `message_id` contra la tabla `processed_webhook_events`. Si un webhook reintenta por inestabilidad de red, se descarta en **< 10 ms**, impidiendo duplicar transacciones.
 - **Respuesta Ultrarrápida al Gateway:** Devuelve `200 OK` en **< 40 ms** inmediatamente tras verificar el remitente y la idempotencia.
 - **Inferencia Asíncrona:** Pasa el audio `.ogg`/`.mp3` a Gemini 1.5 Flash en memoria desacoplada.
-- **Ruta Rápida sin LLM (<50 ms):** La confirmación en dos pasos (*"Responde 1 para confirmar"*) guarda la acción en la tabla efímera `pending_actions` con TTL de 10 minutos. Al responder *"1"*, el webhook detecta el mensaje breve, lee la acción estructurada y ejecuta el RPC atómico en PostgreSQL en **< 50 ms**, consumiendo **0 tokens** de IA.
+- **Ruta Rápida sin LLM (<50 ms):** La confirmación en dos pasos (*"Responde CONFIRMADO para aplicar"*) guarda la acción en la tabla efímera `pending_actions` con TTL de 10 minutos. Al responder *"CONFIRMADO"*, el webhook detecta la palabra clave, lee la acción estructurada y ejecuta el RPC atómico en PostgreSQL en **< 50 ms**, consumiendo **0 tokens** de IA.
+- **Cancelación Inmediata ('CANCELAR') y Superseded:** Responder *"CANCELAR"* cancela la acción en **< 20 ms**. Toda nueva acción dictada por Cristian actualiza las acciones previas no resueltas a `status = 'superseded'`, garantizando cero colisiones.
 
 ### 5.3 Consistencia ACID: Transacciones Atómicas en 1 RTT
-Para evitar inconsistencias en las que se registre un pago pero falle la actualización del saldo de Nequi o la fecha de corte del restaurante:
+Para evitar inconsistencias en las que se registre un pago pero falle la actualización del saldo de Nequi, o se anote un gasto sin descontar el dinero de caja:
 - Se prohíbe encadenar múltiples `await supabase.from(...).insert()` / `.update()` desde el cliente.
-- Toda confirmación invoca el procedimiento almacenado transaccional `apply_confirmed_membership_payment(...)` o `apply_account_transfer(...)`.
-- **Garantía ACID:** En caso de error o desconexión, PostgreSQL hace rollback automático en 1 RTT, manteniendo la caja 100% cuadrada.
+- Toda confirmación invoca su procedimiento transaccional atómico: `apply_confirmed_membership_payment(...)`, `apply_confirmed_expense(...)` o `apply_account_transfer(...)`.
+- **Garantía ACID:** En caso de error o desconexión, PostgreSQL hace rollback automático en 1 RTT, manteniendo la caja y el P&L 100% cuadrados.
 
 ### 5.4 Sincronización Horaria Estricta UTC vs Colombia (UTC-5) en Crons
 Tanto los servidores de Vercel como Supabase `pg_cron` operan internamente en tiempo universal coordinado (UTC):

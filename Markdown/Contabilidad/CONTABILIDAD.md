@@ -2,7 +2,7 @@
 
 > ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.  
 > **Fecha de actualización:** 5 de Septiembre de 2026  
-> **Versión:** 2.4 (Blindaje Integral 100%: DDL Pending Actions, Traspasos de Cuentas, RLS Admin y RPCs Atómicos)  
+> **Versión:** 2.6 (Blindaje 100%: Tabla Satélite business_subscriptions, Cero Alteración en businesses, RPCs Atómicos 1 RTT y RLS Admin)  
 > **Autor:** Antigravity AI (Especialista en Arquitectura SaaS & Finanzas Tecnológicas)  
 > **Destinatario:** Cristian (CEO de FOWY)  
 > **Documento Complementario:** [`Markdown/Contabilidad/AGENTE.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/AGENTE.md) (Especificación técnica del Agente CFO & Secretaria)  
@@ -129,6 +129,7 @@ A continuación se detalla el esquema DDL formal de tablas aditivas que dan sopo
 
 ```mermaid
 erDiagram
+    businesses ||--|| business_subscriptions : "satélite 1:1 (Isla Financiera)"
     businesses ||--o{ membership_payments : "registra pagos"
     businesses ||--o{ payment_commitments : "acuerdos verbales"
     businesses ||--o{ operational_expenses : "costos directos"
@@ -139,19 +140,25 @@ erDiagram
     pending_actions ||--o{ businesses : "accion estructurada"
 ```
 
-### 1. Extensión en la tabla `businesses`:
+### 1. Tabla Satélite de Suscripciones & Onboarding (`business_subscriptions`):
+> 🛡️ **REGLA DE ORO DE ARQUITECTURA:** La tabla madre `businesses` queda **100% VIRGEN, PURA E INTOCABLE**. Toda la información financiera, de cortes de membresía y seguimiento de entregables se aísla en esta entidad satélite 1:1. La IA y el módulo de finanzas solo operan sobre esta tabla satélite, eliminando cualquier riesgo de colateral en el mapa o en los menús de comensales.
+
 ```sql
-ALTER TABLE businesses 
-ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'trial', -- 'trial', 'active', 'grace_period', 'suspended'
-ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ,
-ADD COLUMN IF NOT EXISTS next_billing_date TIMESTAMPTZ,
-ADD COLUMN IF NOT EXISTS monthly_fee NUMERIC(10,2) DEFAULT 50000.00,
-ADD COLUMN IF NOT EXISTS billing_notes TEXT,
--- Entregables y Onboarding comercial
-ADD COLUMN IF NOT EXISTS onboarding_photos VARCHAR(30) DEFAULT 'pending', -- 'pending', 'taken', 'uploaded'
-ADD COLUMN IF NOT EXISTS onboarding_flyers VARCHAR(30) DEFAULT 'none',    -- 'none', 'in_design', 'printed', 'delivered'
-ADD COLUMN IF NOT EXISTS onboarding_stickers_qr VARCHAR(30) DEFAULT 'pending', -- 'pending', 'delivered'
-ADD COLUMN IF NOT EXISTS onboarding_menu_ready BOOLEAN DEFAULT FALSE;
+CREATE TABLE IF NOT EXISTS business_subscriptions (
+    business_id UUID PRIMARY KEY REFERENCES businesses(id) ON DELETE CASCADE,
+    subscription_status VARCHAR(20) NOT NULL DEFAULT 'trial', -- 'trial', 'active', 'grace_period', 'suspended'
+    trial_ends_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '15 days'),
+    next_billing_date TIMESTAMPTZ,
+    monthly_fee NUMERIC(10,2) DEFAULT 50000.00,
+    billing_notes TEXT,
+    -- Entregables y Onboarding comercial
+    onboarding_photos VARCHAR(30) DEFAULT 'pending', -- 'pending', 'taken', 'uploaded'
+    onboarding_flyers VARCHAR(30) DEFAULT 'none',    -- 'none', 'in_design', 'printed', 'delivered'
+    onboarding_stickers_qr VARCHAR(30) DEFAULT 'pending', -- 'pending', 'delivered'
+    onboarding_menu_ready BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
 ### 2. Tabla de Cuentas Financieras y Arqueo de Cajas (`financial_accounts`):
@@ -280,14 +287,14 @@ CREATE TABLE IF NOT EXISTS account_transfers (
 ```
 
 ### 9. Tabla de Acciones Pendientes del Agente con TTL (`pending_actions`):
-Soporte de confirmación en dos pasos para Web y WhatsApp. La acción estructurada se almacena aquí con TTL de 10 minutos para ejecutarse en <50 ms al responder "1" sin re-invocar al LLM:
+Soporte de confirmación en dos pasos para Web y WhatsApp. La acción estructurada se almacena aquí con TTL de 10 minutos para ejecutarse en <50 ms al responder "CONFIRMADO" sin re-invocar al LLM:
 ```sql
 CREATE TABLE IF NOT EXISTS pending_actions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     channel VARCHAR(20) NOT NULL, -- 'whatsapp', 'web'
     action_type VARCHAR(50) NOT NULL, -- 'register_payment', 'register_expense', 'register_transfer', 'schedule_task'
     payload JSONB NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'executed', 'cancelled', 'expired'
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'executed', 'cancelled', 'expired', 'superseded'
     expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '10 minutes'),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     executed_at TIMESTAMPTZ,
@@ -314,7 +321,7 @@ CREATE TABLE IF NOT EXISTS processed_webhook_events (
 Para garantizar integridad contable absoluta (100% ACID), se ejecutan procedimientos en PostgreSQL que consolidan la transacción en 1 solo viaje de red (*1 RTT*):
 
 ```sql
--- 1. Aplicación Atómica de Pago Confirmado de Membresía
+-- 1. Aplicación Atómica de Pago Confirmado de Membresía (con soporte de Abonos Parciales)
 CREATE OR REPLACE FUNCTION apply_confirmed_membership_payment(
     p_business_id UUID,
     p_account_id UUID,
@@ -323,7 +330,9 @@ CREATE OR REPLACE FUNCTION apply_confirmed_membership_payment(
     p_extension_days INT DEFAULT 30,
     p_notes TEXT DEFAULT NULL,
     p_is_partial BOOLEAN DEFAULT FALSE,
-    p_commitment_id UUID DEFAULT NULL
+    p_commitment_id UUID DEFAULT NULL,
+    p_remaining_amount NUMERIC DEFAULT 0.00,
+    p_remaining_due_date DATE DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -333,14 +342,15 @@ DECLARE
     v_receipt_number INT;
     v_new_billing_date TIMESTAMPTZ;
     v_business_name TEXT;
+    v_new_commitment_id UUID := NULL;
 BEGIN
-    -- Validar existencia
+    -- Validar existencia del negocio
     SELECT name INTO v_business_name FROM businesses WHERE id = p_business_id;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Negocio no encontrado';
     END IF;
 
-    -- 1. Insertar el pago y obtener consecutivo
+    -- 1. Insertar el pago y obtener consecutivo oficial
     INSERT INTO membership_payments (
         business_id, account_id, amount, payment_method, 
         period_start, period_end, notes, is_partial, commitment_id
@@ -350,24 +360,43 @@ BEGIN
         p_notes, p_is_partial, p_commitment_id
     ) RETURNING receipt_number INTO v_receipt_number;
 
-    -- 2. Incrementar saldo en la cuenta financiera
+    -- 2. Incrementar saldo en la cuenta financiera destino
     UPDATE financial_accounts
     SET current_balance = current_balance + p_amount, updated_at = NOW()
     WHERE id = p_account_id;
 
-    -- 3. Actualizar estado y fecha de corte del restaurante
-    UPDATE businesses
+    -- 3. Actualizar estado y fecha de corte en la tabla satélite (business_subscriptions)
+    INSERT INTO business_subscriptions (business_id, subscription_status, next_billing_date)
+    VALUES (
+        p_business_id, 
+        'active', 
+        NOW() + (p_extension_days || ' days')::INTERVAL
+    )
+    ON CONFLICT (business_id) DO UPDATE
     SET subscription_status = 'active',
         next_billing_date = CASE 
-            WHEN next_billing_date IS NULL OR next_billing_date < NOW() THEN NOW() + (p_extension_days || ' days')::INTERVAL
-            ELSE next_billing_date + (p_extension_days || ' days')::INTERVAL
-        END
-    WHERE id = p_business_id
+            WHEN business_subscriptions.next_billing_date IS NULL OR business_subscriptions.next_billing_date < NOW() THEN NOW() + (p_extension_days || ' days')::INTERVAL
+            ELSE business_subscriptions.next_billing_date + (p_extension_days || ' days')::INTERVAL
+        END,
+        updated_at = NOW()
     RETURNING next_billing_date INTO v_new_billing_date;
 
-    -- 4. Si estaba ligado a un compromiso verbal, marcarlo como cumplido
+    -- 4. Si estaba ligado a un compromiso verbal previo, marcarlo como cumplido
     IF p_commitment_id IS NOT NULL THEN
         UPDATE payment_commitments SET status = 'fulfilled' WHERE id = p_commitment_id;
+    END IF;
+
+    -- 5. Blindaje de Pagos Parciales: si es abono y queda saldo, crear cartera automáticamente
+    IF p_is_partial AND p_remaining_amount > 0 THEN
+        INSERT INTO payment_commitments (
+            business_id, agreed_amount, agreed_date, notes, status
+        ) VALUES (
+            p_business_id, 
+            p_remaining_amount, 
+            COALESCE(p_remaining_due_date, CURRENT_DATE + 7), 
+            'Saldo pendiente de abono parcial (Recibo REC-' || LPAD(v_receipt_number::TEXT, 4, '0') || ')',
+            'pending'
+        ) RETURNING id INTO v_new_commitment_id;
     END IF;
 
     RETURN jsonb_build_object(
@@ -376,12 +405,15 @@ BEGIN
         'receipt_code', 'REC-' || LPAD(v_receipt_number::TEXT, 4, '0'),
         'business_name', v_business_name,
         'amount', p_amount,
+        'is_partial', p_is_partial,
+        'remaining_amount', p_remaining_amount,
+        'remaining_commitment_id', v_new_commitment_id,
         'next_billing_date', v_new_billing_date
     );
 END;
 $$;
 
--- 2. Aplicación Atómica de Transferencia entre Cuentas
+-- 2. Aplicación Atómica de Transferencia entre Cuentas (Sin alterar P&L)
 CREATE OR REPLACE FUNCTION apply_account_transfer(
     p_source_account_id UUID,
     p_destination_account_id UUID,
@@ -417,6 +449,139 @@ BEGIN
     RETURN jsonb_build_object('success', true, 'amount', p_amount, 'fee', p_fee);
 END;
 $$;
+
+-- 3. Aplicación Atómica de Gasto Operativo Confirmado (OPEX con descuento de caja)
+CREATE OR REPLACE FUNCTION apply_confirmed_expense(
+    p_account_id UUID,
+    p_category VARCHAR,
+    p_amount NUMERIC,
+    p_description TEXT,
+    p_related_business_id UUID DEFAULT NULL,
+    p_expense_date DATE DEFAULT CURRENT_DATE
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_expense_id UUID;
+    v_account_name TEXT;
+    v_new_balance NUMERIC;
+BEGIN
+    -- Validar cuenta financiera
+    SELECT name INTO v_account_name FROM financial_accounts WHERE id = p_account_id;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Cuenta financiera no encontrada';
+    END IF;
+
+    -- 1. Insertar el gasto operativo
+    INSERT INTO operational_expenses (
+        account_id, category, amount, description, 
+        related_business_id, expense_date
+    ) VALUES (
+        p_account_id, p_category, p_amount, p_description, 
+        p_related_business_id, p_expense_date
+    ) RETURNING id INTO v_expense_id;
+
+    -- 2. Descontar atómicamente el saldo de la cuenta
+    UPDATE financial_accounts
+    SET current_balance = current_balance - p_amount,
+        updated_at = NOW()
+    WHERE id = p_account_id
+    RETURNING current_balance INTO v_new_balance;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'expense_id', v_expense_id,
+        'account_name', v_account_name,
+        'amount', p_amount,
+        'new_balance', v_new_balance
+    );
+END;
+$$;
+
+-- 4. Consulta Atómica del Expediente Comercial 360° (Dossier para el Agente y CRM)
+CREATE OR REPLACE FUNCTION get_business_dossier(
+    p_business_identifier TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_biz RECORD;
+    v_metrics JSONB;
+    v_commitments JSONB;
+    v_tasks JSONB;
+BEGIN
+    -- Buscar negocio por ID, slug o nombre uniendo con la tabla satélite business_subscriptions
+    SELECT b.id, b.name, b.slug, 
+           COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
+           bs.next_billing_date, 
+           COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee,
+           COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
+           COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers, 
+           COALESCE(bs.onboarding_stickers_qr, 'pending') AS onboarding_stickers_qr, 
+           COALESCE(bs.onboarding_menu_ready, FALSE) AS onboarding_menu_ready
+    INTO v_biz
+    FROM businesses b
+    LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
+    WHERE b.id::TEXT = p_business_identifier 
+       OR b.slug = p_business_identifier
+       OR b.name ILIKE '%' || p_business_identifier || '%'
+    ORDER BY (b.name ILIKE p_business_identifier || '%') DESC
+    LIMIT 1;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', 'Negocio no encontrado');
+    END IF;
+
+    -- Métricas de los últimos 30 días agregadas en SQL
+    SELECT jsonb_build_object(
+        'total_orders_last_30d', COUNT(*),
+        'estimated_gross_sales', COALESCE(SUM(total_amount), 0),
+        'average_ticket', CASE WHEN COUNT(*) > 0 THEN ROUND(COALESCE(SUM(total_amount), 0) / COUNT(*), 2) ELSE 0 END,
+        'fowy_cost_per_order', CASE WHEN COUNT(*) > 0 THEN ROUND(COALESCE(v_biz.monthly_fee, 50000.00) / COUNT(*), 2) ELSE 0 END
+    ) INTO v_metrics
+    FROM orders
+    WHERE business_id = v_biz.id
+      AND created_at >= NOW() - INTERVAL '30 days';
+
+    -- Compromisos verbales pendientes
+    SELECT jsonb_agg(jsonb_build_object(
+        'id', id, 'agreed_amount', agreed_amount, 'agreed_date', agreed_date, 'notes', notes, 'status', status
+    )) INTO v_commitments
+    FROM payment_commitments
+    WHERE business_id = v_biz.id AND status = 'pending';
+
+    -- Tareas o visitas pendientes
+    SELECT jsonb_agg(jsonb_build_object(
+        'id', id, 'title', title, 'task_type', task_type, 'due_date', due_date, 'due_time', due_time, 'status', status
+    )) INTO v_tasks
+    FROM ceo_tasks
+    WHERE business_id = v_biz.id AND status = 'pending';
+
+    RETURN jsonb_build_object(
+        'business', jsonb_build_object(
+            'id', v_biz.id,
+            'name', v_biz.name,
+            'slug', v_biz.slug,
+            'subscription_status', v_biz.subscription_status,
+            'next_billing_date', v_biz.next_billing_date,
+            'monthly_fee', v_biz.monthly_fee,
+            'deliverables', jsonb_build_object(
+                'photos', v_biz.onboarding_photos,
+                'flyers', v_biz.onboarding_flyers,
+                'stickers_qr', v_biz.onboarding_stickers_qr,
+                'menu_ready', v_biz.onboarding_menu_ready
+            )
+        ),
+        'recent_metrics', v_metrics,
+        'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),
+        'agenda_tasks', COALESCE(v_tasks, '[]'::jsonb)
+    );
+END;
+$$;
 ```
 
 ---
@@ -426,7 +591,8 @@ $$;
 Para proteger toda la información contable sensible de FOWY, todas las tablas financieras se blindan con RLS exigiendo que solo usuarios con rol de administrador tengan acceso:
 
 ```sql
--- Habilitar RLS en todas las tablas financieras
+-- Habilitar RLS en todas las tablas financieras y satélites
+ALTER TABLE business_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE membership_payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE operational_expenses ENABLE ROW LEVEL SECURITY;
@@ -442,9 +608,10 @@ DO $$
 DECLARE
     tbl text;
     tables text[] := ARRAY[
-        'financial_accounts', 'membership_payments', 'operational_expenses', 
-        'payment_commitments', 'ceo_tasks', 'daily_financial_reports', 
-        'account_transfers', 'pending_actions', 'processed_webhook_events'
+        'business_subscriptions', 'financial_accounts', 'membership_payments', 
+        'operational_expenses', 'payment_commitments', 'ceo_tasks', 
+        'daily_financial_reports', 'account_transfers', 'pending_actions', 
+        'processed_webhook_events'
     ];
 BEGIN
     FOREACH tbl IN ARRAY tables LOOP
@@ -458,6 +625,19 @@ BEGIN
     END LOOP;
 END;
 $$;
+
+-- Blindaje de Funciones RPC: Solo accesibles para administradores autenticados o service_role
+REVOKE EXECUTE ON FUNCTION apply_confirmed_membership_payment FROM public;
+GRANT EXECUTE ON FUNCTION apply_confirmed_membership_payment TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION apply_account_transfer FROM public;
+GRANT EXECUTE ON FUNCTION apply_account_transfer TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION apply_confirmed_expense FROM public;
+GRANT EXECUTE ON FUNCTION apply_confirmed_expense TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION get_business_dossier FROM public;
+GRANT EXECUTE ON FUNCTION get_business_dossier TO authenticated, service_role;
 ```
 
 ---
