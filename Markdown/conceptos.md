@@ -76,6 +76,18 @@ Para evitar que los archivos crezcan descontroladamente, seguimos esta jerarquí
 5.  **Resiliencia Visual (Error Boundaries)**: Envolver componentes interactivos de alta complejidad o dependientes de librerías de terceros (como el mapa de Leaflet, pasarelas de pago o gráficos de analítica) en un `<ErrorBoundary>` para evitar que un fallo aislado bloquee o apague toda la aplicación.
 7.  **Regla de Viaje Único (RPC Consolidados)**: Si una interfaz requiere cargar información de más de dos tablas independientes de Supabase (ej: negocio, banners, categorías de menú), consolidar las consultas en una sola llamada RPC (PostgreSQL) para minimizar los viajes de red (RTT) desde el navegador.
 8.  **Manejo de Errores de Tipado (`any` implícito en Vercel)**: Si durante una compilación Vercel arroja un error de tipo `Parameter implicitly has an 'any' type` en código heredado (ej. parámetros en callbacks de Supabase), **DEBES** aplicar un parche explícito (ej. `: any`) localmente en ese archivo. Queda estrictamente prohibido intentar arreglarlo modificando tipos globales (como el Singleton `supabaseClientInstance` en `client.ts`), ya que esto desencadenará un "Efecto Dominó" de decenas de errores de compilación masivos en código antiguo que funcionaba correctamente. (Aplicación directa de la Ley del Remolque).
+9.  **Protocolo Obligatorio de Cierre de Checklist (`npm run build`)**: Al final de cada fase, módulo o checklist de desarrollo, es obligatorio probar siempre `npm run build` en la máquina local para asegurar que compila con exactamente cero errores antes de dar por terminada la tarea o realizar copias de seguridad.
 
 ---
-*Este documento es dinámico y fue consolidado el 23 de Mayo de 2026 tras la auditoría de estabilidad y escalabilidad.*
+
+## 🏁 8. PROTOCOLO OBLIGATORIO DE CIERRE DE CHECKLISTS
+
+> 🛑 **VERIFICACIÓN LOCAL INDISPENSABLE EN CADA CHECKLIST:**  
+> En **cada checklist**, al final de cualquier fase, tarea o módulo de desarrollo, es de **obligatorio cumplimiento**:
+> 
+> 👉 **Probar siempre `npm run build` en tu máquina local para asegurar que compila con cero errores** (0 errores de TypeScript, 0 errores de compilación de Next.js, `Exit code: 0`) antes de dar por finalizada la tarea o subir cualquier cambio a GitHub.
+> 
+> *Queda prohibido dar por concluida una fase si la compilación local no ha sido validada y verificada de forma limpia.*
+
+---
+*Este documento es dinámico y fue actualizado con la regla obligatoria de verificación local de compilación — FOWY 2026.*

@@ -2,6 +2,8 @@
 
 > ⚠️ **REGLA DE ORO**: Solo se permite la creación o edición de líneas de código y la realización de copias de seguridad (Backups) en GitHub si, y solo si, Cristian (CEO de FOWY) lo solicita expresamente.
 
+> 📌 **REGLA DE DATOS EN VIVO (CONTEO DE NEGOCIOS)**: Queda terminantemente prohibido asumir o citar cifras estáticas de negocios (como el dato histórico de "50 negocios"). Cada vez que se requiera saber cuántos negocios existen, estén activos o registrados en FOWY, es obligatorio verificar en vivo consultando la base de datos de Supabase (tabla `businesses`) o el código en tiempo real. La documentación nunca dictará el número de negocios; la única fuente de la verdad es la base de datos en tiempo real.
+
 > **Instrucción para IA**: Lee SOLO este archivo al inicio de cada sesión. Luego abre únicamente los archivos que necesites según la tarea del usuario. No cargues todo el contexto innecesariamente.
 
 ---
@@ -95,10 +97,23 @@
 
 ---
 
+## 💰 8. Subcarpeta `Contabilidad/` (Finanzas, Control de Negocios & Copilot IA)
+
+| Archivo | Descripción | Cuándo leer |
+|---------|-------------|-------------|
+| **[CONTABILIDAD.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/CONTABILIDAD.md)** | Plan maestro de contabilidad integral, control de periodos de prueba, cobro de membresías, OPEX, arqueo de cajas y tracking de entregables (fotos, volantes). | Al diseñar, construir o auditar el módulo de finanzas (`/admin/finanzas`), gestión de cobros o modelos contables en Supabase. |
+| **[AGENTE.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/AGENTE.md)** | Especificación técnica exhaustiva del Agente autónomo (CFO Virtual + Secretaria Ejecutiva): conexión WhatsApp Evolution API QR, tools Function Calling, prompts y parámetros. | Al construir, modificar o auditar el asistente de IA, webhooks de WhatsApp, herramientas de backend o cron jobs. |
+| **[Optimizacion-iA.md](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/Optimizacion-iA.md)** | Guía de alto rendimiento y arquitectura sin deuda técnica: RPC consolidado (1 RTT), índices B-Tree, modularización <250L, lazy loading y webhook asíncrono de WhatsApp. | Al implementar código, optimizar velocidad de respuesta (<100ms UI / <1.2s IA) o prevenir cuellos de botella. |
+
+---
+
 ## ⚡ Guía Rápida por Tarea
 
 | Si la tarea es sobre... | Lee estos archivos |
 |------------------------|-------------------|
+| 💰 Contabilidad / Cobros / Finanzas | `Contabilidad/CONTABILIDAD.md` |
+| 🤖 Agente CFO / Secretaria / WhatsApp | `Contabilidad/AGENTE.md` |
+| ⚡ Rendimiento & Cero Deuda Finanzas | `Contabilidad/Optimizacion-iA.md` |
 | 🎬 FOWY Reels / Videos | `Videos/Videos.UX-UI.md` + `Videos/Videos.Backend.md` + `Videos/videos.up.md` |
 | 🗺️ Mapa / Explorador / PostGIS | `mapa.md` + `rol/rol-usuario.md` |
 | 📑 Auditoría Técnica / Arquitectura | `auditoria-tecnica.md` + `conceptos.md` |
@@ -128,7 +143,7 @@
 
 ## ⚠️ Estado y Alertas Activas del Sistema
 
-1. **Producción Activa en Vivo**: La plataforma opera en producción con 50 negocios registrados en vivo (Supabase Pro + Vercel).
+1. **Producción Activa en Vivo**: La plataforma opera en producción sobre Supabase Pro + Vercel. El volumen de negocios registrados es dinámico y debe verificarse siempre en vivo en la base de datos según la regla maestra de datos en vivo.
 2. **FOWY Reels Desplegado y Optimizado**: Módulo de videos cortos 100% implementado con PostGIS GiST, lazy loading dinámico, paginación infinita y navegación gestual vertical (*Swipe Up/Down*).
 3. **Mapa Inmunizado contra Refetch Storms**: Navegación en `/explorar` optimizada a 60 FPS con proyección estricta de columnas y actualización reactiva en memoria RAM.
 4. **Registro Directo**: Flujo de registro simplificado (`Auth -> Perfil -> Éxito`) asignando el rol `explorer` por defecto.

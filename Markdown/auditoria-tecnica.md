@@ -3,19 +3,19 @@
 > **Documento Oficial de Deuda Técnica, Seguridad y Roadmap de Ingeniería**  
 > **Fecha de emisión:** 10 de Agosto de 2026  
 > **Versión de Auditoría:** 1.2 (Actualizado con Optimización del Mapa, PostGIS GiST e Inmunización Realtime - Guía en [`Markdown/mapa.md`](file:///c:/Users/cange/Documents/fowy/Markdown/mapa.md))  
-> **Estado del Sistema:** Producción Activa en Vivo (50 negocios registrados)  
+> **Estado del Sistema:** Producción Activa en Vivo (Volumen dinámico — verificar en DB)  
 > **Infraestructura Activa:** Supabase Plan Pro ($25 USD/mes) | Vercel Plan Free  
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-FOWY se presenta como una plataforma multi-inquilino (*multi-tenant*) de comercio local y menús digitales de alto rendimiento. El sistema se encuentra actualmente **desplegado en producción real con 50 negocios registrados y operativos**, destacando por un enfoque pragmático que priorizó la velocidad de lanzamiento (*Time-To-Market*) sin sacrificar la seguridad básica ni la estética visual.
+FOWY se presenta como una plataforma multi-inquilino (*multi-tenant*) de comercio local y menús digitales de alto rendimiento. El sistema se encuentra actualmente **desplegado en producción real con negocios registrados y operativos** (cifra dinámica sujeta a verificación en vivo en DB según la regla de [INDICE.md](file:///c:/Users/cange/Documents/fowy/Markdown/INDICE.md)), destacando por un enfoque pragmático que priorizó la velocidad de lanzamiento (*Time-To-Market*) sin sacrificar la seguridad básica ni la estética visual.
 
 ### **Infraestructura y Stack de Producción**
 - **Hosting & Frontend:** Vercel (Plan Free / Hobby).
 - **Backend & Base de Datos:** Supabase (Plan Pro - $25 USD/mes: PostgreSQL + RLS + PostGIS + WebSockets).
-- **Volumen Actual:** 50 negocios activos en producción en la plataforma.
+- **Volumen Actual:** Dinámico en vivo (consultar en tiempo real la tabla `businesses` en Supabase; ver regla en [INDICE.md](file:///c:/Users/cange/Documents/fowy/Markdown/INDICE.md)).
 
 ### **Fortalezas Principales**
 1. **Arquitectura Direct-to-BaaS Eficiente:** El uso de Next.js 15 (App Router) junto con Supabase (PostgreSQL + RLS) eliminó la sobrecarga de mantener servidores de backend dedicados.
