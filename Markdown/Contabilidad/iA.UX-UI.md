@@ -19,14 +19,15 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 3. **Ergonomía de Calle (Mobile-First Real):** El 70% de las interacciones del CEO ocurren caminando, en moto o visitando locales. El diseño adapta drawers a *Bottom Sheets* deslizables y permite despachar recibos por WhatsApp en un solo toque.
 4. **Estética FOWY de Alto Impacto:** Paleta de colores Energy Orange (`#FF6B00` a `#FF8533`), tipografía moderna Inter/Poppins, tarjetas con bordes suaves (`rounded-2xl`), sombras sutiles, micro-animaciones y glassmorphism limpio.
 5. **Iconografía & Emojis 100% Minimalistas (CERO 3D):** Queda **terminantemente prohibido el uso de iconos, stickers o emojis en 3D** (nada de burbujas volumétricas, renders tridimensionales inflados o estilo Fluent 3D). Todos los iconos de la plataforma, el Copilot, los dashboards y el comprobante PDF deben ser **100% minimalistas, vectoriales, planos (*flat*), de línea fina (*stroke* 1.5px a 2px)** utilizando exclusivamente la librería `lucide-react`. Los emojis utilizados en textos deben ser sobrios, estándar y planos.
+6. **Desconexión Segura de Menú & Ley del Remolque (Cero Borrado):** La pantalla anterior de finanzas (`/admin/finanzas`, orientada al escrow y transacciones del marketplace) y su hook `useFinanceManager.ts` se mantienen **100% intactos en código** como respaldo histórico. En el menú lateral (`Sidebar.tsx`), el enlace viejo simplemente se desconecta (desaparece de la vista) y se añade la nueva pestaña visible **"Finanzas FOWY"** apuntando a su ruta independiente `/admin/finanzas-fowy`.
 
 ---
 
-## 🖥️ 2. Wireframe Maestro de `/admin/finanzas`
+## 🖥️ 2. Wireframe Maestro de "Finanzas FOWY" (`/admin/finanzas-fowy`)
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 📑 PANEL DE FINANZAS & AGENTE FOWY — ADMINISTRACIÓN                           [ 🤖 AGENTE ] │
+│ 📑 PANEL DE FINANZAS FOWY & AGENTE FOWY — ADMINISTRACIÓN                      [ 🤖 AGENTE ] │
 ├─────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 1. SEMÁFOROS DE SUSCRIPCIÓN (KPIs SUPERIORES)                                               │
 │ ┌──────────────────┬──────────────────┬──────────────────┬──────────────────────────────┐   │

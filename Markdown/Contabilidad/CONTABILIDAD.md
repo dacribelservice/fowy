@@ -116,7 +116,7 @@ El sistema de gestión financiera y operativa se implementa bajo una **arquitect
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  TABLERO FINANCIERO & CRM (Pantalla /admin/finanzas)                       │
+│  TABLERO FINANCIERO & CRM (Pestaña "Finanzas FOWY" — /admin/finanzas-fowy)  │
 │  ┌──────────────────┬──────────────────┬──────────────────┬──────────────┐  │
 │  │ 🟢 Al Día (18)   │ 🟡 En Prueba (9) │ 🔴 Vencidos (5)  │ Utilidad Mes │  │
 │  │ Recaudo: $900.000│ Días promedio: 8 │ Cartera: $250.000│ +$660.000 COP│  │
@@ -141,7 +141,7 @@ El sistema de gestión financiera y operativa se implementa bajo una **arquitect
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **La Interfaz Web (`/admin/finanzas`):** Para cuando Cristian está frente al computador y necesita el panorama general visual en 3 segundos (semáforos, saldos en cuentas y tabla de estados).
+1. **La Interfaz Web "Finanzas FOWY" (`/admin/finanzas-fowy`):** Conectada como nueva pestaña oficial en el Sidebar. La vista legacy (`/admin/finanzas`) y su hook `useFinanceManager.ts` se mantienen 100% intactos en código como respaldo de custodia/escrow, únicamente desconectándose del menú visible para no generar confusión. Para cuando Cristian está frente al computador y necesita el panorama general visual en 3 segundos (semáforos, saldos en cuentas y tabla de estados).
 2. **El Agente Autónomo (Web & WhatsApp):** Para cuando Cristian está en la calle y necesita dictar audios, consultar tareas o recibir el resumen matutino a las 8:00 AM.  
    *(Toda la arquitectura, prompts, herramientas y conexiones del agente se encuentran detalladas en [`Markdown/Contabilidad/AGENTE.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/AGENTE.md)).*
 
@@ -707,7 +707,7 @@ En cumplimiento absoluto con **[Markdown/conceptos.md](file:///c:/Users/cange/Do
 
 ```text
   [ FASE A: Cimientos Contables & Agenda ] ──► Tablas en Supabase: cuentas, pagos, gastos, agenda y reportes.
-  [ FASE B: Tablero Visual CRM & Agenda ]  ──► Pantalla /admin/finanzas con semáforos, cajas y checklist diario.
+  [ FASE B: Tablero Visual CRM & Agenda ]  ──► Pantalla /admin/finanzas-fowy con semáforos, cajas y checklist diario.
   [ FASE C: Copilot Web (CFO & Secretaria) ] ──► Chat web flotante con Gemini Flash, dictado y confirmación.
   [ FASE D: Enlace WhatsApp Evolution API ]──► Despliegue Docker QR, Webhook bidireccional y Morning Briefing 8 AM.
 ```
@@ -717,7 +717,7 @@ En cumplimiento absoluto con **[Markdown/conceptos.md](file:///c:/Users/cange/Do
 - Inicializar las cuentas base (Nequi, Daviplata, Bancolombia, Efectivo).
 - Configurar el estado de suscripción inicial de los negocios activos en producción.
 
-### Fase B: Tablero Visual CRM & Agenda en `/admin/finanzas` (2 días)
+### Fase B: Tablero Visual CRM & Agenda en "Finanzas FOWY" (`/admin/finanzas-fowy`) (2 días)
 - Resumen de métricas superiores: Recaudo mes, Gastos OPEX mes, Utilidad Neta real y Cartera por cobrar.
 - Desglose de liquidez por cuenta (Nequi, Daviplata, Bancolombia, Efectivo).
 - Bloque interactivo **"Agenda del CEO"**: checklist de visitas y tareas de hoy con botón `[Hecho]`.

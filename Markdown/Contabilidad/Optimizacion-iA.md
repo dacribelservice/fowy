@@ -276,7 +276,7 @@ En versiones iniciales, el dashboard administrativo ejecutaba un `select('*')` e
 PostgreSQL actúa como la **Cocina Central / Única Fuente de la Verdad**. La función RPC `get_network_growth_summary()` ejecuta el análisis temporal con Common Table Expressions (CTEs) directamente en el motor de base de datos:
 1. **Ejecución en Servidor:** Resuelve el cálculo de % MoM, % WoW y % DoD para afiliaciones, visitas y conversiones en **< 10 ms**.
 2. **Payload Minúsculo:** Devuelve un JSON consolidado de **menos de 1 KB**.
-3. **Consumo Universal:** El Dashboard (`/admin/dashboard`), el módulo de Finanzas (`/admin/finanzas`) y el Agente Copilot consumen exactamente el mismo resultado precalculado.
+3. **Consumo Universal:** El Dashboard (`/admin/dashboard`), el módulo de Finanzas FOWY (`/admin/finanzas-fowy`) y el Agente Copilot consumen exactamente el mismo resultado precalculado.
 4. **Cero Columnas Estáticas en `businesses`:** La tabla de restaurantes se mantiene 100% limpia. Toda variación porcentual es dinámica por naturaleza y se calcula al vuelo o se consulta vía este procedimiento.
 
 ---

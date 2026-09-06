@@ -27,7 +27,7 @@ El agente se conecta al ecosistema de FOWY mediante tres canales de entrada/sali
 
 ```mermaid
 graph TD
-    A[CEO: Canal Web /admin/finanzas] -->|POST /api/admin/copilot| D[Motor del Agente Next.js]
+    A[CEO: Canal Web /admin/finanzas-fowy] -->|POST /api/admin/copilot| D[Motor del Agente Next.js]
     B[CEO: WhatsApp Personal Audio/Texto] -->|Webhook Evolution API| E[POST /api/webhooks/whatsapp]
     E --> D
     C[Cron Nocturno 11:59 PM / Matutino 8:00 AM] -->|POST /api/cron/financial-audit| D
@@ -38,7 +38,7 @@ graph TD
 
 ---
 
-### 2.1 Conexión 1: Canal Web (`/admin/finanzas`)
+### 2.1 Conexión 1: Canal Web (`/admin/finanzas-fowy`)
 - **Interfaz:** Componente flotante de chat en Next.js App Router (`src/components/admin/finanzas/copilot/FinanceCopilotSheet.tsx`).
 - **Endpoint:** `POST /api/admin/copilot`
 - **Autenticación:** Requiere sesión activa de Supabase Auth con rol verificado en metadata: `role === 'admin'`.

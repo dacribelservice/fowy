@@ -89,8 +89,8 @@ Auditoría detallada de cada archivo del proyecto que se creará o con el que ha
     - `copilot/CopilotActionCard.tsx` (con ajuste rápido y compartir recibo en 1 clic).
   - **Modo Lectura Satélite en Negocios:**
     - `src/components/admin/businesses/BusinessSubscriptionReadOnlyView.tsx` (Visor informativo para la pantalla de negocio).
-* **Página Principal:** `src/app/admin/finanzas/page.tsx` (Reemplaza la vista anterior de tesorería/escrow convirtiéndola en la Torre de Control SaaS, preservando intacto `src/hooks/useFinanceManager.ts`).
-* **Diagnóstico de Riesgo:** **1.0 / 10**.
+* **Página Principal ("Finanzas FOWY"):** `src/app/admin/finanzas-fowy/page.tsx` (Nueva ruta independiente conectada a la pestaña "Finanzas FOWY" en el Sidebar. La vista legacy `src/app/admin/finanzas/page.tsx` y su hook `useFinanceManager.ts` permanecen 100% intactos en código como respaldo de custodia/escrow, únicamente desconectándose del menú visible).
+* **Diagnóstico de Riesgo:** **0.5 / 10** (Aislamiento total: cero reemplazo o alteración de archivos existentes).
 
 ---
 
@@ -147,7 +147,7 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 ```text
   [ FASE 1: Isla de Base de Datos ]   ──► DDL 10 tablas, Seed FOWY Lab, 6 RPCs (1 RTT), 7 índices, RLS, Secuencias y Revocación DELETE.
   [ FASE 2: Tipos, Utilidades & Core] ──► finance.ts exhaustivo, financeReceipt.ts, evolutionService, geminiCopilotService (RAM).
-  [ FASE 3: Tablero Visual Finanzas ] ──► /admin/finanzas, semáforos, P&L, 4 modales, tabla virtualizada 60 FPS y revalidación SWR.
+  [ FASE 3: Tablero Visual Finanzas FOWY ] ──► /admin/finanzas-fowy, nueva pestaña en Sidebar, semáforos, P&L, 4 modales, tabla 60 FPS y SWR.
   [ FASE 4: Copilot Web Directivo ]   ──► /api/admin/copilot, Bottom Sheet/Drawer, Web Audio API, Ctrl+V en RAM y Kill Switch.
   [ FASE 5: Enlace WhatsApp Evolution]──► Webhook, filtro CEO, deduplicación, audio/imagen en RAM, rutas CONFIRMADO/CANCELAR.
   [ FASE 6: Crons, Modo Lectura & DoD]──► Vercel crons parametrizados, switch de rollback en Negocios y build local limpio (Exit code: 0).
@@ -243,7 +243,7 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ---
 
-- [ ] **Fase 3: Tablero Visual `/admin/finanzas` & Modales**
+- [ ] **Fase 3: Tablero Visual `Finanzas FOWY` (`/admin/finanzas-fowy`) & Modales**
   - [ ] **Punto 3.1 (Semáforos KPI):** Crear `src/components/admin/finanzas/FinanceKpiCards.tsx` (<120L) con las 4 tarjetas superiores de recaudo al día, periodo de prueba, tolerancia en gracia y mora.
   - [ ] **Punto 3.2 (Barra de Salud Financiera & KPIs):** Crear `src/components/admin/finanzas/FinanceHealthMetricsBar.tsx` (<120L) con badges vectoriales planos de CPI Onboarding, DSO Cartera, Runway de Caja y Margen Operativo Neto %.
   - [ ] **Punto 3.3 (Barra de Liquidez Multibolsillo):** Crear `src/components/admin/finanzas/FinanceAccountsBar.tsx` (<140L) con el arqueo visual de Nequi, Daviplata, Bancolombia y Efectivo, con botón directo para abrir traspasos.
@@ -256,7 +256,10 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
     - Crear `modals/QuickExpenseModal.tsx` (<180L) para registrar egresos OPEX con selector de las 5 categorías oficiales en español (`viaticos_calle`, `transporte_movilidad`, `material_negocios`, `tecnologia_fija`, `salario_ceo`, `otros`) e imputación de cuentas.
     - Crear `modals/AccountTransferModal.tsx` (<160L) para traspaso de liquidez entre cuentas.
     - Crear `modals/NewTaskModal.tsx` (<140L) para agendar manualmente visitas y tareas del CEO.
-  - [ ] **Punto 3.9 (Página Orquestadora `/admin/finanzas`):** Actualizar [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/finanzas/page.tsx) (<210L) ensamblando los componentes y verificando que el ícono `Wallet` en [Sidebar.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx) active la ruta sin alterar otras pestañas.
+  - [ ] **Punto 3.9 (Página Orquestadora `Finanzas FOWY` & Desconexión Segura del Menú):**
+    - **Preservación Inmutable:** El archivo legacy `src/app/admin/finanzas/page.tsx` y su hook `useFinanceManager.ts` permanecen **100% intocados y sin borrar**, garantizando respaldo histórico de custodia y escrow.
+    - **Nueva Ruta Aislada:** Crear `src/app/admin/finanzas-fowy/page.tsx` (<210L) ensamblando los componentes del nuevo sistema contable integral.
+    - **Actualización de Menú en [Sidebar.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx):** Desconectar el acceso viejo `{ name: "Finanzas", href: "/admin/finanzas" }` (desaparece de la vista del menú sin borrar su código) y registrar el nuevo acceso oficial `{ name: "Finanzas FOWY", href: "/admin/finanzas-fowy", icon: Wallet }`.
   - [ ] **Punto 3.10 (Definition of Done — Validación Visual):**
     - Carga visual en `<100 ms` respaldada por SWR.
     - Inspeccionar el DOM en DevTools: verificar que solo existen ~12 nodos `<tr>` simultáneos en el DOM durante el scroll en la lista a **60 FPS** sin caídas de cuadros.
@@ -279,7 +282,7 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
     - Consultar: *"¿Cuánto es el Diezmo del mes y cómo va la cobranza en la calle?"*; certificar que el Agente FOWY calcula con exactitud el 10% de la utilidad neta real tras OPEX, evalúa el desglose de gastos (alertando si viáticos > 25% del ingreso) y analiza con criterio directivo el CPI y el DSO aplicando el principio *Dato + Diagnóstico + Acción Recomendada*.
     - Consultar: *"¿Cómo va el crecimiento de la red FOWY y el rendimiento de FOWY Lab?"*; certificar que el agente invoca `get_network_growth_summary` y `query_business_dossier` interpretando las variaciones en % (destacando alzas >15% o alertando riesgo de churn ante caídas >10%).
     - Pegar una captura de pantalla bancaria con `Ctrl + V` y comprobar extracción correcta de datos en RAM sin generar ningún archivo en Supabase Storage.
-    - Cambiar temporalmente `COPILOT_ENABLED=false` en `.env.local` y certificar que el Copilot muestra mensaje de mantenimiento preventivo sin provocar fallos de ejecución en la página `/admin/finanzas`.
+    - Cambiar temporalmente `COPILOT_ENABLED=false` en `.env.local` y certificar que el Copilot muestra mensaje de mantenimiento preventivo sin provocar fallos de ejecución en la página `/admin/finanzas-fowy`.
     - Ejecutar `npx tsc --noEmit` con 0 errores.
 
 ---
