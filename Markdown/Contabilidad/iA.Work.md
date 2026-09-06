@@ -287,10 +287,10 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ---
 
-- [ ] **Fase 5: Conexión WhatsApp con Evolution API v2 & OCR en RAM**
-  - [ ] **Punto 5.1 (Variables de Entorno Completas):** Registrar en `.env.local`:
+- [x] **Fase 5: Conexión WhatsApp con Evolution API v2 & OCR en RAM**
+  - [x] **Punto 5.1 (Variables de Entorno Completas):** Registrar en `.env.local`:
     `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE_NAME`, `CEO_PHONE_NUMBER`, `GEMINI_API_KEY`, `CRON_SECRET`, `COPILOT_ENABLED=true` y `NEXT_PUBLIC_COPILOT_ENABLED=true`.
-  - [ ] **Punto 5.2 (Webhook Receptor de WhatsApp):** Crear `src/app/api/webhooks/whatsapp/route.ts` (<240L):
+  - [x] **Punto 5.2 (Webhook Receptor de WhatsApp):** Crear `src/app/api/webhooks/whatsapp/route.ts` (<240L):
     - Retorno `200 OK` rápido (<40 ms) para liberar el socket de Evolution API.
     - Filtro estricto por número de Cristian (`CEO_PHONE_NUMBER`), descartando cualquier remitente no autorizado con `{ ignored: true }`.
     - Deduplicación de eventos contra `processed_webhook_events` por `message_id` en <10 ms.
@@ -298,7 +298,7 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
     - Ruta rápida para `"CONFIRMADO"` (<50ms, 0 tokens) ejecutando el RPC transaccional correspondiente.
     - Ruta rápida para `"CANCELAR"` (<20ms, 0 tokens) marcando la acción como cancelada.
     - Invalidación por `superseded` de acciones previas no confirmadas al recibir una nueva instrucción.
-  - [ ] **Punto 5.3 (Definition of Done — Validación WhatsApp):**
+  - [x] **Punto 5.3 (Definition of Done — Validación WhatsApp):**
     - *Test 5.3.1 (Seguridad Remitente):* Simular petición HTTP con número ajeno a `CEO_PHONE_NUMBER` y certificar respuesta `{ ignored: true }`.
     - *Test 5.3.2 (Idempotencia):* Enviar dos veces el mismo `message_id` y comprobar descarte en <10 ms.
     - *Test 5.3.3 (Audio / Imagen en RAM):* Enviar nota de voz o pantallazo de transferencia Nequi sobre *"FOWY Lab"*; verificar respuesta en WhatsApp con la propuesta en <1.2s.
