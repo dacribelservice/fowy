@@ -102,7 +102,7 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 * **Sincronización Automática:** Al marcar `[x]` en una tarea de fotos o volantes, se abre un micro-toast con la opción: *"¿Actualizar entregables de este restaurante en su ficha?"* con botón rápido `[Sí, sincronizar]`.
 
 ### 3.4 Bloque 4: Tabla Virtualizada a 60 FPS (`BusinessBillingTable.tsx` & `BusinessBillingRow.tsx`)
-* **Rendimiento:** Implementada con virtualización (solo 10 a 12 filas en el DOM), fluido a 60 FPS sin importar si hay 100 o 10.000 restaurantes.
+* **Rendimiento:** Implementada con virtualización vía `@tanstack/react-virtual` (solo 10 a 12 filas `<tr>` renderizadas en el DOM de forma fija), fluido a **60 FPS** sin caídas de cuadros (*frame drops*) sin importar si hay 100 o 10.000 restaurantes. La prueba técnica de aceptación en DevTools exige validar en vivo que mientras se hace scroll rápido solo existan ~12 nodos en el árbol DOM.
 * **Buscador Trigram GIN:** Input reactivo que filtra en `<5 ms` directamente en PostgreSQL con estado vacío amigable (*Empty State*) si no hay resultados.
 * **Pestañas de Filtro Rápido:** `Todos`, `Al Día`, `En Prueba`, `Por Cobrar`, `Compromisos Hoy`.
 * **Visualización del Plan Debajo del Nombre:** Cada fila muestra debajo del nombre del restaurante un badge o etiqueta minimalista con el plan activo (ej: `[ Plan Standard ]`, `[ Plan Pro ]`, `[ Plan Premium ]`) leído dinámicamente desde la libreta de notas `modules JSONB` o el fee mensual, permitiendo identificar al instante la categoría del cliente sin saturar el ancho de la tabla.
@@ -210,6 +210,23 @@ En la pantalla de cada negocio, la sección que antes requería cambiar selector
 * **Cero rigidez de base de datos:** El plan y los módulos de software se leen de la columna flexible `modules JSONB`, mientras que los servicios de calle se leen de `deliverables JSONB`. Ambos funcionan como notas digitales editables sin necesidad de `ALTER TABLE`.
 * **Cero riesgo de manipulación manual:** Ya no hay que abrir 100 pantallas para cambiar fechas una por una.
 * **Trazabilidad 100%:** Si el restaurante dice "Activo", el botón `[ 📲 Compartir Recibo WhatsApp ]` abre el comprobante legal generado por el módulo de Finanzas.
+* **Patrón de Desconexión sin Eliminación & Rollback en 30 Segundos:**  
+  En `src/app/admin/negocios/[id]/page.tsx`, el formulario anterior `BusinessPaymentViewer.tsx` se preserva intacto como respaldo histórico. La conexión con el nuevo visor satélite se rige por un interruptor booleano:
+  ```tsx
+  const USE_SATELLITE_FINANCE_VIEW = true;
+  // ...
+  {USE_SATELLITE_FINANCE_VIEW ? (
+    <BusinessSubscriptionReadOnlyView businessId={business.id} />
+  ) : (
+    <BusinessPaymentViewer 
+      business={business} 
+      onRefresh={fetchBusiness} 
+      onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)}
+    />
+  )}
+  ```
+  *Protocolo de Rollback:* Si ocurriera cualquier anomalía en producción, cambiar `USE_SATELLITE_FINANCE_VIEW = false` restaura el formulario operativo legacy en menos de 30 segundos sin pérdida de datos ni regresiones.
+
 
 ---
 

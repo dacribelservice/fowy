@@ -122,12 +122,13 @@ graph TD
 
 ### 2.3 Conexión 3: Ciclo Autónomo Dual (Cron Jobs) con Mapeo Horario Colombia (UTC-5)
 1. **Cierre Nocturno & Purga de Eventos (11:59 PM Colombia = 04:59 UTC del día siguiente):**
-   - **Disparador:** Vercel Cron (`cron: "59 4 * * *"`) o Supabase `pg_cron` llamando a `POST /api/cron/financial-audit`.
+   - **Disparador:** Vercel Cron (`cron: "59 4 * * *"`) o Supabase `pg_cron` llamando a `POST /api/cron/financial-audit?action=nightly_close`.
    - **Labor:** Audita las últimas 24 horas (ingresos, gastos OPEX, avance de días de prueba, vencimientos). Genera el balance del día y lo almacena inmutablemente en la tabla `daily_financial_reports`. Además, ejecuta la purga automática de registros con más de 7 días en `processed_webhook_events` para mantener la base de datos ligera.
 2. **Morning Briefing Matutino (8:00 AM Colombia = 13:00 UTC):**
-   - **Disparador:** Cron programado a las `13:00 UTC` (`cron: "0 13 * * *"`).
+   - **Disparador:** Cron programado a las `13:00 UTC` (`cron: "0 13 * * *"`) llamando a `POST /api/cron/financial-audit?action=morning_briefing`.
    - **Labor:** Consulta tareas del día en `ceo_tasks`, cobros programados en `payment_commitments`, estado de caja y redacta el informe matutino.
    - **Despacho:** Envía el mensaje automáticamente al WhatsApp personal del CEO a través de la instancia de Evolution API.
+
 
 ---
 
@@ -449,7 +450,8 @@ Prepara el traspaso o retiro de fondos entre cuentas de liquidez (Nequi, Davipla
 5. **Aislamiento Sagrado de la Tabla `businesses` (Solo Lectura):**  
    La IA tiene **terminantemente prohibido ejecutar sentencias `UPDATE`, `INSERT` o `DELETE` sobre la tabla `businesses`**. La tabla madre queda pura para los comensales. Todas las modificaciones operativas y de cobro se ejecutan exclusivamente sobre la tabla satélite `business_subscriptions`.
 6. **Aislamiento de Tipos (`finance.ts` vs `supabase.ts`):**  
-   Prohibido tocar o regenerar `src/types/supabase.ts`. La IA tiene acceso de solo lectura a `supabase.ts` para contextualizar negocios y comensales, pero todos los tipos y esquemas de finanzas se declaran de forma autónoma en `src/types/finance.ts`, garantizando cero contaminación en el resto de la app.
+   Prohibido tocar o regenerar `src/types/supabase.ts`. La IA tiene acceso de solo lectura a `supabase.ts` para contextualizar negocios y comensales, pero todos los tipos y esquemas de finanzas se declaran de forma autónoma en `src/types/finance.ts` (incluyendo `DeliverablesMap`, `ModulesMap`, `ReceiptData`, `PendingActionDTO`, `CopilotChatMessage`, DTOs de los 6 RPCs y argumentos de las 9 tools), garantizando cero contaminación y cero uso de `any` en el resto de la app.
+
 7. **Kill Switch de Emergencia & Restaurante Laboratorio:**  
    Implementación de la variable `COPILOT_ENABLED=true/false` para desconexión rápida del Copilot sin afectar el panel web manual. Las pruebas iniciales de audios, confirmaciones y cobros se ejecutan sobre el restaurante demo (*"FOWY Lab"*).
 8. **Procesamiento Multimodal de Audio e Imágenes 100% en RAM:**  

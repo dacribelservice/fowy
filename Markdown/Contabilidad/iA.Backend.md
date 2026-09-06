@@ -737,8 +737,14 @@ GRANT EXECUTE ON FUNCTION get_admin_finance_summary TO authenticated, service_ro
 REVOKE EXECUTE ON FUNCTION get_admin_businesses_billing_page FROM public;
 GRANT EXECUTE ON FUNCTION get_admin_businesses_billing_page TO authenticated, service_role;
 
+-- Permisos sobre Secuencia de Consecutivo de Recibos (SERIAL REC-XXXX)
+GRANT USAGE, SELECT ON SEQUENCE membership_payments_receipt_number_seq TO authenticated, service_role;
+
 -- Revocación Físico-SQL de DELETE (Criterio de la Llave Sin Borrado)
 -- La base de datos rechaza de raíz cualquier intento de borrado sobre la Isla Financiera
+-- NOTA TÉCNICA: Las tablas efímeras 'pending_actions' (por expiración de TTL de 10 min) y 
+-- 'processed_webhook_events' (por purga nocturna automática de eventos > 7 días) se excluyen 
+-- deliberadamente de esta restricción para permitir las labores de limpieza del sistema.
 DO $$
 DECLARE
     tbl text;
@@ -754,6 +760,17 @@ BEGIN
 END;
 $$;
 ```
+
+### 5.1 Suite de Pruebas de Verificación Técnica (DoD SQL - 6 RPCs)
+Para certificar la correcta instalación de la Fase 1 en Supabase SQL Editor:
+1. **Resumen Financiero:** `SELECT get_admin_finance_summary();` (Valida P&L, cuentas y semáforos en <20 ms).
+2. **Paginación Server-Side:** `SELECT get_admin_businesses_billing_page('all', '', 10, 0);` (Valida paginación y Trigram GIN en <15 ms).
+3. **Expediente 360°:** `SELECT get_business_dossier('fowy-lab');` (Valida unión satélite, entregables y métricas de pedidos en <10 ms).
+4. **Pago Transaccional:** `SELECT apply_confirmed_membership_payment(p_business_id := (SELECT id FROM businesses WHERE slug = 'fowy-lab'), p_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_amount := 50000, p_payment_method := 'nequi');` (Valida generación de REC-XXXX, suma a Nequi y actualización de fecha).
+5. **Gasto OPEX:** `SELECT apply_confirmed_expense(p_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_category := 'infrastructure', p_amount := 10000, p_description := 'Prueba OPEX');` (Valida inserción y descuento en caja).
+6. **Traspaso de Fondos:** `SELECT apply_account_transfer(p_source_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_destination_account_id := (SELECT id FROM financial_accounts WHERE code = 'daviplata'), p_amount := 5000);` (Valida movimiento entre bolsillos sin afectar P&L).
+7. **Prueba de Inviolabilidad DELETE:** `DELETE FROM membership_payments;` (Debe arrojar: `permission denied for table membership_payments`).
+
 
 ---
 

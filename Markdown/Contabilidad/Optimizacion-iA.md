@@ -255,8 +255,10 @@ const rowVirtualizer = useVirtualizer({
 });
 ```
 
-### 4.2 Paginación Infinita Suave (`useSWRInfinite`)
+### 4.2 Paginación Infinita Suave (`useSWRInfinite`) & Revalidación Reactiva
 Al hacer scroll hacia abajo, la aplicación solicita la siguiente página de 30 negocios en segundo plano. La interfaz nunca se congela y la memoria RAM permanece controlada en menos de 45 MB.
+- **Mutadores SWR en Tiempo Real:** El hook `src/hooks/useAdminFinance.ts` no solo orquesta las consultas en caché, sino que expone las funciones mutadoras `revalidateSummary()` y `revalidateBilling()`. Cuando se confirma un pago, gasto o traspaso desde cualquier modal o desde el Copilot, estas funciones invalidan y actualizan los datos en segundo plano en `<50 ms`, garantizando reactividad instantánea en saldos, semáforos y tablas sin recargar el navegador.
+
 
 ---
 
@@ -289,9 +291,10 @@ Para evitar inconsistencias en las que se registre un pago pero falle la actuali
 
 ### 5.4 Sincronización Horaria Estricta UTC vs Colombia (UTC-5) en Crons
 Tanto los servidores de Vercel como Supabase `pg_cron` operan internamente en tiempo universal coordinado (UTC):
-- **Cierre Nocturno 11:59 PM (Colombia UTC-5):** Se programa estrictamente a las `04:59 UTC` del día siguiente (`cron: "59 4 * * *"`).
-- **Morning Briefing 8:00 AM (Colombia UTC-5):** Se programa estrictamente a las `13:00 UTC` (`cron: "0 13 * * *"`).
-- **Resultado:** Despacho exacto al minuto en el reloj del celular de Cristian sin desfasajes de zona horaria.
+- **Cierre Nocturno 11:59 PM (Colombia UTC-5):** Se programa estrictamente a las `04:59 UTC` del día siguiente (`cron: "59 4 * * *"`) invocando `POST /api/cron/financial-audit?action=nightly_close`.
+- **Morning Briefing 8:00 AM (Colombia UTC-5):** Se programa estrictamente a las `13:00 UTC` (`cron: "0 13 * * *"`) invocando `POST /api/cron/financial-audit?action=morning_briefing`.
+- **Resultado:** Despacho exacto al minuto en el reloj del celular de Cristian sin desfasajes de zona horaria y con ejecución determinista según el parámetro `action`.
+
 
 ---
 
