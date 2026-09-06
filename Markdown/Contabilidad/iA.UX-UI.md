@@ -44,10 +44,14 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 │ ┌─────────────────────────────────────────────────────────┬───────────────────────────────┐ │
 │ │ 💳 LIQUIDEZ POR CUENTA (Bolsillos)                      │ 📊 UTILIDAD NETA DEL MES      │ │
 │ │ • Nequi:         $ 850.000 COP                          │ • Ingresos Cobrados: $950.000 │ │
-│ │ • Daviplata:     $ 150.000 COP                          │ • Gastos OPEX:      -$280.000 │ │
-│ │ • Bancolombia:   $ 420.000 COP                          │ ───────────────────────────── │ │
-│ │ • Efectivo Mano: $ 180.000 COP                          │ 💰 UTILIDAD REAL:   +$670.000 │ │
-│ │ Total Liquidez:  $1.600.000 COP                         │ 🙏 DIEZMO (10%):     $ 67.000 │ │
+│ │ • Daviplata:     $ 150.000 COP                          │ • Gastos OPEX Totales:-$280.00│ │
+│ │ • Bancolombia:   $ 420.000 COP                          │   ├─ 🖥️ Servidores:  $105.000 │ │
+│ │ • Efectivo Mano: $ 180.000 COP                          │   ├─ 🍔 Viáticos/Calle:$85.000│ │
+│ │ Total Liquidez:  $1.600.000 COP                         │   ├─ ⛽ Transporte:    $50.000│ │
+│ │                                                         │   └─ 🖨️ Materiales:    $40.000│ │
+│ │                                                         │ ───────────────────────────── │ │
+│ │                                                         │ 💰 UTILIDAD REAL:   +$670.000 │ │
+│ │                                                         │ 🙏 DIEZMO (10%):     $ 67.000 │ │
 │ │                                                         │ (Margen Operativo: 70.5%)     │ │
 │ └─────────────────────────────────────────────────────────┴───────────────────────────────┘ │
 │                                                                                             │
@@ -110,7 +114,12 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 * **Arqueo de Fondos:** 4 tarjetas visuales con logotipos de Nequi, Daviplata, Bancolombia y Efectivo, con selector rápido para registrar traspasos entre cuentas en 2 clics (*"Traspasar $100k de Nequi a Efectivo"*).
 * **P&L en Vivo:** 
   * Cifra de Ingresos en texto verde esmeralda.
-  * Cifra de Gastos OPEX en texto rojo coral.
+  * Cifra de Gastos OPEX en texto rojo coral con **micro-desglose por categorías clave** (leído directamente de `v_expenses_by_category` en <10 ms sin consultas extra):
+    * 🖥️ **Tecnología Fija:** Supabase Pro ($25 USD), dominios web, tokens Gemini.
+    * 🍔 **Viáticos de Calle:** Almuerzos y alimentación en ruta de visitas *(con alerta visual en ámbar si supera el 25% del recaudo para controlar la fuga silenciosa de caja)*.
+    * ⛽ **Transporte & Movilidad:** Gasolina, parqueaderos, pasajes.
+    * 🖨️ **Material Negocios:** Volantes, fotos gastronómicas, stickers QR.
+    * 👤 **Sueldo Cristian (CEO):** Asignación mensual formal del fundador.
   * **Cifra de Utilidad Neta Real** en tipografía destacada (`text-3xl font-extrabold`) con badge de margen porcentual.
   * **Métrica del Diezmo (10% de la Utilidad Neta Real tras Gastos Deducibles):** Renglón contable destacado (`🙏 DIEZMO (10%): $67.000 COP`) calculado automáticamente como el 10% de la utilidad neta mensual tras descontar todos los gastos OPEX posibles ($\text{Diezmo} = \text{Utilidad Neta Real} \times 0.10$). Si la empresa opera en pérdida o utilidad cero, el diezmo es `$0 COP`. Permite a Cristian separar con total transparencia y exactitud matemática el fondo de diezmo de FOWY.
 

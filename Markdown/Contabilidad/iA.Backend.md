@@ -120,7 +120,9 @@ Registra el OPEX real de FOWY imputando a cuentas y locales:
 CREATE TABLE IF NOT EXISTS operational_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID REFERENCES financial_accounts(id) NOT NULL,
-    category VARCHAR(40) NOT NULL, -- 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing', 'other'
+    -- Categorías oficiales: 'viaticos_calle', 'transporte_movilidad', 'material_negocios', 'tecnologia_fija', 'salario_ceo', 'otros'
+    -- (Retrocompatible con: 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing')
+    category VARCHAR(40) NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT NOT NULL,
     related_business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
@@ -590,6 +592,7 @@ DECLARE
     v_runway NUMERIC := 0.0;
     v_margin_pct NUMERIC := 0.0;
     v_tithing NUMERIC := 0.00;
+    v_expenses_by_category JSONB := '{}'::jsonb;
     v_metrics JSONB;
     v_health_kpis JSONB;
     v_accounts JSONB;
@@ -607,6 +610,16 @@ BEGIN
     INTO v_expenses
     FROM operational_expenses
     WHERE expense_date >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota'))::DATE;
+
+    -- 2.1 Desglose de egresos por categoría en el mes (Alimentación/calle, transporte, material, tech, sueldo)
+    SELECT COALESCE(jsonb_object_agg(cat, total), '{}'::jsonb)
+    INTO v_expenses_by_category
+    FROM (
+        SELECT category AS cat, SUM(amount) AS total
+        FROM operational_expenses
+        WHERE expense_date >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota'))::DATE
+        GROUP BY category
+    ) sub;
 
     -- 3. Cartera pendiente (compromisos verbales activos)
     SELECT COALESCE(SUM(agreed_amount), 0)
@@ -640,7 +653,7 @@ BEGIN
     SELECT COALESCE(AVG(amount), 35000.00)
     INTO v_avg_onboarding_cost
     FROM operational_expenses
-    WHERE category IN ('flyers_printing', 'photography')
+    WHERE category IN ('material_negocios', 'flyers_printing', 'photography')
       AND expense_date >= NOW() - INTERVAL '60 days';
 
     IF v_avg_onboarding_cost > 0 THEN
@@ -664,6 +677,7 @@ BEGIN
     v_metrics := jsonb_build_object(
         'month_income', v_income,
         'month_expenses', v_expenses,
+        'expenses_by_category', v_expenses_by_category,
         'net_profit', v_income - v_expenses,
         'tithing', v_tithing,
         'pending_receivables', v_receivables,

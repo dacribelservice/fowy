@@ -51,12 +51,18 @@ Cada negocio tiene un estado contable automatizado en base de datos:
 - **`suspendido` (Mora crítica):** Se oculta temporalmente de la vista pública en `/explorar` hasta la confirmación de pago.
 
 ### 🔹 Pilar 2: Control de Egresos y Gastos Operativos (OPEX)
-La contabilidad exige registrar cada salida de dinero clasificada por categoría y cuenta de origen:
-- **Costos de Infraestructura (Fijos):** Suscripción Supabase Plan Pro ($25 USD/mes), dominios web, herramientas auxiliares.
-- **Costos Directos de Adquisición (Variables):** Pago a imprenta por 500/1000 volantes por negocio, honorarios de fotógrafo por sesión gastronómica, stickers QR para mesas.
-- **Gastos de Operación y Ventas:** Gasolina, transporte, viáticos de visitas comerciales en la calle.
+La contabilidad exige registrar cada salida de dinero clasificada por cuenta de origen y bajo **5 categorías prácticas y directas** que reflejan la operación real de FOWY:
+1. 🍔 **`viaticos_calle` (Alimentación & Viáticos de Ruta):** Almuerzos, comidas, cafés y refrigerios consumidos durante la jornada de visitas a restaurantes.  
+   - *Regla Anti-Fricción:* Cristian **no** registra café por café ni empanada por empanada; dicta un único audio al final del día (ej. *"Agente FOWY, viáticos de hoy en calle: $25.000 en efectivo"*).
+   - *Alerta CFO:* Si los viáticos de calle superan el 25% del recaudo del periodo, el Agente FOWY emite alerta proactiva por fuga silenciosa de caja.
+2. ⛽ **`transporte_movilidad` (Transporte & Movilidad):** Gasolina de la moto/vehículo, pasajes, parqueaderos y carreras comerciales.
+3. 🖨️ **`material_negocios` (Material de Clientes / Onboarding):** Pago a imprenta por volantes físicos, sesiones de fotos gastronómicas, stickers QR para mesas y pendones publicitarios (imputables a cada local).
+4. 🖥️ **`tecnologia_fija` (Servidores & Herramientas Fijas):** Suscripción mensual de Supabase Plan Pro ($25 USD / ~$105.000 COP), dominios web, consumo de APIs de IA y herramientas cloud.
+5. 👤 **`salario_ceo` (Sueldo / Honorarios Cristian):** Asignación mensual fija o retiros de sustento del CEO, formalmente aislados para no mezclar gastos personales con la caja de la empresa.
+6. 📦 **`otros` (Misceláneos):** Gastos imprevistos o menores no recurrentes.
+
 - **Fórmula contable obligatoria:**  
-  $$\text{Utilidad Operativa Neta} = \text{Recaudo Total (Membresías + Banners + Extras)} - \text{Egresos Operativos (OPEX)}$$
+  $$\text{Utilidad Operativa Neta} = \text{Recaudo Total (Membresías + Banners + Extras)} - \text{Egresos Operativos (OPEX Totales)}$$
 
 ### 🔹 Pilar 3: Arqueo de Cuentas y Cajas de Fondos (Bolsillos)
 En Colombia el recaudo y gasto ocurre en diferentes canales. Cada transacción se asigna a su cuenta real:
@@ -220,8 +226,10 @@ CREATE TABLE IF NOT EXISTS membership_payments (
 ```sql
 CREATE TABLE IF NOT EXISTS operational_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID REFERENCES financial_accounts(id),
-    category VARCHAR(40) NOT NULL, -- 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing', 'other'
+    account_id UUID REFERENCES financial_accounts(id) NOT NULL,
+    -- Categorías oficiales: 'viaticos_calle', 'transporte_movilidad', 'material_negocios', 'tecnologia_fija', 'salario_ceo', 'otros'
+    -- (Retrocompatible con: 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing')
+    category VARCHAR(40) NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT NOT NULL,
     related_business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
