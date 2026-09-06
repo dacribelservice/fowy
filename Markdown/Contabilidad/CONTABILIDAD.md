@@ -77,11 +77,27 @@ Evita cobrar a clientes que aún tienen servicios pendientes, protegiendo la rep
 - **Stickers QR de Mesa:** `Pendiente` | `Entregado`.
 - **Capacitación del Personal:** `Pendiente` | `Realizada`.
 
-### 🔹 Pilar 6: Estados Financieros Estándar Automatizados
+### 🔹 Pilar 6: Estados Financieros Estándar & Métricas de Eficiencia y Crecimiento (KPI / CPI / % Crecimiento / Diezmo)
 El sistema genera sin esfuerzo manual:
-1. **Estado de Pérdidas y Ganancias (P&L):** Ingresos brutos vs costos directos de entrega vs costos fijos = Margen bruto y Utilidad neta mensual.
+1. **Estado de Pérdidas y Ganancias (P&L):** Ingresos brutos vs costos directos de entrega vs costos fijos = Margen bruto, Utilidad neta mensual y **Métrica del Diezmo (10% de la utilidad neta real tras descontar todos los gastos OPEX posibles)**. Si la utilidad neta es menor o igual a cero, el Diezmo se calcula en $0 COP.
 2. **Flujo de Caja Real (Cash Flow):** Entradas efectivas vs salidas reales por semana/mes.
-3. **Comprobantes de Pago Consecutivos:** Generación de recibos formales (`REC-001`, `REC-002`) con formato limpio para comprobante a clientes por WhatsApp.
+3. **Indicadores Clave de Eficiencia Financiera (KPI / CPI):**
+   - **CPI Onboarding (Cost Performance Index):** Presupuesto base de activación ($35.000 COP) vs gasto real en volantes, fotos y viáticos ($CPI = \frac{EV}{AC}$).
+   - **DSO (Days Sales Outstanding):** Días promedio de cobro en calle (cartera pendiente vs velocidad de ingreso diario).
+   - **Margen Operativo Real:** Margen porcentual neto tras cubrir costos fijos y variables.
+   - **Runway de Caja:** Meses de operación garantizados por los saldos líquidos frente al costo de servidores.
+   - **CAC Payback:** Tiempo de recuperación de la inversión inicial en cada restaurante.
+4. **Métricas de Crecimiento Dinámico en % (Macro Plataforma FOWY & Micro Restaurante):**
+   - **Crecimiento Macroeconómico Red FOWY (Single Source of Truth):**
+     * `% MoM, % WoW, % DoD de Afiliaciones:` Ritmo de nuevos restaurantes sumados a la red (ej: +28.5% este mes).
+     * `% MoM, % WoW de Tráfico Comensal:` Variación de visitas a menús y cartas digitales.
+     * `% MoM, % WoW de Pedidos / Conversiones:` Tasa de crecimiento de clics a WhatsApp generados para los restaurantes.
+     * *Arquitectura:* Calculado 100% en PostgreSQL vía RPC `get_network_growth_summary()`. La base de datos es el cerebro global que calcula los porcentajes en <10 ms y entrega un JSON liviano (<1 KB); el Dashboard de administración (`/admin/dashboard`), el módulo de Finanzas (`/admin/finanzas`) y la IA Copilot beben de la misma fuente sin duplicar consultas ni descargar tablas al navegador.
+   - **Crecimiento Micro Individual por Negocio (% en Expediente 360°):**
+     * `% MoM y % WoW de Pedidos y Visitas:` Calculado al vuelo en `get_business_dossier()` comparando los últimos 30 días contra el periodo anterior.
+     * *Protección de Base de Datos:* La tabla `businesses` permanece 100% pura y virgen (cero columnas estáticas innecesarias). Los porcentajes se calculan en memoria de PostgreSQL al consultar la ficha o la fila del restaurante.
+     * *Doble Propósito:* En la UI, alimenta el micro-badge de tendencia en `BusinessBillingRow.tsx` ubicado directamente debajo del estado de suscripción (`↳ [ 📈 +14.2% ]` / `↳ [ 📉 -12.5% ]`) para mantener la tabla limpia y sin datos apeñuscados. En la IA Copilot, activa alertas automáticas de retención/churn o argumentos contundentes de renovación.
+5. **Comprobantes de Pago Consecutivos:** Generación de recibos formales (`REC-001`, `REC-002`) con formato limpio para comprobante a clientes por WhatsApp.
 
 ### 🔹 Pilar 7: Agenda Operativa del CEO
 Registro y seguimiento de visitas de campo, mandados a imprenta y reuniones presenciales para evitar promesas rotas con los restaurantes.
@@ -98,8 +114,10 @@ El sistema de gestión financiera y operativa se implementa bajo una **arquitect
 │  ┌──────────────────┬──────────────────┬──────────────────┬──────────────┐  │
 │  │ 🟢 Al Día (18)   │ 🟡 En Prueba (9) │ 🔴 Vencidos (5)  │ Utilidad Mes │  │
 │  │ Recaudo: $900.000│ Días promedio: 8 │ Cartera: $250.000│ +$660.000 COP│  │
+│  │                  │                  │                  │ Diezmo: $66k │  │
 │  └──────────────────┴──────────────────┴──────────────────┴──────────────┘  │
 │                                                                             │
+│  [ SALUD: CPI: 1.14 (Eficiente) | DSO: 3.4 días | Runway: 6.2m | Margen: 70.5% ]
 │  [ CAJAS: Nequi: $520k | Daviplata: $150k | Bancolombia: $400k | Efectivo: $150k ]
 │                                                                             │
 │  ┌────────────────────────────────────────┐ ┌─────────────────────────────┐ │
@@ -111,7 +129,7 @@ El sistema de gestión financiera y operativa se implementa bajo una **arquitect
 │                                                                             │
 │                                                        ┌─────────────────┐  │
 │                                                        │ 🤖 BOTÓN FLOTANTE│  │
-│                                                        │   "FOWY COPILOT"│  │
+│                                                        │   "AGENTE FOWY" │  │
 │                                                        │  [ 2 Tareas Hoy]│  │
 │                                                        └─────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────┘

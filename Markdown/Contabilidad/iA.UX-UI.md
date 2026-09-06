@@ -26,7 +26,7 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 📑 PANEL DE FINANZAS & COPILOT DIRECTIVO — FOWY                               [ 🤖 COPILOT ]│
+│ 📑 PANEL DE FINANZAS & AGENTE FOWY — ADMINISTRACIÓN                           [ 🤖 AGENTE ] │
 ├─────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 1. SEMÁFOROS DE SUSCRIPCIÓN (KPIs SUPERIORES)                                               │
 │ ┌──────────────────┬──────────────────┬──────────────────┬──────────────────────────────┐   │
@@ -34,41 +34,48 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 │ │ Recaudo: $900.000│ Días prom: 8     │ Cartera: $150.000│ En mora crítica              │   │
 │ └──────────────────┴──────────────────┴──────────────────┴──────────────────────────────┘   │
 │                                                                                             │
-│ 2. ARQUEO DE CAJAS & ESTADO DE RESULTADOS (P&L REAL)                                        │
+│ 2. INDICADORES DE EFICIENCIA & SALUD FINANCIERA (CPI / DSO / RUNWAY)                        │
+│ ┌──────────────────┬──────────────────┬──────────────────┬──────────────────────────────┐   │
+│ │ 🎯 CPI ONBOARDING│ ⏱️ DSO CARTERA   │ 🛡️ RUNWAY CAJA   │ 📈 MARGEN OPERATIVO          │   │
+│ │ 1.14 (Eficiente) │ 3.4 días (Ágil)  │ 6.2 meses cubierto│ 70.5% neto                   │   │
+│ └──────────────────┴──────────────────┴──────────────────┴──────────────────────────────┘   │
+│                                                                                             │
+│ 3. ARQUEO DE CAJAS & ESTADO DE RESULTADOS (P&L REAL)                                        │
 │ ┌─────────────────────────────────────────────────────────┬───────────────────────────────┐ │
 │ │ 💳 LIQUIDEZ POR CUENTA (Bolsillos)                      │ 📊 UTILIDAD NETA DEL MES      │ │
 │ │ • Nequi:         $ 850.000 COP                          │ • Ingresos Cobrados: $950.000 │ │
 │ │ • Daviplata:     $ 150.000 COP                          │ • Gastos OPEX:      -$280.000 │ │
 │ │ • Bancolombia:   $ 420.000 COP                          │ ───────────────────────────── │ │
 │ │ • Efectivo Mano: $ 180.000 COP                          │ 💰 UTILIDAD REAL:   +$670.000 │ │
-│ │ Total Liquidez:  $1.600.000 COP                         │ (Margen Operativo: 70.5%)     │ │
+│ │ Total Liquidez:  $1.600.000 COP                         │ 🙏 DIEZMO (10%):     $ 67.000 │ │
+│ │                                                         │ (Margen Operativo: 70.5%)     │ │
 │ └─────────────────────────────────────────────────────────┴───────────────────────────────┘ │
 │                                                                                             │
-│ 3. AGENDA DEL CEO (HOY) ── [ + Nueva Visita / Tarea ]                                       │
+│ 4. AGENDA DEL CEO (HOY) ── [ + Nueva Visita / Tarea ]                                       │
 │ ┌─────────────────────────────────────────────────────────────────────────────────────────┐ │
 │ │ [x] 09:30 AM: Recoger 1.000 volantes en imprenta para Maye Ricuras       [ 🖨️ Imprenta ] │ │
 │ │ [ ] 11:00 AM: Visitar Kaprichos para revisar fotos y menú digital        [ 📍 Visita ]   │ │
 │ │ [ ] 04:00 PM: Cobrar $50.000 a Asados Diana (Compromiso pactado)         [ 💰 Cobro ]    │ │
 │ └─────────────────────────────────────────────────────────────────────────────────────────┘ │
 │                                                                                             │
-│ 4. LISTA DE RESTAURANTES (Paginación Virtualizada a 60 FPS)                                 │
+│ 5. LISTA DE RESTAURANTES (Paginación Virtualizada a 60 FPS)                                 │
 │ [ 🔍 Buscar restaurante por nombre... (Trigram GIN) ]  [ Filtro: Todos v ] [ + Registrar ]  │
-│ ┌───────────────────────────┬──────────────┬──────────────────┬──────────────┬────────────────┐ │
-│ │ Restaurante & Plan        │ Estado       │ Próximo Pago     │ Entregables  │ Acciones       │ │
-│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
-│ │ Asados Diana              │ 🟢 Al Día    │ 05/10/2026       │ 📷 Entregado │ [Cobrar] [Ver] │ │
-│ │ ↳ [ Plan Standard ]       │              │ ↳ (en 30 días)   │              │                │ │
-│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
-│ │ Maye Ricuras              │ 🟡 En Prueba │ 12/09/2026       │ 📄 En Diseño │ [Extender][Msg]│ │
-│ │ ↳ [ Plan Standard ]       │              │ ↳ (quedan 7 días)│              │                │ │
-│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
-│ │ Kaprichos                 │ 🟠 En Gracia │ 02/09/2026       │ 📷 Pendiente │ [Cobrar] [Msg] │ │
-│ │ ↳ [ Plan Pro ]            │              │ ↳ (hace 3 días)  │              │                │ │
-│ └───────────────────────────┴──────────────┴──────────────────┴──────────────┴────────────────┘ │
+│ ┌─────────────────────────┬────────────────┬──────────────────┬──────────────┬────────────────┐ │
+│ │ Restaurante & Plan      │ Estado         │ Próximo Pago     │ Entregables  │ Acciones       │ │
+│ ├─────────────────────────┼────────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Asados Diana            │ 🟢 Al Día      │ 05/10/2026       │ 📷 Entregado │ [Cobrar] [Ver] │ │
+│ │ ↳ [ Plan Standard ]     │ ↳ [ 📈 +14.2% ]│ ↳ (en 30 días)   │              │                │ │
+│ ├─────────────────────────┼────────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Maye Ricuras            │ 🟡 En Prueba   │ 12/09/2026       │ 📄 En Diseño │ [Extender][Msg]│ │
+│ │ ↳ [ Plan Standard ]     │ ↳ [ ⚖️  0.0% ] │ ↳ (quedan 7 días)│              │                │ │
+│ ├─────────────────────────┼────────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Kaprichos               │ 🟠 En Gracia   │ 02/09/2026       │ 📷 Pendiente │ [Cobrar] [Msg] │ │
+│ │ ↳ [ Plan Pro ]          │ ↳ [ 📉 -12.5% ]│ ↳ (hace 3 días)  │              │                │ │
+│ └─────────────────────────┴────────────────┴──────────────────┴──────────────┴────────────────┘ │
 │                                                                                             │
 │                                                                     ┌─────────────────────┐ │
 │                                                                     │ 🤖 BOTÓN FLOTANTE   │ │
-│                                                                     │   "FOWY COPILOT"    │ │
+│                                                                     │   "AGENTE FOWY"     │ │
 │                                                                     │   [ 2 Tareas Hoy ]  │ │
 │                                                                     └─────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -86,14 +93,28 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
   * **Naranja (`grace_period`):** Restaurantes con 3 a 5 días de tolerancia con cartera pendiente.
   * **Rojo (`suspended`):** Locales en mora crítica que requieren llamada o visita presencial.
 
-### 3.2 Bloque 2: Arqueo Multibolsillo & P&L en Vivo (`FinanceProfitLossCard.tsx` y `FinanceAccountsBar.tsx`)
+### 3.2 Bloque 2: Indicadores de Eficiencia & Salud Financiera (`FinanceHealthMetricsBar.tsx`)
+* **Propósito:** Medir la rentabilidad real, eficiencia del capital invertido y velocidad de cobranza mediante métricas financieras estándar (CPI, DSO, Runway, Margen Operativo).
+* **Componente:** Barra ejecutiva horizontal compacta con 4 micro-tarjetas con badges vectoriales planos (`lucide-react` stroke 1.5px, cero 3D):
+  * **🎯 CPI Onboarding (Cost Performance Index):** Relación entre el presupuesto objetivo de activación (\$35.000 COP) y el costo real ejecutado en fotos, volantes y viáticos.
+    * *Verde ($\ge 1.0$):* Eficiente (gasto bajo control o inferior al presupuesto).
+    * *Rojo ($< 1.0$):* Sobrecosto de instalación (se está quemando más dinero del presupuestado por cliente).
+  * **⏱️ DSO Cartera (Days Sales Outstanding):** Días promedio que tarda un restaurante en pagar tras su fecha de corte o prueba.
+    * *Verde ($\le 4$ días):* Cobranza ágil y líquida.
+    * *Ámbar (4 a 7 días):* Advertencia de cartera lenta.
+    * *Rojo ($> 7$ días):* Dinero estancado en la calle erosionando la caja.
+  * **🛡️ Runway de Caja:** Meses de supervivencia que cubren los saldos líquidos actuales (Nequi, Daviplata, Bancolombia, Cash) frente a los costos fijos mensuales (Supabase Pro \$25 USD + viáticos esenciales).
+  * **📈 Margen Operativo Neto %:** Porcentaje de utilidad operativa real descontando todos los egresos OPEX de calle sobre los ingresos totales cobrados.
+
+### 3.3 Bloque 3: Arqueo Multibolsillo & P&L en Vivo (`FinanceProfitLossCard.tsx` y `FinanceAccountsBar.tsx`)
 * **Arqueo de Fondos:** 4 tarjetas visuales con logotipos de Nequi, Daviplata, Bancolombia y Efectivo, con selector rápido para registrar traspasos entre cuentas en 2 clics (*"Traspasar $100k de Nequi a Efectivo"*).
 * **P&L en Vivo:** 
   * Cifra de Ingresos en texto verde esmeralda.
   * Cifra de Gastos OPEX en texto rojo coral.
   * **Cifra de Utilidad Neta Real** en tipografía destacada (`text-3xl font-extrabold`) con badge de margen porcentual.
+  * **Métrica del Diezmo (10% de la Utilidad Neta Real tras Gastos Deducibles):** Renglón contable destacado (`🙏 DIEZMO (10%): $67.000 COP`) calculado automáticamente como el 10% de la utilidad neta mensual tras descontar todos los gastos OPEX posibles ($\text{Diezmo} = \text{Utilidad Neta Real} \times 0.10$). Si la empresa opera en pérdida o utilidad cero, el diezmo es `$0 COP`. Permite a Cristian separar con total transparencia y exactitud matemática el fondo de diezmo de FOWY.
 
-### 3.3 Bloque 3: Agenda de Campo del CEO (`CeoAgendaChecklist.tsx`)
+### 3.4 Bloque 4: Agenda de Campo del CEO (`CeoAgendaChecklist.tsx`)
 * **Diseño:** Tarjetas de tareas con checkbox interactivo y badges con iconos vectoriales minimalistas (`lucide-react` stroke 1.5px, cero 3D):
   * `MapPin` **Visita presencial** (azul).
   * `Printer` **Imprenta de volantes** (morado).
@@ -101,11 +122,15 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
   * `DollarSign` **Cobro programado** (verde).
 * **Sincronización Automática:** Al marcar `[x]` en una tarea de fotos o volantes, se abre un micro-toast con la opción: *"¿Actualizar entregables de este restaurante en su ficha?"* con botón rápido `[Sí, sincronizar]`.
 
-### 3.4 Bloque 4: Tabla Virtualizada a 60 FPS (`BusinessBillingTable.tsx` & `BusinessBillingRow.tsx`)
+### 3.5 Bloque 5: Tabla Virtualizada a 60 FPS (`BusinessBillingTable.tsx` & `BusinessBillingRow.tsx`)
 * **Rendimiento:** Implementada con virtualización vía `@tanstack/react-virtual` (solo 10 a 12 filas `<tr>` renderizadas en el DOM de forma fija), fluido a **60 FPS** sin caídas de cuadros (*frame drops*) sin importar si hay 100 o 10.000 restaurantes. La prueba técnica de aceptación en DevTools exige validar en vivo que mientras se hace scroll rápido solo existan ~12 nodos en el árbol DOM.
 * **Buscador Trigram GIN:** Input reactivo que filtra en `<5 ms` directamente en PostgreSQL con estado vacío amigable (*Empty State*) si no hay resultados.
 * **Pestañas de Filtro Rápido:** `Todos`, `Al Día`, `En Prueba`, `Por Cobrar`, `Compromisos Hoy`.
-* **Visualización del Plan Debajo del Nombre:** Cada fila muestra debajo del nombre del restaurante un badge o etiqueta minimalista con el plan activo (ej: `[ Plan Standard ]`, `[ Plan Pro ]`, `[ Plan Premium ]`) leído dinámicamente desde la libreta de notas `modules JSONB` o el fee mensual, permitiendo identificar al instante la categoría del cliente sin saturar el ancho de la tabla.
+* **Visualización del Plan Debajo del Nombre:** Cada fila muestra debajo del nombre del restaurante un badge o etiqueta minimalista con el plan activo (ej: `↳ [ Plan Standard ]`, `↳ [ Plan Pro ]`, `↳ [ Plan Premium ]`) leído dinámicamente desde la libreta de notas `modules JSONB` o el fee mensual, permitiendo identificar al instante la categoría del cliente con total claridad y sin saturar el ancho de la columna.
+* **Micro-Badge de Tendencia & Crecimiento en % Debajo del Estado (`BusinessBillingRow.tsx`):** Para evitar sobrecargar la columna del nombre y mantener un diseño espacioso y pulcro ("cero apeñuscamiento"), el porcentaje de variación de pedidos de los últimos 30 días se ubica **directamente debajo del semáforo de estado** (`↳ [ 📈 +14.2% ]`):
+  * *Crecimiento positivo:* `↳ [ 📈 +14.2% ]` en verde esmeralda sutil (`bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-semibold`).
+  * *Estable:* `↳ [ ⚖️ 0.0% ]` en gris suave (`bg-slate-500/10 text-slate-500 text-[10px]`).
+  * *Caída / Churn Risk:* `↳ [ 📉 -12.5% ]` en rojo coral (`bg-rose-500/10 text-rose-600 border border-rose-500/20 text-[10px] font-semibold`), alertando a Cristian de forma visual sobre qué negocios requieren visita de rescate o incentivos antes de intentar cobrarles.
 * **Conteo Relativo de Días Debajo de la Fecha:** Inmediatamente debajo de la fecha de pago (`DD/MM/YYYY`), se renderiza un indicador con el tiempo relativo para eliminar el cálculo mental:
   * *Al día con holgura:* `↳ (en 30 días)` en texto gris tenue (`text-slate-400`).
   * *Próximo a corte o en prueba:* `↳ (quedan 7 días)` o `↳ (vence hoy)` en texto ámbar (`text-amber-500 font-semibold`).
@@ -118,17 +143,38 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 
 ---
 
-## 🤖 4. Componente Flotante Copilot Web (`FinanceCopilotSheet.tsx`)
+## 🤖 4. Componente Flotante del Agente FOWY (`AgenteFowySheet.tsx` / `FinanceCopilotSheet.tsx`)
 
-Ubicado en la esquina inferior derecha como un botón flotante con pulso activo:
+### Ubicación Ergonómica & Convivencia con el Botón del Menú:
+* **En Pantallas Móviles / Celular (`< 768px`):**  
+  La interfaz móvil de FOWY ya cuenta con el botón de acción rápida flotante (el botón naranja circular con ícono `+` en la esquina inferior derecha, `bottom-6 right-4`). Para **evitar colisión táctil y jamás tapar el botón del menú**, el botón del **Agente FOWY** se posiciona **verticalmente justo encima** de dicho botón (`bottom-24 right-4` o `bottom-28 right-4`, `z-40`):
+  * **Ergonomía de una mano en calle:** Cristian puede acceder con el pulgar derecho al botón `+` abajo, o subir 3 centímetros el pulgar y tocar el botón del **Agente FOWY** sin que los dos botones choquen ni se tapen.
+* **En Pantallas de Escritorio (`>= 768px`):**  
+  Se ubica en la esquina inferior derecha habitual (`bottom-6 right-6`).
+
+### ¿Cómo Funciona el Botón del Agente FOWY?
+1. **Estado en Reposo (Cerrado):**
+   * Es una píldora o cápsula flotante estilizada con fondo oscuro semitransparente (`bg-slate-900/90 text-white backdrop-blur border border-slate-700 shadow-xl`), ícono de robot/IA minimalista y el texto **"AGENTE FOWY"**.
+   * **Badge de Alerta con Contador:** Si hay tareas de campo o compromisos pendientes para hoy, renderiza un micro-badge ámbar (`[ 2 Tareas Hoy ]`), avisando a Cristian de un vistazo sin tener que abrir la agenda.
+2. **Al Dar Clic o Toque (Apertura Adaptativa):**
+   * **En Celular (`< 768px`):** Se despliega instantáneamente como un **Bottom Sheet deslizable** desde la parte inferior de la pantalla con un tirador táctil (*drag handle*), ocupando el 75% de la altura de la pantalla para operarlo con una mano mientras camina por la calle.
+   * **En Escritorio (`>= 768px`):** Se desliza suavemente como un **Drawer lateral derecho** de 420px de ancho.
+3. **Interacción Multimodal:**
+   * **Por Voz:** Presionando el botón `[ 🎙️ Dictar Audio ]` (Web Audio API), Cristian habla a velocidad normal (*"Don Pedro pagó 50 mil por Nequi"*).
+   * **Por Texto:** Puede escribir dudas o mandados (*"¿Cuánto es el Diezmo del mes?", "¿Cuánto dinero tengo en Nequi?", "Acuérdame visitar a Kaprichos mañana"*).
+   * **Por Imagen (`Ctrl+V` o Adjunto):** Puede pegar un pantallazo de Nequi o foto de factura; el agente lee el OCR en RAM en milisegundos.
+4. **Respuesta en Bandeja de Plata (Two-Step Confirmation):**
+   * El agente no ejecuta a ciegas: devuelve una **tarjeta visual de pre-confirmación** estructurada con los datos contables, montos, cuenta y consecutivo `#REC-XXXX`.
+   * Cristian pulsa `[ ✅ CONFIRMAR Y APLICAR ]` o `[ ✏️ Ajustar ]`.
+   * Al confirmar, se aplica la transacción en PostgreSQL en `<50 ms` y aparece el botón directo `[ 📲 ENVIAR RECIBO POR WHATSAPP AL DUEÑO ]` para despachar el comprobante formal en 1 solo clic.
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ 🤖 FOWY COPILOT — CFO & SECRETARIA                     │
+│ 🤖 AGENTE FOWY — CFO & SECRETARIA EJECUTIVA            │
 ├────────────────────────────────────────────────────────┤
 │ 💬 Cristian: "Maye Ricuras pagó 50 mil por Nequi"      │
 │                                                        │
-│ 🤖 Copilot: "Entendido Cristian. He preparado la       │
+│ 🤖 Agente: "Entendido Cristian. He preparado la        │
 │ transacción para confirmación:"                        │
 │                                                        │
 │ ┌────────────────────────────────────────────────────┐ │
@@ -149,14 +195,14 @@ Ubicado en la esquina inferior derecha como un botón flotante con pulso activo:
 └────────────────────────────────────────────────────────┘
 ```
 
-### Micro-Interacciones Clave del Copilot:
+### Micro-Interacciones Clave del Agente:
 1. **Responsividad Adaptativa (Drawer en Desktop vs. Bottom Sheet en Móvil):**
    * En pantallas grandes (`>= 768px`): Se abre como un **Drawer lateral derecho** elegante.
    * En pantallas móviles (`< 768px`): Se despliega automáticamente como un **Bottom Sheet inferior** con tirador táctil (*drag handle*), permitiendo operarlo y dictarle con una sola mano desde la calle.
 2. **Botón de Ajuste Rápido (`[ ✏️ Ajustar ]`):**  
-   Si el Copilot interpretó un dato impreciso (ej. eran 45 días en vez de 30, o la cuenta era Daviplata en vez de Nequi), un clic en `[ ✏️ Ajustar ]` abre un micro-editor en la misma tarjeta sin tener que cancelar y volver a dictar toda la orden.
+   Si el Agente interpretó un dato impreciso (ej. eran 45 días en vez de 30, o la cuenta era Daviplata en vez de Nequi), un clic en `[ ✏️ Ajustar ]` abre un micro-editor en la misma tarjeta sin tener que cancelar y volver a dictar toda la orden.
 3. **Compartir Recibo por WhatsApp en 1 Clic (Tarjeta de Éxito):**  
-   Al confirmar la transacción (`[ ✅ CONFIRMAR Y APLICAR ]`), el Copilot ejecuta el RPC en `<50 ms` y renderiza la tarjeta de confirmación con confetti visual y el botón dorado:
+   Al confirmar la transacción (`[ ✅ CONFIRMAR Y APLICAR ]`), el Agente ejecuta el RPC en `<50 ms` y renderiza la tarjeta de confirmación con confetti visual y el botón dorado:
    ```text
    ┌────────────────────────────────────────────────────┐
    │ 🎉 ¡PAGO REGISTRADO CON ÉXITO!                     │
@@ -237,18 +283,19 @@ Para garantizar cumplimiento estricto de la regla de oro de [`conceptos.md`](fil
 ```text
 src/components/admin/finanzas/
 ├── FinanceKpiCards.tsx          (~110L - 4 Semáforos superiores)
+├── FinanceHealthMetricsBar.tsx  (~115L - Barra ejecutiva de salud: CPI Onboarding, DSO Cartera, Runway, Margen)
 ├── FinanceAccountsBar.tsx       (~140L - Bolsillos de Nequi/Daviplata/Bancolombia)
-├── FinanceProfitLossCard.tsx    (~125L - Tarjeta P&L con ingresos, gastos y utilidad neta)
+├── FinanceProfitLossCard.tsx    (~125L - Tarjeta P&L con ingresos, gastos, utilidad neta y diezmo)
 ├── CeoAgendaChecklist.tsx       (~160L - Checklist interactivo de tareas y visitas)
 ├── BusinessBillingTable.tsx     (~185L - Tabla virtualizada a 60 FPS con @tanstack/react-virtual y Trigram GIN)
-├── BusinessBillingRow.tsx       (~150L - Fila con Plan, días restantes bajo la fecha, badges y botón [Msg])
+├── BusinessBillingRow.tsx       (~150L - Fila con Plan bajo nombre, % bajo estado, días bajo fecha y [Msg])
 ├── modals/
 │   ├── QuickPaymentModal.tsx    (~195L - Modal de cobro con botón de compartir recibo)
 │   ├── QuickExpenseModal.tsx    (~170L - Modal para registrar gasto OPEX)
 │   ├── AccountTransferModal.tsx (~160L - Modal para traspaso de fondos entre cajas)
 │   └── NewTaskModal.tsx         (~135L - Modal para agendar nueva visita o tarea del CEO)
 └── copilot/
-    ├── FinanceCopilotSheet.tsx  (~210L - Drawer/Bottom Sheet responsive con Web Audio API)
+    ├── FinanceCopilotSheet.tsx  (~210L - Drawer/Bottom Sheet responsive Agente FOWY con Web Audio API)
     ├── CopilotVoiceMic.tsx      (~120L - Grabador de voz con Web Audio API)
     └── CopilotActionCard.tsx    (~165L - Tarjeta con ajuste rápido y compartir recibo)
 

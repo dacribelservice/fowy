@@ -72,11 +72,12 @@ Auditoría detallada de cada archivo del proyecto que se creará o con el que ha
 ### 2.5 En la Interfaz Visual (`src/components/admin/finanzas/`, `src/app/admin/finanzas/` y `src/components/admin/businesses/`)
 * **Componentes Atómicos (<250L) en Rutas Físicas Mapeadas 1:1:**
   - `src/components/admin/finanzas/FinanceKpiCards.tsx` (Semáforos superiores de recaudo y mora).
+  - `src/components/admin/finanzas/FinanceHealthMetricsBar.tsx` (Barra de salud financiera & KPIs: CPI Onboarding, DSO Cartera, Runway, Margen Operativo %).
   - `src/components/admin/finanzas/FinanceAccountsBar.tsx` (Arqueo Nequi/Daviplata/Bancolombia/Cash).
   - `src/components/admin/finanzas/FinanceProfitLossCard.tsx` (Ingresos, Gastos OPEX y Utilidad Neta Real).
   - `src/components/admin/finanzas/CeoAgendaChecklist.tsx` (Agenda diaria y visitas de campo).
   - `src/components/admin/finanzas/BusinessBillingTable.tsx` (Tabla virtualizada a 60 FPS con `@tanstack/react-virtual` y buscador Trigram GIN).
-  - `src/components/admin/finanzas/BusinessBillingRow.tsx` (Fila con Plan debajo del nombre, días restantes bajo la fecha, badges de entregables y botón directo WhatsApp [Msg]).
+  - `src/components/admin/finanzas/BusinessBillingRow.tsx` (Fila con Plan bajo el nombre, % de crecimiento bajo el estado, días restantes bajo la fecha, badges de entregables y botón directo WhatsApp [Msg]).
   - **Subdirectorio Modales (`src/components/admin/finanzas/modals/`):**
     - `modals/QuickPaymentModal.tsx` (con botón para compartir recibo por WhatsApp).
     - `modals/QuickExpenseModal.tsx` (egresos OPEX con imputación de cuentas).
@@ -171,13 +172,14 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
       `INSERT INTO business_subscriptions (business_id, subscription_status, trial_ends_at, monthly_fee) SELECT id, 'trial', (created_at + INTERVAL '15 days'), 50000.00 FROM businesses ON CONFLICT (business_id) DO NOTHING;`
     - Sembrar las 4 cuentas base en `financial_accounts`: Nequi (`nequi`), Daviplata (`daviplata`), Bancolombia (`bancolombia`), Efectivo en Mano (`cash`).
     - Crear el negocio laboratorio *"FOWY Lab"* (con slug `fowy-lab`) en `businesses` y asociarle su registro en `business_subscriptions` para pruebas no destructivas.
-  - [ ] **Punto 1.3 (Procedimientos RPC Atómicos en 1 RTT):** Compilar en PostgreSQL los 6 procedimientos con `SECURITY DEFINER`:
+  - [ ] **Punto 1.3 (Procedimientos RPC Atómicos en 1 RTT):** Compilar en PostgreSQL los 7 procedimientos con `SECURITY DEFINER`:
     1. `apply_confirmed_membership_payment`: Aplica recaudo, actualiza saldo en cuenta, avanza fecha de corte en satélite y crea cartera en `payment_commitments` si fue abono parcial con saldo restante.
     2. `apply_confirmed_expense`: Registra OPEX y debita el saldo de la cuenta financiera en una sola transacción ACID.
     3. `apply_account_transfer`: Mueve fondos entre cuentas debitando comisión bancaria si aplica (registrándola como OPEX de infraestructura).
-    4. `get_business_dossier`: Retorna expediente 360° en <10 ms uniendo `businesses`, `business_subscriptions`, pedidos de los últimos 30 días, compromisos y tareas pendientes.
-    5. `get_admin_finance_summary`: Retorna P&L del mes, cajas, tareas del día y semáforos en <15 ms y <4 KB (con timezone `America/Bogota`).
+    4. `get_business_dossier`: Retorna expediente 360° en <10 ms uniendo `businesses`, `business_subscriptions`, pedidos y métricas de crecimiento porcentual relativo (`orders_wow_pct`, `orders_mom_pct`, `visits_mom_pct`), compromisos y tareas pendientes.
+    5. `get_admin_finance_summary`: Retorna P&L del mes (ingresos, gastos, utilidad neta real y **Diezmo del 10%** tras OPEX), cajas, tareas del día, semáforos e indicadores de salud financiera (`cpi_onboarding`, `dso_days`, `runway_months`, `operating_margin_pct`) en <15 ms y <4 KB (con timezone `America/Bogota`).
     6. `get_admin_businesses_billing_page`: Paginación server-side de 30 en 30 con ordenamiento prioritario (gracia ➔ trial ➔ al día), lectura de `deliverables JSONB` y `modules JSONB`, y filtro Trigram GIN.
+    7. `get_network_growth_summary`: Retorna agregación analítica de la red FOWY (% MoM, % WoW, % DoD en afiliaciones, visitas a menús y pedidos/conversiones a WhatsApp) en <10 ms y <1 KB como Single Source of Truth para Dashboard, Finanzas y Copilot sin escanear tablas en cliente.
   - [ ] **Punto 1.4 (Extensiones e Índices de Rendimiento 10k+):**
     - Activar extensión: `CREATE EXTENSION IF NOT EXISTS pg_trgm;`
     - Crear los 7 índices de alto rendimiento:
@@ -190,31 +192,32 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
       7. `idx_account_transfers_created` (B-Tree en `account_transfers(created_at DESC)`).
   - [ ] **Punto 1.5 (Seguridad RLS, Secuencias y Revocación Físico-SQL de DELETE):**
     - Habilitar RLS en las 10 tablas con la política `admin_finance_isolation_policy` para administradores (`auth.jwt() ->> 'role' = 'admin'`).
-    - Otorgar permisos de ejecución de los 6 RPCs: `GRANT EXECUTE ON FUNCTION ... TO authenticated, service_role;` (y revocar a `public`).
+    - Otorgar permisos de ejecución de los 7 RPCs: `GRANT EXECUTE ON FUNCTION ... TO authenticated, service_role;` (y revocar a `public`).
     - Otorgar permisos sobre la secuencia del recibo: `GRANT USAGE, SELECT ON SEQUENCE membership_payments_receipt_number_seq TO authenticated, service_role;`.
     - Revocar físicamente el comando `DELETE` en las 8 tablas de almacenamiento inmutable:  
       `REVOKE DELETE ON business_subscriptions, financial_accounts, membership_payments, operational_expenses, payment_commitments, ceo_tasks, daily_financial_reports, account_transfers FROM authenticated, anon, public;`  
       *(Nota Técnica: Las tablas efímeras `pending_actions` y `processed_webhook_events` se excluyen deliberadamente de esta restricción para permitir expiración por TTL y purga nocturna de eventos > 7 días).*
   - [ ] **Punto 1.6 (Definition of Done — Validación de Base de Datos):**
-    - *Test 1.6.1 (Lectura Resumen):* `SELECT get_admin_finance_summary();` responde en `<20 ms` con JSON válido y timezone Colombia.
+    - *Test 1.6.1 (Lectura Resumen, Diezmo & KPIs):* `SELECT get_admin_finance_summary();` responde en `<20 ms` con JSON válido conteniendo `metrics` (con ingresos, egresos, utilidad y `tithing` del 10%), `health_kpis` (`cpi_onboarding`, `dso_days`, `runway_months`, `operating_margin_pct`), `counts`, `accounts` y `today_tasks`.
     - *Test 1.6.2 (Paginación Pura):* `SELECT get_admin_businesses_billing_page('all', '', 10, 0);` responde en `<15 ms`.
-    - *Test 1.6.3 (Expediente Dossier):* `SELECT get_business_dossier('fowy-lab');` responde en `<10 ms` con estructura de negocio, entregables y métricas.
+    - *Test 1.6.3 (Expediente Dossier & Crecimiento Negocio):* `SELECT get_business_dossier('fowy-lab');` responde en `<10 ms` con estructura de negocio, entregables, métricas y objeto `growth_metrics` con porcentajes de variación WoW y MoM.
     - *Test 1.6.4 (Escritura Transaccional Pago):* Ejecutar `apply_confirmed_membership_payment` sobre *"FOWY Lab"*, verificar incremento de saldo en Nequi, consecutivo `REC-0001` y fecha actualizada en `business_subscriptions`.
     - *Test 1.6.5 (Escritura Transaccional Gasto):* Ejecutar `apply_confirmed_expense` debitando de Nequi y certificar descuento exacto del balance.
     - *Test 1.6.6 (Traspaso entre Cuentas):* Ejecutar `apply_account_transfer` moviendo `$10.000` de Nequi a Daviplata con fee `$0`, verificando balance debitado y acreditado simultáneamente.
-    - *Test 1.6.7 (Criterio Sin Borrado):* Ejecutar `DELETE FROM membership_payments;` y comprobar que PostgreSQL rechaza la instrucción con error de permisos insuficientes.
-    - *Test 1.6.8 (Cero Regresión en Negocios):* Verificar que `businesses` no recibió columnas nuevas y que `COUNT(*)` en `business_subscriptions` coincide con `businesses`.
+    - *Test 1.6.7 (Crecimiento Macroeconómico Red FOWY):* `SELECT get_network_growth_summary();` responde en `<10 ms` con objeto JSON conteniendo MoM, WoW y DoD de afiliaciones, visitas y pedidos de toda la red.
+    - *Test 1.6.8 (Criterio Sin Borrado):* Ejecutar `DELETE FROM membership_payments;` y comprobar que PostgreSQL rechaza la instrucción con error de permisos insuficientes.
+    - *Test 1.6.9 (Cero Regresión en Negocios):* Verificar que `businesses` no recibió columnas nuevas y que `COUNT(*)` en `business_subscriptions` coincide con `businesses`.
 
 ---
 
 - [ ] **Fase 2: Arquitectura TypeScript, Dependencias, Utilidades & Servicios Core**
   - [ ] **Punto 2.1 (Instalación de Dependencias de Virtualización):** Instalar en el proyecto `@tanstack/react-virtual` para soportar renderizado de tablas masivas a 60 FPS sin memory leaks.
   - [ ] **Punto 2.2 (Contratos de Tipos — Aislamiento en `src/types/finance.ts`):** Crear el archivo autónomo `src/types/finance.ts` (<220L) sin tocar [supabase.ts](file:///c:/Users/cange/Documents/fowy/src/types/supabase.ts):
-    - DTOs de retornos de los 6 RPCs (`AdminFinanceSummaryDTO`, `BillingPageDTO`, `BusinessDossierDTO`).
+    - DTOs de retornos de los 7 RPCs (`AdminFinanceSummaryDTO` con soporte de `tithing: number`, `BillingPageDTO`, `BusinessDossierDTO`, `NetworkGrowthDTO`) incluyendo el contrato formal `FinancialHealthKpisDTO` (`cpi_onboarding: number; dso_days: number; runway_months: number; operating_margin_pct: number;`) y `BusinessGrowthMetricsDTO` (`orders_wow_pct`, `orders_mom_pct`, `visits_mom_pct`, `trend_status`).
     - Interfaces de las 10 tablas satélites.
     - Modelos de JSONB: `DeliverablesMap` (`Record<string, 'pending' | 'in_progress' | 'delivered' | 'none'>`) y `ModulesMap` (`Record<string, boolean>`).
     - Enums y tipos de dominio: `SubscriptionStatus`, `PaymentMethod`, `ExpenseCategory`, `TaskType`, `PriorityLevel`.
-    - Esquemas de argumentos de las **9 herramientas de Function Calling**: `GetCfoSummaryArgs`, `QueryDossierArgs`, `PreparePaymentArgs`, `PrepareExpenseArgs`, `ScheduleTaskArgs`, `QueryAgendaArgs`, `CompleteTaskArgs`, `PrepareCommitmentArgs`, `PrepareTransferArgs`.
+    - Esquemas de argumentos de las **10 herramientas de Function Calling**: `GetCfoSummaryArgs`, `QueryDossierArgs`, `PreparePaymentArgs`, `PrepareExpenseArgs`, `ScheduleTaskArgs`, `QueryAgendaArgs`, `CompleteTaskArgs`, `PrepareCommitmentArgs`, `PrepareTransferArgs`, `GetNetworkGrowthArgs`.
     - Tipos de mensajería y UI: `ReceiptData`, `CopilotChatMessage`, `PendingActionDTO`, `EvolutionWebhookPayload`.
   - [ ] **Punto 2.3 (Helper Centralizado de Recibos y Formatos):** Crear `src/utils/financeReceipt.ts` (<110L):
     1. `formatCOP(amount: number): string`: Devuelve `$50.000 COP`.
@@ -224,11 +227,11 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
   - [ ] **Punto 2.4 (Servicio Evolution WhatsApp):** Crear `src/services/evolutionService.ts` (<150L) con llamadas outbound (`/message/sendText`) usando `fetch` nativo hacia Evolution API v2, timeout controlado de 4 segundos y tipado estricto.
   - [ ] **Punto 2.5 (Servicio Gemini Multimodal REST en RAM):** Crear `src/services/geminiCopilotService.ts` (<240L) consumiendo directamente la REST API de Google AI (`gemini-1.5-flash`) mediante `fetch` nativo:
     - Configuración: `temperature: 0.1`, `topP: 0.95`, `maxOutputTokens: 2048`.
-    - Inyección inmutable del `systemInstruction` (CFO & Secretaria).
-    - Declaración formal del catálogo de las 9 herramientas con Function Calling `AUTO`.
+    - Inyección inmutable del `systemInstruction` (CFO & Secretaria con inteligencia y criterio de CPI/DSO y análisis de crecimiento macro/micro).
+    - Declaración formal del catálogo de las 10 herramientas con Function Calling `AUTO`.
     - Soporte multimodal de audio nativo (.ogg/.mp3) y visión OCR para comprobantes de pago y tickets OPEX procesados 100% en memoria volátil (RAM) con evaporación inmediata del buffer (cero persistencia en Supabase Storage).
   - [ ] **Punto 2.6 (Hook Financiero Administrativo):** Crear `src/hooks/useAdminFinance.ts` (<180L) con caché SWR consumiendo `get_admin_finance_summary` y `get_admin_businesses_billing_page`, exponiendo:
-    - Datos: `summary`, `billingData`, `isLoading`, `error`.
+    - Datos: `summary`, `healthKpis`, `billingData`, `isLoading`, `error`.
     - Filtros: `searchTerm`, `statusFilter`, `page`, `setSearchTerm`, `setStatusFilter`, `setPage`.
     - Mutadores: `revalidateSummary()`, `revalidateBilling()`.  
     *(Protegiendo intacto [useFinanceManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useFinanceManager.ts) de expertos).*
@@ -242,34 +245,38 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 - [ ] **Fase 3: Tablero Visual `/admin/finanzas` & Modales**
   - [ ] **Punto 3.1 (Semáforos KPI):** Crear `src/components/admin/finanzas/FinanceKpiCards.tsx` (<120L) con las 4 tarjetas superiores de recaudo al día, periodo de prueba, tolerancia en gracia y mora.
-  - [ ] **Punto 3.2 (Barra de Liquidez Multibolsillo):** Crear `src/components/admin/finanzas/FinanceAccountsBar.tsx` (<140L) con el arqueo visual de Nequi, Daviplata, Bancolombia y Efectivo, con botón directo para abrir traspasos.
-  - [ ] **Punto 3.3 (Tarjeta P&L en Vivo):** Crear `src/components/admin/finanzas/FinanceProfitLossCard.tsx` (<130L) con ingresos cobrados, gastos OPEX y Utilidad Neta Real destacada con badge porcentual de margen.
-  - [ ] **Punto 3.4 (Agenda de Campo del CEO):** Crear `src/components/admin/finanzas/CeoAgendaChecklist.tsx` (<170L) con checkbox interactivo para completar tareas, badges minimalistas de actividad (`lucide-react` planos, cero 3D) y botón `[ + Nueva Tarea ]`.
-  - [ ] **Punto 3.5 (Fila de Negocio con Plan, Días Restantes y Badges):** Crear `src/components/admin/finanzas/BusinessBillingRow.tsx` (<160L) con el Plan activo debajo del nombre (leído de `modules JSONB`), días restantes bajo la fecha vía `financeReceipt.ts`, badges de la mochila `deliverables JSONB` y botón directo `[ Msg ]` para WhatsApp.
-  - [ ] **Punto 3.6 (Tabla Virtualizada 60 FPS):** Crear `src/components/admin/finanzas/BusinessBillingTable.tsx` (<200L) con virtual scrolling vía `@tanstack/react-virtual`, buscador con debounce sobre Trigram GIN y pestañas de filtro rápido.
-  - [ ] **Punto 3.7 (Subdirectorio Modales en `src/components/admin/finanzas/modals/`):**
+  - [ ] **Punto 3.2 (Barra de Salud Financiera & KPIs):** Crear `src/components/admin/finanzas/FinanceHealthMetricsBar.tsx` (<120L) con badges vectoriales planos de CPI Onboarding, DSO Cartera, Runway de Caja y Margen Operativo Neto %.
+  - [ ] **Punto 3.3 (Barra de Liquidez Multibolsillo):** Crear `src/components/admin/finanzas/FinanceAccountsBar.tsx` (<140L) con el arqueo visual de Nequi, Daviplata, Bancolombia y Efectivo, con botón directo para abrir traspasos.
+  - [ ] **Punto 3.4 (Tarjeta P&L en Vivo con Diezmo):** Crear `src/components/admin/finanzas/FinanceProfitLossCard.tsx` (<130L) con ingresos cobrados, gastos OPEX, Utilidad Neta Real destacada con badge porcentual de margen y renglón contable del Diezmo (10% de la utilidad neta real tras OPEX).
+  - [ ] **Punto 3.5 (Agenda de Campo del CEO):** Crear `src/components/admin/finanzas/CeoAgendaChecklist.tsx` (<170L) con checkbox interactivo para completar tareas, badges minimalistas de actividad (`lucide-react` planos, cero 3D) y botón `[ + Nueva Tarea ]`.
+  - [ ] **Punto 3.6 (Fila de Negocio con Plan, % bajo Estado, Días Restantes y Badges):** Crear `src/components/admin/finanzas/BusinessBillingRow.tsx` (<160L) con el Plan activo debajo del nombre (leído de `modules JSONB`), micro-badge dinámico de tendencia de crecimiento en % de pedidos **ubicado directamente debajo del semáforo de estado** (`↳ [ 📈 +14.2% ]` / `↳ [ 📉 -12.5% ]`) para evitar apeñuscar datos, días restantes bajo la fecha vía `financeReceipt.ts`, badges de la mochila `deliverables JSONB` y botón directo `[ Msg ]` para WhatsApp.
+  - [ ] **Punto 3.7 (Tabla Virtualizada 60 FPS):** Crear `src/components/admin/finanzas/BusinessBillingTable.tsx` (<200L) con virtual scrolling vía `@tanstack/react-virtual`, buscador con debounce sobre Trigram GIN y pestañas de filtro rápido.
+  - [ ] **Punto 3.8 (Subdirectorio Modales en `src/components/admin/finanzas/modals/`):**
     - Crear `modals/QuickPaymentModal.tsx` (<200L) con soporte de abonos parciales, imputación de cuenta y botón para compartir recibo por WhatsApp.
     - Crear `modals/QuickExpenseModal.tsx` (<170L) para registrar egresos OPEX con imputación de cuentas.
     - Crear `modals/AccountTransferModal.tsx` (<160L) para traspaso de liquidez entre cuentas.
     - Crear `modals/NewTaskModal.tsx` (<140L) para agendar manualmente visitas y tareas del CEO.
-  - [ ] **Punto 3.8 (Página Orquestadora `/admin/finanzas`):** Actualizar [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/finanzas/page.tsx) (<210L) ensamblando los componentes y verificando que el ícono `Wallet` en [Sidebar.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx) active la ruta sin alterar otras pestañas.
-  - [ ] **Punto 3.9 (Definition of Done — Validación Visual):**
+  - [ ] **Punto 3.9 (Página Orquestadora `/admin/finanzas`):** Actualizar [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/finanzas/page.tsx) (<210L) ensamblando los componentes y verificando que el ícono `Wallet` en [Sidebar.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx) active la ruta sin alterar otras pestañas.
+  - [ ] **Punto 3.10 (Definition of Done — Validación Visual):**
     - Carga visual en `<100 ms` respaldada por SWR.
     - Inspeccionar el DOM en DevTools: verificar que solo existen ~12 nodos `<tr>` simultáneos en el DOM durante el scroll en la lista a **60 FPS** sin caídas de cuadros.
-    - Registrar un pago de prueba en *"FOWY Lab"* mediante `QuickPaymentModal.tsx` y certificar que la fila, los KPIs y la barra de liquidez se actualizan instantáneamente sin recargar la página (gracias a `revalidateSummary()` y `revalidateBilling()`).
+    - Verificar que `FinanceHealthMetricsBar.tsx` renderiza las 4 métricas (CPI, DSO, Runway y Margen) con códigos de color semafóricos según umbrales de negocio.
+    - Registrar un pago de prueba en *"FOWY Lab"* mediante `QuickPaymentModal.tsx` y certificar que la fila, los KPIs, la barra de salud y la barra de liquidez se actualizan instantáneamente sin recargar la página (gracias a `revalidateSummary()` y `revalidateBilling()`).
     - Verificar que ningún archivo supera las 220 líneas de código y que todos los iconos provienen de `lucide-react` con trazo fino (cero 3D).
     - Ejecutar `npx tsc --noEmit` con exactamente 0 errores.
 
 ---
 
-- [ ] **Fase 4: Copilot Web (CFO & Secretaria) en `copilot/` con UX de Calle**
-  - [ ] **Punto 4.1 (Endpoint Orquestador Copilot Web):** Crear `src/app/api/admin/copilot/route.ts` (<220L) con Gemini 1.5 Flash, verificación de sesión admin (`role === 'admin'`), inyección de snapshot contable en <20ms, evaluación del Kill Switch `COPILOT_ENABLED` y recepción de imágenes pegadas en Base64 para análisis OCR efímero en RAM.
+- [ ] **Fase 4: Agente FOWY Web (CFO & Secretaria) en `copilot/` con UX de Calle**
+  - [ ] **Punto 4.1 (Endpoint Orquestador Agente FOWY):** Crear `src/app/api/admin/copilot/route.ts` (<220L) con Gemini 1.5 Flash, verificación de sesión admin (`role === 'admin'`), inyección de snapshot contable y macro en <20ms incluyendo `health_kpis` (CPI, DSO, Runway, Diezmo) y `network_growth` (% MoM, % WoW), evaluación del Kill Switch `COPILOT_ENABLED` y recepción de imágenes pegadas en Base64 para análisis OCR efímero en RAM.
   - [ ] **Punto 4.2 (Grabador Micrófono Web Audio API):** Crear `src/components/admin/finanzas/copilot/CopilotVoiceMic.tsx` (<120L) para dictado de voz nativo en el navegador mediante Web Audio API / MediaRecorder.
   - [ ] **Punto 4.3 (Tarjeta de Pre-confirmación y Ajuste):** Crear `src/components/admin/finanzas/copilot/CopilotActionCard.tsx` (<180L) con botones `[ ✅ Confirmar y Aplicar ]`, `[ ❌ Cancelar ]`, editor inline `[ ✏️ Ajustar ]` y botón de éxito `[ 📲 Enviar Recibo por WhatsApp ]`.
-  - [ ] **Punto 4.4 (Panel Flotante Adaptativo):** Crear `src/components/admin/finanzas/copilot/FinanceCopilotSheet.tsx` (<230L) con comportamiento responsive (Drawer lateral en pantallas `>=768px` y Bottom Sheet deslizable en celulares `<768px`), soporte para pegar capturas (`Ctrl + V`), y lectura de `NEXT_PUBLIC_COPILOT_ENABLED`.
-  - [ ] **Punto 4.5 (Definition of Done — Validación Copilot Web):**
+  - [ ] **Punto 4.4 (Panel Flotante Adaptativo Agente FOWY):** Crear `src/components/admin/finanzas/copilot/FinanceCopilotSheet.tsx` (<230L) con botón flotante estilizado "AGENTE FOWY". **En celulares (`<768px`), posicionar el botón verticalmente justo encima del botón flotante de acción rápida (`+`) en `bottom-24 right-4` para evitar colisiones táctiles y no tapar el menú; en desktop ubicarlo en `bottom-6 right-6`**. Despliegue adaptativo (Drawer lateral en pantallas `>=768px` y Bottom Sheet deslizable en celulares `<768px`), soporte para pegar capturas (`Ctrl + V`), y lectura de `NEXT_PUBLIC_COPILOT_ENABLED`.
+  - [ ] **Punto 4.5 (Definition of Done — Validación Agente FOWY & Criterio Directivo):**
     - Dictar o escribir: *"FOWY Lab pagó 50 mil por Nequi"*; verificar aparición de la tarjeta de pre-confirmación en <1.2s.
     - Probar el botón `[ ✏️ Ajustar ]` cambiando el monto a `$60.000` y pulsar confirmar; verificar ejecución del RPC en `<50 ms` y actualización reactiva de los saldos.
+    - Consultar: *"¿Cuánto es el Diezmo del mes y cómo va la cobranza en la calle?"*; certificar que el Agente FOWY calcula con exactitud el 10% de la utilidad neta real tras OPEX y analiza con criterio directivo el CPI y el DSO aplicando el principio *Dato + Diagnóstico + Acción Recomendada*.
+    - Consultar: *"¿Cómo va el crecimiento de la red FOWY y el rendimiento de FOWY Lab?"*; certificar que el agente invoca `get_network_growth_summary` y `query_business_dossier` interpretando las variaciones en % (destacando alzas >15% o alertando riesgo de churn ante caídas >10%).
     - Pegar una captura de pantalla bancaria con `Ctrl + V` y comprobar extracción correcta de datos en RAM sin generar ningún archivo en Supabase Storage.
     - Cambiar temporalmente `COPILOT_ENABLED=false` en `.env.local` y certificar que el Copilot muestra mensaje de mantenimiento preventivo sin provocar fallos de ejecución en la página `/admin/finanzas`.
     - Ejecutar `npx tsc --noEmit` con 0 errores.

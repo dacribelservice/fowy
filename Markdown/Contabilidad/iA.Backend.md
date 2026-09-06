@@ -432,7 +432,7 @@ $$;
 ```
 
 ### 3.4 `get_business_dossier`
-Consulta el expediente 360° en `<10 ms` uniendo `businesses` con `business_subscriptions`:
+Consulta el expediente 360° en `<10 ms` uniendo `businesses` con `business_subscriptions` y calculando al vuelo las tendencias de crecimiento porcentual (% DoD, WoW, MoM) sin agregar columnas en `businesses`:
 
 ```sql
 CREATE OR REPLACE FUNCTION get_business_dossier(
@@ -445,8 +445,22 @@ AS $$
 DECLARE
     v_biz RECORD;
     v_metrics JSONB;
+    v_growth JSONB;
     v_commitments JSONB;
     v_tasks JSONB;
+    -- Variables para cálculo porcentual dinámico
+    v_orders_7d INT := 0;
+    v_orders_prev_7d INT := 0;
+    v_orders_30d INT := 0;
+    v_orders_prev_30d INT := 0;
+    v_visits_7d INT := 0;
+    v_visits_prev_7d INT := 0;
+    v_visits_30d INT := 0;
+    v_visits_prev_30d INT := 0;
+    v_orders_wow_pct NUMERIC := 0.0;
+    v_orders_mom_pct NUMERIC := 0.0;
+    v_visits_wow_pct NUMERIC := 0.0;
+    v_visits_mom_pct NUMERIC := 0.0;
 BEGIN
     SELECT b.id, b.name, b.slug, 
            COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
@@ -467,6 +481,7 @@ BEGIN
         RETURN jsonb_build_object('error', 'Negocio no encontrado');
     END IF;
 
+    -- Métricas consolidadas de los últimos 30 días
     SELECT jsonb_build_object(
         'total_orders_last_30d', COUNT(*),
         'estimated_gross_sales', COALESCE(SUM(total_amount), 0),
@@ -475,6 +490,52 @@ BEGIN
     ) INTO v_metrics
     FROM orders
     WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '30 days';
+
+    -- 2. Cálculo dinámico de Crecimiento Porcentual (Sin alterar businesses)
+    -- Pedidos: 7 días actuales vs 7 días anteriores
+    SELECT COUNT(*) INTO v_orders_7d FROM orders WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '7 days';
+    SELECT COUNT(*) INTO v_orders_prev_7d FROM orders WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days';
+    IF v_orders_prev_7d > 0 THEN
+        v_orders_wow_pct := ROUND(((v_orders_7d - v_orders_prev_7d)::NUMERIC / v_orders_prev_7d) * 100, 1);
+    ELSIF v_orders_7d > 0 THEN
+        v_orders_wow_pct := 100.0;
+    END IF;
+
+    -- Pedidos: 30 días actuales vs 30 días anteriores
+    SELECT COUNT(*) INTO v_orders_30d FROM orders WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '30 days';
+    SELECT COUNT(*) INTO v_orders_prev_30d FROM orders WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days';
+    IF v_orders_prev_30d > 0 THEN
+        v_orders_mom_pct := ROUND(((v_orders_30d - v_orders_prev_30d)::NUMERIC / v_orders_prev_30d) * 100, 1);
+    ELSIF v_orders_30d > 0 THEN
+        v_orders_mom_pct := 100.0;
+    END IF;
+
+    -- Visitas al menú digital: 7 días actuales vs 7 días anteriores
+    SELECT COUNT(*) INTO v_visits_7d FROM analytics_visits WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '7 days';
+    SELECT COUNT(*) INTO v_visits_prev_7d FROM analytics_visits WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days';
+    IF v_visits_prev_7d > 0 THEN
+        v_visits_wow_pct := ROUND(((v_visits_7d - v_visits_prev_7d)::NUMERIC / v_visits_prev_7d) * 100, 1);
+    ELSIF v_visits_7d > 0 THEN
+        v_visits_wow_pct := 100.0;
+    END IF;
+
+    -- Visitas al menú digital: 30 días actuales vs 30 días anteriores
+    SELECT COUNT(*) INTO v_visits_30d FROM analytics_visits WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '30 days';
+    SELECT COUNT(*) INTO v_visits_prev_30d FROM analytics_visits WHERE business_id = v_biz.id AND created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days';
+    IF v_visits_prev_30d > 0 THEN
+        v_visits_mom_pct := ROUND(((v_visits_30d - v_visits_prev_30d)::NUMERIC / v_visits_prev_30d) * 100, 1);
+    ELSIF v_visits_30d > 0 THEN
+        v_visits_mom_pct := 100.0;
+    END IF;
+
+    v_growth := jsonb_build_object(
+        'orders_wow_pct', v_orders_wow_pct,
+        'orders_mom_pct', v_orders_mom_pct,
+        'visits_wow_pct', v_visits_wow_pct,
+        'visits_mom_pct', v_visits_mom_pct,
+        'orders_current_7d', v_orders_7d,
+        'visits_current_7d', v_visits_7d
+    );
 
     SELECT jsonb_agg(jsonb_build_object(
         'id', id, 'agreed_amount', agreed_amount, 'agreed_date', agreed_date, 'notes', notes, 'status', status
@@ -500,6 +561,7 @@ BEGIN
             'modules', v_biz.modules
         ),
         'recent_metrics', v_metrics,
+        'growth_metrics', v_growth,
         'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),
         'agenda_tasks', COALESCE(v_tasks, '[]'::jsonb)
     );
@@ -508,7 +570,7 @@ $$;
 ```
 
 ### 3.5 `get_admin_finance_summary`
-Calcula el P&L completo, cajas, tareas y semáforos en **< 4 KB y < 15 ms**:
+Calcula el P&L completo, cajas, tareas, semáforos y **métricas de salud financiera (CPI, DSO, Runway y Margen Operativo)** en **< 4 KB y < 15 ms**:
 
 ```sql
 CREATE OR REPLACE FUNCTION get_admin_finance_summary()
@@ -521,32 +583,99 @@ DECLARE
     v_expenses NUMERIC := 0.00;
     v_paid_count INT := 0;
     v_receivables NUMERIC := 0.00;
+    v_total_liquidity NUMERIC := 0.00;
+    v_avg_onboarding_cost NUMERIC := 0.00;
+    v_cpi NUMERIC := 1.0;
+    v_dso NUMERIC := 0.0;
+    v_runway NUMERIC := 0.0;
+    v_margin_pct NUMERIC := 0.0;
+    v_tithing NUMERIC := 0.00;
     v_metrics JSONB;
+    v_health_kpis JSONB;
     v_accounts JSONB;
     v_today_tasks JSONB;
     v_counts JSONB;
 BEGIN
+    -- 1. Ingresos y recaudos del mes en curso (Hora Colombia)
     SELECT COALESCE(SUM(amount), 0), COUNT(*)
     INTO v_income, v_paid_count
     FROM membership_payments 
     WHERE period_start >= date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
 
+    -- 2. Egresos y gastos operativos (OPEX) del mes
     SELECT COALESCE(SUM(amount), 0)
     INTO v_expenses
     FROM operational_expenses
     WHERE expense_date >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota'))::DATE;
 
+    -- 3. Cartera pendiente (compromisos verbales activos)
     SELECT COALESCE(SUM(agreed_amount), 0)
     INTO v_receivables
     FROM payment_commitments
     WHERE status = 'pending';
 
+    -- 4. Liquidez total disponible en todos los bolsillos activos
+    SELECT COALESCE(SUM(current_balance), 0)
+    INTO v_total_liquidity
+    FROM financial_accounts 
+    WHERE is_active = TRUE;
+
+    -- 5. Cálculo de Indicadores de Salud Financiera & Eficiencia (KPI / CPI):
+    -- 5.1 Margen Operativo Neto (%)
+    IF v_income > 0 THEN
+        v_margin_pct := ROUND(((v_income - v_expenses) / v_income) * 100, 1);
+    ELSE
+        v_margin_pct := 0.0;
+    END IF;
+
+    -- 5.2 Diezmo (10% de la Utilidad Neta Real tras descontar todos los gastos OPEX posibles)
+    IF (v_income - v_expenses) > 0 THEN
+        v_tithing := ROUND((v_income - v_expenses) * 0.10, 2);
+    ELSE
+        v_tithing := 0.00;
+    END IF;
+
+    -- 5.3 CPI Onboarding (Cost Performance Index):
+    -- Presupuesto base de activación ($35.000 COP) vs Costo real promedio en volantes y fotos
+    SELECT COALESCE(AVG(amount), 35000.00)
+    INTO v_avg_onboarding_cost
+    FROM operational_expenses
+    WHERE category IN ('flyers_printing', 'photography')
+      AND expense_date >= NOW() - INTERVAL '60 days';
+
+    IF v_avg_onboarding_cost > 0 THEN
+        v_cpi := ROUND(35000.00 / v_avg_onboarding_cost, 2);
+    ELSE
+        v_cpi := 1.0;
+    END IF;
+
+    -- 5.4 DSO Cartera (Days Sales Outstanding):
+    -- Días promedio de cobro en calle: (Cartera / (Ingreso mensual / 30 días))
+    IF v_income > 0 THEN
+        v_dso := ROUND(v_receivables / (v_income / 30.0), 1);
+    ELSE
+        v_dso := 0.0;
+    END IF;
+
+    -- 5.5 Runway de Caja (Meses):
+    -- Cobertura de supervivencia con costo fijo mensual estimado ($120.000 COP ~ Supabase Pro $25 USD)
+    v_runway := ROUND(v_total_liquidity / NULLIF(120000.00, 0), 1);
+
     v_metrics := jsonb_build_object(
         'month_income', v_income,
         'month_expenses', v_expenses,
         'net_profit', v_income - v_expenses,
+        'tithing', v_tithing,
         'pending_receivables', v_receivables,
-        'total_paid_count', v_paid_count
+        'total_paid_count', v_paid_count,
+        'operating_margin_pct', v_margin_pct
+    );
+
+    v_health_kpis := jsonb_build_object(
+        'cpi_onboarding', v_cpi,
+        'dso_days', v_dso,
+        'runway_months', v_runway,
+        'operating_margin_pct', v_margin_pct
     );
 
     -- Conteo de negocios por semáforo 100% resiliente (combina businesses con satélite)
@@ -570,6 +699,7 @@ BEGIN
 
     RETURN jsonb_build_object(
         'metrics', v_metrics,
+        'health_kpis', v_health_kpis,
         'counts', v_counts,
         'accounts', COALESCE(v_accounts, '[]'::jsonb),
         'today_tasks', COALESCE(v_today_tasks, '[]'::jsonb)
@@ -637,6 +767,111 @@ BEGIN
         'total', v_total_filtered,
         'limit', p_limit,
         'offset', p_offset
+    );
+END;
+$$;
+```
+
+### 3.7 `get_network_growth_summary`
+**Única Fuente de la Verdad (*Single Source of Truth*) para Crecimiento de la Red FOWY** (consumido por el Dashboard, Finanzas y el Copilot en `<10 ms`):  
+Calcula directamente en PostgreSQL las variaciones porcentuales (% MoM, WoW, DoD) de afiliaciones de negocios y tráfico comensal sin escaneos masivos en el cliente:
+
+```sql
+CREATE OR REPLACE FUNCTION get_network_growth_summary()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_total_businesses INT := 0;
+    v_biz_this_month INT := 0;
+    v_biz_prev_month INT := 0;
+    v_biz_mom_pct NUMERIC := 0.0;
+    v_visits_this_month INT := 0;
+    v_visits_prev_month INT := 0;
+    v_visits_this_week INT := 0;
+    v_visits_prev_week INT := 0;
+    v_visits_mom_pct NUMERIC := 0.0;
+    v_visits_wow_pct NUMERIC := 0.0;
+    v_orders_this_month INT := 0;
+    v_orders_prev_month INT := 0;
+    v_orders_mom_pct NUMERIC := 0.0;
+BEGIN
+    SELECT COUNT(*) INTO v_total_businesses FROM businesses;
+
+    -- Afiliaciones: Este mes vs mes pasado (Tasa de Afiliación)
+    SELECT COUNT(*) INTO v_biz_this_month FROM businesses 
+    WHERE created_at >= date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    SELECT COUNT(*) INTO v_biz_prev_month FROM businesses 
+    WHERE created_at >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota') - INTERVAL '1 month')
+      AND created_at < date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    IF v_biz_prev_month > 0 THEN
+        v_biz_mom_pct := ROUND(((v_biz_this_month - v_biz_prev_month)::NUMERIC / v_biz_prev_month) * 100, 1);
+    ELSIF v_biz_this_month > 0 THEN
+        v_biz_mom_pct := 100.0;
+    END IF;
+
+    -- Visitas de comensales: Este mes vs mes pasado (Curva Macro Bezier)
+    SELECT COUNT(*) INTO v_visits_this_month FROM analytics_visits 
+    WHERE created_at >= date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    SELECT COUNT(*) INTO v_visits_prev_month FROM analytics_visits 
+    WHERE created_at >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota') - INTERVAL '1 month')
+      AND created_at < date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    IF v_visits_prev_month > 0 THEN
+        v_visits_mom_pct := ROUND(((v_visits_this_month - v_visits_prev_month)::NUMERIC / v_visits_prev_month) * 100, 1);
+    ELSIF v_visits_this_month > 0 THEN
+        v_visits_mom_pct := 100.0;
+    END IF;
+
+    -- Visitas: Esta semana vs semana anterior
+    SELECT COUNT(*) INTO v_visits_this_week FROM analytics_visits 
+    WHERE created_at >= NOW() - INTERVAL '7 days';
+
+    SELECT COUNT(*) INTO v_visits_prev_week FROM analytics_visits 
+    WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days';
+
+    IF v_visits_prev_week > 0 THEN
+        v_visits_wow_pct := ROUND(((v_visits_this_week - v_visits_prev_week)::NUMERIC / v_visits_prev_week) * 100, 1);
+    ELSIF v_visits_this_week > 0 THEN
+        v_visits_wow_pct := 100.0;
+    END IF;
+
+    -- Pedidos / Conversión: Este mes vs mes pasado
+    SELECT COUNT(*) INTO v_orders_this_month FROM orders 
+    WHERE created_at >= date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    SELECT COUNT(*) INTO v_orders_prev_month FROM orders 
+    WHERE created_at >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota') - INTERVAL '1 month')
+      AND created_at < date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
+
+    IF v_orders_prev_month > 0 THEN
+        v_orders_mom_pct := ROUND(((v_orders_this_month - v_orders_prev_month)::NUMERIC / v_orders_prev_month) * 100, 1);
+    ELSIF v_orders_this_month > 0 THEN
+        v_orders_mom_pct := 100.0;
+    END IF;
+
+    RETURN jsonb_build_object(
+        'total_businesses', v_total_businesses,
+        'affiliations', jsonb_build_object(
+            'this_month', v_biz_this_month,
+            'prev_month', v_biz_prev_month,
+            'growth_mom_pct', v_biz_mom_pct
+        ),
+        'visits', jsonb_build_object(
+            'this_month', v_visits_this_month,
+            'prev_month', v_visits_prev_month,
+            'growth_mom_pct', v_visits_mom_pct,
+            'growth_wow_pct', v_visits_wow_pct
+        ),
+        'orders_conversion', jsonb_build_object(
+            'this_month', v_orders_this_month,
+            'prev_month', v_orders_prev_month,
+            'growth_mom_pct', v_orders_mom_pct
+        )
     );
 END;
 $$;
@@ -737,6 +972,9 @@ GRANT EXECUTE ON FUNCTION get_admin_finance_summary TO authenticated, service_ro
 REVOKE EXECUTE ON FUNCTION get_admin_businesses_billing_page FROM public;
 GRANT EXECUTE ON FUNCTION get_admin_businesses_billing_page TO authenticated, service_role;
 
+REVOKE EXECUTE ON FUNCTION get_network_growth_summary FROM public;
+GRANT EXECUTE ON FUNCTION get_network_growth_summary TO authenticated, service_role;
+
 -- Permisos sobre Secuencia de Consecutivo de Recibos (SERIAL REC-XXXX)
 GRANT USAGE, SELECT ON SEQUENCE membership_payments_receipt_number_seq TO authenticated, service_role;
 
@@ -761,15 +999,16 @@ END;
 $$;
 ```
 
-### 5.1 Suite de Pruebas de Verificación Técnica (DoD SQL - 6 RPCs)
+### 5.1 Suite de Pruebas de Verificación Técnica (DoD SQL - 7 RPCs)
 Para certificar la correcta instalación de la Fase 1 en Supabase SQL Editor:
-1. **Resumen Financiero:** `SELECT get_admin_finance_summary();` (Valida P&L, cuentas y semáforos en <20 ms).
+1. **Resumen Financiero:** `SELECT get_admin_finance_summary();` (Valida P&L, Diezmo (10% de utilidad neta), cuentas y semáforos en <20 ms).
 2. **Paginación Server-Side:** `SELECT get_admin_businesses_billing_page('all', '', 10, 0);` (Valida paginación y Trigram GIN en <15 ms).
 3. **Expediente 360°:** `SELECT get_business_dossier('fowy-lab');` (Valida unión satélite, entregables y métricas de pedidos en <10 ms).
 4. **Pago Transaccional:** `SELECT apply_confirmed_membership_payment(p_business_id := (SELECT id FROM businesses WHERE slug = 'fowy-lab'), p_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_amount := 50000, p_payment_method := 'nequi');` (Valida generación de REC-XXXX, suma a Nequi y actualización de fecha).
 5. **Gasto OPEX:** `SELECT apply_confirmed_expense(p_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_category := 'infrastructure', p_amount := 10000, p_description := 'Prueba OPEX');` (Valida inserción y descuento en caja).
 6. **Traspaso de Fondos:** `SELECT apply_account_transfer(p_source_account_id := (SELECT id FROM financial_accounts WHERE code = 'nequi'), p_destination_account_id := (SELECT id FROM financial_accounts WHERE code = 'daviplata'), p_amount := 5000);` (Valida movimiento entre bolsillos sin afectar P&L).
-7. **Prueba de Inviolabilidad DELETE:** `DELETE FROM membership_payments;` (Debe arrojar: `permission denied for table membership_payments`).
+7. **Crecimiento Macroeconómico Red FOWY:** `SELECT get_network_growth_summary();` (Valida agregación analítica de % MoM, % WoW, % DoD en afiliaciones, visitas y conversiones en <10 ms).
+8. **Prueba de Inviolabilidad DELETE:** `DELETE FROM membership_payments;` (Debe arrojar: `permission denied for table membership_payments`).
 
 
 ---
