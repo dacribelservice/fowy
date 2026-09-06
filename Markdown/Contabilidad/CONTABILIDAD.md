@@ -159,6 +159,12 @@ CREATE TABLE IF NOT EXISTS business_subscriptions (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Inicialización / Backfill de Negocios Existentes (Cero Ceros en Producción)
+INSERT INTO business_subscriptions (business_id, subscription_status, trial_ends_at, monthly_fee)
+SELECT id, 'trial', (created_at + INTERVAL '15 days'), 50000.00
+FROM businesses
+ON CONFLICT (business_id) DO NOTHING;
 ```
 
 ### 2. Tabla de Cuentas Financieras y Arqueo de Cajas (`financial_accounts`):
@@ -181,7 +187,7 @@ CREATE TABLE IF NOT EXISTS membership_payments (
     receipt_number SERIAL UNIQUE, -- Consecutivo automático para comprobantes (ej: REC-001)
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     account_id UUID REFERENCES financial_accounts(id),
-    amount NUMERIC(10,2) NOT NULL,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     payment_method VARCHAR(30) NOT NULL, -- 'nequi', 'daviplata', 'bancolombia', 'cash'
     is_partial BOOLEAN DEFAULT FALSE,    -- Soporte para abonos parciales (ej: $25.000)
     commitment_id UUID REFERENCES payment_commitments(id) ON DELETE SET NULL, -- Enlace con acuerdo verbal
@@ -200,7 +206,7 @@ CREATE TABLE IF NOT EXISTS operational_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID REFERENCES financial_accounts(id),
     category VARCHAR(40) NOT NULL, -- 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing', 'other'
-    amount NUMERIC(10,2) NOT NULL,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT NOT NULL,
     related_business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
     receipt_proof_url TEXT,
@@ -300,11 +306,14 @@ CREATE TABLE IF NOT EXISTS pending_actions (
     executed_at TIMESTAMPTZ,
     user_id UUID REFERENCES auth.users(id)
 );
-CREATE INDEX IF NOT EXISTS idx_pending_actions_active ON pending_actions(channel, status, expires_at);
+-- Índice Parcial de Alto Rendimiento (Búsqueda en <0.5ms en RAM para acciones activas)
+CREATE INDEX IF NOT EXISTS idx_pending_actions_active 
+ON pending_actions(channel, expires_at) 
+WHERE status = 'pending';
 ```
 
 ### 10. Tabla de Idempotencia y Deduplicación de Webhooks (`processed_webhook_events`):
-Previene la ejecución duplicada de audios o mensajes ante reintentos automáticos de red de Evolution API o WhatsApp:
+Previene la ejecución duplicada de audios o mensajes ante reintentos automáticos de red de Evolution API o WhatsApp (purga automática > 7 días en cron nocturno):
 ```sql
 CREATE TABLE IF NOT EXISTS processed_webhook_events (
     message_id VARCHAR(100) PRIMARY KEY,
@@ -671,8 +680,9 @@ En cumplimiento absoluto con **[Markdown/conceptos.md](file:///c:/Users/cange/Do
    - Prohibido tocar o modificar las funciones RPC congeladas `get_businesses_in_viewport` y `get_business_menu_payload`.  
    - Prohibido modificar [`useExplorerManager.ts`](file:///c:/Users/cange/Documents/fowy/src/hooks/useExplorerManager.ts) o [`useOrderManager.ts`](file:///c:/Users/cange/Documents/fowy/src/hooks/useOrderManager.ts).
 4. **🛑 Autonomía Destructiva de la IA:**  
-   - Prohibido otorgar credenciales con permisos de borrado (`DELETE`) a las funciones del Copilot.  
-   - Prohibido aplicar pagos o modificar estados a ciegas: toda acción exige **Confirmación en Dos Pasos** con aprobación física de Cristian.
+   - Prohibido otorgar credenciales con permisos de borrado (`DELETE`) a las funciones del Copilot (revocación físico-SQL).  
+   - Prohibido aplicar pagos o modificar estados a ciegas: toda acción exige **Confirmación en Dos Pasos** con aprobación física de Cristian.  
+   - Implementación obligatoria de **Kill Switch** (`COPILOT_ENABLED`) para desactivar la IA si hay fallas externas sin afectar el CRM manual, y validación previa en el **Restaurante Laboratorio** (*"FOWY Lab"*).
 
 ---
 

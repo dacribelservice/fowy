@@ -98,17 +98,18 @@ graph TD
 - **Mecanismo Anti-Colisión (Superseded Actions):**
   - Si Cristian envía un nuevo mensaje o audio que genera una nueva acción antes de confirmar la anterior, el backend actualiza automáticamente las acciones pendientes previas de ese canal a `status = 'superseded'`. Así, responder `"CONFIRMADO"` siempre confirmará exclusivamente la última propuesta emitida.
 
-- **Manejo de Notas de Voz (Audios de WhatsApp):**
-  - Evolution API envía el audio en formato `.ogg` (Opus) o `.mp3` como buffer Base64 o URL temporal segura.
-  - El backend de Next.js pasa el buffer directamente a **Gemini 1.5 Flash**, el cual soporta procesamiento multimodal nativo de audio sin necesidad de servicios intermedios como Whisper.
+- **Manejo de Notas de Voz (Audios de WhatsApp 100% en Memoria RAM):**
+  - Evolution API envía el audio en formato `.ogg` (Opus) o `.mp3` como buffer Base64 o stream efímero.
+  - El backend de Next.js pasa el buffer directamente a **Gemini 1.5 Flash** en memoria volátil sin subir ni persistir el archivo en Supabase Storage (cero basura digital y cero costos de storage).
+  - Gemini 1.5 Flash soporta procesamiento multimodal nativo de audio sin necesidad de servicios intermedios como Whisper.
 - **Salida hacia WhatsApp:** Mensajes de texto estructurados con emojis directivos y opciones de confirmación rápida (`Responde CONFIRMADO para aplicar, o CANCELAR para anular`).
 
 ---
 
 ### 2.3 Conexión 3: Ciclo Autónomo Dual (Cron Jobs) con Mapeo Horario Colombia (UTC-5)
-1. **Cierre Nocturno (11:59 PM Colombia = 04:59 UTC del día siguiente):**
+1. **Cierre Nocturno & Purga de Eventos (11:59 PM Colombia = 04:59 UTC del día siguiente):**
    - **Disparador:** Vercel Cron (`cron: "59 4 * * *"`) o Supabase `pg_cron` llamando a `POST /api/cron/financial-audit`.
-   - **Labor:** Audita las últimas 24 horas (ingresos, gastos OPEX, avance de días de prueba, vencimientos). Genera el balance del día y lo almacena inmutablemente en la tabla `daily_financial_reports`.
+   - **Labor:** Audita las últimas 24 horas (ingresos, gastos OPEX, avance de días de prueba, vencimientos). Genera el balance del día y lo almacena inmutablemente en la tabla `daily_financial_reports`. Además, ejecuta la purga automática de registros con más de 7 días en `processed_webhook_events` para mantener la base de datos ligera.
 2. **Morning Briefing Matutino (8:00 AM Colombia = 13:00 UTC):**
    - **Disparador:** Cron programado a las `13:00 UTC` (`cron: "0 13 * * *"`).
    - **Labor:** Consulta tareas del día en `ceo_tasks`, cobros programados en `payment_commitments`, estado de caja y redacta el informe matutino.
@@ -339,7 +340,7 @@ Marca una tarea como realizada y sincroniza automáticamente los entregables del
     "task_id": {"type": "string", "description": "UUID de la tarea completada."},
     "sync_deliverable": {
       "type": "boolean",
-      "description": "Si true, actualiza el estado de fotos o volantes en la tabla businesses."
+      "description": "Si true, actualiza el estado de fotos o volantes en la tabla satélite business_subscriptions."
     }
   }
   ```
@@ -426,6 +427,14 @@ Prepara el traspaso o retiro de fondos entre cuentas de liquidez (Nequi, Davipla
    Cualquier código que implemente o modifique este agente debe pasar `npm run build` en local con cero errores antes de cualquier despliegue.
 5. **Aislamiento Sagrado de la Tabla `businesses` (Solo Lectura):**  
    La IA tiene **terminantemente prohibido ejecutar sentencias `UPDATE`, `INSERT` o `DELETE` sobre la tabla `businesses`**. La tabla madre queda pura para los comensales. Todas las modificaciones operativas y de cobro se ejecutan exclusivamente sobre la tabla satélite `business_subscriptions`.
+6. **Aislamiento de Tipos (`finance.ts` vs `supabase.ts`):**  
+   Prohibido tocar o regenerar `src/types/supabase.ts`. La IA tiene acceso de solo lectura a `supabase.ts` para contextualizar negocios y comensales, pero todos los tipos y esquemas de finanzas se declaran de forma autónoma en `src/types/finance.ts`, garantizando cero contaminación en el resto de la app.
+7. **Kill Switch de Emergencia & Restaurante Laboratorio:**  
+   Implementación de la variable `COPILOT_ENABLED=true/false` para desconexión rápida del Copilot sin afectar el panel web manual. Las pruebas iniciales de audios, confirmaciones y cobros se ejecutan sobre el restaurante demo (*"FOWY Lab"*).
+8. **Procesamiento de Audio 100% en RAM:**  
+   Los audios recibidos por WhatsApp se transmiten a Gemini en memoria volátil sin persistir en Supabase Storage, eliminando costos y archivos huérfanos.
+9. **Purga Automática de Deduplicación:**  
+   El cron nocturno elimina eventos de `processed_webhook_events` con más de 7 días, previniendo el crecimiento innecesario de la tabla.
 
 ---
 *Fin de la Especificación Técnica Oficial del Agente — FOWY 2026*

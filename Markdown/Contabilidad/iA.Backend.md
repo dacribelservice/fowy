@@ -7,7 +7,7 @@
 > **Destinatario:** Cristian (CEO de FOWY)  
 > **Alineación:** [`Markdown/conceptos.md`](file:///c:/Users/cange/Documents/fowy/Markdown/conceptos.md), [`Markdown/Contabilidad/iA.UX-UI.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/iA.UX-UI.md) e [`Markdown/Contabilidad/iA.Work.md`](file:///c:/Users/cange/Documents/fowy/Markdown/Contabilidad/iA.Work.md)  
 > **Fecha:** 5 de Septiembre de 2026  
-> **Versión:** 1.0 (Motor 100% Blindado con Tabla Satélite, ACID en 1 RTT y Cero Escritura en businesses)  
+> **Versión:** 1.1 (Motor 100% Blindado con Seed de Negocios Existentes, Timezone Colombia y Cero Escritura en businesses)  
 
 ---
 
@@ -66,6 +66,13 @@ CREATE TABLE IF NOT EXISTS business_subscriptions (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 2.1.1 Inicialización / Backfill de Negocios Existentes (Cero Ceros en Producción)
+-- Da de alta a todos los negocios existentes en 'trial' sin alterar la tabla businesses
+INSERT INTO business_subscriptions (business_id, subscription_status, trial_ends_at, monthly_fee)
+SELECT id, 'trial', (created_at + INTERVAL '15 days'), 50000.00
+FROM businesses
+ON CONFLICT (business_id) DO NOTHING;
 ```
 
 ### 2.2 Arqueo de Cuentas Financieras y Cajas (`financial_accounts`)
@@ -92,7 +99,7 @@ CREATE TABLE IF NOT EXISTS membership_payments (
     receipt_number SERIAL UNIQUE, -- Consecutivo automático para comprobantes (ej: REC-001)
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     account_id UUID REFERENCES financial_accounts(id),
-    amount NUMERIC(10,2) NOT NULL,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     payment_method VARCHAR(30) NOT NULL, -- 'nequi', 'daviplata', 'bancolombia', 'cash'
     is_partial BOOLEAN DEFAULT FALSE,    -- Soporte para abonos parciales (ej: $25.000)
     commitment_id UUID,                  -- Enlace opcional con compromiso previo
@@ -113,7 +120,7 @@ CREATE TABLE IF NOT EXISTS operational_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID REFERENCES financial_accounts(id) NOT NULL,
     category VARCHAR(40) NOT NULL, -- 'infrastructure', 'flyers_printing', 'photography', 'transport', 'marketing', 'other'
-    amount NUMERIC(10,2) NOT NULL,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT NOT NULL,
     related_business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
     receipt_proof_url TEXT,
@@ -218,12 +225,15 @@ CREATE TABLE IF NOT EXISTS pending_actions (
     executed_at TIMESTAMPTZ,
     user_id UUID REFERENCES auth.users(id)
 );
-```
+
+-- Índice Parcial de Alto Rendimiento (Búsqueda en <0.5ms en RAM para acciones activas)
+CREATE INDEX IF NOT EXISTS idx_pending_actions_active 
+ON pending_actions(channel, expires_at) 
+WHERE status = 'pending';
 
 ### 2.10 Deduplicación e Idempotencia de Webhooks (`processed_webhook_events`)
-Previene duplicación de transacciones ante reintentos de red:
-
-```sql
+Previene duplicación de transacciones ante reintentos de red.
+-- Retención y purga automática: Registros > 7 días purgados automáticamente en el cron nocturno de las 11:59 PM.
 CREATE TABLE IF NOT EXISTS processed_webhook_events (
     message_id VARCHAR(100) PRIMARY KEY,
     sender_phone VARCHAR(30) NOT NULL,
@@ -524,12 +534,12 @@ BEGIN
     SELECT COALESCE(SUM(amount), 0), COUNT(*)
     INTO v_income, v_paid_count
     FROM membership_payments 
-    WHERE period_start >= date_trunc('month', CURRENT_DATE);
+    WHERE period_start >= date_trunc('month', NOW() AT TIME ZONE 'America/Bogota');
 
     SELECT COALESCE(SUM(amount), 0)
     INTO v_expenses
     FROM operational_expenses
-    WHERE expense_date >= date_trunc('month', CURRENT_DATE);
+    WHERE expense_date >= (date_trunc('month', NOW() AT TIME ZONE 'America/Bogota'))::DATE;
 
     SELECT COALESCE(SUM(agreed_amount), 0)
     INTO v_receivables
@@ -544,13 +554,16 @@ BEGIN
         'total_paid_count', v_paid_count
     );
 
+    -- Conteo de negocios por semáforo 100% resiliente (combina businesses con satélite)
     SELECT jsonb_build_object(
-        'active', COUNT(*) FILTER (WHERE subscription_status = 'active'),
-        'trial', COUNT(*) FILTER (WHERE subscription_status = 'trial'),
-        'grace_period', COUNT(*) FILTER (WHERE subscription_status = 'grace_period'),
-        'suspended', COUNT(*) FILTER (WHERE subscription_status = 'suspended'),
-        'total', (SELECT COUNT(*) FROM businesses)
-    ) INTO v_counts FROM business_subscriptions;
+        'active', COUNT(*) FILTER (WHERE COALESCE(bs.subscription_status, 'trial') = 'active'),
+        'trial', COUNT(*) FILTER (WHERE COALESCE(bs.subscription_status, 'trial') = 'trial'),
+        'grace_period', COUNT(*) FILTER (WHERE COALESCE(bs.subscription_status, 'trial') = 'grace_period'),
+        'suspended', COUNT(*) FILTER (WHERE COALESCE(bs.subscription_status, 'trial') = 'suspended'),
+        'total', COUNT(b.id)
+    ) INTO v_counts 
+    FROM businesses b
+    LEFT JOIN business_subscriptions bs ON bs.business_id = b.id;
 
     SELECT jsonb_agg(jsonb_build_object(
         'id', id, 'code', code, 'name', name, 'current_balance', current_balance
@@ -660,9 +673,10 @@ ON operational_expenses(expense_date DESC);
 CREATE INDEX IF NOT EXISTS idx_ceo_tasks_due_status 
 ON ceo_tasks(due_date, status);
 
--- 6. Cola efímera de confirmación de 2 pasos (<1ms)
-CREATE INDEX IF NOT EXISTS idx_pending_actions_lookup 
-ON pending_actions(channel, status, expires_at);
+-- 6. Cola efímera de confirmación de 2 pasos (<0.5ms mediante Índice Parcial en RAM)
+CREATE INDEX IF NOT EXISTS idx_pending_actions_active 
+ON pending_actions(channel, expires_at) 
+WHERE status = 'pending';
 
 -- 7. Traspasos entre cuentas
 CREATE INDEX IF NOT EXISTS idx_account_transfers_created 
@@ -727,6 +741,23 @@ GRANT EXECUTE ON FUNCTION get_admin_finance_summary TO authenticated, service_ro
 
 REVOKE EXECUTE ON FUNCTION get_admin_businesses_billing_page FROM public;
 GRANT EXECUTE ON FUNCTION get_admin_businesses_billing_page TO authenticated, service_role;
+
+-- Revocación Físico-SQL de DELETE (Criterio de la Llave Sin Borrado)
+-- La base de datos rechaza de raíz cualquier intento de borrado sobre la Isla Financiera
+DO $$
+DECLARE
+    tbl text;
+    tables text[] := ARRAY[
+        'business_subscriptions', 'financial_accounts', 'membership_payments', 
+        'operational_expenses', 'payment_commitments', 'ceo_tasks', 
+        'daily_financial_reports', 'account_transfers'
+    ];
+BEGIN
+    FOREACH tbl IN ARRAY tables LOOP
+        EXECUTE format('REVOKE DELETE ON %I FROM authenticated, anon, public;', tbl);
+    END LOOP;
+END;
+$$;
 ```
 
 ---
@@ -736,7 +767,11 @@ GRANT EXECUTE ON FUNCTION get_admin_businesses_billing_page TO authenticated, se
 * **Palabra de Confirmación:** **`"CONFIRMADO"`** (ejecuta RPC en `<50 ms`, 0 tokens de IA).
 * **Palabra de Cancelación:** **`"CANCELAR"`** (marca acción como `cancelled` en `<20 ms`).
 * **Superseded:** Toda nueva instrucción dictada invalida las acciones pendientes anteriores (`status = 'superseded'`).
-* **Audios Multimodales:** Procesamiento directo en Gemini 1.5 Flash (soporte nativo Opus/MP3 sin Whisper).
+* **Audios Multimodales en RAM:** Procesamiento directo en memoria volátil con Gemini 1.5 Flash (soporte nativo Opus/MP3 sin Whisper y sin almacenar archivos de audio en Supabase Storage, evitando basura digital).
+* **Kill Switch de Emergencia:** Variable `COPILOT_ENABLED=true/false`. Si se apaga, la UI web opera 100% como panel manual sin colgarse.
+* **Restaurante Laboratorio ("FOWY Lab"):** Las pruebas de WhatsApp y notas de voz se validan sobre un local demo antes de impactar negocios de producción.
+* **Purga Automática de Eventos Webhook:** Limpieza programada de registros de `processed_webhook_events` mayores a 7 días en el cron nocturno de las 11:59 PM para prevenir crecimiento descontrolado de la tabla.
+* **Aislamiento de Tipos TypeScript:** Prohibido tocar o regenerar `src/types/supabase.ts`. Toda la estructura de backend y frontend vive en `src/types/finance.ts`.
 
 ---
 *Fin del Documento Maestro Backend — FOWY iA Finanzas 2026*

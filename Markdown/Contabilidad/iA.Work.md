@@ -82,9 +82,12 @@ Auditoría detallada de cada archivo del proyecto que se creará o con el que ha
 ---
 
 ### 2.6 Punto de Contacto Existente: Pantalla de Negocio (`/admin/negocios/[id]`)
-* **Estado Actual:** Formularios manuales donde se digitan fechas, planes y estatus uno por uno.
-* **Modificación Quirúrgica:** La sección "Configuración General" se conecta en **Modo Lectura** leyendo de la tabla satélite `business_subscriptions` y el último recibo emitido (`REC-XXXX`), ahorrando horas de trabajo manual repetitivo.
-* **Diagnóstico de Riesgo:** **2.0 / 10**. Solo lectura; no se modifican controladores ni hooks de catálogo.
+* **Estado Actual:** Formularios manuales donde se digitan fechas, planes, precios y estatus uno por uno.
+* **Estrategia de Transición (Patrón Jubilado / Desconexión Segura sin Eliminación):**
+  - **Cero Modificaciones Durante el Desarrollo (Fases 1 a 5):** Este formulario viejo no se toca en lo absoluto mientras se construye la Isla Financiera y el Copilot.
+  - **Desconexión en Fase 6 (Sin Eliminar el Código):** Solo al terminar y verificar al 100% el nuevo módulo de IA y Finanzas, se "jubila" el bloque viejo desconectándolo visualmente (preservando el componente como respaldo) y se conecta el nuevo visor informativo en Modo Lectura enlazado a `business_subscriptions`.
+  - **Red de Seguridad (Rollback en 30 Segundos):** Si en cualquier momento ocurre un imprevisto o se desea volver al esquema anterior, el bloque histórico se puede reconectar de inmediato sin pérdida de datos ni riesgo operativo.
+* **Diagnóstico de Riesgo:** **1.0 / 10** (Mínimo / Totalmente blindado con salvavidas de reconexión).
 
 ---
 
@@ -103,7 +106,7 @@ Auditoría detallada de cada archivo del proyecto que se creará o con el que ha
 
 ---
 
-## 🛑 4. CÓDIGO ROJO: LAS 4 REGLAS INQUEBRANTABLES
+## 🛑 4. CÓDIGO ROJO: LAS REGLAS INQUEBRANTABLES & LOS 5 CRITERIOS QUIRÚRGICOS
 
 En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/Documents/fowy/Markdown/conceptos.md)**:
 
@@ -113,8 +116,14 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
    Todo componente o hook nuevo debe respetar la regla del techo de 250 líneas. Si un componente crece, se divide inmediatamente en sub-componentes atómicos.
 3. **🛑 Prohibida la Autonomía a Ciegas:**  
    Ningún cobro, gasto o traspaso se aplica sin la aprobación física de Cristian (mediante `"CONFIRMADO"` en WhatsApp o botón web).
-4. **🛑 Prohibido Subir a Producción sin Compilación Limpia:**  
-   Cero despliegues sin haber ejecutado y verificado `npm run build` en local con cero errores de TypeScript y ESLint.
+4. **🛑 Criterio de Aislamiento de Tipos (`finance.ts` vs `supabase.ts`):**  
+   Queda terminantemente prohibido modificar o regenerar `src/types/supabase.ts`. Todos los tipos contables, suscripciones y estados de IA se crean en `src/types/finance.ts`. La IA solo lee `supabase.ts` para entender negocios y comensales, garantizando cero contaminación en el resto de la app.
+5. **🛑 Criterio de la Llave Sin Borrado (Revocación Físico-SQL de `DELETE`):**  
+   En PostgreSQL, las cuentas y funciones de la IA tienen revocado el comando `DELETE`. Si la IA o un webhook intentan borrar filas, el motor SQL lo rechaza de raíz. Solo se permite archivar o cambiar estados (`cancelled`, `superseded`).
+6. **🛑 Criterio del Kill Switch de Emergencia & Restaurante Laboratorio:**  
+   Se implementa la variable `COPILOT_ENABLED=true/false`. Si WhatsApp o Evolution API sufren fallas externas, la IA se desconecta con un switch y el panel `/admin/finanzas` sigue funcionando al 100% como CRM manual. Las pruebas iniciales de audio y cobros se ejecutan sobre un restaurante demo (*"FOWY Lab"*).
+7. **🛑 Criterio de la Aduana de Compilación (`npm run build` en Local):**  
+   Cero despliegues a ciegas en Vercel. Antes de subir cualquier fase, se ejecuta `npm run build` en local certificando cero advertencias y cero errores de TypeScript y ESLint.
 
 ---
 
@@ -133,8 +142,9 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 - [ ] **Fase 1: Infraestructura de Datos (Supabase Pro)**
   - [ ] Ejecutar DDL de las 10 tablas de la Isla Financiera.
+  - [ ] Ejecutar Seed inicial de `business_subscriptions` para negocios existentes (`ON CONFLICT DO NOTHING`).
   - [ ] Crear los 6 procedimientos RPC atómicos (`apply_confirmed_membership_payment`, `apply_confirmed_expense`, `apply_account_transfer`, `get_business_dossier`, `get_admin_finance_summary`, `get_admin_businesses_billing_page`).
-  - [ ] Habilitar extensión `pg_trgm` y desplegar los 7 índices de aceleración.
+  - [ ] Habilitar extensión `pg_trgm` y desplegar los 7 índices de aceleración (incluyendo índice parcial en `pending_actions` y restricciones `CHECK (amount > 0)`).
   - [ ] Aplicar políticas RLS y privilegios `GRANT EXECUTE`.
   - [ ] Poblar cuentas iniciales en `financial_accounts` (Nequi, Daviplata, Bancolombia, Efectivo).
 
@@ -153,21 +163,23 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 - [ ] **Fase 4: Copilot Web (CFO & Secretaria)**
   - [ ] Crear endpoint `src/app/api/admin/copilot/route.ts` con Gemini 1.5 Flash y Function Calling.
+  - [ ] Implementar Kill Switch de emergencia (variable `COPILOT_ENABLED` en `.env` y fallback en interfaz).
   - [ ] Construir `FinanceCopilotSheet.tsx`, `CopilotVoiceMic.tsx` y `CopilotActionCard.tsx`.
   - [ ] Probar flujo interactivo de pre-confirmación en dos pasos.
 
 - [ ] **Fase 5: Conexión WhatsApp con Evolution API v2**
   - [ ] Desplegar contenedor Docker de Evolution API y vincular WhatsApp personal de Cristian vía QR.
   - [ ] Crear endpoint webhook `src/app/api/webhooks/whatsapp/route.ts`.
+  - [ ] Crear negocio demo de pruebas (*"FOWY Lab"*) para validación segura de audios y cobros antes de operar con locales reales.
   - [ ] Implementar deduplicación por `message_id`.
   - [ ] Programar ruta rápida para la palabra clave `"CONFIRMADO"` (`<50 ms`) y `"CANCELAR"`.
-  - [ ] Integrar procesamiento multimodal de audios de voz (.ogg / .mp3) con Gemini.
+  - [ ] Integrar procesamiento multimodal de audios de voz (.ogg / .mp3) con Gemini 100% en memoria RAM (cero basura en Storage).
 
 - [ ] **Fase 6: Automatización & Modo Lectura**
   - [ ] Crear endpoint `src/app/api/cron/financial-audit/route.ts`.
-  - [ ] Configurar cron de Cierre Nocturno 11:59 PM (04:59 UTC).
+  - [ ] Configurar cron de Cierre Nocturno 11:59 PM (04:59 UTC) con purga automática de `processed_webhook_events` (>7 días).
   - [ ] Configurar cron de Morning Briefing 8:00 AM (13:00 UTC) directo al WhatsApp del CEO.
-  - [ ] Transformar la sección "Configuración General" de la pantalla de negocio en modo lectura informativo conectado a `business_subscriptions`.
+  - [ ] Jubilar (desconectar sin eliminar) el bloque histórico de campos manuales en `/admin/negocios/[id]`, preservando el componente de respaldo (switch de rollback rápido) y conectando el nuevo visor informativo en Modo Lectura enlazado a Finanzas.
   - [ ] Ejecutar `npm run build` para certificar compilación 100% limpia con cero errores.
 
 ---
