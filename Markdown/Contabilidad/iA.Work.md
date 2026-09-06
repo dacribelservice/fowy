@@ -155,8 +155,8 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ### Checklist Detallada (1 Punto = 1 Archivo / Función 100% Terminado):
 
-- [ ] **Fase 1: Infraestructura de Datos en Supabase Pro (Isla Satélite)**
-  - [ ] **Punto 1.1 (DDL 10 Tablas Satélites):** Ejecutar en Supabase SQL Editor el script DDL asegurando claves primarias, foráneas, restricciones `CHECK` y valores predeterminados sin tocar la tabla madre `businesses`:
+- [x] **Fase 1: Infraestructura de Datos en Supabase Pro (Isla Satélite)**
+  - [x] **Punto 1.1 (DDL 10 Tablas Satélites):** Ejecutar en Supabase SQL Editor el script DDL asegurando claves primarias, foráneas, restricciones `CHECK` y valores predeterminados sin tocar la tabla madre `businesses`:
     1. `business_subscriptions`: PK `business_id` (FK `businesses.id` ON DELETE CASCADE), `deliverables JSONB DEFAULT '{"fotos": "pending", "volantes": "none", "stickers_qr": "pending", "menu_ready": false}'::jsonb` y `modules JSONB DEFAULT '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb`.
     2. `financial_accounts`: `code VARCHAR(30) UNIQUE NOT NULL` (`nequi`, `daviplata`, `bancolombia`, `cash`), `name`, `current_balance NUMERIC(12,2) DEFAULT 0.00`, `is_active BOOLEAN DEFAULT TRUE`.
     3. `membership_payments`: `receipt_number SERIAL UNIQUE`, `amount NUMERIC(10,2) CHECK (amount > 0)`, `is_partial BOOLEAN DEFAULT FALSE`, `commitment_id UUID`.
@@ -167,12 +167,12 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
     8. `account_transfers`: `amount NUMERIC(10,2) CHECK (amount > 0)`, `fee NUMERIC(10,2) DEFAULT 0.00`, origen y destino.
     9. `pending_actions`: `channel VARCHAR(20)`, `action_type VARCHAR(50)`, `payload JSONB`, `status VARCHAR(20) DEFAULT 'pending'`, `expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '10 minutes')`.
     10. `processed_webhook_events`: `message_id VARCHAR(100) PRIMARY KEY`, `sender_phone VARCHAR(30)`, `event_type VARCHAR(30)`.
-  - [ ] **Punto 1.2 (Seed & Backfill Contable):**
+  - [x] **Punto 1.2 (Seed & Backfill Contable):**
     - Ejecutar el backfill seguro de los negocios existentes hacia `business_subscriptions`:  
       `INSERT INTO business_subscriptions (business_id, subscription_status, trial_ends_at, monthly_fee) SELECT id, 'trial', (created_at + INTERVAL '15 days'), 50000.00 FROM businesses ON CONFLICT (business_id) DO NOTHING;`
     - Sembrar las 4 cuentas base en `financial_accounts`: Nequi (`nequi`), Daviplata (`daviplata`), Bancolombia (`bancolombia`), Efectivo en Mano (`cash`).
     - Crear el negocio laboratorio *"FOWY Lab"* (con slug `fowy-lab`) en `businesses` y asociarle su registro en `business_subscriptions` para pruebas no destructivas.
-  - [ ] **Punto 1.3 (Procedimientos RPC Atómicos en 1 RTT):** Compilar en PostgreSQL los 7 procedimientos con `SECURITY DEFINER`:
+  - [x] **Punto 1.3 (Procedimientos RPC Atómicos en 1 RTT):** Compilar en PostgreSQL los 7 procedimientos con `SECURITY DEFINER`:
     1. `apply_confirmed_membership_payment`: Aplica recaudo, actualiza saldo en cuenta, avanza fecha de corte en satélite y crea cartera en `payment_commitments` si fue abono parcial con saldo restante.
     2. `apply_confirmed_expense`: Registra OPEX y debita el saldo de la cuenta financiera en una sola transacción ACID.
     3. `apply_account_transfer`: Mueve fondos entre cuentas debitando comisión bancaria si aplica (registrándola como OPEX de infraestructura).
@@ -180,7 +180,7 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
     5. `get_admin_finance_summary`: Retorna P&L del mes (ingresos, gastos, desglose `expenses_by_category`, utilidad neta real y **Diezmo del 10%** tras OPEX), cajas, tareas del día, semáforos e indicadores de salud financiera (`cpi_onboarding`, `dso_days`, `runway_months`, `operating_margin_pct`) en <15 ms y <4 KB (con timezone `America/Bogota`).
     6. `get_admin_businesses_billing_page`: Paginación server-side de 30 en 30 con ordenamiento prioritario (gracia ➔ trial ➔ al día), lectura de `deliverables JSONB` y `modules JSONB`, y filtro Trigram GIN.
     7. `get_network_growth_summary`: Retorna agregación analítica de la red FOWY (% MoM, % WoW, % DoD en afiliaciones, visitas a menús y pedidos/conversiones a WhatsApp) en <10 ms y <1 KB como Single Source of Truth para Dashboard, Finanzas y Copilot sin escanear tablas en cliente.
-  - [ ] **Punto 1.4 (Extensiones e Índices de Rendimiento 10k+):**
+  - [x] **Punto 1.4 (Extensiones e Índices de Rendimiento 10k+):**
     - Activar extensión: `CREATE EXTENSION IF NOT EXISTS pg_trgm;`
     - Crear los 7 índices de alto rendimiento:
       1. `idx_businesses_name_trgm` (GIN en `businesses(name gin_trgm_ops)`).
@@ -190,14 +190,14 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
       5. `idx_ceo_tasks_due_status` (B-Tree en `ceo_tasks(due_date, status)`).
       6. `idx_pending_actions_active` (Índice parcial en `pending_actions(channel, expires_at) WHERE status = 'pending'`).
       7. `idx_account_transfers_created` (B-Tree en `account_transfers(created_at DESC)`).
-  - [ ] **Punto 1.5 (Seguridad RLS, Secuencias y Revocación Físico-SQL de DELETE):**
+  - [x] **Punto 1.5 (Seguridad RLS, Secuencias y Revocación Físico-SQL de DELETE):**
     - Habilitar RLS en las 10 tablas con la política `admin_finance_isolation_policy` para administradores (`auth.jwt() ->> 'role' = 'admin'`).
     - Otorgar permisos de ejecución de los 7 RPCs: `GRANT EXECUTE ON FUNCTION ... TO authenticated, service_role;` (y revocar a `public`).
     - Otorgar permisos sobre la secuencia del recibo: `GRANT USAGE, SELECT ON SEQUENCE membership_payments_receipt_number_seq TO authenticated, service_role;`.
     - Revocar físicamente el comando `DELETE` en las 8 tablas de almacenamiento inmutable:  
       `REVOKE DELETE ON business_subscriptions, financial_accounts, membership_payments, operational_expenses, payment_commitments, ceo_tasks, daily_financial_reports, account_transfers FROM authenticated, anon, public;`  
       *(Nota Técnica: Las tablas efímeras `pending_actions` y `processed_webhook_events` se excluyen deliberadamente de esta restricción para permitir expiración por TTL y purga nocturna de eventos > 7 días).*
-  - [ ] **Punto 1.6 (Definition of Done — Validación de Base de Datos):**
+  - [x] **Punto 1.6 (Definition of Done — Validación de Base de Datos):**
     - *Test 1.6.1 (Lectura Resumen, Diezmo & KPIs):* `SELECT get_admin_finance_summary();` responde en `<20 ms` con JSON válido conteniendo `metrics` (con ingresos, egresos, utilidad y `tithing` del 10%), `health_kpis` (`cpi_onboarding`, `dso_days`, `runway_months`, `operating_margin_pct`), `counts`, `accounts` y `today_tasks`.
     - *Test 1.6.2 (Paginación Pura):* `SELECT get_admin_businesses_billing_page('all', '', 10, 0);` responde en `<15 ms`.
     - *Test 1.6.3 (Expediente Dossier & Crecimiento Negocio):* `SELECT get_business_dossier('fowy-lab');` responde en `<10 ms` con estructura de negocio, entregables, métricas y objeto `growth_metrics` con porcentajes de variación WoW y MoM.

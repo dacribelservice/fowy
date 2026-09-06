@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_transfers: {
+        Row: {
+          amount: number
+          created_at: string | null
+          destination_account_id: string
+          fee: number | null
+          id: string
+          notes: string | null
+          registered_by: string | null
+          source_account_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          destination_account_id: string
+          fee?: number | null
+          id?: string
+          notes?: string | null
+          registered_by?: string | null
+          source_account_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          destination_account_id?: string
+          fee?: number | null
+          id?: string
+          notes?: string | null
+          registered_by?: string | null
+          source_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_transfers_destination_account_id_fkey"
+            columns: ["destination_account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_transfers_source_account_id_fkey"
+            columns: ["source_account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_visits: {
         Row: {
           business_id: string | null
@@ -177,6 +225,53 @@ export type Database = {
           },
         ]
       }
+      business_subscriptions: {
+        Row: {
+          billing_notes: string | null
+          business_id: string
+          created_at: string | null
+          deliverables: Json | null
+          modules: Json | null
+          monthly_fee: number | null
+          next_billing_date: string | null
+          subscription_status: string
+          trial_ends_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          billing_notes?: string | null
+          business_id: string
+          created_at?: string | null
+          deliverables?: Json | null
+          modules?: Json | null
+          monthly_fee?: number | null
+          next_billing_date?: string | null
+          subscription_status?: string
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          billing_notes?: string | null
+          business_id?: string
+          created_at?: string | null
+          deliverables?: Json | null
+          modules?: Json | null
+          monthly_fee?: number | null
+          next_billing_date?: string | null
+          subscription_status?: string
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           category_id: string | null
@@ -303,6 +398,128 @@ export type Database = {
         }
         Relationships: []
       }
+      ceo_tasks: {
+        Row: {
+          business_id: string | null
+          created_at: string | null
+          due_date: string
+          due_time: string | null
+          id: string
+          notes: string | null
+          priority: string | null
+          registered_by: string | null
+          status: string | null
+          task_type: string
+          title: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string | null
+          due_date: string
+          due_time?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string | null
+          registered_by?: string | null
+          status?: string | null
+          task_type: string
+          title: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string | null
+          due_date?: string
+          due_time?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string | null
+          registered_by?: string | null
+          status?: string | null
+          task_type?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ceo_tasks_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_financial_reports: {
+        Row: {
+          ai_cfo_recommendations: string | null
+          businesses_due_today: number
+          businesses_in_grace: number
+          businesses_in_trial: number
+          businesses_suspended: number
+          commitments_due: Json | null
+          created_at: string | null
+          daily_expenses: number | null
+          daily_income: number | null
+          daily_net: number | null
+          executive_summary: string
+          id: string
+          month_to_date_expenses: number | null
+          month_to_date_income: number | null
+          month_to_date_net: number | null
+          morning_briefing_text: string
+          pending_receivables: number | null
+          report_date: string
+          tasks_scheduled_today: Json | null
+          total_active_businesses: number
+          urgent_actions: Json | null
+        }
+        Insert: {
+          ai_cfo_recommendations?: string | null
+          businesses_due_today: number
+          businesses_in_grace: number
+          businesses_in_trial: number
+          businesses_suspended: number
+          commitments_due?: Json | null
+          created_at?: string | null
+          daily_expenses?: number | null
+          daily_income?: number | null
+          daily_net?: number | null
+          executive_summary: string
+          id?: string
+          month_to_date_expenses?: number | null
+          month_to_date_income?: number | null
+          month_to_date_net?: number | null
+          morning_briefing_text: string
+          pending_receivables?: number | null
+          report_date?: string
+          tasks_scheduled_today?: Json | null
+          total_active_businesses: number
+          urgent_actions?: Json | null
+        }
+        Update: {
+          ai_cfo_recommendations?: string | null
+          businesses_due_today?: number
+          businesses_in_grace?: number
+          businesses_in_trial?: number
+          businesses_suspended?: number
+          commitments_due?: Json | null
+          created_at?: string | null
+          daily_expenses?: number | null
+          daily_income?: number | null
+          daily_net?: number | null
+          executive_summary?: string
+          id?: string
+          month_to_date_expenses?: number | null
+          month_to_date_income?: number | null
+          month_to_date_net?: number | null
+          morning_briefing_text?: string
+          pending_receivables?: number | null
+          report_date?: string
+          tasks_scheduled_today?: Json | null
+          total_active_businesses?: number
+          urgent_actions?: Json | null
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           created_at: string | null
@@ -350,6 +567,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      financial_accounts: {
+        Row: {
+          account_number: string | null
+          code: string
+          current_balance: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          code: string
+          current_balance?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          code?: string
+          current_balance?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       global_categories: {
         Row: {
@@ -494,6 +741,79 @@ export type Database = {
         }
         Relationships: []
       }
+      membership_payments: {
+        Row: {
+          account_id: string | null
+          amount: number
+          business_id: string | null
+          commitment_id: string | null
+          created_at: string | null
+          id: string
+          is_partial: boolean | null
+          notes: string | null
+          payment_method: string
+          period_end: string
+          period_start: string
+          proof_url: string | null
+          receipt_number: number
+          registered_by: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          business_id?: string | null
+          commitment_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_partial?: boolean | null
+          notes?: string | null
+          payment_method: string
+          period_end: string
+          period_start: string
+          proof_url?: string | null
+          receipt_number?: number
+          registered_by?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          business_id?: string | null
+          commitment_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_partial?: boolean | null
+          notes?: string | null
+          payment_method?: string
+          period_end?: string
+          period_start?: string
+          proof_url?: string | null
+          receipt_number?: number
+          registered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_payments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_payments_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_payments_commitment_id_fkey"
+            columns: ["commitment_id"]
+            isOneToOne: false
+            referencedRelation: "payment_commitments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string
@@ -531,6 +851,60 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_expenses: {
+        Row: {
+          account_id: string
+          amount: number
+          category: string
+          created_at: string | null
+          description: string
+          expense_date: string | null
+          id: string
+          receipt_proof_url: string | null
+          registered_by: string | null
+          related_business_id: string | null
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          category: string
+          created_at?: string | null
+          description: string
+          expense_date?: string | null
+          id?: string
+          receipt_proof_url?: string | null
+          registered_by?: string | null
+          related_business_id?: string | null
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          category?: string
+          created_at?: string | null
+          description?: string
+          expense_date?: string | null
+          id?: string
+          receipt_proof_url?: string | null
+          registered_by?: string | null
+          related_business_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_expenses_related_business_id_fkey"
+            columns: ["related_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
         ]
@@ -598,6 +972,47 @@ export type Database = {
           },
         ]
       }
+      payment_commitments: {
+        Row: {
+          agreed_amount: number
+          agreed_date: string
+          business_id: string | null
+          created_at: string | null
+          id: string
+          notes: string
+          registered_by: string | null
+          status: string | null
+        }
+        Insert: {
+          agreed_amount: number
+          agreed_date: string
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes: string
+          registered_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          agreed_amount?: number
+          agreed_date?: string
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string
+          registered_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_commitments_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_proofs: {
         Row: {
           amount: number | null
@@ -635,6 +1050,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pending_actions: {
+        Row: {
+          action_type: string
+          channel: string
+          created_at: string | null
+          executed_at: string | null
+          expires_at: string
+          id: string
+          payload: Json
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          channel: string
+          created_at?: string | null
+          executed_at?: string | null
+          expires_at?: string
+          id?: string
+          payload: Json
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          channel?: string
+          created_at?: string | null
+          executed_at?: string | null
+          expires_at?: string
+          id?: string
+          payload?: Json
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      processed_webhook_events: {
+        Row: {
+          event_type: string
+          message_id: string
+          processed_at: string | null
+          sender_phone: string
+        }
+        Insert: {
+          event_type: string
+          message_id: string
+          processed_at?: string | null
+          sender_phone: string
+        }
+        Update: {
+          event_type?: string
+          message_id?: string
+          processed_at?: string | null
+          sender_phone?: string
+        }
+        Relationships: []
       }
       product_menu_categories: {
         Row: {
@@ -1152,6 +1624,42 @@ export type Database = {
             }
             Returns: string
           }
+      apply_account_transfer: {
+        Args: {
+          p_amount: number
+          p_destination_account_id: string
+          p_fee?: number
+          p_notes?: string
+          p_source_account_id: string
+        }
+        Returns: Json
+      }
+      apply_confirmed_expense: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_category: string
+          p_description: string
+          p_expense_date?: string
+          p_related_business_id?: string
+        }
+        Returns: Json
+      }
+      apply_confirmed_membership_payment: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_business_id: string
+          p_commitment_id?: string
+          p_extension_days?: number
+          p_is_partial?: boolean
+          p_notes?: string
+          p_payment_method: string
+          p_remaining_amount?: number
+          p_remaining_due_date?: string
+        }
+        Returns: Json
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -1283,7 +1791,21 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_admin_businesses_billing_page: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_status?: string
+        }
+        Returns: Json
+      }
+      get_admin_finance_summary: { Args: never; Returns: Json }
       get_admin_rankings: { Args: never; Returns: Json }
+      get_business_dossier: {
+        Args: { p_business_identifier: string }
+        Returns: Json
+      }
       get_business_menu_payload: { Args: { p_slug: string }; Returns: Json }
       get_businesses_in_viewport: {
         Args: {
@@ -1332,6 +1854,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_network_growth_summary: { Args: never; Returns: Json }
       get_reels_feed: {
         Args: {
           filter_category_id?: string
