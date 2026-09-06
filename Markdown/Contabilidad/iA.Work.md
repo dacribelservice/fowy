@@ -210,33 +210,33 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ---
 
-- [ ] **Fase 2: Arquitectura TypeScript, Dependencias, Utilidades & Servicios Core**
-  - [ ] **Punto 2.1 (Instalación de Dependencias de Virtualización):** Instalar en el proyecto `@tanstack/react-virtual` para soportar renderizado de tablas masivas a 60 FPS sin memory leaks.
-  - [ ] **Punto 2.2 (Contratos de Tipos — Aislamiento en `src/types/finance.ts`):** Crear el archivo autónomo `src/types/finance.ts` (<220L) sin tocar [supabase.ts](file:///c:/Users/cange/Documents/fowy/src/types/supabase.ts):
+- [x] **Fase 2: Arquitectura TypeScript, Dependencias, Utilidades & Servicios Core**
+  - [x] **Punto 2.1 (Instalación de Dependencias de Virtualización):** Instalar en el proyecto `@tanstack/react-virtual` para soportar renderizado de tablas masivas a 60 FPS sin memory leaks.
+  - [x] **Punto 2.2 (Contratos de Tipos — Aislamiento en `src/types/finance.ts`):** Crear el archivo autónomo `src/types/finance.ts` (<220L) sin tocar [supabase.ts](file:///c:/Users/cange/Documents/fowy/src/types/supabase.ts):
     - DTOs de retornos de los 7 RPCs (`AdminFinanceSummaryDTO` con soporte de `tithing: number` y `expenses_by_category: Record<string, number>`, `BillingPageDTO`, `BusinessDossierDTO`, `NetworkGrowthDTO`) incluyendo el contrato formal `FinancialHealthKpisDTO` (`cpi_onboarding: number; dso_days: number; runway_months: number; operating_margin_pct: number;`) y `BusinessGrowthMetricsDTO` (`orders_wow_pct`, `orders_mom_pct`, `visits_mom_pct`, `trend_status`).
     - Interfaces de las 10 tablas satélites.
     - Modelos de JSONB: `DeliverablesMap` (`Record<string, 'pending' | 'in_progress' | 'delivered' | 'none'>`) y `ModulesMap` (`Record<string, boolean>`).
     - Enums y tipos de dominio: `SubscriptionStatus`, `PaymentMethod`, `ExpenseCategory` (`'viaticos_calle' | 'transporte_movilidad' | 'material_negocios' | 'tecnologia_fija' | 'salario_ceo' | 'otros'`), `TaskType`, `PriorityLevel`.
     - Esquemas de argumentos de las **10 herramientas de Function Calling**: `GetCfoSummaryArgs`, `QueryDossierArgs`, `PreparePaymentArgs`, `PrepareExpenseArgs`, `ScheduleTaskArgs`, `QueryAgendaArgs`, `CompleteTaskArgs`, `PrepareCommitmentArgs`, `PrepareTransferArgs`, `GetNetworkGrowthArgs`.
     - Tipos de mensajería y UI: `ReceiptData`, `CopilotChatMessage`, `PendingActionDTO`, `EvolutionWebhookPayload`.
-  - [ ] **Punto 2.3 (Helper Centralizado de Recibos y Formatos):** Crear `src/utils/financeReceipt.ts` (<110L):
+  - [x] **Punto 2.3 (Helper Centralizado de Recibos y Formatos):** Crear `src/utils/financeReceipt.ts` (<110L):
     1. `formatCOP(amount: number): string`: Devuelve `$50.000 COP`.
     2. `getRelativeDaysText(dateStr: string | null, status: string)`: Devuelve `"en 30 días"`, `"quedan 7 días"` o `"hace 3 días - vencido"` con su clase de color Tailwind.
     3. `buildOfficialReceiptText(data: ReceiptData)`: Redacta la plantilla de recibo digital oficial `#REC-XXXX`.
     4. `buildWhatsAppLink(phone: string, text: string)`: Genera URL segura codificada `https://wa.me/...`.
-  - [ ] **Punto 2.4 (Servicio Evolution WhatsApp):** Crear `src/services/evolutionService.ts` (<150L) con llamadas outbound (`/message/sendText`) usando `fetch` nativo hacia Evolution API v2, timeout controlado de 4 segundos y tipado estricto.
-  - [ ] **Punto 2.5 (Servicio Gemini Multimodal REST en RAM):** Crear `src/services/geminiCopilotService.ts` (<240L) consumiendo directamente la REST API de Google AI (`gemini-1.5-flash`) mediante `fetch` nativo:
+  - [x] **Punto 2.4 (Servicio Evolution WhatsApp):** Crear `src/services/evolutionService.ts` (<150L) con llamadas outbound (`/message/sendText`) usando `fetch` nativo hacia Evolution API v2, timeout controlado de 4 segundos y tipado estricto.
+  - [x] **Punto 2.5 (Servicio Gemini Multimodal REST en RAM):** Crear `src/services/geminiCopilotService.ts` (<240L) consumiendo directamente la REST API de Google AI (`gemini-1.5-flash`) mediante `fetch` nativo:
     - Configuración: `temperature: 0.1`, `topP: 0.95`, `maxOutputTokens: 2048`.
     - Inyección inmutable del `systemInstruction` (CFO & Secretaria con inteligencia y criterio de CPI/DSO y análisis de crecimiento macro/micro).
     - Declaración formal del catálogo de las 10 herramientas con Function Calling `AUTO`.
     - Soporte multimodal de audio nativo (.ogg/.mp3) y visión OCR para comprobantes de pago y tickets OPEX procesados 100% en memoria volátil (RAM) con evaporación inmediata del buffer (cero persistencia en Supabase Storage).
-  - [ ] **Punto 2.6 (Hook Financiero Administrativo):** Crear `src/hooks/useAdminFinance.ts` (<180L) con caché SWR consumiendo `get_admin_finance_summary` y `get_admin_businesses_billing_page`, exponiendo:
+  - [x] **Punto 2.6 (Hook Financiero Administrativo):** Crear `src/hooks/useAdminFinance.ts` (<180L) con caché SWR consumiendo `get_admin_finance_summary` y `get_admin_businesses_billing_page`, exponiendo:
     - Datos: `summary`, `healthKpis`, `billingData`, `isLoading`, `error`.
     - Filtros: `searchTerm`, `statusFilter`, `page`, `setSearchTerm`, `setStatusFilter`, `setPage`.
     - Mutadores: `revalidateSummary()`, `revalidateBilling()`.  
     *(Protegiendo intacto [useFinanceManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useFinanceManager.ts) de expertos).*
-  - [ ] **Punto 2.7 (Hook de Chat y Voz):** Crear `src/hooks/useCopilotChat.ts` (<200L) con manejo de historial de mensajes, captura Web Audio API local, previsualización de imágenes pegadas con `Ctrl + V`, llamada al endpoint `/api/admin/copilot` y gestión de estados de pre-confirmación.
-  - [ ] **Punto 2.8 (Definition of Done — Validación Core):**
+  - [x] **Punto 2.7 (Hook de Chat y Voz):** Crear `src/hooks/useCopilotChat.ts` (<200L) con manejo de historial de mensajes, captura Web Audio API local, previsualización de imágenes pegadas con `Ctrl + V`, llamada al endpoint `/api/admin/copilot` y gestión de estados de pre-confirmación.
+  - [x] **Punto 2.8 (Definition of Done — Validación Core):**
     - Ejecutar `npx tsc --noEmit` certificando **exactamente 0 errores de tipado**.
     - Ejecutar `git status` y verificar que [supabase.ts](file:///c:/Users/cange/Documents/fowy/src/types/supabase.ts) y [useFinanceManager.ts](file:///c:/Users/cange/Documents/fowy/src/hooks/useFinanceManager.ts) permanecen 100% intocados.
     - Probar localmente que `financeReceipt.ts` formatea correctamente montos, fechas y redacta el recibo `#REC-0001`.
