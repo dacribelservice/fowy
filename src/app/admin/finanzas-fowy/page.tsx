@@ -15,6 +15,7 @@ import {
   AccountTransferModal,
   NewTaskModal,
 } from "@/components/admin/finanzas/modals";
+import { FinanceCopilotSheet } from "@/components/admin/finanzas/copilot/FinanceCopilotSheet";
 import type { BusinessBillingRowDTO } from "@/types/finance";
 
 export default function AdminFinanzasFowyPage() {
@@ -159,6 +160,9 @@ export default function AdminFinanzasFowyPage() {
         onSuccess={revalidateAll}
         businesses={businessesList}
       />
+
+      {/* Asistente Flotante Agente FOWY (CFO & Secretaria) */}
+      <FinanceCopilotSheet todayTasksCount={summary?.today_tasks?.length || 0} />
     </div>
   );
 }

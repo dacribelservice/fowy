@@ -143,13 +143,13 @@ export function useCopilotChat() {
     }
   }, []);
 
-  const confirmAction = useCallback(async (action: PendingActionDTO) => {
+  const confirmAction = useCallback(async (action: PendingActionDTO, updatedPayload?: Record<string, any>) => {
     setIsSending(true);
     try {
       const res = await fetch("/api/admin/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "confirm", actionId: action.id }),
+        body: JSON.stringify({ action: "confirm", actionId: action.id, updatedPayload }),
       });
       const data = await res.json();
       setMessages((prev) =>
