@@ -34,7 +34,7 @@ const menuItems = [
   { name: "Vendedores", href: "/admin/vendedores", icon: Users },
   { name: "Profesionales", href: "/admin/profesionales", icon: Briefcase },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserCircle },
-  { name: "Finanzas", href: "/admin/finanzas", icon: Wallet },
+  { name: "Finanzas FOWY", href: "/admin/finanzas-fowy", icon: Wallet },
   { name: "Marketing", href: "/admin/marketing", icon: Sparkles },
   { name: "Seguridad", href: "/admin/seguridad", icon: ShieldCheck },
 ];

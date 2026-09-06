@@ -20,7 +20,7 @@ export default function FloatingActionMenu() {
     { icon: <Users size={22} />, href: "/admin/vendedores", delay: 0.25 },
     { icon: <Briefcase size={22} />, href: "/admin/profesionales", delay: 0.2 },
     { icon: <UserCircle size={22} />, href: "/admin/usuarios", delay: 0.15 },
-    { icon: <Wallet size={22} />, href: "/admin/finanzas", delay: 0.1 },
+    { icon: <Wallet size={22} />, href: "/admin/finanzas-fowy", delay: 0.1 },
     { icon: <Sparkles size={22} />, href: "/admin/marketing", delay: 0.05 },
     { icon: <ShieldCheck size={22} />, href: "/admin/seguridad", delay: 0 },
   ];

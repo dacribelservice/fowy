@@ -243,24 +243,24 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ---
 
-- [ ] **Fase 3: Tablero Visual `Finanzas FOWY` (`/admin/finanzas-fowy`) & Modales**
-  - [ ] **Punto 3.1 (Semáforos KPI):** Crear `src/components/admin/finanzas/FinanceKpiCards.tsx` (<120L) con las 4 tarjetas superiores de recaudo al día, periodo de prueba, tolerancia en gracia y mora.
-  - [ ] **Punto 3.2 (Barra de Salud Financiera & KPIs):** Crear `src/components/admin/finanzas/FinanceHealthMetricsBar.tsx` (<120L) con badges vectoriales planos de CPI Onboarding, DSO Cartera, Runway de Caja y Margen Operativo Neto %.
-  - [ ] **Punto 3.3 (Barra de Liquidez Multibolsillo):** Crear `src/components/admin/finanzas/FinanceAccountsBar.tsx` (<140L) con el arqueo visual de Nequi, Daviplata, Bancolombia y Efectivo, con botón directo para abrir traspasos.
-  - [ ] **Punto 3.4 (Tarjeta P&L en Vivo con Diezmo y Desglose OPEX):** Crear `src/components/admin/finanzas/FinanceProfitLossCard.tsx` (<140L) con ingresos cobrados, gastos OPEX con micro-desglose por categorías clave (`tecnologia_fija`, `viaticos_calle`, `transporte_movilidad`, `material_negocios`, `salario_ceo`), alerta ámbar de fuga de caja si viáticos superan el 25% del recaudo, Utilidad Neta Real destacada y renglón contable del Diezmo (10% de la utilidad neta real tras OPEX).
-  - [ ] **Punto 3.5 (Agenda de Campo del CEO):** Crear `src/components/admin/finanzas/CeoAgendaChecklist.tsx` (<170L) con checkbox interactivo para completar tareas, badges minimalistas de actividad (`lucide-react` planos, cero 3D) y botón `[ + Nueva Tarea ]`.
-  - [ ] **Punto 3.6 (Fila de Negocio con Plan, % bajo Estado, Días Restantes y Badges):** Crear `src/components/admin/finanzas/BusinessBillingRow.tsx` (<160L) con el Plan activo debajo del nombre (leído de `modules JSONB`), micro-badge dinámico de tendencia de crecimiento en % de pedidos **ubicado directamente debajo del semáforo de estado** (`↳ [ 📈 +14.2% ]` / `↳ [ 📉 -12.5% ]`) para evitar apeñuscar datos, días restantes bajo la fecha vía `financeReceipt.ts`, badges de la mochila `deliverables JSONB` y botón directo `[ Msg ]` para WhatsApp.
-  - [ ] **Punto 3.7 (Tabla Virtualizada 60 FPS):** Crear `src/components/admin/finanzas/BusinessBillingTable.tsx` (<200L) con virtual scrolling vía `@tanstack/react-virtual`, buscador con debounce sobre Trigram GIN y pestañas de filtro rápido.
-  - [ ] **Punto 3.8 (Subdirectorio Modales en `src/components/admin/finanzas/modals/`):**
+- [x] **Fase 3: Tablero Visual `Finanzas FOWY` (`/admin/finanzas-fowy`) & Modales**
+  - [x] **Punto 3.1 (Semáforos KPI):** Crear `src/components/admin/finanzas/FinanceKpiCards.tsx` (<120L) con las 4 tarjetas superiores de recaudo al día, periodo de prueba, tolerancia en gracia y mora.
+  - [x] **Punto 3.2 (Barra de Salud Financiera & KPIs):** Crear `src/components/admin/finanzas/FinanceHealthMetricsBar.tsx` (<120L) con badges vectoriales planos de CPI Onboarding, DSO Cartera, Runway de Caja y Margen Operativo Neto %.
+  - [x] **Punto 3.3 (Barra de Liquidez Multibolsillo):** Crear `src/components/admin/finanzas/FinanceAccountsBar.tsx` (<140L) con el arqueo visual de Nequi, Daviplata, Bancolombia y Efectivo, con botón directo para abrir traspasos.
+  - [x] **Punto 3.4 (Tarjeta P&L en Vivo con Diezmo y Desglose OPEX):** Crear `src/components/admin/finanzas/FinanceProfitLossCard.tsx` (<140L) con ingresos cobrados, gastos OPEX con micro-desglose por categorías clave (`tecnologia_fija`, `viaticos_calle`, `transporte_movilidad`, `material_negocios`, `salario_ceo`), alerta ámbar de fuga de caja si viáticos superan el 25% del recaudo, Utilidad Neta Real destacada y renglón contable del Diezmo (10% de la utilidad neta real tras OPEX).
+  - [x] **Punto 3.5 (Agenda de Campo del CEO):** Crear `src/components/admin/finanzas/CeoAgendaChecklist.tsx` (<170L) con checkbox interactivo para completar tareas, badges minimalistas de actividad (`lucide-react` planos, cero 3D) y botón `[ + Nueva Tarea ]`.
+  - [x] **Punto 3.6 (Fila de Negocio con Plan, % bajo Estado, Días Restantes y Badges):** Crear `src/components/admin/finanzas/BusinessBillingRow.tsx` (<160L) con el Plan activo debajo del nombre (leído de `modules JSONB`), micro-badge dinámico de tendencia de crecimiento en % de pedidos **ubicado directamente debajo del semáforo de estado** (`↳ [ 📈 +14.2% ]` / `↳ [ 📉 -12.5% ]`) para evitar apeñuscar datos, días restantes bajo la fecha vía `financeReceipt.ts`, badges de la mochila `deliverables JSONB` y botón directo `[ Msg ]` para WhatsApp.
+  - [x] **Punto 3.7 (Tabla Virtualizada 60 FPS):** Crear `src/components/admin/finanzas/BusinessBillingTable.tsx` (<200L) con virtual scrolling vía `@tanstack/react-virtual`, buscador con debounce sobre Trigram GIN y pestañas de filtro rápido.
+  - [x] **Punto 3.8 (Subdirectorio Modales en `src/components/admin/finanzas/modals/`):**
     - Crear `modals/QuickPaymentModal.tsx` (<200L) con soporte de abonos parciales, imputación de cuenta y botón para compartir recibo por WhatsApp.
     - Crear `modals/QuickExpenseModal.tsx` (<180L) para registrar egresos OPEX con selector de las 5 categorías oficiales en español (`viaticos_calle`, `transporte_movilidad`, `material_negocios`, `tecnologia_fija`, `salario_ceo`, `otros`) e imputación de cuentas.
     - Crear `modals/AccountTransferModal.tsx` (<160L) para traspaso de liquidez entre cuentas.
     - Crear `modals/NewTaskModal.tsx` (<140L) para agendar manualmente visitas y tareas del CEO.
-  - [ ] **Punto 3.9 (Página Orquestadora `Finanzas FOWY` & Desconexión Segura del Menú):**
+  - [x] **Punto 3.9 (Página Orquestadora `Finanzas FOWY` & Desconexión Segura del Menú):**
     - **Preservación Inmutable:** El archivo legacy `src/app/admin/finanzas/page.tsx` y su hook `useFinanceManager.ts` permanecen **100% intocados y sin borrar**, garantizando respaldo histórico de custodia y escrow.
     - **Nueva Ruta Aislada:** Crear `src/app/admin/finanzas-fowy/page.tsx` (<210L) ensamblando los componentes del nuevo sistema contable integral.
     - **Actualización de Menú en [Sidebar.tsx](file:///c:/Users/cange/Documents/fowy/src/components/admin/Sidebar.tsx):** Desconectar el acceso viejo `{ name: "Finanzas", href: "/admin/finanzas" }` (desaparece de la vista del menú sin borrar su código) y registrar el nuevo acceso oficial `{ name: "Finanzas FOWY", href: "/admin/finanzas-fowy", icon: Wallet }`.
-  - [ ] **Punto 3.10 (Definition of Done — Validación Visual):**
+  - [x] **Punto 3.10 (Definition of Done — Validación Visual):**
     - Carga visual en `<100 ms` respaldada por SWR.
     - Inspeccionar el DOM en DevTools: verificar que solo existen ~12 nodos `<tr>` simultáneos en el DOM durante el scroll en la lista a **60 FPS** sin caídas de cuadros.
     - Verificar que `FinanceHealthMetricsBar.tsx` renderiza las 4 métricas (CPI, DSO, Runway y Margen) con códigos de color semafóricos según umbrales de negocio.
