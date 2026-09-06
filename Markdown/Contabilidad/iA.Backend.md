@@ -61,6 +61,9 @@ CREATE TABLE IF NOT EXISTS business_subscriptions (
     -- Entregables y Trabajos Operativos Dinámicos (Mochila Flexible JSONB)
     -- Permite guardar cualquier trabajo presente o futuro (fotos, volantes, pendón, stickers QR, reels, manteles, etc.)
     deliverables JSONB DEFAULT '{"fotos": "pending", "volantes": "none", "stickers_qr": "pending", "menu_ready": false}'::jsonb,
+    -- Especificación Flexible del Plan y Módulos de Software (Libreta de Notas JSONB)
+    -- Funciona como una nota editable sin rigidez: permite registrar qué plan/módulos tiene activos el negocio (standard, pro, premium, inventario, delivery, etc.) sin ALTER TABLE
+    modules JSONB DEFAULT '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -449,7 +452,8 @@ BEGIN
            COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
            bs.next_billing_date, 
            COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee,
-           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
+           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables,
+           COALESCE(bs.modules, '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb) AS modules
     INTO v_biz
     FROM businesses b
     LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
@@ -492,7 +496,8 @@ BEGIN
             'subscription_status', v_biz.subscription_status,
             'next_billing_date', v_biz.next_billing_date,
             'monthly_fee', v_biz.monthly_fee,
-            'deliverables', v_biz.deliverables
+            'deliverables', v_biz.deliverables,
+            'modules', v_biz.modules
         ),
         'recent_metrics', v_metrics,
         'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),
@@ -604,7 +609,8 @@ BEGIN
         'trial_ends_at', trial_ends_at,
         'next_billing_date', next_billing_date,
         'monthly_fee', monthly_fee,
-        'deliverables', deliverables
+        'deliverables', deliverables,
+        'modules', modules
     )) INTO v_rows
     FROM (
         SELECT b.id, b.name, 
@@ -612,7 +618,8 @@ BEGIN
                bs.trial_ends_at, 
                bs.next_billing_date, 
                COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee, 
-               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
+               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables,
+               COALESCE(bs.modules, '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb) AS modules
         FROM businesses b
         LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
         WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)
@@ -757,7 +764,7 @@ $$;
 * **Superseded:** Toda nueva instrucción dictada invalida las acciones pendientes anteriores (`status = 'superseded'`).
 * **Audios Multimodales en RAM:** Procesamiento directo en memoria volátil con Gemini 1.5 Flash (soporte nativo Opus/MP3 sin Whisper y sin almacenar archivos de audio en Supabase Storage, evitando basura digital).
 * **Imágenes y Capturas Multimodales en RAM:** Ingesta de comprobantes bancarios (pantallazos de Nequi/Daviplata/Bancolombia) y tickets de gastos OPEX en papel procesados 100% en memoria volátil con Gemini 1.5 Flash Vision OCR (cero persistencia en Supabase Storage, cero basura digital y costo $0 USD).
-* **Kill Switch de Emergencia:** Variable `COPILOT_ENABLED=true/false`. Si se apaga, la UI web opera 100% como panel manual sin colgarse.
+* **Kill Switch de Emergencia:** Variables `COPILOT_ENABLED=true/false` (backend) y `NEXT_PUBLIC_COPILOT_ENABLED=true/false` (cliente web). Si se apaga, la UI web opera 100% como panel manual sin colgarse ni generar errores undefined en React.
 * **Restaurante Laboratorio ("FOWY Lab"):** Las pruebas de WhatsApp, notas de voz e imágenes se validan sobre un local demo antes de impactar negocios de producción.
 * **Purga Automática de Eventos Webhook:** Limpieza programada de registros de `processed_webhook_events` mayores a 7 días en el cron nocturno de las 11:59 PM para prevenir crecimiento descontrolado de la tabla.
 * **Aislamiento de Tipos TypeScript:** Prohibido tocar o regenerar `src/types/supabase.ts`. Toda la estructura de backend y frontend vive en `src/types/finance.ts`.

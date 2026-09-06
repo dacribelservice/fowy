@@ -203,4 +203,37 @@
     - `ReelPlayerModal.tsx`: **176 líneas** (cumple estrictamente el techo < 180L).
     - Compilación de producción (`npm run build`) validada exitosamente con **0 errores de TypeScript, 0 errores de ESLint, 33 rutas compiladas y `Exit code: 0`**.
 
+### 📌 Hito: Arquitectura de "Código Jubilado" & Protocolo de Salvavidas (Rollback en 10s mediante Switch de Cables) para Finanzas & Negocios
+- **Fecha**: 5 de Septiembre de 2026
+- **Resumen**: Registro y blindaje técnico del protocolo de seguridad operativa bajo la **Ley del Remolque** para la transición del módulo de Finanzas (`/admin/finanzas`) y la pantalla de Negocios (`/admin/negocios/[id]`). Se formaliza el patrón de **"Código Jubilado"**, el cual estipula que las interfaces y lógicas existentes **NO se destruyen ni se eliminan del repositorio**. En su lugar, permanecen encapsuladas como respaldo intacto ("conectar los cables"), permitiendo una restauración total y limpia del estado previo en menos de 10 a 30 segundos mediante un interruptor booleano en una sola línea de código ante cualquier contingencia.
+- **Detalles Técnicos**:
+  - **1. Respaldo Intacto de la Pantalla de Finanzas (`src/app/admin/finanzas/page.tsx`)**:
+    - La interfaz previa de tesorería (gráfica de crecimiento de red, tarjetas de GMV, comisiones FOWY, custodia Escrow y lista de últimas transacciones) no se destruye.
+    - Se encapsula íntegramente en el componente de respaldo `LegacyMarketplaceFinanceView.tsx`.
+    - Su hook base `src/hooks/useFinanceManager.ts` permanece 100% congelado e intocado, protegiendo el marketplace de expertos en `src/app/(partners)/business/expert/page.tsx`.
+    - Se implementa el interruptor de seguridad de cables:
+      ```typescript
+      // 🛟 INTERRUPTOR DE SEGURIDAD (RECONEXIÓN EN 10 SEGUNDOS)
+      const USE_NEW_FINANCE_DASHBOARD = true; // Cambiar a false restaura la pantalla anterior
+
+      export default function AdminFinancePage() {
+        if (!USE_NEW_FINANCE_DASHBOARD) {
+          return <LegacyMarketplaceFinanceView />; // ⬅️ Vuelve la pantalla original de Escrow
+        }
+        return <SaaSTowerOfControlView />; // ⬅️ Nueva Torre de Control SaaS con Copilot
+      }
+      ```
+    - **Garantía Operativa**: Si la nueva Torre de Control, el Copilot o las cajas Nequi/Daviplata experimentan contingencias, basta con cambiar `true` por `false` para reactivar la pantalla anterior de forma instantánea.
+  - **2. Respaldo Intacto en la Ficha de Negocio (`src/app/admin/negocios/[id]/page.tsx`)**:
+    - El formulario manual histórico `BusinessPaymentViewer.tsx` se preserva 100% intacto en el proyecto.
+    - La integración con el nuevo visor satélite informativo `BusinessSubscriptionReadOnlyView.tsx` queda gobernada por el flag booleano:
+      ```typescript
+      const USE_SATELLITE_FINANCE_VIEW = true; // true = Modo Lectura Satélite, false = Formulario clásico
+      ```
+    - Si se requiere volver al formulario manual, cambiar a `false` restablece la vista en menos de 30 segundos sin pérdida de registros.
+  - **3. Cumplimiento Estricto de la Ley del Remolque**:
+    - El código legado ("el carro que ya funciona") queda intacto y desacoplado.
+    - El nuevo desarrollo financiero opera como un "remolque" que puede engancharse o desengancharse de forma transparente y reversible.
+
+
 

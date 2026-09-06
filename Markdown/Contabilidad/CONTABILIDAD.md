@@ -525,7 +525,8 @@ BEGIN
            COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
            bs.next_billing_date, 
            COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee,
-           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
+           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables,
+           COALESCE(bs.modules, '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb) AS modules
     INTO v_biz
     FROM businesses b
     LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
@@ -572,7 +573,8 @@ BEGIN
             'subscription_status', v_biz.subscription_status,
             'next_billing_date', v_biz.next_billing_date,
             'monthly_fee', v_biz.monthly_fee,
-            'deliverables', v_biz.deliverables
+            'deliverables', v_biz.deliverables,
+            'modules', v_biz.modules
         ),
         'recent_metrics', v_metrics,
         'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),

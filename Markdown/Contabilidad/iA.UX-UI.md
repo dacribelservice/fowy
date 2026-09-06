@@ -53,13 +53,18 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 │                                                                                             │
 │ 4. LISTA DE RESTAURANTES (Paginación Virtualizada a 60 FPS)                                 │
 │ [ 🔍 Buscar restaurante por nombre... (Trigram GIN) ]  [ Filtro: Todos v ] [ + Registrar ]  │
-│ ┌───────────────────────────┬──────────────┬──────────────┬──────────────┬────────────────┐ │
-│ │ Restaurante               │ Estado       │ Próximo Pago │ Entregables  │ Acciones       │ │
-│ ├───────────────────────────┼──────────────┼──────────────┼──────────────┼────────────────┤ │
-│ │ Asados Diana              │ 🟢 Al Día    │ 05/10/2026   │ 📷 Entregado │ [Cobrar] [Ver] │ │
-│ │ Maye Ricuras              │ 🟡 En Prueba │ 12/09/2026   │ 📄 En Diseño │ [Extender][Msg]│ │
-│ │ Kaprichos                 │ 🟠 En Gracia │ 02/09/2026   │ 📷 Pendiente │ [Cobrar] [Msg] │ │
-│ └───────────────────────────┴──────────────┴──────────────┴──────────────┴────────────────┘ │
+│ ┌───────────────────────────┬──────────────┬──────────────────┬──────────────┬────────────────┐ │
+│ │ Restaurante & Plan        │ Estado       │ Próximo Pago     │ Entregables  │ Acciones       │ │
+│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Asados Diana              │ 🟢 Al Día    │ 05/10/2026       │ 📷 Entregado │ [Cobrar] [Ver] │ │
+│ │ ↳ [ Plan Standard ]       │              │ ↳ (en 30 días)   │              │                │ │
+│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Maye Ricuras              │ 🟡 En Prueba │ 12/09/2026       │ 📄 En Diseño │ [Extender][Msg]│ │
+│ │ ↳ [ Plan Standard ]       │              │ ↳ (quedan 7 días)│              │                │ │
+│ ├───────────────────────────┼──────────────┼──────────────────┼──────────────┼────────────────┤ │
+│ │ Kaprichos                 │ 🟠 En Gracia │ 02/09/2026       │ 📷 Pendiente │ [Cobrar] [Msg] │ │
+│ │ ↳ [ Plan Pro ]            │              │ ↳ (hace 3 días)  │              │                │ │
+│ └───────────────────────────┴──────────────┴──────────────────┴──────────────┴────────────────┘ │
 │                                                                                             │
 │                                                                     ┌─────────────────────┐ │
 │                                                                     │ 🤖 BOTÓN FLOTANTE   │ │
@@ -100,9 +105,14 @@ El módulo de Finanzas no es una hoja de cálculo aburrida; es la **Torre de Con
 * **Rendimiento:** Implementada con virtualización (solo 10 a 12 filas en el DOM), fluido a 60 FPS sin importar si hay 100 o 10.000 restaurantes.
 * **Buscador Trigram GIN:** Input reactivo que filtra en `<5 ms` directamente en PostgreSQL con estado vacío amigable (*Empty State*) si no hay resultados.
 * **Pestañas de Filtro Rápido:** `Todos`, `Al Día`, `En Prueba`, `Por Cobrar`, `Compromisos Hoy`.
+* **Visualización del Plan Debajo del Nombre:** Cada fila muestra debajo del nombre del restaurante un badge o etiqueta minimalista con el plan activo (ej: `[ Plan Standard ]`, `[ Plan Pro ]`, `[ Plan Premium ]`) leído dinámicamente desde la libreta de notas `modules JSONB` o el fee mensual, permitiendo identificar al instante la categoría del cliente sin saturar el ancho de la tabla.
+* **Conteo Relativo de Días Debajo de la Fecha:** Inmediatamente debajo de la fecha de pago (`DD/MM/YYYY`), se renderiza un indicador con el tiempo relativo para eliminar el cálculo mental:
+  * *Al día con holgura:* `↳ (en 30 días)` en texto gris tenue (`text-slate-400`).
+  * *Próximo a corte o en prueba:* `↳ (quedan 7 días)` o `↳ (vence hoy)` en texto ámbar (`text-amber-500 font-semibold`).
+  * *Vencido (en gracia o mora):* `↳ (hace 3 días - vencido)` en texto rojo suave (`text-rose-500 font-bold`).
 * **Badges de Entregables Dinámicos (Mochila Flexible JSONB):** Dibuja automáticamente las etiquetas con iconos vectoriales planos de `lucide-react` para cualquier trabajo del local (ej: `Camera` Fotos, `FileText` Volantes, `Flag` Pendón, `QrCode` Stickers QR, `Clapperboard` Video Reel), con código de colores según el estado (Gris: Pendiente, Naranja: En proceso/imprenta, Verde: Entregado). **Terminantemente prohibido el uso de iconos o emojis 3D**.
-* **Micro-Acción de Calle (Recordatorio por WhatsApp en 1 Clic):**  
-  En cada fila con cobro pendiente o periodo de prueba, el botón minimalista `[ Msg ]` (ícono `MessageSquare`) abre directamente un enlace a WhatsApp (`https://wa.me/...`) con un mensaje profesional pre-redactado según el caso:
+* **Micro-Acción de Calle `[ Msg ]` (Recordatorio por WhatsApp en 1 Clic):**  
+  En cada fila con cobro pendiente o periodo de prueba, el botón minimalista `[ Msg ]` (ícono vectorial `MessageSquare` de `lucide-react`) abre directamente un enlace a WhatsApp (`https://wa.me/...`) con un mensaje profesional pre-redactado según el caso:
   * *Para fin de prueba:* `"Hola [Nombre], te escribe Cristian de FOWY. Tus 15 días de prueba gratis concluyen hoy. Tu menú ha recibido [X] visitas. ¿Deseas que activemos el mes regular?"`
   * *Para cobro en gracia:* `"Hola [Nombre], te comparto el recordatorio de renovación de FOWY del mes en curso. Puedes transferir a Nequi o Daviplata..."`
 
@@ -175,7 +185,7 @@ En la pantalla de cada negocio, la sección que antes requería cambiar selector
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  MÓDULOS ACTIVOS                  CONFIGURACIÓN GENERAL (Modo Lectura)       │
 ├──────────────────────────────────────────────────────────────────────────────┤
-│  ESTATUS DEL NEGOCIO              PLAN CONTRATADO                            │
+│  ESTATUS DEL NEGOCIO              PLAN Y PRECIO REGISTRADO                   │
 │  [ 🟢 Activo / Operativo ]        [ Standard — $50.000 COP ]                 │
 │  (Sincronizado desde Finanzas)    (Corte automático mensual)                 │
 │                                                                              │
@@ -183,15 +193,21 @@ En la pantalla de cada negocio, la sección que antes requería cambiar selector
 │  [ 02/10/2026 ]                   [ 📄 Recibo #REC-025 — Pagado Nequi ]      │
 │  (14 días restantes)              [ 📲 Compartir Recibo WhatsApp ]           │
 │                                                                              │
-│  TRABAJOS Y ENTREGABLES ACTIVOS (Mochila Dinámica JSONB)                     │
+│  MÓDULOS Y FUNCIONES ACTIVAS (Libreta Flexible 'modules' JSONB)              │
+│  • Standard: [ 🟢 Activo ]   • Pro: [ ⚪ Inactivo ]                          │
+│  • Premium: [ ⚪ Inactivo ]  • Inventario: [ ⚪ Inactivo ]                    │
+│  (Funciona como una nota sin rigidez: se adapta a cualquier función futura)  │
+│                                                                              │
+│  TRABAJOS Y ENTREGABLES ACTIVOS (Mochila Flexible 'deliverables' JSONB)      │
 │  • Fotos: [ 🟢 Listas ]   • Volantes: [ 🟢 1.000 entregados ]                │
 │  • Pendón: [ 🟠 Imprenta ] • Stickers QR: [ 🟢 Instalados ]                  │
-│  (La lista se adapta dinámicamente a cualquier trabajo registrado)           │
+│  (La lista se adapta dinámicamente a cualquier trabajo comercial registrado) │
 │                                                                              │
 │  ℹ️ Para registrar pagos o ajustar este plan, hazlo desde [ Finanzas ]      │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
+* **Cero rigidez de base de datos:** El plan y los módulos de software se leen de la columna flexible `modules JSONB`, mientras que los servicios de calle se leen de `deliverables JSONB`. Ambos funcionan como notas digitales editables sin necesidad de `ALTER TABLE`.
 * **Cero riesgo de manipulación manual:** Ya no hay que abrir 100 pantallas para cambiar fechas una por una.
 * **Trazabilidad 100%:** Si el restaurante dice "Activo", el botón `[ 📲 Compartir Recibo WhatsApp ]` abre el comprobante legal generado por el módulo de Finanzas.
 
@@ -207,16 +223,20 @@ src/components/admin/finanzas/
 ├── FinanceAccountsBar.tsx       (~140L - Bolsillos de Nequi/Daviplata/Bancolombia)
 ├── FinanceProfitLossCard.tsx    (~125L - Tarjeta P&L con ingresos, gastos y utilidad neta)
 ├── CeoAgendaChecklist.tsx       (~160L - Checklist interactivo de tareas y visitas)
-├── BusinessBillingTable.tsx     (~185L - Tabla virtualizada con buscador Trigram GIN)
-├── BusinessBillingRow.tsx       (~135L - Fila de negocio con badges y botón WhatsApp)
+├── BusinessBillingTable.tsx     (~185L - Tabla virtualizada a 60 FPS con @tanstack/react-virtual y Trigram GIN)
+├── BusinessBillingRow.tsx       (~150L - Fila con Plan, días restantes bajo la fecha, badges y botón [Msg])
 ├── modals/
 │   ├── QuickPaymentModal.tsx    (~195L - Modal de cobro con botón de compartir recibo)
 │   ├── QuickExpenseModal.tsx    (~170L - Modal para registrar gasto OPEX)
-│   └── AccountTransferModal.tsx (~160L - Modal para traspaso de fondos entre cajas)
+│   ├── AccountTransferModal.tsx (~160L - Modal para traspaso de fondos entre cajas)
+│   └── NewTaskModal.tsx         (~135L - Modal para agendar nueva visita o tarea del CEO)
 └── copilot/
     ├── FinanceCopilotSheet.tsx  (~210L - Drawer/Bottom Sheet responsive con Web Audio API)
     ├── CopilotVoiceMic.tsx      (~120L - Grabador de voz con Web Audio API)
     └── CopilotActionCard.tsx    (~165L - Tarjeta con ajuste rápido y compartir recibo)
+
+src/utils/
+└── financeReceipt.ts            (~95L - Helper centralizado: formatCOP, días relativos, wa.me)
 
 src/components/admin/businesses/
 └── BusinessSubscriptionReadOnlyView.tsx (~150L - Modo lectura satélite en Negocios)

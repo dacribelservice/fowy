@@ -161,7 +161,8 @@ BEGIN
         'trial_ends_at', trial_ends_at,
         'next_billing_date', next_billing_date,
         'monthly_fee', monthly_fee,
-        'deliverables', deliverables
+        'deliverables', deliverables,
+        'modules', modules
     )) INTO v_rows
     FROM (
         SELECT b.id, b.name, 
@@ -169,7 +170,8 @@ BEGIN
                bs.trial_ends_at, 
                bs.next_billing_date, 
                COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee, 
-               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
+               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables,
+               COALESCE(bs.modules, '{"standard": true, "pro": false, "premium": false, "inventario": false}'::jsonb) AS modules
         FROM businesses b
         LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
         WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)
@@ -308,11 +310,15 @@ Tanto los servidores de Vercel como Supabase `pg_cron` operan internamente en ti
 ## 7. Garantías de Cero Deuda Técnica
 
 1. **Cumplimiento Estricto de la Ley del Remolque:**  
-   Todo el código nuevo se organiza en componentes atómicos de menos de 250 líneas en `src/components/admin/finanzas/`.
+   Todo el código nuevo se organiza en componentes atómicos de menos de 250 líneas en `src/components/admin/finanzas/` con subdirectorios `modals/` y `copilot/`.
 2. **Aislamiento de Tipos:**  
-   Los tipos de paginación y finanzas residen exclusivamente en `src/types/finance.ts`, sin tocar los tipos globales de comensales.
+   Los tipos de paginación y finanzas residen exclusivamente en `src/types/finance.ts`, sin tocar los tipos globales de comensales ni `supabase.ts`.
 3. **Cero Impacto en la App Pública:**  
    Los comensales en `/explorar` y los menús digitales no comparten estas consultas ni consumen recursos de las tablas contables.
+4. **Helper Centralizado de Recibos y Formatos (`src/utils/financeReceipt.ts`):**  
+   Centraliza el formateo COP, cálculo de días relativos y generación de enlaces de WhatsApp, protegiendo a todos los componentes del límite de 250 líneas.
+5. **Salvavidas de Rollback en 30 Segundos:**  
+   La pantalla de negocios preserva `BusinessPaymentViewer.tsx` intacto bajo el flag `USE_SATELLITE_FINANCE_VIEW`, permitiendo revertir cualquier cambio al instante.
 
 ---
 *Documento oficial de optimización y escalabilidad masiva — FOWY 2026*

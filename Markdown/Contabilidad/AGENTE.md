@@ -81,6 +81,10 @@ graph TD
   - `EVOLUTION_API_KEY`: Clave de autenticación maestra para llamadas outbound hacia Evolution API.
   - `EVOLUTION_INSTANCE_NAME`: Identificador de la instancia vinculada (ej: `fowy-ceo`).
   - `CEO_PHONE_NUMBER`: Número celular de Cristian con código de país (ej: `573001234567`).
+  - `GEMINI_API_KEY`: Clave de API de Google AI Studio para inferencia multimodal (Gemini 1.5 Flash).
+  - `CRON_SECRET`: Secreto de autorización Bearer para los disparadores de Vercel Cron.
+  - `COPILOT_ENABLED`: Kill Switch de seguridad (`true`/`false`) para desacoplar la IA en backend ante contingencias externas sin frenar el CRM web.
+  - `NEXT_PUBLIC_COPILOT_ENABLED`: Variable espejo para el cliente web (`true`/`false`) que permite al navegador conocer el estado del Copilot sin provocar valores undefined en runtime.
 
 - **Ruta Rápida para Confirmaciones ('CONFIRMADO'): Cero Tokens, Cero Re-inferencia (<50 ms):**
   - Si el texto recibido es la palabra `"CONFIRMADO"` (o `"confirmado"`), el backend consulta la tabla `pending_actions` donde `channel = 'whatsapp' AND status = 'pending' AND expires_at > NOW()` ordenado por `created_at DESC LIMIT 1`.
@@ -132,6 +136,7 @@ graph TD
 | Parámetro | Valor Configurado | Justificación de Ingeniería |
 | :--- | :--- | :--- |
 | **Modelo** | `gemini-1.5-flash` | Latencia ultra-baja (<800 ms), ventana de 1 millón de tokens, costo prácticamente $0 USD y soporte nativo de audio. |
+| **Protocolo de Conexión** | REST API Nativo (`fetch`) | Directo a Google AI (`generativelanguage.googleapis.com`) en Node.js 20+; cero SDKs pesados de terceros y compatibilidad total con React 19 / Next.js 16. |
 | **Temperatura** | `0.1` | Mínima alucinación; garantiza respuestas contables rigurosas y llamadas a funciones deterministas. |
 | **Top-P** | `0.95` | Muestreo controlado para lenguaje natural fluido sin desviarse de las instrucciones. |
 | **Max Output Tokens** | `2048` | Suficiente para reportes financieros extensos y dossieres completos sin truncamiento. |
@@ -245,7 +250,8 @@ Consulta el expediente 360° de un restaurante específico. Invoca en base de da
       "subscription_status": "active",
       "next_billing_date": "2026-10-05",
       "monthly_fee": 50000.00,
-      "deliverables": {"photos": "uploaded", "flyers": "delivered", "stickers_qr": "delivered"}
+      "deliverables": {"photos": "uploaded", "flyers": "delivered", "stickers_qr": "delivered"},
+      "modules": {"standard": true, "pro": false, "premium": false, "inventario": false}
     },
     "recent_metrics": {
       "total_orders_last_30d": 42,
