@@ -47,6 +47,7 @@ Para evitar que los archivos crezcan descontroladamente, seguimos esta jerarquí
 1.  **No `alert()` nativos**: Queda prohibido el uso de diálogos del navegador. Usar el sistema de **Toasts Premium** o modales de confirmación.
 2.  **Micro-animaciones**: Usar `framer-motion` para transiciones suaves (fade-in, slide-up) al cargar datos o abrir modales.
 3.  **Sin "Hardcoding"**: Los nombres de planes, estatus y roles deben coincidir exactamente con los Enums de la base de datos (`standard`, `pro`, `premium` en minúsculas).
+4.  **Iconografía y Emojis 100% Minimalistas (CERO 3D)**: Prohibición absoluta de iconos, stickers o emojis en 3D (nada de renders tridimensionales volumétricos o burbujas infladas). Toda la iconografía debe ser plana (*flat*), minimalista y vectorial de trazo fino (*stroke* de 1.5px a 2px) con `lucide-react`.
 
 ---
 

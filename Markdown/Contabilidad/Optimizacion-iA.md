@@ -161,8 +161,7 @@ BEGIN
         'trial_ends_at', trial_ends_at,
         'next_billing_date', next_billing_date,
         'monthly_fee', monthly_fee,
-        'onboarding_photos', onboarding_photos,
-        'onboarding_flyers', onboarding_flyers
+        'deliverables', deliverables
     )) INTO v_rows
     FROM (
         SELECT b.id, b.name, 
@@ -170,8 +169,7 @@ BEGIN
                bs.trial_ends_at, 
                bs.next_billing_date, 
                COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee, 
-               COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
-               COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers
+               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
         FROM businesses b
         LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
         WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)

@@ -58,11 +58,9 @@ CREATE TABLE IF NOT EXISTS business_subscriptions (
     next_billing_date TIMESTAMPTZ,
     monthly_fee NUMERIC(10,2) DEFAULT 50000.00,
     billing_notes TEXT,
-    -- Entregables y Onboarding comercial
-    onboarding_photos VARCHAR(30) DEFAULT 'pending', -- 'pending', 'taken', 'uploaded'
-    onboarding_flyers VARCHAR(30) DEFAULT 'none',    -- 'none', 'in_design', 'printed', 'delivered'
-    onboarding_stickers_qr VARCHAR(30) DEFAULT 'pending', -- 'pending', 'delivered'
-    onboarding_menu_ready BOOLEAN DEFAULT FALSE,
+    -- Entregables y Trabajos Operativos Dinámicos (Mochila Flexible JSONB)
+    -- Permite guardar cualquier trabajo presente o futuro (fotos, volantes, pendón, stickers QR, reels, manteles, etc.)
+    deliverables JSONB DEFAULT '{"fotos": "pending", "volantes": "none", "stickers_qr": "pending", "menu_ready": false}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -451,10 +449,7 @@ BEGIN
            COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
            bs.next_billing_date, 
            COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee,
-           COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
-           COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers, 
-           COALESCE(bs.onboarding_stickers_qr, 'pending') AS onboarding_stickers_qr, 
-           COALESCE(bs.onboarding_menu_ready, FALSE) AS onboarding_menu_ready
+           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
     INTO v_biz
     FROM businesses b
     LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
@@ -497,12 +492,7 @@ BEGIN
             'subscription_status', v_biz.subscription_status,
             'next_billing_date', v_biz.next_billing_date,
             'monthly_fee', v_biz.monthly_fee,
-            'deliverables', jsonb_build_object(
-                'photos', v_biz.onboarding_photos,
-                'flyers', v_biz.onboarding_flyers,
-                'stickers_qr', v_biz.onboarding_stickers_qr,
-                'menu_ready', v_biz.onboarding_menu_ready
-            )
+            'deliverables', v_biz.deliverables
         ),
         'recent_metrics', v_metrics,
         'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),
@@ -614,8 +604,7 @@ BEGIN
         'trial_ends_at', trial_ends_at,
         'next_billing_date', next_billing_date,
         'monthly_fee', monthly_fee,
-        'onboarding_photos', onboarding_photos,
-        'onboarding_flyers', onboarding_flyers
+        'deliverables', deliverables
     )) INTO v_rows
     FROM (
         SELECT b.id, b.name, 
@@ -623,8 +612,7 @@ BEGIN
                bs.trial_ends_at, 
                bs.next_billing_date, 
                COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee, 
-               COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
-               COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers
+               COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
         FROM businesses b
         LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
         WHERE (p_status = 'all' OR COALESCE(bs.subscription_status, 'trial') = p_status)
@@ -768,10 +756,52 @@ $$;
 * **Palabra de Cancelación:** **`"CANCELAR"`** (marca acción como `cancelled` en `<20 ms`).
 * **Superseded:** Toda nueva instrucción dictada invalida las acciones pendientes anteriores (`status = 'superseded'`).
 * **Audios Multimodales en RAM:** Procesamiento directo en memoria volátil con Gemini 1.5 Flash (soporte nativo Opus/MP3 sin Whisper y sin almacenar archivos de audio en Supabase Storage, evitando basura digital).
+* **Imágenes y Capturas Multimodales en RAM:** Ingesta de comprobantes bancarios (pantallazos de Nequi/Daviplata/Bancolombia) y tickets de gastos OPEX en papel procesados 100% en memoria volátil con Gemini 1.5 Flash Vision OCR (cero persistencia en Supabase Storage, cero basura digital y costo $0 USD).
 * **Kill Switch de Emergencia:** Variable `COPILOT_ENABLED=true/false`. Si se apaga, la UI web opera 100% como panel manual sin colgarse.
-* **Restaurante Laboratorio ("FOWY Lab"):** Las pruebas de WhatsApp y notas de voz se validan sobre un local demo antes de impactar negocios de producción.
+* **Restaurante Laboratorio ("FOWY Lab"):** Las pruebas de WhatsApp, notas de voz e imágenes se validan sobre un local demo antes de impactar negocios de producción.
 * **Purga Automática de Eventos Webhook:** Limpieza programada de registros de `processed_webhook_events` mayores a 7 días en el cron nocturno de las 11:59 PM para prevenir crecimiento descontrolado de la tabla.
 * **Aislamiento de Tipos TypeScript:** Prohibido tocar o regenerar `src/types/supabase.ts`. Toda la estructura de backend y frontend vive en `src/types/finance.ts`.
+
+---
+
+### 6.1 Pipeline Técnico de Ingesta de Imágenes en Memoria RAM (Cero Basura en Storage)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor CEO as Cristian (CEO FOWY)
+    participant WAPI as WhatsApp / Evolution API v2
+    participant NextAPI as Next.js (/api/webhooks/whatsapp)
+    participant RAM as Memoria Volátil (Buffer RAM)
+    participant Gemini as Gemini 1.5 Flash (Vision OCR)
+    participant DB as Supabase PostgreSQL (Isla Financiera)
+    participant Storage as Supabase Storage (Buckets S3)
+
+    CEO->>WAPI: Envía pantallazo Nequi o foto de ticket OPEX
+    WAPI->>NextAPI: Webhook payload (imageMessage, Base64)
+    NextAPI->>RAM: Carga Buffer efímero en memoria RAM
+    NextAPI->>Gemini: Inferencia Multimodal inlineData {mimeType, data}
+    Note over Storage: 🚫 CERO INTERACCIÓN: Prohibido subir a Storage
+    Gemini-->>NextAPI: Tool Call: prepare_payment_action o prepare_expense_action
+    NextAPI->>RAM: Destrucción y purga inmediata del Buffer (GC)
+    NextAPI->>DB: Registra datos en pending_actions (TTL 10 min)
+    NextAPI->>WAPI: Devuelve tarjeta con datos extraídos + pide "CONFIRMADO"
+    WAPI->>CEO: Mensaje con desglose exacto para confirmación
+```
+
+#### Protocolo de Ejecución de Visión OCR Efímera:
+1. **Recepción del Payload:** El webhook recibe el evento con `mimetype` (`image/jpeg`, `image/png`, `image/webp`) y la data en Base64.
+2. **Buffer en Memoria Node.js:** Se crea el buffer en memoria volátil (`Buffer.from(base64String, 'base64')`).
+3. **Inferencia Directa en Gemini 1.5 Flash:** El buffer se inyecta como `inlineData` junto con el prompt del sistema contable:
+   - **Pantallazos de Transferencias (Nequi, Daviplata, Bancolombia):** La IA extrae: valor transferido, fecha, hora, cuenta/teléfono destino y código de comprobante/referencia. Invoca `prepare_payment_action`.
+   - **Tickets Físicos de Papel (Gastos OPEX):** La IA extrae: valor total, concepto (ej: *"500 volantes publicitarios"*), imprenta/comercio y fecha. Invoca `prepare_expense_action`.
+   - **Fotos de Menús y Cartas:** Reconocimiento óptico de platos, descripciones y precios para digitalización ágil.
+   - **Fotos de Entregables:** Reconocimiento de stickers QR instalados o paquetes de volantes entregados para sincronizar la columna flexible `deliverables JSONB` vía `complete_secretary_task`.
+4. **Evaporación Inmediata (Garbage Collection):** La variable del buffer se descarta y desreferencia inmediatamente.
+5. **Política Absoluta de Cero Almacenamiento:**  
+   - Queda **estrictamente prohibido ejecutar `supabase.storage.from(...).upload(...)`** con imágenes efímeras.
+   - La base de datos solo almacena metadatos contables (números, montos, fechas, referencias alfanuméricas).
+   - Resultado: Base de datos ligera, cero costos de almacenamiento en la nube, máxima privacidad y cero acumulación de archivos inoficiosos.
 
 ---
 *Fin del Documento Maestro Backend — FOWY iA Finanzas 2026*

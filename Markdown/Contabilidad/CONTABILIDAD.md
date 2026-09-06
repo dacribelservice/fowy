@@ -151,11 +151,9 @@ CREATE TABLE IF NOT EXISTS business_subscriptions (
     next_billing_date TIMESTAMPTZ,
     monthly_fee NUMERIC(10,2) DEFAULT 50000.00,
     billing_notes TEXT,
-    -- Entregables y Onboarding comercial
-    onboarding_photos VARCHAR(30) DEFAULT 'pending', -- 'pending', 'taken', 'uploaded'
-    onboarding_flyers VARCHAR(30) DEFAULT 'none',    -- 'none', 'in_design', 'printed', 'delivered'
-    onboarding_stickers_qr VARCHAR(30) DEFAULT 'pending', -- 'pending', 'delivered'
-    onboarding_menu_ready BOOLEAN DEFAULT FALSE,
+    -- Entregables y Trabajos Operativos Dinámicos (Mochila Flexible JSONB)
+    -- Permite registrar cualquier trabajo presente o futuro (fotos, volantes, pendón, stickers QR, reels, manteles, etc.)
+    deliverables JSONB DEFAULT '{"fotos": "pending", "volantes": "none", "stickers_qr": "pending", "menu_ready": false}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -523,15 +521,11 @@ DECLARE
     v_commitments JSONB;
     v_tasks JSONB;
 BEGIN
-    -- Buscar negocio por ID, slug o nombre uniendo con la tabla satélite business_subscriptions
     SELECT b.id, b.name, b.slug, 
            COALESCE(bs.subscription_status, 'trial') AS subscription_status, 
            bs.next_billing_date, 
            COALESCE(bs.monthly_fee, 50000.00) AS monthly_fee,
-           COALESCE(bs.onboarding_photos, 'pending') AS onboarding_photos, 
-           COALESCE(bs.onboarding_flyers, 'none') AS onboarding_flyers, 
-           COALESCE(bs.onboarding_stickers_qr, 'pending') AS onboarding_stickers_qr, 
-           COALESCE(bs.onboarding_menu_ready, FALSE) AS onboarding_menu_ready
+           COALESCE(bs.deliverables, '{}'::jsonb) AS deliverables
     INTO v_biz
     FROM businesses b
     LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
@@ -578,12 +572,7 @@ BEGIN
             'subscription_status', v_biz.subscription_status,
             'next_billing_date', v_biz.next_billing_date,
             'monthly_fee', v_biz.monthly_fee,
-            'deliverables', jsonb_build_object(
-                'photos', v_biz.onboarding_photos,
-                'flyers', v_biz.onboarding_flyers,
-                'stickers_qr', v_biz.onboarding_stickers_qr,
-                'menu_ready', v_biz.onboarding_menu_ready
-            )
+            'deliverables', v_biz.deliverables
         ),
         'recent_metrics', v_metrics,
         'pending_commitments', COALESCE(v_commitments, '[]'::jsonb),

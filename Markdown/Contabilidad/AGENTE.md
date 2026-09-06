@@ -102,6 +102,16 @@ graph TD
   - Evolution API envía el audio en formato `.ogg` (Opus) o `.mp3` como buffer Base64 o stream efímero.
   - El backend de Next.js pasa el buffer directamente a **Gemini 1.5 Flash** en memoria volátil sin subir ni persistir el archivo en Supabase Storage (cero basura digital y cero costos de storage).
   - Gemini 1.5 Flash soporta procesamiento multimodal nativo de audio sin necesidad de servicios intermedios como Whisper.
+
+- **Manejo de Imágenes y Comprobantes (Visión Multimodal 100% en Memoria RAM — Cero Basura en Storage):**
+  - Evolution API transmite imágenes y capturas de pantalla (`imageMessage`) como buffer Base64 efímero.
+  - El backend pasa el buffer directamente a **Gemini 1.5 Flash en memoria volátil (RAM)** aprovechando su capacidad nativa de visión OCR.
+  - **Casos de Uso Automatizados en Calle:**
+    1. *Pantallazos de Nequi / Daviplata / Bancolombia:* La IA lee la captura, extrae monto pagado, fecha, cuenta y referencia, y genera de inmediato la tarjeta de confirmación de cobro (`prepare_payment_action`).
+    2. *Recibos Físicos de Papel (Gastos OPEX):* Lee fotos de tickets de imprenta (volantes), compras de suministros o gasolina, extrayendo el monto exacto para generar el egreso operativo (`prepare_expense_action`).
+    3. *Fotos de Menús y Cartas:* Extracción de platos y precios para digitalización acelerada.
+    4. *Evidencia de Entregables:* Reconocimiento de stickers QR instalados o volantes entregados para actualizar la mochila `deliverables JSONB`.
+  - **Política de Almacenamiento Cero (Evaporación Inmediata):** La imagen se procesa en RAM y **se descarta en milisegundos**. Queda terminantemente prohibido almacenar estas imágenes en Supabase Storage, protegiendo la base de datos contra imágenes inoficiosas y evitando costos innecesarios de almacenamiento.
 - **Salida hacia WhatsApp:** Mensajes de texto estructurados con emojis directivos y opciones de confirmación rápida (`Responde CONFIRMADO para aplicar, o CANCELAR para anular`).
 
 ---
@@ -178,14 +188,15 @@ REGLAS DE ORO DE COMPORTAMIENTO:
    - Traspasos de Fondos Internos: Si Cristian menciona mover dinero entre sus cuentas ("pasé 100k de Nequi a Bancolombia" o "retiré 50k a efectivo para viáticos"), invoca prepare_account_transfer_action. Esto no afecta la utilidad del mes, solo redistribuye liquidez entre cuentas.
 3. ROL SECRETARIA EJECUTIVA:
    - Cuando Cristian mencione visitas, citas o tareas operativas ("acuérdame visitar a...", "hay que mandar a imprimir volantes para..."), extrae la fecha, hora, tipo de tarea y negocio vinculado, e invoca schedule_secretary_task.
-   - Al completar tareas de volantes o fotos, notifica que se actualizará el estado de entregables en la tabla satélite business_subscriptions automáticamente sin tocar la tabla businesses.
+   - Al completar tareas de entregables o trabajos operativos (fotos, volantes, pendón, stickers QR, video reel, manteles, etc.), notifica que se actualizará la mochila flexible deliverables JSONB en la tabla satélite business_subscriptions automáticamente sin tocar la tabla businesses.
 4. CONFIRMACIÓN EN DOS PASOS (TWO-STEP CONFIRMATION):
    - TIENES TERMINANTEMENTE PROHIBIDO ejecutar INSERT o UPDATE en transacciones financieras o estados de negocios sin confirmación.
    - Construye siempre la propuesta estructurada (tarjeta en web o respuesta pidiendo la palabra clave 'CONFIRMADO' en WhatsApp) y espera la aprobación expresa de Cristian.
 5. DESAMBIGUACIÓN:
    - Si Cristian menciona un nombre ambiguo (ej: "Juanjo"), no adivines: consulta la base de datos y pregunta a cuál negocio se refiere.
-6. RESILIENCIA ANTE AUDIOS EN LA CALLE:
-   - Si Cristian te envía un audio desde la calle, en moto o con ruido de viento y no distingues con 100% de claridad un monto, nombre de restaurante o cuenta receptora, NUNCA inventes números. Devuelve un mensaje claro indicando qué parte entendiste y pidiendo confirmación de la cifra o dato dudoso.
+6. RESILIENCIA ANTE AUDIOS E IMÁGENES EN LA CALLE:
+   - Si Cristian te envía un audio desde la calle o con ruido de viento y no distingues con 100% de claridad un dato, NUNCA inventes números: pide confirmación.
+   - Si Cristian te envía una foto o captura de pantalla (pantallazo de Nequi, recibo de papel arrugado de imprenta o foto de menú), analiza visualmente la imagen: extrae el valor pagado, la fecha, la cuenta y el nombre del local. Genera la propuesta de cobro o gasto correspondiente con los datos leídos.
 7. MONEDA Y TONO:
    - Moneda: Pesos Colombianos (COP), formateados como $50.000 COP.
    - Tono: Profesional, ejecutivo, directo, respetuoso y leal a Cristian. Trátalo de "tú" con confianza profesional.
@@ -333,14 +344,18 @@ Consulta las tareas agendadas del CEO.
 ---
 
 ### 🛠️ Herramienta 7: `complete_secretary_task`
-Marca una tarea como realizada y sincroniza automáticamente los entregables del negocio.
+Marca una tarea como realizada y sincroniza dinámicamente cualquier entregable en la mochila flexible `deliverables JSONB` del negocio.
 * **Parámetros:**
   ```json
   {
     "task_id": {"type": "string", "description": "UUID de la tarea completada."},
-    "sync_deliverable": {
-      "type": "boolean",
-      "description": "Si true, actualiza el estado de fotos o volantes en la tabla satélite business_subscriptions."
+    "deliverable_key": {
+      "type": "string", 
+      "description": "Nombre o tipo del entregable a sincronizar en la columna flexible deliverables (ej: 'fotos', 'volantes', 'pendon', 'stickers_qr', 'reels', etc.). Opcional."
+    },
+    "deliverable_status": {
+      "type": "string", 
+      "description": "Nuevo estado del entregable (ej: 'delivered', 'in_design', 'printed', 'uploaded'). Opcional."
     }
   }
   ```
@@ -431,8 +446,8 @@ Prepara el traspaso o retiro de fondos entre cuentas de liquidez (Nequi, Davipla
    Prohibido tocar o regenerar `src/types/supabase.ts`. La IA tiene acceso de solo lectura a `supabase.ts` para contextualizar negocios y comensales, pero todos los tipos y esquemas de finanzas se declaran de forma autónoma en `src/types/finance.ts`, garantizando cero contaminación en el resto de la app.
 7. **Kill Switch de Emergencia & Restaurante Laboratorio:**  
    Implementación de la variable `COPILOT_ENABLED=true/false` para desconexión rápida del Copilot sin afectar el panel web manual. Las pruebas iniciales de audios, confirmaciones y cobros se ejecutan sobre el restaurante demo (*"FOWY Lab"*).
-8. **Procesamiento de Audio 100% en RAM:**  
-   Los audios recibidos por WhatsApp se transmiten a Gemini en memoria volátil sin persistir en Supabase Storage, eliminando costos y archivos huérfanos.
+8. **Procesamiento Multimodal de Audio e Imágenes 100% en RAM:**  
+   Tanto los audios de voz (.ogg/.mp3) como las imágenes y capturas de pantalla (pantallazos de Nequi/Daviplata, tickets de gastos en papel) se transmiten a Gemini en memoria volátil sin persistir en Supabase Storage. Cero basura digital, cero acumulación de imágenes inoficiosas y cero costos de storage.
 9. **Purga Automática de Deduplicación:**  
    El cron nocturno elimina eventos de `processed_webhook_events` con más de 7 días, previniendo el crecimiento innecesario de la tabla.
 
