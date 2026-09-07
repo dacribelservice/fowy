@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Bot, X, Send, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Bot, X, Send, Sparkles, Plus, ArrowUp } from "lucide-react";
 import { useCopilotChat } from "@/hooks/useCopilotChat";
 import { CopilotActionCard } from "./CopilotActionCard";
 import { CopilotVoiceMic } from "./CopilotVoiceMic";
@@ -123,24 +123,24 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
 
       {/* 2. Panel Desplegable: Bottom Sheet en móvil (<768px) / Drawer lateral en desktop (>=768px) */}
       {isOpen && (
-        <div className="fixed inset-0 z-[70] flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[70] flex justify-end bg-black/65 backdrop-blur-md transition-opacity duration-300 animate-in fade-in">
           <div
             onPaste={handlePaste}
-            className="w-full md:w-[420px] h-[88vh] md:h-full mt-auto md:mt-0 rounded-t-3xl md:rounded-none md:rounded-l-3xl bg-slate-950 border-t md:border-t-0 md:border-l border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom md:slide-in-from-right duration-300"
+            className="w-full md:w-[440px] h-[90vh] md:h-full mt-auto md:mt-0 rounded-t-[2.2rem] md:rounded-none md:rounded-l-3xl bg-slate-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-slate-800/90 shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ease-out animate-in slide-in-from-bottom md:slide-in-from-right"
           >
-            {/* Tirador táctil para móvil */}
-            <div className="md:hidden w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto my-2.5" />
+            {/* Tirador táctil ergonómico para móvil */}
+            <div className="md:hidden w-12 h-1.5 bg-slate-700/80 hover:bg-slate-600 rounded-full mx-auto my-3 cursor-grab transition-all" />
 
             {/* Cabecera del Asistente */}
-            <div className="px-4 py-3 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/40">
+            <div className="px-5 py-3 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/40">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shadow-inner">
                   <Bot className="w-4 h-4 text-amber-400" strokeWidth={1.8} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
                     <span>AGENTE FOWY</span>
-                    <Sparkles className="w-3 h-3 text-amber-400" strokeWidth={2} />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" strokeWidth={2} />
                   </h3>
                   <p className="text-[10px] text-slate-400">CFO & Secretaria Ejecutiva</p>
                 </div>
@@ -148,7 +148,7 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition active:scale-95"
                 aria-label="Cerrar asistente"
               >
                 <X className="w-4 h-4" strokeWidth={1.8} />
@@ -207,29 +207,33 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
 
             {/* Previsualización de Imagen Pegada con Ctrl+V o Adjunta */}
             {attachedMedia && (
-              <div className="px-4 py-2 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="mx-3.5 mb-2 px-3 py-2 rounded-2xl border border-slate-700/80 bg-slate-900/90 backdrop-blur-md flex items-center justify-between shadow-lg">
+                <div className="flex items-center gap-2.5">
                   <img
                     src={attachedMedia.previewUrl}
                     alt="Adjunto efímero"
-                    className="w-10 h-10 object-cover rounded-lg border border-slate-700"
+                    className="w-10 h-10 object-cover rounded-xl border border-slate-700"
                   />
                   <div className="text-[11px] text-slate-300">
-                    <span className="block font-medium">Captura cargada en RAM</span>
-                    <span className="text-slate-500 text-[10px]">Cero almacenamiento en Storage</span>
+                    <span className="block font-medium text-white">Comprobante / Ticket</span>
+                    <span className="text-slate-400 text-[10px]">Listo para análisis con IA</span>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={clearAttachedMedia}
-                  className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800"
+                  className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition active:scale-95"
                 >
-                  <X className="w-3.5 h-3.5" strokeWidth={2} />
+                  <X className="w-4 h-4" strokeWidth={2} />
                 </button>
               </div>
             )}
 
-            <form onSubmit={handleSend} className="p-3 border-t border-slate-800/80 bg-slate-900/50 flex items-center gap-2">
+            {/* Barra de Entrada Flotante Estilo iOS / Apple iMessage */}
+            <form
+              onSubmit={handleSend}
+              className="px-3.5 pb-4 pt-2 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent flex items-center gap-2 select-none"
+            >
               <input
                 ref={fileInputRef}
                 type="file"
@@ -237,37 +241,50 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
                 className="hidden"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) attachImageFile(f); }}
               />
+
+              {/* Botón Circular + Flotante */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title="Adjuntar pantallazo o ticket"
-                className="text-slate-400 hover:text-slate-200 p-2 rounded-full hover:bg-slate-800 transition"
+                aria-label="Adjuntar imagen o ticket"
+                className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center shrink-0 border border-slate-700/70 shadow-md transition-all duration-200 active:scale-90"
               >
-                <ImageIcon className="w-4 h-4" strokeWidth={1.8} />
+                <Plus className="w-5 h-5" strokeWidth={2} />
               </button>
-              <CopilotVoiceMic
-                isRecording={isRecording}
-                onStartRecording={startRecording}
-                onStopRecording={stopRecording}
-                disabled={isSending || isCopilotDisabled}
-              />
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isSending || isCopilotDisabled}
-                placeholder={isRecording ? "Escuchando..." : "Dicta o escribe instrucción..."}
-                className="flex-1 bg-slate-900 border border-slate-800 focus:border-amber-500/80 rounded-full px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
-              />
-              <button
-                type="submit"
-                disabled={(!inputText.trim() && !attachedMedia) || isSending || isCopilotDisabled}
-                className="w-8 h-8 rounded-full bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-white flex items-center justify-center transition shadow select-none"
-                aria-label="Enviar mensaje"
-              >
-                <Send className="w-3.5 h-3.5" strokeWidth={2} />
-              </button>
+
+              {/* Cápsula Flotante Unificada iMessage */}
+              <div className="flex-1 min-h-[46px] flex items-center bg-slate-900/90 border border-slate-700/70 focus-within:border-amber-500/80 focus-within:ring-2 focus-within:ring-amber-500/20 rounded-full px-3.5 py-1.5 shadow-lg backdrop-blur-md transition-all duration-200">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isSending || isCopilotDisabled}
+                  placeholder={isRecording ? "Escuchando..." : "Dicta o escribe instrucción..."}
+                  className="flex-1 bg-transparent text-xs sm:text-sm text-white placeholder-slate-400/80 outline-none pr-1.5"
+                />
+
+                {/* Transición fluida: Botón de Enviar o Micrófono Integrado */}
+                {Boolean(inputText.trim() || attachedMedia) ? (
+                  <button
+                    type="submit"
+                    disabled={isSending || isCopilotDisabled}
+                    className="w-7 h-7 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center transition-all duration-200 shadow-md active:scale-90 shrink-0 select-none animate-in zoom-in-75 duration-150"
+                    aria-label="Enviar mensaje"
+                  >
+                    <ArrowUp className="w-4 h-4" strokeWidth={2.6} />
+                  </button>
+                ) : (
+                  <CopilotVoiceMic
+                    variant="inline"
+                    isRecording={isRecording}
+                    onStartRecording={startRecording}
+                    onStopRecording={stopRecording}
+                    disabled={isSending || isCopilotDisabled}
+                  />
+                )}
+              </div>
             </form>
           </div>
         </div>
