@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Store } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { BusinessBillingRowDTO } from "@/types/finance";
-import { BusinessBillingRow } from "./BusinessBillingRow";
+import { BusinessBillingRow, BusinessBillingCard } from "./BusinessBillingRow";
 
 interface BusinessBillingTableProps {
   rows?: BusinessBillingRowDTO[];
@@ -109,10 +109,10 @@ export const BusinessBillingTable: React.FC<BusinessBillingTableProps> = ({
         </div>
       </div>
 
-      {/* Contenedor Virtualizado 60 FPS */}
+      {/* Vista Desktop / PC: Tabla Virtualizada 60 FPS */}
       <div
         ref={parentRef}
-        className="overflow-auto max-h-[520px] rounded-xl border border-slate-200/70 dark:border-slate-800/70 scrollbar-thin"
+        className="hidden md:block overflow-auto max-h-[520px] rounded-xl border border-slate-200/70 dark:border-slate-800/70 scrollbar-thin"
       >
         <table className="w-full text-left border-collapse min-w-[620px]">
           <thead className="sticky top-0 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-sm z-10 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80 dark:border-slate-800/80">
@@ -169,6 +169,31 @@ export const BusinessBillingTable: React.FC<BusinessBillingTableProps> = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Vista Celular / Mobile: Lista de Tarjeticas Elegantes */}
+      <div className="block md:hidden overflow-auto max-h-[560px] space-y-3 p-0.5 scrollbar-thin">
+        {isLoading && (
+          <div className="py-12 text-center text-xs text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80">
+            Cargando directorio de cobro...
+          </div>
+        )}
+
+        {!isLoading && rows.length === 0 && (
+          <div className="py-12 text-center text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 p-6">
+            <Store className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" strokeWidth={1.5} />
+            <p className="text-xs font-medium">No se encontraron negocios con este filtro</p>
+            <p className="text-[10px] text-slate-400">Prueba con otra búsqueda o selecciona "Todos"</p>
+          </div>
+        )}
+
+        {!isLoading && rows.length > 0 && rows.map((row) => (
+          <BusinessBillingCard
+            key={row.id}
+            row={row}
+            onOpenPaymentModal={onOpenPaymentModal}
+          />
+        ))}
       </div>
 
       {/* Pie de tabla con total */}

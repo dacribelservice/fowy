@@ -5,7 +5,8 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { 
   ShieldCheck, Calendar, Receipt, Share2, 
-  Layers, PackageCheck, AlertCircle, ArrowUpRight, Loader2 
+  Layers, PackageCheck, AlertCircle, ArrowUpRight, Loader2,
+  Camera, Clapperboard, Printer, UtensilsCrossed, QrCode
 } from "lucide-react";
 
 interface Props {
@@ -142,24 +143,48 @@ export function BusinessSubscriptionReadOnlyView({ businessId }: Props) {
         </div>
       </div>
 
-      {/* Mochila Flexible: Entregables de Calle (deliverables JSONB) */}
+      {/* Mochila Flexible: Entregables de Calle (5 Entregables Clave) */}
       <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm space-y-3">
         <div className="flex items-center gap-2 text-slate-700 font-bold text-xs uppercase tracking-wider">
           <PackageCheck className="w-4 h-4 text-fowy-primary" />
-          <span>Entregables Comerciales (Mochila Flexible JSONB)</span>
+          <span>Entregables Comerciales (5 Entregables Clave)</span>
         </div>
-        {Object.keys(deliverables).length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {Object.entries(deliverables).map(([itemKey, val]) => (
-              <div key={itemKey} className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 text-xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">{itemKey}</span>
-                <span className="font-semibold text-slate-700">{String(val)}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
+          {[
+            { key: "fotos", altKey: "photos", label: "Fotos", icon: Camera },
+            { key: "videos", altKey: "video", label: "Videos", icon: Clapperboard },
+            { key: "volantes", altKey: "flyers", label: "Volantes", icon: Printer },
+            { key: "menu_ready", altKey: "menu", label: "Menú Listo", icon: UtensilsCrossed },
+            { key: "stickers_qr", altKey: "qr", label: "Stickers QR", icon: QrCode },
+          ].map((item) => {
+            const Icon = item.icon;
+            const val = deliverables[item.key] ?? deliverables[item.altKey];
+            const isDone = val === "delivered" || val === "done" || val === true;
+
+            return (
+              <div
+                key={item.key}
+                className={`p-3 rounded-2xl border flex flex-col items-center text-center gap-1.5 transition-all ${
+                  isDone
+                    ? "bg-orange-50/70 border-orange-500/80 text-orange-600 shadow-sm"
+                    : "bg-white border-slate-200 text-slate-400"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${
+                  isDone ? "bg-orange-500/10 text-orange-500" : "bg-slate-100 text-slate-400"
+                }`}>
+                  <Icon className="w-4 h-4" strokeWidth={1.8} />
+                </div>
+                <span className="text-[11px] font-bold text-slate-700">{item.label}</span>
+                <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
+                  isDone ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-400"
+                }`}>
+                  {isDone ? "Entregado" : "Pendiente"}
+                </span>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-slate-400 italic">No hay entregables registrados aún para este restaurante.</p>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       {/* Aviso Directivo */}
