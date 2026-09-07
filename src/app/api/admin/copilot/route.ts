@@ -20,9 +20,24 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Verificación de sesión de administrador
-  const role = user?.app_metadata?.role || user?.user_metadata?.role;
-  if (!user || (role !== "admin" && process.env.NODE_ENV !== "development")) {
+  if (!user) {
+    return NextResponse.json({ error: "Acceso denegado: sesión no iniciada" }, { status: 401 });
+  }
+
+  // Verificación de rol admin o super_admin (metadata o tabla profiles)
+  const metaRole = user.app_metadata?.role || user.user_metadata?.role;
+  let isAdmin = metaRole === "admin" || metaRole === "super_admin";
+
+  if (!isAdmin) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+  }
+
+  if (!isAdmin && process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Acceso denegado: requiere rol admin" }, { status: 401 });
   }
 
