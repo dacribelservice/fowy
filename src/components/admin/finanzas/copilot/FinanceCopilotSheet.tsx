@@ -14,6 +14,62 @@ interface FinanceCopilotSheetProps {
  * Panel Flotante Adaptativo del Agente FOWY (CFO & Secretaria) (<220L).
  * Móvil: bottom-24 right-4 y Bottom Sheet; Desktop: Drawer lateral.
  */
+function renderFormattedMessage(text: string, isUser: boolean = false) {
+  if (!text) return null;
+
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-1">
+      {lines.map((line, lineIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={lineIdx} className="h-1" />;
+        }
+
+        // Detectar viñetas: empieza con "* " o "- "
+        const isBullet = trimmed.startsWith("* ") || trimmed.startsWith("- ");
+        const cleanLine = isBullet ? trimmed.replace(/^[\*\-]\s+/, "") : line;
+
+        // Parsear negritas: **texto**
+        const parts = cleanLine.split(/(\*\*[^*]+\*\*)/g);
+
+        const renderedLine = parts.map((part, partIdx) => {
+          if (part.startsWith("**") && part.endsWith("**")) {
+            const boldText = part.slice(2, -2);
+            return (
+              <strong
+                key={partIdx}
+                className={isUser ? "font-bold text-white" : "font-bold text-white tracking-wide"}
+              >
+                {boldText}
+              </strong>
+            );
+          }
+          return <React.Fragment key={partIdx}>{part}</React.Fragment>;
+        });
+
+        if (isBullet) {
+          return (
+            <div key={lineIdx} className="flex items-start gap-1.5 pl-0.5 my-0.5">
+              <span className={`select-none text-[12px] leading-none mt-0.5 ${isUser ? "text-white/80" : "text-amber-400 font-bold"}`}>
+                •
+              </span>
+              <div className="flex-1 leading-relaxed">{renderedLine}</div>
+            </div>
+          );
+        }
+
+        return (
+          <p key={lineIdx} className="leading-relaxed">
+            {renderedLine}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayTasksCount = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -114,13 +170,13 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
                   className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
                 >
                   <div
-                    className={`px-3.5 py-2.5 rounded-2xl shadow-sm whitespace-pre-line leading-relaxed ${
+                    className={`px-3.5 py-2.5 rounded-2xl shadow-sm leading-relaxed ${
                       msg.sender === "user"
                         ? "bg-amber-600 text-white rounded-tr-none max-w-[85%]"
                         : "bg-slate-900 text-slate-200 border border-slate-800 rounded-tl-none max-w-[92%]"
                     }`}
                   >
-                    {msg.text}
+                    {renderFormattedMessage(msg.text, msg.sender === "user")}
                   </div>
 
                   {/* Tarjeta estructurada de pre-confirmación en 2 pasos */}
