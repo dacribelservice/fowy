@@ -67,7 +67,7 @@ export const FinanceCopilotSheet: React.FC<FinanceCopilotSheetProps> = ({ todayT
 
       {/* 2. Panel Desplegable: Bottom Sheet en móvil (<768px) / Drawer lateral en desktop (>=768px) */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[70] flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div
             onPaste={handlePaste}
             className="w-full md:w-[420px] h-[88vh] md:h-full mt-auto md:mt-0 rounded-t-3xl md:rounded-none md:rounded-l-3xl bg-slate-950 border-t md:border-t-0 md:border-l border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom md:slide-in-from-right duration-300"
