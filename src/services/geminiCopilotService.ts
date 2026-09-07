@@ -64,7 +64,7 @@ export async function generateCopilotResponse(
     return { text: '', error: 'GEMINI_API_KEY no configurada en variables de entorno' };
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
   const systemText = liveContext
     ? `${SYSTEM_INSTRUCTION}\n\n[CONTEXTO OPERATIVO EN VIVO]:\n${JSON.stringify(liveContext)}`
     : SYSTEM_INSTRUCTION;

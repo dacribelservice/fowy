@@ -9,10 +9,13 @@ import { BusinessTopBar, BusinessProfileCard, BusinessBasicSettings } from "@/co
 import { BusinessLocationManager } from "@/components/admin/businesses/BusinessLocationManager";
 import { BusinessModuleManager } from "@/components/admin/businesses/BusinessModuleManager";
 import { BusinessPaymentViewer } from "@/components/admin/businesses/BusinessPaymentViewer";
+import { BusinessSubscriptionReadOnlyView } from "@/components/admin/businesses/BusinessSubscriptionReadOnlyView";
 import { BusinessPlanPill } from "@/components/admin/businesses/BusinessPlanPill";
 import { BusinessMetricsList } from "@/components/admin/businesses/BusinessMetricsList";
 import { BusinessTrafficChart } from "@/components/admin/businesses/BusinessTrafficChart";
 import { FowySalesChart } from "@/components/admin/businesses/FowySalesChart";
+
+const USE_SATELLITE_FINANCE_VIEW = true;
 
 
 export interface BusinessData {
@@ -188,16 +191,24 @@ export default function BusinessDetailsPage() {
             ) : (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <BusinessBasicSettings 
-                    business={business} 
-                    onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
-                  />
+                  {!USE_SATELLITE_FINANCE_VIEW && (
+                    <BusinessBasicSettings 
+                      business={business} 
+                      onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)} 
+                    />
+                  )}
 
-                  <BusinessPaymentViewer 
-                    business={business} 
-                    onRefresh={fetchBusiness} 
-                    onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)}
-                  />
+                  {USE_SATELLITE_FINANCE_VIEW ? (
+                    <div className="md:col-span-2">
+                      <BusinessSubscriptionReadOnlyView businessId={business.id} />
+                    </div>
+                  ) : (
+                    <BusinessPaymentViewer 
+                      business={business} 
+                      onRefresh={fetchBusiness} 
+                      onChange={(updates) => setBusiness({ ...business, ...updates } as BusinessData)}
+                    />
+                  )}
 
                   <div className="md:col-span-2">
                     <BusinessLocationManager 

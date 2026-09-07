@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/financial-audit?action=nightly_close",
+      "schedule": "59 4 * * *"
+    },
+    {
+      "path": "/api/cron/financial-audit?action=morning_briefing",
+      "schedule": "0 13 * * *"
+    }
+  ]
+}

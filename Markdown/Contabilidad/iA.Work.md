@@ -307,11 +307,11 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
 
 ---
 
-- [ ] **Fase 6: Automatización de Crons, Modo Lectura en Negocios & Aduana Final**
-  - [ ] **Punto 6.1 (Endpoint Cron Dual con Mapeo Colombia UTC-5):** Crear `src/app/api/cron/financial-audit/route.ts` (<200L) protegido con `Authorization: Bearer ${CRON_SECRET}`:
+- [x] **Fase 6: Automatización de Crons, Modo Lectura en Negocios & Aduana Final**
+  - [x] **Punto 6.1 (Endpoint Cron Dual con Mapeo Colombia UTC-5):** Crear `src/app/api/cron/financial-audit/route.ts` (<200L) protegido con `Authorization: Bearer ${CRON_SECRET}`:
     - Rama `?action=nightly_close` (11:59 PM Colombia = `04:59 UTC`): Generación del balance inmutable en `daily_financial_reports` y purga de eventos mayores a 7 días en `processed_webhook_events`.
     - Rama `?action=morning_briefing` (8:00 AM Colombia = `13:00 UTC`): Consulta de agenda y cobros del día con despacho automático a WhatsApp vía `evolutionService.ts`.
-  - [ ] **Punto 6.2 (Configuración Vercel Cron):** Crear `vercel.json` en la raíz del proyecto:
+  - [x] **Punto 6.2 (Configuración Vercel Cron):** Crear `vercel.json` en la raíz del proyecto:
     ```json
     {
       "crons": [
@@ -326,8 +326,8 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
       ]
     }
     ```
-  - [ ] **Punto 6.3 (Componente Satélite Modo Lectura):** Crear `src/components/admin/businesses/BusinessSubscriptionReadOnlyView.tsx` (<180L) para visualizar estatus, fechas, módulos activos desde `modules JSONB` y entregables desde `deliverables JSONB`, con botón para compartir recibo por WhatsApp.
-  - [ ] **Punto 6.4 (Conexión Segura con Rollback en 30 Segundos en Negocios):** Integrar el visor en [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/negocios/[id]/page.tsx) preservando `BusinessPaymentViewer` intacto:
+  - [x] **Punto 6.3 (Componente Satélite Modo Lectura):** Crear `src/components/admin/businesses/BusinessSubscriptionReadOnlyView.tsx` (<180L) para visualizar estatus, fechas, módulos activos desde `modules JSONB` y entregables desde `deliverables JSONB`, con botón para compartir recibo por WhatsApp.
+  - [x] **Punto 6.4 (Conexión Segura con Rollback en 30 Segundos en Negocios):** Integrar el visor en [page.tsx](file:///c:/Users/cange/Documents/fowy/src/app/admin/negocios/[id]/page.tsx) preservando `BusinessPaymentViewer` intacto:
     ```tsx
     const USE_SATELLITE_FINANCE_VIEW = true;
     // ...
@@ -341,12 +341,12 @@ En estricto cumplimiento con **[`Markdown/conceptos.md`](file:///c:/Users/cange/
       />
     )}
     ```
-  - [ ] **Punto 6.5 (Aduana Obligatoria de Compilación Local):** Ejecutar en la terminal local:
+  - [x] **Punto 6.5 (Aduana Obligatoria de Compilación Local):** Ejecutar en la terminal local:
     ```bash
     npm run build
     ```
     Certificando `Exit code: 0`, exactamente 0 errores de TypeScript y 0 advertencias de ESLint.
-  - [ ] **Punto 6.6 (Definition of Done — Validación de Release Final):**
+  - [x] **Punto 6.6 (Definition of Done — Validación de Release Final):**
     - Simular llamada al cron con `action=nightly_close` y certificar creación de fila en `daily_financial_reports`.
     - Abrir `/admin/negocios/[id]` y verificar que el modo lectura se renderiza sin errores.
     - Simular rollback en 30 segundos cambiando `USE_SATELLITE_FINANCE_VIEW = false` y verificar que el formulario anterior revive sin afectación.
